@@ -1,4 +1,5 @@
 #include "../ui-base.hpp"
+#include <nall/bps/patch.hpp>
 Cartridge cartridge;
 
 //================
@@ -263,30 +264,54 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
   if(reader.load(filename, data, size) == false) return false;
 
   patchApplied = false;
-  string name(filepath(nall::basename(filename), config().path.patch), ".ups");
 
-  file fp;
-  if(config().file.applyPatches && fp.open(name, file::mode::read)) {
-    unsigned patchsize = fp.size();
-    uint8_t *patchdata = new uint8_t[patchsize];
-    fp.read(patchdata, patchsize);
-    fp.close();
+  string bpsName(filepath(nall::basename(filename), config().path.patch), ".bps");
+  string upsName(filepath(nall::basename(filename), config().path.patch), ".ups");
 
-    uint8_t *outdata = 0;
-    unsigned outsize = 0;
-    ups patcher;
-    if(patcher.apply(patchdata, patchsize, data, size, 0, outsize) == ups::result::target_too_small) {
-      outdata = new uint8_t[outsize];
-      if(patcher.apply(patchdata, patchsize, data, size, outdata, outsize) == ups::result::success) {
+  if(config().file.applyPatches) {
+    if(file::exists(bpsName)) {
+      bpspatch bps;
+      bps.modify(bpsName);
+
+      unsigned targetSize = bps.size();
+      uint8_t *targetData = new uint8_t[targetSize];
+
+      bps.source(data, size);
+      bps.target(targetData, targetSize);
+
+      if(bps.apply() == bpspatch::result::success) {
         delete[] data;
-        data = outdata;
-        size = outsize;
+        data = targetData;
+        size = targetSize;
         patchApplied = true;
       } else {
-        delete[] outdata;
+        delete[] targetData;
+      }
+    } else {
+      file fp;
+      if(config().file.applyPatches && fp.open(upsName, file::mode::read)) {
+        unsigned patchsize = fp.size();
+        uint8_t *patchdata = new uint8_t[patchsize];
+        fp.read(patchdata, patchsize);
+        fp.close();
+
+        uint8_t *outdata = 0;
+        unsigned outsize = 0;
+        ups patcher;
+        if(patcher.apply(patchdata, patchsize, data, size, 0, outsize) == ups::result::target_too_small) {
+          outdata = new uint8_t[outsize];
+          if(patcher.apply(patchdata, patchsize, data, size, outdata, outsize) == ups::result::success) {
+            delete[] data;
+            data = outdata;
+            size = outsize;
+            patchApplied = true;
+          } else {
+            delete[] outdata;
+          }
+        }
+        delete[] patchdata;
       }
     }
-    delete[] patchdata;
   }
 
   name = string(nall::basename(filename), ".xml");
