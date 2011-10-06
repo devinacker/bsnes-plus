@@ -288,15 +288,12 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
         delete[] targetData;
       }
     } else {
-      file fp;
-      if(config().file.applyPatches && fp.open(upsName, file::mode::read)) {
-        unsigned patchsize = fp.size();
-        uint8_t *patchdata = new uint8_t[patchsize];
-        fp.read(patchdata, patchsize);
-        fp.close();
-
+      filemap fp;
+      if(config().file.applyPatches && fp.open(upsName, filemap::mode::read)) {
         uint8_t *outdata = 0;
         unsigned outsize = 0;
+        const uint8_t *patchdata = fp.data();
+        unsigned patchsize = fp.size();
         ups patcher;
         if(patcher.apply(patchdata, patchsize, data, size, 0, outsize) == ups::result::target_too_small) {
           outdata = new uint8_t[outsize];
@@ -309,7 +306,6 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
             delete[] outdata;
           }
         }
-        delete[] patchdata;
       }
     }
   }
