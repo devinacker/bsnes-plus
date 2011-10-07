@@ -27,7 +27,7 @@ void Utility::modifySystemState(system_state_t systemState) {
 
       showMessage(string()
       << "Loaded " << cartridge.name
-      << (cartridge.patchApplied ? ", and applied UPS patch." : "."));
+      << (cartridge.patchApplied ? ", and applied BPS/UPS patch." : "."));
       mainWindow->setWindowTitle(string() << cartridge.name << " - " << SNES::Info::Name << " v" << SNES::Info::Version);
       #if defined(DEBUGGER)
       debugger->echo(string() << "Loaded " << cartridge.name << ".<br>");
