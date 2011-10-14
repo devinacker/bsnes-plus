@@ -255,6 +255,55 @@ void Cartridge::saveCheats() {
 //private functions
 //=================
 
+bool Cartridge::applyBPS(string &filename, uint8_t *&data, unsigned &size) {
+  if(file::exists(filename) == false)
+    return false;
+
+  bpspatch bps;
+  bps.modify(filename);
+
+  unsigned targetSize = bps.size();
+  uint8_t *targetData = new uint8_t[targetSize];
+
+  bps.source(data, size);
+  bps.target(targetData, targetSize);
+
+  if(bps.apply() == bpspatch::result::success) {
+    delete[] data;
+    data = targetData;
+    size = targetSize;
+    return true;
+  } else {
+    delete[] targetData;
+  }
+
+  return false;
+}
+
+bool Cartridge::applyUPS(string &filename, uint8_t *&data, unsigned &size) {
+  filemap fp;
+  if(fp.open(filename, filemap::mode::read)) {
+    uint8_t *outdata = 0;
+    unsigned outsize = 0;
+    const uint8_t *patchdata = fp.data();
+    unsigned patchsize = fp.size();
+    ups patcher;
+    if(patcher.apply(patchdata, patchsize, data, size, 0, outsize) == ups::result::target_too_small) {
+      outdata = new uint8_t[outsize];
+      if(patcher.apply(patchdata, patchsize, data, size, outdata, outsize) == ups::result::success) {
+        delete[] data;
+        data = outdata;
+        size = outsize;
+        return true;
+      } else {
+        delete[] outdata;
+      }
+    }
+  }
+
+  return false;
+}
+
 bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &memory) {
   if(file::exists(filename) == false) return false;
 
@@ -263,55 +312,21 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
   audio.clear();
   if(reader.load(filename, data, size) == false) return false;
 
-  patchApplied = false;
+  patchApplied = "";
 
   string bpsName(filepath(nall::basename(filename), config().path.patch), ".bps");
   string upsName(filepath(nall::basename(filename), config().path.patch), ".ups");
 
   if(config().file.applyPatches) {
-    if(file::exists(bpsName)) {
-      bpspatch bps;
-      bps.modify(bpsName);
-
-      unsigned targetSize = bps.size();
-      uint8_t *targetData = new uint8_t[targetSize];
-
-      bps.source(data, size);
-      bps.target(targetData, targetSize);
-
-      if(bps.apply() == bpspatch::result::success) {
-        delete[] data;
-        data = targetData;
-        size = targetSize;
-        patchApplied = true;
-      } else {
-        delete[] targetData;
-      }
-    } else {
-      filemap fp;
-      if(config().file.applyPatches && fp.open(upsName, filemap::mode::read)) {
-        uint8_t *outdata = 0;
-        unsigned outsize = 0;
-        const uint8_t *patchdata = fp.data();
-        unsigned patchsize = fp.size();
-        ups patcher;
-        if(patcher.apply(patchdata, patchsize, data, size, 0, outsize) == ups::result::target_too_small) {
-          outdata = new uint8_t[outsize];
-          if(patcher.apply(patchdata, patchsize, data, size, outdata, outsize) == ups::result::success) {
-            delete[] data;
-            data = outdata;
-            size = outsize;
-            patchApplied = true;
-          } else {
-            delete[] outdata;
-          }
-        }
-      }
+    if(applyBPS(bpsName, data, size)) {
+      patchApplied = "BPS";
+    } else if(applyUPS(upsName, data, size)) {
+      patchApplied = "UPS";
     }
   }
 
   name = string(nall::basename(filename), ".xml");
-  if(patchApplied == false && file::exists(name)) {
+  if(patchApplied == "" && file::exists(name)) {
     //prefer manually created XML cartridge mapping
     xml.readfile(name);
   } else {
