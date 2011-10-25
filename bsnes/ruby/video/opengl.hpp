@@ -36,19 +36,16 @@ public:
   unsigned iwidth, iheight;
 
   void resize(unsigned width, unsigned height) {
-    if(iwidth >= width && iheight >= height) return;
-
-    if(gltexture) glDeleteTextures(1, &gltexture);
+    if(gltexture == 0) glGenTextures(1, &gltexture);
     iwidth  = max(width,  iwidth );
     iheight = max(height, iheight);
     if(buffer) delete[] buffer;
     buffer = new uint32_t[iwidth * iheight];
 
-    glGenTextures(1, &gltexture);
     glBindTexture(GL_TEXTURE_2D, gltexture);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, iwidth);
     glTexImage2D(GL_TEXTURE_2D,
-      /* mip-map level = */ 0, /* internal format = */ GL_RGB,
+      /* mip-map level = */ 0, /* internal format = */ GL_RGBA,
       iwidth, iheight, /* border = */ 0, /* format = */ GL_BGRA,
       GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
   }
