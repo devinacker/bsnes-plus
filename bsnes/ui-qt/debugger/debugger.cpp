@@ -206,6 +206,7 @@ void Debugger::stepAction() {
 
 void Debugger::stepOverAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepOver;
+  SNES::debugger.step_over_new = true;
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;

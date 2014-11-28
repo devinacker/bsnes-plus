@@ -26,6 +26,7 @@ public:
     None, StepInto, StepOver, StepOut 
   } step_type;
   int call_count;
+  bool step_over_new;
 
   enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM };
   uint8 read(MemorySource, unsigned addr);

@@ -23,12 +23,18 @@ void CPUDebugger::op_step() {
   // adjust call count if this is a call or return
   // (or if we're stepping over and no call occurred)
   // (TODO: track interrupts as well?)
-  uint8 opcode = CPU::op_read(opcode_pc);
-  if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
-    debugger.call_count++;
-  } else if (opcode == 0x60 || opcode == 0x6b || 
-             (debugger.call_count == 0 && debugger.step_type == Debugger::StepType::StepOver)) {
-    debugger.call_count--;
+  if (debugger.step_cpu) {
+    if (debugger.step_over_new && debugger.call_count == 0) {
+      debugger.call_count = -1;
+      debugger.step_over_new = false;
+    }
+  
+    uint8 opcode = CPU::op_read(opcode_pc);
+    if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
+      debugger.call_count++;
+    } else if (opcode == 0x60 || opcode == 0x6b) {
+      debugger.call_count--;
+    }
   }
   
   opcode_edge = false;

@@ -22,13 +22,20 @@ void SMPDebugger::op_step() {
   // adjust call count if this is a call or return
   // (or if we're stepping over and no call occurred)
   // (TODO: track interrupts as well?)
-  uint8 opcode = SMP::op_read(opcode_pc);
-  if (opcode == 0x3f || opcode == 0x4f || (opcode & 0xf) == 0x01) {
-    debugger.call_count++;
-  } else if (opcode == 0x6f || 
-             (debugger.call_count == 0 && debugger.step_type == Debugger::StepType::StepOver)) {
-    debugger.call_count--;
+  if (debugger.step_smp) {
+    if (debugger.step_over_new && debugger.call_count == 0) {
+      debugger.call_count = -1;
+      debugger.step_over_new = false;
+    }
+  
+    uint8 opcode = SMP::op_read(opcode_pc);
+    if (opcode == 0x3f || opcode == 0x4f || (opcode & 0xf) == 0x01) {
+      debugger.call_count++;
+    } else if (opcode == 0x6f) {
+      debugger.call_count--;
+    }
   }
+  
   opcode_edge = false;
 
   SMP::op_step();
