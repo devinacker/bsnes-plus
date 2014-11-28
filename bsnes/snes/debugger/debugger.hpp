@@ -22,6 +22,11 @@ public:
   bool step_cpu;
   bool step_smp;
 
+  enum class StepType : unsigned { 
+    None, StepInto, StepOver, StepOut 
+  } step_type;
+  int call_count;
+
   enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM };
   uint8 read(MemorySource, unsigned addr);
   void write(MemorySource, unsigned addr, uint8 data);

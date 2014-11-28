@@ -8,13 +8,29 @@ void CPUDebugger::op_step() {
   opcode_pc = regs.pc;
 
   opcode_edge = true;
-  if(debugger.step_cpu) {
+  if(debugger.step_cpu &&
+      (debugger.step_type == Debugger::StepType::StepInto ||
+       (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
+      
     debugger.break_event = Debugger::BreakEvent::CPUStep;
+    debugger.step_type = Debugger::StepType::None;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
   } else {
     debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Exec, regs.pc, 0x00);
   }
   if(step_event) step_event();
+
+  // adjust call count if this is a call or return
+  // (or if we're stepping over and no call occurred)
+  // (TODO: track interrupts as well?)
+  uint8 opcode = CPU::op_read(opcode_pc);
+  if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
+    debugger.call_count++;
+  } else if (opcode == 0x60 || opcode == 0x6b || 
+             (debugger.call_count == 0 && debugger.step_type == Debugger::StepType::StepOver)) {
+    debugger.call_count--;
+  }
+  
   opcode_edge = false;
 
   CPU::op_step();

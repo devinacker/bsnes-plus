@@ -7,13 +7,28 @@ void SMPDebugger::op_step() {
   opcode_pc = regs.pc;
 
   opcode_edge = true;
-  if(debugger.step_smp) {
+  if(debugger.step_smp &&
+      (debugger.step_type == Debugger::StepType::StepInto ||
+       (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
+      
     debugger.break_event = Debugger::BreakEvent::SMPStep;
+    debugger.step_type = Debugger::StepType::None;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
   } else {
     debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Exec, regs.pc, 0x00);
   }
   if(step_event) step_event();
+
+  // adjust call count if this is a call or return
+  // (or if we're stepping over and no call occurred)
+  // (TODO: track interrupts as well?)
+  uint8 opcode = SMP::op_read(opcode_pc);
+  if (opcode == 0x3f || opcode == 0x4f || (opcode & 0xf) == 0x01) {
+    debugger.call_count++;
+  } else if (opcode == 0x6f || 
+             (debugger.call_count == 0 && debugger.step_type == Debugger::StepType::StepOver)) {
+    debugger.call_count--;
+  }
   opcode_edge = false;
 
   SMP::op_step();

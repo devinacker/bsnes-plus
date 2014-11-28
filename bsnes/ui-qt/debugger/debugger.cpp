@@ -63,12 +63,23 @@ Debugger::Debugger() {
   commandLayout = new QHBoxLayout;
   controlLayout->addLayout(commandLayout);
 
-  runBreak = new QPushButton("Break");
+  // TODO: icons/hotkeys instead of text
+  runBreak = new QToolButton;
+  runBreak->setText("Brk");
   commandLayout->addWidget(runBreak);
   commandLayout->addSpacing(Style::WidgetSpacing);
 
-  stepInstruction = new QPushButton("Step");
+  stepInstruction = new QToolButton;
+  stepInstruction->setText("Step");
   commandLayout->addWidget(stepInstruction);
+
+  stepOver = new QToolButton;
+  stepOver->setText("Over");
+  commandLayout->addWidget(stepOver);
+
+  stepOut = new QToolButton;
+  stepOut->setText("Out");
+  commandLayout->addWidget(stepOut);
 
   controlLayout->addSpacing(Style::WidgetSpacing);
 
@@ -77,6 +88,8 @@ Debugger::Debugger() {
 
   stepSMP = new QCheckBox("Step S-SMP");
   controlLayout->addWidget(stepSMP);
+
+  controlLayout->addSpacing(Style::WidgetSpacing);
 
   traceCPU = new QCheckBox("Trace S-CPU opcodes");
   controlLayout->addWidget(traceCPU);
@@ -114,7 +127,11 @@ Debugger::Debugger() {
   connect(menu_misc_options, SIGNAL(triggered()), debuggerOptions, SLOT(show()));
 
   connect(runBreak, SIGNAL(released()), this, SLOT(toggleRunStatus()));
+  
   connect(stepInstruction, SIGNAL(released()), this, SLOT(stepAction()));
+  connect(stepOver, SIGNAL(released()), this, SLOT(stepOverAction()));
+  connect(stepOut, SIGNAL(released()), this, SLOT(stepOutAction()));
+  
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
   connect(traceCPU, SIGNAL(stateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
@@ -153,7 +170,12 @@ void Debugger::modifySystemState(unsigned state) {
 
 void Debugger::synchronize() {
   runBreak->setText(application.debug ? "Run" : "Break");
-  stepInstruction->setEnabled(SNES::cartridge.loaded() && application.debug && (stepCPU->isChecked() || stepSMP->isChecked()));
+  bool stepEnabled = SNES::cartridge.loaded() && application.debug && (stepCPU->isChecked() || stepSMP->isChecked());
+  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() == 1);
+  
+  stepInstruction->setEnabled(stepEnabled);
+  stepOver->setEnabled(stepOtherEnabled);
+  stepOut->setEnabled(stepOtherEnabled);
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
   SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
 
@@ -173,9 +195,26 @@ void Debugger::toggleRunStatus() {
   application.debug = !application.debug;
   if(!application.debug) application.debugrun = false;
   synchronize();
+  
+  // TODO: disassemble current address when breaking (if any are selected)
 }
 
 void Debugger::stepAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepInto;
+  application.debugrun = true;
+}
+
+void Debugger::stepOverAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepOver;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+}
+
+void Debugger::stepOutAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepOut;
+  SNES::debugger.call_count = 0;
+  
   application.debugrun = true;
 }
 
@@ -192,7 +231,7 @@ void Debugger::event() {
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a00000'>" << s << "</font><br>");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
       }
 
@@ -201,7 +240,7 @@ void Debugger::event() {
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a00000'>" << t << "</font><br>");
+        echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
       }
     } break;

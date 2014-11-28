@@ -20,8 +20,10 @@ public:
   QTextEdit *console;
   QVBoxLayout *controlLayout;
   QHBoxLayout *commandLayout;
-  QPushButton *runBreak;
-  QPushButton *stepInstruction;
+  QToolButton *runBreak;
+  QToolButton *stepInstruction;
+  QToolButton *stepOver;
+  QToolButton *stepOut;
   QCheckBox *stepCPU;
   QCheckBox *stepSMP;
   QCheckBox *traceCPU;
@@ -42,6 +44,8 @@ public slots:
 
   void toggleRunStatus();
   void stepAction();
+  void stepOverAction();
+  void stepOutAction();
 
 private:
   unsigned frameCounter;
