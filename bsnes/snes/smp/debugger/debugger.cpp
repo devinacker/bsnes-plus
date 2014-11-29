@@ -44,7 +44,8 @@ void SMPDebugger::op_step() {
 
 alwaysinline uint8_t SMPDebugger::op_readpc() {
   usage[regs.pc] |= UsageExec;
-  return SMP::op_readpc();
+  // execute code without setting read flag
+  return SMP::op_read(regs.pc++);
 }
 
 uint8 SMPDebugger::op_read(uint16 addr) {

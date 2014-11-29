@@ -53,7 +53,8 @@ alwaysinline uint8_t CPUDebugger::op_readpc() {
   int offset = cartridge.rom_offset(regs.pc);
   if (offset >= 0) cart_usage[offset] |= UsageExec;
   
-  return CPU::op_readpc();
+  // execute code without setting read flag
+  return CPU::op_read((regs.pc.b << 16) + regs.pc.w++);
 }
 
 uint8 CPUDebugger::op_read(uint32 addr) {
