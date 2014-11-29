@@ -47,6 +47,11 @@ void CPUDebugger::op_step() {
   synchronize_smp();
 }
 
+alwaysinline uint8_t CPUDebugger::op_readpc() {
+  usage[regs.pc] |= UsageExec;
+  return CPU::op_readpc();
+}
+
 uint8 CPUDebugger::op_read(uint32 addr) {
   uint8 data = CPU::op_read(addr);
   usage[addr] |= UsageRead;

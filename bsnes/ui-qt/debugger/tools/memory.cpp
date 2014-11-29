@@ -12,9 +12,10 @@ MemoryEditor::MemoryEditor() {
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  editor = new HexEditor;
+  editor = new MemHexEditor;
   editor->reader = { &MemoryEditor::reader, this };
   editor->writer = { &MemoryEditor::writer, this };
+  editor->usage  = { &MemoryEditor::usage, this };
   editor->setFont(QFont(Style::Monospace));
   editor->setMinimumWidth((editor->lineWidth() + 3) * editor->fontMetrics().width(' '));
   editor->setMinimumHeight((16 + 1) * editor->fontMetrics().height());
@@ -166,4 +167,56 @@ uint8_t MemoryEditor::reader(unsigned addr) {
 
 void MemoryEditor::writer(unsigned addr, uint8_t data) {
   SNES::debugger.write(memorySource, addr, data);
+}
+
+uint8_t MemoryEditor::usage(unsigned addr) {
+  // TODO ...
+  if (memorySource == SNES::Debugger::MemorySource::CPUBus && addr < 1 << 24) {
+    return SNES::cpu.usage[addr];
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::APURAM && addr < 1 << 16) {
+    return SNES::smp.usage[addr];
+  }
+  
+  return 0;
+}
+
+void MemHexEditor::refresh() {
+  string output;
+  char temp[256];
+  unsigned offset = editorOffset;
+
+  for(unsigned y = 0; y < editorRows; y++) {
+    if(offset >= editorSize) break;
+    sprintf(temp, "%.4x:%.4x", (offset >> 16) & 0xffff, (offset >> 0) & 0xffff);
+    output << "<font color='#808080'>" << temp << "</font>&nbsp;&nbsp;";
+
+    for(unsigned x = 0; x < editorColumns; x++) {
+      if(offset >= editorSize) break;
+      sprintf(temp, "%.2x", reader ? reader(offset) : 0x00);
+	  
+	  string color;
+	  uint8_t this_usage = usage ? usage(offset) : 0;
+	  
+	  if (this_usage & UsageExec) {
+	    // code: red text
+	    color = (x & 1) ? "#800000" : "#ff0000";
+	  } else if (this_usage & UsageRead || this_usage & UsageWrite) {
+	    // data: blue text
+	    color = (x & 1) ? "#000080" : "#0000ff";
+	  } else {
+	    // unknown: grey text
+	    color = (x & 1) ? "#404040" : "#808080";
+	  }
+	  
+      output << "<font color='" << color << "'>" << temp << "</font>";
+      if(x != (editorColumns - 1)) output << "&nbsp;";
+	  
+      offset++;
+    }
+
+    if(y != (editorRows - 1)) output << "<br>";
+  }
+
+  setHtml(output);
 }

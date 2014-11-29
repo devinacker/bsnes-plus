@@ -16,6 +16,7 @@ public:
   bool opcode_edge;  //true right before an opcode execues, used to skip over opcodes
 
   void op_step();
+  virtual uint8_t op_readpc();
   uint8 op_read(uint32 addr);
   void op_write(uint32 addr, uint8 data);
 

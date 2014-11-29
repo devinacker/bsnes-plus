@@ -19,7 +19,7 @@ public:
   void setOffset(unsigned offset);
   void setSize(unsigned size);
   unsigned lineWidth() const;
-  void refresh();
+  virtual void refresh();
 
   HexEditor();
 

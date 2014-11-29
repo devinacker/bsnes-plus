@@ -42,6 +42,11 @@ void SMPDebugger::op_step() {
   synchronize_cpu();
 }
 
+alwaysinline uint8_t SMPDebugger::op_readpc() {
+  usage[regs.pc] |= UsageExec;
+  return SMP::op_readpc();
+}
+
 uint8 SMPDebugger::op_read(uint16 addr) {
   uint8 data = SMP::op_read(addr);
   usage[addr] |= UsageRead;
