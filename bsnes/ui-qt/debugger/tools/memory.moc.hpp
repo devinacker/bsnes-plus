@@ -10,6 +10,8 @@ public:
   };
   
   virtual void refresh();
+  unsigned offset() const { return editorOffset; };
+  unsigned size() const { return editorSize; };
 };
 
 class MemoryEditor : public Window {
@@ -23,6 +25,15 @@ public:
   QLineEdit *addr;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
+  
+  QHBoxLayout *toolLayout;
+  QToolButton *prevCodeButton;
+  QToolButton *nextCodeButton;
+  QToolButton *prevDataButton;
+  QToolButton *nextDataButton;
+  QToolButton *prevUnkButton;
+  QToolButton *nextUnkButton;
+  
   QWidget *spacer;
   QPushButton *exportButton;
   QPushButton *importButton;
@@ -42,6 +53,16 @@ public slots:
   void sourceChanged(int);
   void refresh();
   void updateOffset();
+  
+  void prevCode();
+  void nextCode();
+  void prevData();
+  void nextData();
+  void prevUnknown();
+  void nextUnknown();
+  void gotoPrevious(int);
+  void gotoNext(int);
+  
   void exportMemory();
   void importMemory();
   void exportMemory(SNES::Memory&, const string&) const;

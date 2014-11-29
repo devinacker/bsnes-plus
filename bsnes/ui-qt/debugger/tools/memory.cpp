@@ -46,6 +46,24 @@ MemoryEditor::MemoryEditor() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
+  toolLayout = new QHBoxLayout;
+  controlLayout->addLayout(toolLayout);
+  #define tool(widget, icon, text, slot) \
+    widget = new QToolButton; \
+    toolLayout->addWidget(widget); \
+    widget->setAutoRaise(true); \
+    widget->setIcon(QIcon(":16x16/mem-" icon ".png")); \
+    widget->setToolTip(text); \
+    connect(widget, SIGNAL(released()), this, SLOT(slot()))
+  tool(prevCodeButton, "prev-code",    "Previous Code",    prevCode);
+  tool(nextCodeButton, "next-code",    "Next Code",        nextCode);
+  tool(prevDataButton, "prev-data",    "Previous Data",    prevData);
+  tool(nextDataButton, "next-data",    "Next Data",        nextData);
+  tool(prevUnkButton,  "prev-unknown", "Previous Unknown", prevUnknown);
+  tool(nextUnkButton,  "next-unknown", "Next Unknown",     nextUnknown);
+  #undef tool
+  toolLayout->addStretch();
+
   spacer = new QWidget;
   spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
   controlLayout->addWidget(spacer);
@@ -121,6 +139,100 @@ void MemoryEditor::refresh() {
 void MemoryEditor::updateOffset() {
   editor->setOffset(hex(addr->text().toUtf8().data()));
   refresh();
+}
+
+
+void MemoryEditor::prevCode() {
+  gotoPrevious(MemHexEditor::UsageExec);
+}
+
+void MemoryEditor::nextCode() {
+  gotoNext(MemHexEditor::UsageExec);
+}
+
+void MemoryEditor::prevData() {
+  gotoPrevious(MemHexEditor::UsageRead | MemHexEditor::UsageWrite);
+}
+
+void MemoryEditor::nextData() {
+  gotoNext(MemHexEditor::UsageRead | MemHexEditor::UsageWrite);
+}
+
+void MemoryEditor::prevUnknown() {
+  gotoPrevious(0);
+}
+
+void MemoryEditor::nextUnknown() {
+  gotoNext(0);
+}
+
+void MemoryEditor::gotoPrevious(int type) {
+  int offset = (int)editor->offset();
+  bool found = false;
+  SNES::uint8 *usage;
+  
+  if (memorySource == SNES::Debugger::MemorySource::CPUBus) {
+    usage = SNES::cpu.usage;
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::APURAM) {
+    usage = SNES::smp.usage;
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
+    usage = SNES::cpu.cart_usage;
+  } else return;
+  
+  while (--offset >= 0) {
+    bool foundHere = ((type && usage[offset] & type) || (!type && (usage[offset] & 0xf0) == 0));
+    
+    if (found && !foundHere) {
+      offset++; break;
+    } else if (!found && foundHere) {
+      found = foundHere;
+    }
+  }
+  
+  if (offset < 0 && found) offset = 0;
+  
+  if (offset >= 0) {
+    addr->setText(QString::number(offset, 16));
+    updateOffset();
+  } else {
+    QMessageBox::information(this, "Memory Editor", "Reached beginning of memory.", QMessageBox::Ok);
+  }
+}
+
+void MemoryEditor::gotoNext(int type) {
+  int offset = (int)editor->offset();
+  unsigned size = editor->size();
+  bool found = true;
+  SNES::uint8 *usage;
+  
+  if (memorySource == SNES::Debugger::MemorySource::CPUBus) {
+    usage = SNES::cpu.usage;
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::APURAM) {
+    usage = SNES::smp.usage;
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
+    usage = SNES::cpu.cart_usage;
+  } else return;
+  
+  while (++offset < size) {
+    bool foundHere = ((type && usage[offset] & type) || (!type && (usage[offset] & 0xf0) == 0));
+    
+    if (!found && foundHere) {
+      found = true; break;
+    } else if (found && !foundHere) {
+      found = foundHere;
+	}
+  }
+  
+  if (offset < size) {
+    addr->setText(QString::number(offset, 16));
+    updateOffset();
+  } else {
+    QMessageBox::information(this, "Memory Editor", "Reached end of memory.", QMessageBox::Ok);
+  }
 }
 
 void MemoryEditor::exportMemory() {
