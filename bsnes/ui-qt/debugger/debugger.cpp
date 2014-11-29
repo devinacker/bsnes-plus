@@ -84,6 +84,7 @@ Debugger::Debugger() {
   controlLayout->addSpacing(Style::WidgetSpacing);
 
   stepCPU = new QCheckBox("Step S-CPU");
+  stepCPU->setChecked(true);
   controlLayout->addWidget(stepCPU);
 
   stepSMP = new QCheckBox("Step S-SMP");
@@ -194,6 +195,7 @@ void Debugger::clear() {
 void Debugger::toggleRunStatus() {
   application.debug = !application.debug;
   if(!application.debug) application.debugrun = false;
+  else audio.clear();
   synchronize();
   
   // TODO: disassemble current address when breaking (if any are selected)
@@ -263,6 +265,7 @@ void Debugger::event() {
     } break;
   }
 
+  audio.clear();
   autoUpdate();
 }
 
