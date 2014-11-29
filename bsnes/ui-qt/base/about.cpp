@@ -29,17 +29,17 @@ AboutWindow::AboutWindow() {
 
   info = new QLabel(string() <<
     "<table width='100%'><tr>"
-    "<td align='left'><b>bsnes-classic version</b> " << SNES::Info::Version << "</td>"
+    "<td align='left'><b>bsnes-plus version</b> " << SNES::Info::Version << "</td>"
     "<td align='right'><b>" << SNES::Info::Profile <<" profile"
 #if defined(DEBUGGER)
     " with debugger"
 #endif
     "</b></td></tr><tr>"
     "<td align='left'><b>Project homepage:</b></td>"
-    "<td align='right'><a href='http://code.google.com/p/bsnes-classic'>http://code.google.com/p/bsnes-classic</a></td>"
+    "<td align='right'><a href='https://github.com/devinacker/bsnes-plus'>https://github.com/devinacker/bsnes-plus</a></td>"
     "</tr><tr>"
-    "<td align='left'><b>Based on original bsnes by byuu:</b></td>"
-    "<td align='right'><a href='http://byuu.org'>http://byuu.org</a></td>"
+    "<td align='left'><b>Based on bsnes-classic v073u1:</b></td>"
+    "<td align='right'><a href='http://code.google.com/p/bsnes-classic'>http://code.google.com/p/bsnes-classic</a></td>"
     "</tr></table>"
   );
   layout->addWidget(info);
