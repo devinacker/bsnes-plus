@@ -206,11 +206,7 @@ void MemHexEditor::refresh() {
       string color;
       uint8_t this_usage = usage ? usage(offset) : 0;
       
-      if (this_usage & UsageExec
-          && (this_usage & UsageRead || this_usage & UsageWrite)) {
-        // code & data: purple text
-        color = (x & 1) ? "#800080" : "#ff00ff";
-      } else if (this_usage & UsageExec) {
+      if (this_usage & UsageExec) {
         // code: red text
         color = (x & 1) ? "#800000" : "#ff0000";
       } else if (this_usage & UsageRead || this_usage & UsageWrite) {
