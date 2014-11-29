@@ -33,6 +33,7 @@ MemoryEditor::MemoryEditor() {
   source->addItem("S-PPU VRAM");
   source->addItem("S-PPU OAM");
   source->addItem("S-PPU CGRAM");
+  source->addItem("Cartridge ROM");
   controlLayout->addWidget(source);
   controlLayout->addSpacing(2);
 
@@ -98,6 +99,7 @@ void MemoryEditor::sourceChanged(int index) {
     case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setSize(64 * 1024);        break;
     case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setSize(544);              break;
     case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setSize(512);              break;
+    case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setSize(SNES::memory::cartrom.size()); break;
   }
 
   editor->setOffset(hex(addr->text().toUtf8().data()));
@@ -108,6 +110,10 @@ void MemoryEditor::refresh() {
   if(SNES::cartridge.loaded() == false) {
     editor->setHtml("");
   } else {
+    if (memorySource == SNES::Debugger::MemorySource::CartROM) {
+      editor->setSize(SNES::memory::cartrom.size());
+    }
+  
     editor->refresh();
   }
 }
@@ -170,12 +176,14 @@ void MemoryEditor::writer(unsigned addr, uint8_t data) {
 }
 
 uint8_t MemoryEditor::usage(unsigned addr) {
-  // TODO ...
   if (memorySource == SNES::Debugger::MemorySource::CPUBus && addr < 1 << 24) {
     return SNES::cpu.usage[addr];
   }
   else if (memorySource == SNES::Debugger::MemorySource::APURAM && addr < 1 << 16) {
     return SNES::smp.usage[addr];
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::CartROM && addr < 1 << 24) {
+    return SNES::cpu.cart_usage[addr];
   }
   
   return 0;
@@ -189,29 +197,33 @@ void MemHexEditor::refresh() {
   for(unsigned y = 0; y < editorRows; y++) {
     if(offset >= editorSize) break;
     sprintf(temp, "%.4x:%.4x", (offset >> 16) & 0xffff, (offset >> 0) & 0xffff);
-    output << "<font color='#808080'>" << temp << "</font>&nbsp;&nbsp;";
+    output << "<font color='#404040'>" << temp << "</font>&nbsp;&nbsp;";
 
     for(unsigned x = 0; x < editorColumns; x++) {
       if(offset >= editorSize) break;
       sprintf(temp, "%.2x", reader ? reader(offset) : 0x00);
-	  
-	  string color;
-	  uint8_t this_usage = usage ? usage(offset) : 0;
-	  
-	  if (this_usage & UsageExec) {
-	    // code: red text
-	    color = (x & 1) ? "#800000" : "#ff0000";
-	  } else if (this_usage & UsageRead || this_usage & UsageWrite) {
-	    // data: blue text
-	    color = (x & 1) ? "#000080" : "#0000ff";
-	  } else {
-	    // unknown: grey text
-	    color = (x & 1) ? "#404040" : "#808080";
-	  }
-	  
+      
+      string color;
+      uint8_t this_usage = usage ? usage(offset) : 0;
+      
+      if (this_usage & UsageExec
+          && (this_usage & UsageRead || this_usage & UsageWrite)) {
+        // code & data: purple text
+        color = (x & 1) ? "#800080" : "#ff00ff";
+      } else if (this_usage & UsageExec) {
+        // code: red text
+        color = (x & 1) ? "#800000" : "#ff0000";
+      } else if (this_usage & UsageRead || this_usage & UsageWrite) {
+        // data: blue text
+        color = (x & 1) ? "#000080" : "#0000ff";
+      } else {
+        // unknown: grey text
+        color = (x & 1) ? "#404040" : "#808080";
+      }
+      
       output << "<font color='" << color << "'>" << temp << "</font>";
       if(x != (editorColumns - 1)) output << "&nbsp;";
-	  
+      
       offset++;
     }
 

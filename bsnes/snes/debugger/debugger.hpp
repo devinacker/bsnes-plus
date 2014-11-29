@@ -28,7 +28,7 @@ public:
   int call_count;
   bool step_over_new;
 
-  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM };
+  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM, CartROM };
   uint8 read(MemorySource, unsigned addr);
   void write(MemorySource, unsigned addr, uint8 data);
 

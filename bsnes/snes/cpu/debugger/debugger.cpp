@@ -49,12 +49,20 @@ void CPUDebugger::op_step() {
 
 alwaysinline uint8_t CPUDebugger::op_readpc() {
   usage[regs.pc] |= UsageExec;
+  
+  int offset = cartridge.rom_offset(regs.pc);
+  if (offset >= 0) cart_usage[offset] |= UsageExec;
+  
   return CPU::op_readpc();
 }
 
 uint8 CPUDebugger::op_read(uint32 addr) {
   uint8 data = CPU::op_read(addr);
   usage[addr] |= UsageRead;
+  
+  int offset = cartridge.rom_offset(addr);
+  if (offset >= 0) cart_usage[offset] |= UsageRead;
+  
   debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, addr, data);
   return data;
 }
@@ -68,12 +76,14 @@ void CPUDebugger::op_write(uint32 addr, uint8 data) {
 
 CPUDebugger::CPUDebugger() {
   usage = new uint8[1 << 24]();
+  cart_usage = new uint8[1 << 24]();
   opcode_pc = 0x8000;
   opcode_edge = false;
 }
 
 CPUDebugger::~CPUDebugger() {
   delete[] usage;
+  delete[] cart_usage;
 }
 
 bool CPUDebugger::property(unsigned id, string &name, string &value) {

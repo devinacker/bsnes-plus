@@ -12,6 +12,7 @@ public:
     UsageFlagX = 0x01,
   };
   uint8 *usage;
+  uint8 *cart_usage;
   uint32 opcode_pc;
   bool opcode_edge;
 

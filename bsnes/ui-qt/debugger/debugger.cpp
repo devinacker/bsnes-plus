@@ -146,14 +146,21 @@ Debugger::Debugger() {
 
 void Debugger::modifySystemState(unsigned state) {
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
+  string cartusagefile = usagefile;
   usagefile << "-usage.bin";
   file fp;
 
   if(state == Utility::LoadCartridge) {
+    memset(SNES::cpu.cart_usage, 0x00, 1 << 24);
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
       fp.close();
+	  
+	  for (unsigned i = 0; i < 1 << 24; i++) {
+	    int offset = SNES::cartridge.rom_offset(i);
+	    if (offset >= 0) SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i];
+      }
     } else {
       memset(SNES::cpu.usage, 0x00, 1 << 24);
       memset(SNES::smp.usage, 0x00, 1 << 16);

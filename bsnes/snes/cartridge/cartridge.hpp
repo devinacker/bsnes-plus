@@ -65,6 +65,8 @@ public:
   };
   array<Mapping> mapping;
 
+  int rom_offset(unsigned) const;
+  
   void load(Mode, const lstring&);
   void unload();
 

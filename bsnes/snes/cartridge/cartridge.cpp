@@ -19,6 +19,16 @@ namespace memory {
 
 Cartridge cartridge;
 
+int Cartridge::rom_offset(unsigned addr) const {
+  
+  Bus::Page &page = bus.page[addr >> 8];
+  if (page.access == &memory::cartrom) {
+    return page.offset + addr;
+  }
+  
+  return -1;
+}
+
 void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   mode = cartridge_mode;
   region = Region::NTSC;

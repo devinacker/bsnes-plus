@@ -12,6 +12,7 @@ public:
     UsageFlagX = 0x01,
   };
   uint8 *usage;
+  uint8 *cart_usage;
   uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
   bool opcode_edge;  //true right before an opcode execues, used to skip over opcodes
 
