@@ -1,10 +1,14 @@
 #include <snes.hpp>
 
 #define CPU_CPP
+#define ALT_CPU_CPP
+
 namespace SNES {
 
 #if defined(DEBUGGER)
-  #include "debugger/debugger.cpp"
+  // now using the same CPU debugger as the other CPU implementation 
+  // since they were mostly identical
+  #include "../../cpu/debugger/debugger.cpp"
   CPUDebugger cpu;
 #else
   CPU cpu;

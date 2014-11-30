@@ -1,3 +1,5 @@
+#define ALT_CPU_HPP
+
 class CPU : public Processor, public CPUcore, public PPUcounter, public MMIO {
 public:
   enum : bool { Threaded = true };
@@ -148,7 +150,9 @@ private:
 };
 
 #if defined(DEBUGGER)
-  #include "debugger/debugger.hpp"
+  // now using the same CPU debugger as the other CPU implementation 
+  // since they were mostly identical
+  #include "../../cpu/debugger/debugger.hpp"
   extern CPUDebugger cpu;
 #else
   extern CPU cpu;

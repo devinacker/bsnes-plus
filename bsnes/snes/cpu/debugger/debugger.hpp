@@ -13,7 +13,11 @@ public:
   };
   uint8 *usage;
   uint8 *cart_usage;
+#if defined(ALT_CPU_HPP)
+  uint32 opcode_pc;
+#else
   uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
+#endif
   bool opcode_edge;  //true right before an opcode execues, used to skip over opcodes
 
   void op_step();

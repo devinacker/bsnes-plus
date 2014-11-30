@@ -10,19 +10,19 @@ snes_objects += snes-msu1 snes-serial
 objects += $(snes_objects)
 
 ifeq ($(profile),accuracy)
-  flags += -DPROFILE_ACCURACY
+  flags += -DPROFILE_ACCURACY -DDEBUGGER
   snescpu := $(snes)/cpu
   snessmp := $(snes)/smp
   snesdsp := $(snes)/dsp
   snesppu := $(snes)/ppu
 else ifeq ($(profile),compatibility)
-  flags += -DPROFILE_COMPATIBILITY
+  flags += -DPROFILE_COMPATIBILITY -DDEBUGGER
   snescpu := $(snes)/cpu
   snessmp := $(snes)/smp
   snesdsp := $(snes)/alt/dsp
   snesppu := $(snes)/alt/ppu-compatibility
 else ifeq ($(profile),performance)
-  flags += -DPROFILE_PERFORMANCE
+  flags += -DPROFILE_PERFORMANCE -DDEBUGGER
   snescpu := $(snes)/alt/cpu
   snessmp := $(snes)/smp
   snesdsp := $(snes)/alt/dsp

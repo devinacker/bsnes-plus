@@ -1,7 +1,7 @@
 include nall/Makefile
 snes := snes
 ifeq ($(profile),)
-  profile := debugger
+  profile := compatibility
 endif
 ifeq ($(ui),)
   ui := ui-qt
