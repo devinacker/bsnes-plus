@@ -1,6 +1,7 @@
 /*
- * All changes to this file should be also made to snes/alt/cpu/debugger/debugger.cpp
- * (which is used by some emulation profiles).
+ * Building with the "performance" profile will include this from snes/alt/cpu/cpu.cpp instead of
+ * the usual snes/cpu/cpu.cpp. When this is the case, ALT_CPU_CPP is defined.
+ * Be sure to test builds with multiple profiles and account for differences in the two implementations.
  */
 #ifdef CPU_CPP
 

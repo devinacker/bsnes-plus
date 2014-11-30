@@ -1,3 +1,8 @@
+/*
+ * Building with the "performance" profile will include this from snes/alt/cpu/cpu.hpp instead of
+ * the usual snes/cpu/cpu.hpp. When this is the case, ALT_CPU_HPP is defined.
+ * Be sure to test builds with multiple profiles and account for differences in the two implementations.
+ */
 class CPUDebugger : public CPU, public ChipDebugger {
 public:
   bool property(unsigned id, string &name, string &value);
