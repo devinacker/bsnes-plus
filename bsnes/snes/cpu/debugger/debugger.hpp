@@ -19,15 +19,25 @@ public:
   uint8 *usage;
   uint8 *cart_usage;
 #if defined(ALT_CPU_HPP)
+  uint8 mmio_read(unsigned addr);
+  void mmio_write(unsigned addr, uint8 data);
+  
   uint32 opcode_pc;
+  
 #else
+  uint8 mmio_r2180();
+  void mmio_w2180(uint8 data);
+  
   uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
+  
 #endif
+
   bool opcode_edge;  //true right before an opcode execues, used to skip over opcodes
 
   void op_step();
-  virtual uint8_t op_readpc();
+  uint8_t op_readpc();
   uint8 op_read(uint32 addr);
+  uint8 dma_read(uint32 abus);
   void op_write(uint32 addr, uint8 data);
 
   CPUDebugger();

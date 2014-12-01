@@ -69,12 +69,52 @@ uint8 CPUDebugger::op_read(uint32 addr) {
   return data;
 }
 
+// TODO: add DMA read/write breakpoints maybe
+uint8 CPUDebugger::dma_read(uint32 abus) {
+  usage[abus] |= UsageRead;
+  
+  int offset = cartridge.rom_offset(abus);
+  if (offset >= 0) cart_usage[offset] |= UsageRead;
+  
+  return CPU::dma_read(abus);
+}
+
 void CPUDebugger::op_write(uint32 addr, uint8 data) {
   CPU::op_write(addr, data);
   usage[addr] |= UsageWrite;
   usage[addr] &= ~UsageExec;
   debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Write, addr, data);
 }
+
+// $2180 MMIO-based WRAM access
+// TODO: breakpoints for these too? since this will mostly be triggered via DMA
+#if defined(ALT_CPU_CPP)
+uint8 CPUDebugger::mmio_read(unsigned addr) {
+  if (addr & 0xffff == 0x2180) {
+    usage[0x7e0000 | status.wram_addr] |= UsageRead;
+  }
+  
+  return CPU::mmio_read(addr);
+}
+
+void CPU::mmio_write(unsigned addr, uint8 data) {
+  if (addr & 0xffff == 0x2180) {
+    usage[0x7e0000 | status.wram_addr] |= UsageWrite;
+  }
+  
+  CPU::mmio_write(addr, data);
+}
+#else
+uint8 CPUDebugger::mmio_r2180() {
+  usage[0x7e0000 | status.wram_addr] |= UsageRead;
+  return CPU::mmio_r2180();
+}
+
+void CPUDebugger::mmio_w2180(uint8 data) {
+  usage[0x7e0000 | status.wram_addr] |= UsageWrite;
+  CPU::mmio_w2180(data);
+}
+#endif
 
 CPUDebugger::CPUDebugger() {
   usage = new uint8[1 << 24]();

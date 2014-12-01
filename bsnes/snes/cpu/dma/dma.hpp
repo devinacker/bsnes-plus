@@ -54,7 +54,7 @@ struct {
 void dma_add_clocks(unsigned clocks);
 bool dma_transfer_valid(uint8 bbus, uint32 abus);
 bool dma_addr_valid(uint32 abus);
-uint8 dma_read(uint32 abus);
+debugvirtual uint8 dma_read(uint32 abus);
 void dma_write(bool valid, unsigned addr = 0, uint8 data = 0);
 void dma_transfer(bool direction, uint8 bbus, uint32 abus);
 

@@ -14,8 +14,8 @@ public:
   bool interrupt_pending();
   uint8 port_read(uint8 port);
   void port_write(uint8 port, uint8 data);
-  uint8 mmio_read(unsigned addr);
-  void mmio_write(unsigned addr, uint8 data);
+  debugvirtual uint8 mmio_read(unsigned addr);
+  debugvirtual void mmio_write(unsigned addr, uint8 data);
 
   void op_io();
   debugvirtual uint8 op_read(unsigned addr);
@@ -56,7 +56,7 @@ private:
   //dma
   bool dma_transfer_valid(uint8 bbus, unsigned abus);
   bool dma_addr_valid(unsigned abus);
-  uint8 dma_read(unsigned abus);
+  debugvirtual uint8 dma_read(unsigned abus);
   void dma_write(bool valid, unsigned addr, uint8 data);
   void dma_transfer(bool direction, uint8 bbus, unsigned abus);
   uint8 dma_bbus(unsigned i, unsigned index);

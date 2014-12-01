@@ -3,7 +3,7 @@ void mmio_reset();
 uint8 mmio_read(unsigned addr);
 void mmio_write(unsigned addr, uint8 data);
 
-uint8 mmio_r2180();
+debugvirtual uint8 mmio_r2180();
 uint8 mmio_r4016();
 uint8 mmio_r4017();
 uint8 mmio_r4210();
@@ -35,7 +35,7 @@ uint8 mmio_r43x9(uint8 i);
 uint8 mmio_r43xa(uint8 i);
 uint8 mmio_r43xb(uint8 i);
 
-void mmio_w2180(uint8 data);
+debugvirtual void mmio_w2180(uint8 data);
 void mmio_w2181(uint8 data);
 void mmio_w2182(uint8 data);
 void mmio_w2183(uint8 data);
