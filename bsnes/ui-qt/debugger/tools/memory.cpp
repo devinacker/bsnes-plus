@@ -34,6 +34,7 @@ MemoryEditor::MemoryEditor() {
   source->addItem("S-PPU OAM");
   source->addItem("S-PPU CGRAM");
   source->addItem("Cartridge ROM");
+  source->addItem("Cartridge RAM");
   controlLayout->addWidget(source);
   controlLayout->addSpacing(2);
 
@@ -118,6 +119,7 @@ void MemoryEditor::sourceChanged(int index) {
     case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setSize(544);              break;
     case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setSize(512);              break;
     case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setSize(SNES::memory::cartrom.size()); break;
+    case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setSize(SNES::memory::cartram.size()); break;
   }
 
   editor->setOffset(hex(addr->text().toUtf8().data()));

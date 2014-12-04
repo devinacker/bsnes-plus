@@ -9,7 +9,7 @@ public:
     UsageExec  = 0x20,
   };
   
-  virtual void refresh();
+  void refresh();
   unsigned offset() const { return editorOffset; };
   unsigned size() const { return editorSize; };
 };

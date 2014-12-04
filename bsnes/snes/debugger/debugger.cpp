@@ -62,6 +62,11 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
 	  if (addr < memory::cartrom.size())
 	    return memory::cartrom.read(addr & 0xffffff);
     } break;
+	
+	case MemorySource::CartRAM: {
+	  if (addr < memory::cartram.size())
+	    return memory::cartram.read(addr & 0xffffff);
+    } break;
   }
 
   return 0x00;
@@ -100,6 +105,11 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
         return memory::cartrom.write(addr & 0xffffff, data);
 	    memory::cartrom.write_protect(true);
 	  }
+    } break;
+	
+	case MemorySource::CartRAM: {
+	  if (addr < memory::cartram.size())
+	    return memory::cartram.write(addr & 0xffffff, data);
     } break;
   }
 }

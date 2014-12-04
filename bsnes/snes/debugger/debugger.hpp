@@ -13,7 +13,7 @@ public:
     unsigned addr;
     signed data;  //-1 = unused
     enum class Mode : unsigned { Exec, Read, Write } mode;
-    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM } source;
+    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus } source;
     unsigned counter;  //number of times breakpoint has been hit since being set
   } breakpoint[Breakpoints];
   unsigned breakpoint_hit;
@@ -28,7 +28,7 @@ public:
   int call_count;
   bool step_over_new;
 
-  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM, CartROM };
+  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM, CartROM, CartRAM, SA1Bus };
   uint8 read(MemorySource, unsigned addr);
   void write(MemorySource, unsigned addr, uint8 data);
 

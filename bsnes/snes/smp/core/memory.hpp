@@ -1,4 +1,4 @@
-virtual alwaysinline uint8_t op_readpc() {
+debugvirtual alwaysinline uint8_t op_readpc() {
   return op_read(regs.pc++);
 }
 
