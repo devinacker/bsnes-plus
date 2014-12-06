@@ -5,6 +5,7 @@ public:
     BreakpointHit,
     CPUStep,
     SMPStep,
+	SA1Step,
   } break_event;
 
   enum { Breakpoints = 8 };
@@ -13,7 +14,7 @@ public:
     unsigned addr;
     signed data;  //-1 = unused
     enum class Mode : unsigned { Exec, Read, Write } mode;
-    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM } source;
+    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus } source;
     unsigned counter;  //number of times breakpoint has been hit since being set
   } breakpoint[Breakpoints];
   unsigned breakpoint_hit;
@@ -21,6 +22,7 @@ public:
 
   bool step_cpu;
   bool step_smp;
+  bool step_sa1;
 
   enum class StepType : unsigned { 
     None, StepInto, StepOver, StepOut 

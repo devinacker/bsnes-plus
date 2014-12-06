@@ -139,6 +139,7 @@ Debugger::Debugger() {
 
   step_cpu = false;
   step_smp = false;
+  step_sa1 = false;
   
   step_type = StepType::None;
 }

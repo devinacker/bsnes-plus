@@ -183,6 +183,9 @@ void MemoryEditor::gotoPrevious(int type) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
     usage = SNES::cpu.cart_usage;
+  } 
+  else if (memorySource == SNES::Debugger::MemorySource::SA1Bus) {
+    usage = SNES::sa1.usage;
   } else return;
   
   while (--offset >= 0) {
@@ -219,6 +222,9 @@ void MemoryEditor::gotoNext(int type) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
     usage = SNES::cpu.cart_usage;
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::SA1Bus) {
+    usage = SNES::sa1.usage;
   } else return;
   
   while (++offset < size) {
@@ -300,6 +306,9 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM && addr < 1 << 24) {
     return SNES::cpu.cart_usage[addr];
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::SA1Bus && addr < 1 << 24) {
+    return SNES::sa1.usage[addr];
   }
   
   return 0;

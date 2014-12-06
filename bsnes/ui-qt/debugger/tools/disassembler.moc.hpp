@@ -1,15 +1,8 @@
-class CPUDisassembler : public QWidget {
+class DisasmWidget : public QWidget {
 public:
   QVBoxLayout *layout;
   QTextEdit *view;
-  CPUDisassembler();
-};
-
-class SMPDisassembler : public QWidget {
-public:
-  QVBoxLayout *layout;
-  QTextEdit *view;
-  SMPDisassembler();
+  DisasmWidget();
 };
 
 class Disassembler : public Window {
@@ -19,11 +12,12 @@ public:
   QVBoxLayout *layout;
   QTabWidget *tab;
 
-  enum Source { CPU, SMP };
+  enum Source { CPU, SMP, SA1 };
   void refresh(Source, unsigned);
   Disassembler();
 };
 
-extern CPUDisassembler *cpuDisassembler;
-extern SMPDisassembler *smpDisassembler;
+extern DisasmWidget *cpuDisassembler;
+extern DisasmWidget *smpDisassembler;
+extern DisasmWidget *sa1Disassembler;
 extern Disassembler *disassembler;

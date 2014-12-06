@@ -21,6 +21,9 @@ public:
   void enter();
   void interrupt(uint16 vector);
   void tick();
+  
+  // used by the SA-1 debugger prior to executing instructions
+  debugvirtual void op_step() {};
 
   alwaysinline void trigger_irq();
   alwaysinline void last_cycle();
@@ -35,8 +38,11 @@ public:
   SA1();
 };
 
-extern SA1 sa1;
-extern SA1Bus sa1bus;
 #if defined(DEBUGGER)
-extern VBRBus vbrbus;
+  #include "debugger/debugger.hpp"
+  extern SA1Debugger sa1;
+  extern VBRBus vbrbus;
+#else
+  extern SA1 sa1;
 #endif
+extern SA1Bus sa1bus;

@@ -26,8 +26,10 @@ public:
   QToolButton *stepOut;
   QCheckBox *stepCPU;
   QCheckBox *stepSMP;
+  QCheckBox *stepSA1;
   QCheckBox *traceCPU;
   QCheckBox *traceSMP;
+  QCheckBox *traceSA1;
   QCheckBox *traceMask;
   QWidget *spacer;
 

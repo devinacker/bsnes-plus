@@ -3,7 +3,12 @@
 #define SA1_CPP
 namespace SNES {
 
-SA1 sa1;
+#if defined(DEBUGGER)
+  #include "debugger/debugger.cpp"
+  SA1Debugger sa1;
+#else
+  SA1 sa1;
+#endif
 
 #include "serialization.cpp"
 #include "bus/bus.cpp"
@@ -30,6 +35,8 @@ void SA1::enter() {
       status.interrupt_pending = false;
       interrupt(status.interrupt_vector);
     }
+
+    op_step();
 
     (this->*opcode_table[op_readpc()])();
   }

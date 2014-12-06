@@ -25,12 +25,24 @@ void Tracer::stepSmp() {
   }
 }
 
+void Tracer::stepSa1() {
+  if(traceSa1) {
+    unsigned addr = SNES::sa1.regs.pc;
+    if(!traceMask || !(traceMaskSA1[addr >> 3] & (0x80 >> (addr & 7)))) {
+      char text[256];
+      SNES::sa1.disassemble_opcode(text, addr);
+      tracefile.print(string() << text << "\n");
+    }
+    traceMaskSA1[addr >> 3] |= 0x80 >> (addr & 7);
+  }
+}
+
 void Tracer::setCpuTraceState(int state) {
   traceCpu = (state == Qt::Checked);
 
   if(traceCpu && !tracefile.open()) {
     tracefile.open(string() << config().path.data << "trace.log", file::mode::write);
-  } else if(!traceCpu && !traceSmp && tracefile.open()) {
+  } else if(!traceCpu && !traceSmp && !traceSa1 && tracefile.open()) {
     tracefile.close();
   }
 }
@@ -40,7 +52,17 @@ void Tracer::setSmpTraceState(int state) {
 
   if(traceSmp && !tracefile.open()) {
     tracefile.open(string() << config().path.data << "trace.log", file::mode::write);
-  } else if(!traceCpu && !traceSmp && tracefile.open()) {
+  } else if(!traceCpu && !traceSmp && !traceSa1 && tracefile.open()) {
+    tracefile.close();
+  }
+}
+
+void Tracer::setSa1TraceState(int state) {
+  traceSa1 = (state == Qt::Checked);
+
+  if(traceSa1 && !tracefile.open()) {
+    tracefile.open(string() << config().path.data << "trace.log", file::mode::write);
+  } else if(!traceCpu && !traceSmp && !traceSa1 && tracefile.open()) {
     tracefile.close();
   }
 }
@@ -52,23 +74,28 @@ void Tracer::setTraceMaskState(int state) {
     //flush all bitmasks once enabled
     memset(traceMaskCPU, 0x00, (1 << 24) >> 3);
     memset(traceMaskSMP, 0x00, (1 << 16) >> 3);
+    memset(traceMaskSA1, 0x00, (1 << 16) >> 3);
   }
 }
 
 Tracer::Tracer() {
   traceCpu = false;
   traceSmp = false;
+  traceSa1 = false;
   traceMask = false;
 
   traceMaskCPU = new uint8_t[(1 << 24) >> 3]();
   traceMaskSMP = new uint8_t[(1 << 16) >> 3]();
+  traceMaskSA1 = new uint8_t[(1 << 16) >> 3]();
 
   SNES::cpu.step_event = { &Tracer::stepCpu, this };
   SNES::smp.step_event = { &Tracer::stepSmp, this };
+  SNES::sa1.step_event = { &Tracer::stepSa1, this };
 }
 
 Tracer::~Tracer() {
   delete[] traceMaskCPU;
   delete[] traceMaskSMP;
+  delete[] traceMaskSA1;
   if(tracefile.open()) tracefile.close();
 }

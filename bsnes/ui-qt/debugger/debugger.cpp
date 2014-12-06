@@ -90,6 +90,9 @@ Debugger::Debugger() {
   stepSMP = new QCheckBox("Step S-SMP");
   controlLayout->addWidget(stepSMP);
 
+  stepSA1 = new QCheckBox("Step SA-1");
+  controlLayout->addWidget(stepSA1);
+
   controlLayout->addSpacing(Style::WidgetSpacing);
 
   traceCPU = new QCheckBox("Trace S-CPU opcodes");
@@ -97,6 +100,9 @@ Debugger::Debugger() {
 
   traceSMP = new QCheckBox("Trace S-SMP opcodes");
   controlLayout->addWidget(traceSMP);
+  
+  traceSA1 = new QCheckBox("Trace SA-1 opcodes");
+  controlLayout->addWidget(traceSA1);
 
   traceMask = new QCheckBox("Enable trace mask");
   controlLayout->addWidget(traceMask);
@@ -135,8 +141,10 @@ Debugger::Debugger() {
   
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
+  connect(stepSA1, SIGNAL(released()), this, SLOT(synchronize()));
   connect(traceCPU, SIGNAL(stateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
   connect(traceSMP, SIGNAL(stateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
+  connect(traceSA1, SIGNAL(stateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
   connect(traceMask, SIGNAL(stateChanged(int)), tracer, SLOT(setTraceMaskState(int)));
 
   frameCounter = 0;
@@ -145,6 +153,7 @@ Debugger::Debugger() {
 }
 
 void Debugger::modifySystemState(unsigned state) {
+  // TODO: include cartridge ROM/RAM and expansion usage in this
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
   string cartusagefile = usagefile;
   usagefile << "-usage.bin";
@@ -156,10 +165,10 @@ void Debugger::modifySystemState(unsigned state) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
       fp.close();
-	  
-	  for (unsigned i = 0; i < 1 << 24; i++) {
-	    int offset = SNES::cartridge.rom_offset(i);
-	    if (offset >= 0) SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i];
+      
+      for (unsigned i = 0; i < 1 << 24; i++) {
+        int offset = SNES::cartridge.rom_offset(i);
+        if (offset >= 0) SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i];
       }
     } else {
       memset(SNES::cpu.usage, 0x00, 1 << 24);
@@ -178,14 +187,15 @@ void Debugger::modifySystemState(unsigned state) {
 
 void Debugger::synchronize() {
   runBreak->setText(application.debug ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && application.debug && (stepCPU->isChecked() || stepSMP->isChecked());
-  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() == 1);
+  bool stepEnabled = SNES::cartridge.loaded() && application.debug && (stepCPU->isChecked() || stepSMP->isChecked() || stepSA1->isChecked());
+  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + stepSA1->isChecked() == 1);
   
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
   SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
+  SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
 
   memoryEditor->synchronize();
 }
@@ -253,6 +263,15 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
       }
+      
+      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
+        SNES::debugger.step_sa1 = true;
+        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
+        string s = t;
+        s.replace(" ", "&nbsp;");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+		disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+      }
     } break;
 
     case SNES::Debugger::BreakEvent::CPUStep: {
@@ -269,6 +288,14 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SMP, SNES::smp.regs.pc);
+    } break;
+	
+	case SNES::Debugger::BreakEvent::SA1Step: {
+      SNES::sa1.disassemble_opcode(t, SNES::sa1.regs.pc);
+      string s = t;
+      s.replace(" ", "&nbsp;");
+      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      disassembler->refresh(Disassembler::SA1, SNES::sa1.regs.pc);
     } break;
   }
 

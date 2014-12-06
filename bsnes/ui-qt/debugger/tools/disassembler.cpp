@@ -1,23 +1,10 @@
 #include "disassembler.moc"
-CPUDisassembler *cpuDisassembler;
-SMPDisassembler *smpDisassembler;
+DisasmWidget *cpuDisassembler;
+DisasmWidget *smpDisassembler;
+DisasmWidget *sa1Disassembler;
 Disassembler *disassembler;
 
-CPUDisassembler::CPUDisassembler() {
-  layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
-  setLayout(layout);
-
-  view = new QTextEdit;
-  view->setReadOnly(true);
-  view->setFont(QFont(Style::Monospace));
-  view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  view->setMinimumHeight((25 + 1) * view->fontMetrics().height());
-  layout->addWidget(view);
-}
-
-SMPDisassembler::SMPDisassembler() {
+DisasmWidget::DisasmWidget() {
   layout = new QVBoxLayout;
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
@@ -42,12 +29,14 @@ Disassembler::Disassembler() {
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  cpuDisassembler = new CPUDisassembler;
-  smpDisassembler = new SMPDisassembler;
+  cpuDisassembler = new DisasmWidget;
+  smpDisassembler = new DisasmWidget;
+  sa1Disassembler = new DisasmWidget;
 
   tab = new QTabWidget;
   tab->addTab(cpuDisassembler, "S-CPU");
   tab->addTab(smpDisassembler, "S-SMP");
+  tab->addTab(sa1Disassembler, "SA-1");
   layout->addWidget(tab);
 }
 
@@ -56,6 +45,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
   unsigned mask;
   if(source == CPU) { usage = SNES::cpu.usage; mask = (1 << 24) - 1; }
   if(source == SMP) { usage = SNES::smp.usage; mask = (1 << 16) - 1; }
+  if(source == SA1) { usage = SNES::sa1.usage; mask = (1 << 24) - 1; }
 
   int line[25];
   for(unsigned i = 0; i < 25; i++) line[i] = -1;
@@ -98,6 +88,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
       char t[256];
       if(source == CPU) { SNES::cpu.disassemble_opcode(t, line[i]); t[20] = 0; }
       if(source == SMP) { SNES::smp.disassemble_opcode(t, line[i]); t[23] = 0; }
+      if(source == SA1) { SNES::sa1.disassemble_opcode(t, line[i]); t[20] = 0; }
       string text = rtrim(t);
       text.replace(" ", "&nbsp;");
       output << text;
@@ -109,4 +100,5 @@ void Disassembler::refresh(Source source, unsigned addr) {
 
   if(source == CPU) cpuDisassembler->view->setHtml(output);
   if(source == SMP) smpDisassembler->view->setHtml(output);
+  if(source == SA1) sa1Disassembler->view->setHtml(output);
 }
