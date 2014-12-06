@@ -37,3 +37,6 @@ public:
 
 extern SA1 sa1;
 extern SA1Bus sa1bus;
+#if defined(DEBUGGER)
+extern VBRBus vbrbus;
+#endif
