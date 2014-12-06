@@ -234,7 +234,7 @@ void MemoryEditor::gotoNext(int type) {
       found = true; break;
     } else if (found && !foundHere) {
       found = foundHere;
-	}
+    }
   }
   
   if (offset < size) {
@@ -331,8 +331,8 @@ void MemHexEditor::refresh() {
       string color;
       uint8_t this_usage = usage ? usage(offset) : 0;
       
-	  if (this_usage & UsageExec && this_usage & UsageRead) {
-	    color = (x & 1) ? "#800080" : "#ff00ff";
+      if (this_usage & UsageExec && this_usage & UsageRead) {
+        color = (x & 1) ? "#800080" : "#ff00ff";
       } else if (this_usage & UsageExec) {
         // code: red text
         color = (x & 1) ? "#800000" : "#ff0000";

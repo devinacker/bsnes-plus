@@ -270,7 +270,7 @@ void Debugger::event() {
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-		disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
       }
     } break;
 
@@ -289,8 +289,8 @@ void Debugger::event() {
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SMP, SNES::smp.regs.pc);
     } break;
-	
-	case SNES::Debugger::BreakEvent::SA1Step: {
+    
+    case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.regs.pc);
       string s = t;
       s.replace(" ", "&nbsp;");
