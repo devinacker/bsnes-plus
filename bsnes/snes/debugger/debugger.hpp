@@ -5,7 +5,7 @@ public:
     BreakpointHit,
     CPUStep,
     SMPStep,
-	SA1Step,
+    SA1Step,
   } break_event;
 
   enum { Breakpoints = 8 };

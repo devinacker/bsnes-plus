@@ -57,18 +57,18 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     case MemorySource::CGRAM: {
       return memory::cgram.read(addr & 0x01ff);
     } break;
-	
-	case MemorySource::CartROM: {
-	  if (addr < memory::cartrom.size())
-	    return memory::cartrom.read(addr & 0xffffff);
+    
+    case MemorySource::CartROM: {
+      if (addr < memory::cartrom.size())
+        return memory::cartrom.read(addr & 0xffffff);
     } break;
-	
-	case MemorySource::CartRAM: {
-	  if (addr < memory::cartram.size())
-	    return memory::cartram.read(addr & 0xffffff);
+    
+    case MemorySource::CartRAM: {
+      if (addr < memory::cartram.size())
+        return memory::cartram.read(addr & 0xffffff);
     } break;
-	
-	case MemorySource::SA1Bus: {
+    
+    case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
       return vbrbus.read(addr & 0xffffff);
     } break;
@@ -103,21 +103,21 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     case MemorySource::CGRAM: {
       memory::cgram.write(addr & 0x01ff, data);
     } break;
-	
-	case MemorySource::CartROM: {
-	  if (addr < memory::cartrom.size()) {
-	    memory::cartrom.write_protect(false);
+    
+    case MemorySource::CartROM: {
+      if (addr < memory::cartrom.size()) {
+        memory::cartrom.write_protect(false);
         return memory::cartrom.write(addr & 0xffffff, data);
-	    memory::cartrom.write_protect(true);
-	  }
+        memory::cartrom.write_protect(true);
+      }
     } break;
-	
-	case MemorySource::CartRAM: {
-	  if (addr < memory::cartram.size())
-	    memory::cartram.write(addr & 0xffffff, data);
+    
+    case MemorySource::CartRAM: {
+      if (addr < memory::cartram.size())
+        memory::cartram.write(addr & 0xffffff, data);
     } break;
-	
-	case MemorySource::SA1Bus: {
+    
+    case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
       vbrbus.write(addr & 0xffffff, data);
     } break;
