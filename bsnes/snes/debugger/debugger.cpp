@@ -6,20 +6,27 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
   for(unsigned i = 0; i < Breakpoints; i++) {
     if(breakpoint[i].enabled == false) continue;
 
-    bool source_wram = ((breakpoint[i].addr & 0x40e000) == 0x000000) || ((breakpoint[i].addr & 0xffe000) == 0x7e0000);
-    bool offset_wram = ((addr & 0x40e000) == 0x000000) || ((addr & 0xffe000) == 0x7e0000);
-
-    if(source == Debugger::Breakpoint::Source::CPUBus && source_wram && offset_wram) {
-      //shadow S-CPU WRAM addresses ($00-3f|80-bf:0000-1fff mirrors $7e:0000-1fff)
-      if((breakpoint[i].addr & 0x1fff) != (addr & 0x1fff)) continue;
-    } else {
-      if(breakpoint[i].addr != addr) continue;
-    }
-
     if(breakpoint[i].data != -1 && breakpoint[i].data != data) continue;
     if(breakpoint[i].source != source) continue;
     if(breakpoint[i].mode != mode) continue;
 
+    // account for address mirroring on the S-CPU and SA-1 buses
+    if (source == Debugger::Breakpoint::Source::CPUBus) {
+      Bus::Page &source_page = bus.page[breakpoint[i].addr >> 8];
+	  Bus::Page &offset_page = bus.page[addr >> 8];
+
+      if (source_page.access != offset_page.access) continue;
+	  if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+    } else if (source == Debugger::Breakpoint::Source::SA1Bus) {
+	  Bus::Page &source_page = sa1bus.page[breakpoint[i].addr >> 8];
+	  Bus::Page &offset_page = sa1bus.page[addr >> 8];
+
+      if (source_page.access != offset_page.access) continue;
+	  if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+	} else {
+	  if (breakpoint[i].addr != addr) continue;
+	}
+	
     breakpoint[i].counter++;
     breakpoint_hit = i;
     break_event = BreakEvent::BreakpointHit;
