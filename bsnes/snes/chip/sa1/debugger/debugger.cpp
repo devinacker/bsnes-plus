@@ -64,10 +64,10 @@ uint8 SA1Debugger::op_read(uint32 addr) {
 // TODO: SA-1 DMA/HDMA
 
 void SA1Debugger::op_write(uint32 addr, uint8 data) {
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::SA1Bus, Debugger::Breakpoint::Mode::Write, addr, data);
   SA1::op_write(addr, data);
   usage[addr] |= UsageWrite;
   usage[addr] &= ~UsageExec;
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::SA1Bus, Debugger::Breakpoint::Mode::Write, addr, data);
 }
 
 // TODO: SA-1 MMIO, bitmap RAM access and stuff

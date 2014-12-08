@@ -56,10 +56,10 @@ uint8 SMPDebugger::op_read(uint16 addr) {
 }
 
 void SMPDebugger::op_write(uint16 addr, uint8 data) {
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Write, addr, data);
   SMP::op_write(addr, data);
   usage[addr] |= UsageWrite;
   usage[addr] &= ~UsageExec;
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Write, addr, data);
 }
 
 SMPDebugger::SMPDebugger() {
