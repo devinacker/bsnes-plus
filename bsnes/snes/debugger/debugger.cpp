@@ -77,7 +77,7 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     
     case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
-      return vbrbus.read(addr & 0xffffff);
+      return cartridge.has_sa1() ? vbrbus.read(addr & 0xffffff) : 0;
     } break;
   }
 
@@ -126,7 +126,7 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     
     case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
-      vbrbus.write(addr & 0xffffff, data);
+      if (cartridge.has_sa1()) vbrbus.write(addr & 0xffffff, data);
     } break;
   }
 }

@@ -12,6 +12,7 @@ public:
   void refresh();
   unsigned offset() const { return editorOffset; };
   unsigned size() const { return editorSize; };
+  void setSize(unsigned size) { HexEditor::setSize(size == -1U ? 0 : size); };
 };
 
 class MemoryEditor : public Window {
