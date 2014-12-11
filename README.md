@@ -6,14 +6,18 @@ introduce some new features and improvements, mostly aimed at debugging.
 ## What's new
 
 - "Step over" and "step out" buttons in debugger
+- Improved handling of address mirroring for breakpoints (extends to the entire address space, not just RAM)
 - Real-time code and data highlighting in memory editor, with fast searching for known code/data locations and unexplored regions
 - Cartridge ROM and RAM views in memory editor for mapper-agnostic analysis
+- SA-1 disassembly and debugging
+- SA-1 bus and BW-RAM viewing and (partial) usage logging
 
 ## Coming soon
 
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
-- SA-1 disassembly and debugging
-- SA-1 bus and BW-RAM viewing and usage logging
+- More keyboard shortcuts for menus, etc.
+- Similar addressing improvements for cheats
+- Super FX debugging
 
 ## Building on Windows
 
