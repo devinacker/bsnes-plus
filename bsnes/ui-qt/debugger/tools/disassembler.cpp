@@ -2,6 +2,7 @@
 DisasmWidget *cpuDisassembler;
 DisasmWidget *smpDisassembler;
 DisasmWidget *sa1Disassembler;
+DisasmWidget *sfxDisassembler;
 Disassembler *disassembler;
 
 DisasmWidget::DisasmWidget() {
@@ -32,11 +33,13 @@ Disassembler::Disassembler() {
   cpuDisassembler = new DisasmWidget;
   smpDisassembler = new DisasmWidget;
   sa1Disassembler = new DisasmWidget;
+  sfxDisassembler = new DisasmWidget;
 
   tab = new QTabWidget;
   tab->addTab(cpuDisassembler, "S-CPU");
   tab->addTab(smpDisassembler, "S-SMP");
   tab->addTab(sa1Disassembler, "SA-1");
+  tab->addTab(sfxDisassembler, "SuperFX");
   layout->addWidget(tab);
 }
 
@@ -46,6 +49,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
   if(source == CPU) { usage = SNES::cpu.usage; mask = (1 << 24) - 1; }
   if(source == SMP) { usage = SNES::smp.usage; mask = (1 << 16) - 1; }
   if(source == SA1) { usage = SNES::sa1.usage; mask = (1 << 24) - 1; }
+  if(source == SFX) { usage = SNES::superfx.usage; mask = (1 << 24) - 1; }
 
   int line[25];
   for(unsigned i = 0; i < 25; i++) line[i] = -1;
@@ -89,6 +93,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
       if(source == CPU) { SNES::cpu.disassemble_opcode(t, line[i]); t[20] = 0; }
       if(source == SMP) { SNES::smp.disassemble_opcode(t, line[i]); t[23] = 0; }
       if(source == SA1) { SNES::sa1.disassemble_opcode(t, line[i]); t[20] = 0; }
+      if(source == SFX) { SNES::superfx.disassemble_opcode(t, line[i]); t[20] = 0; }
       string text = rtrim(t);
       text.replace(" ", "&nbsp;");
       output << text;
@@ -101,4 +106,5 @@ void Disassembler::refresh(Source source, unsigned addr) {
   if(source == CPU) cpuDisassembler->view->setHtml(output);
   if(source == SMP) smpDisassembler->view->setHtml(output);
   if(source == SA1) sa1Disassembler->view->setHtml(output);
+  if(source == SFX) sfxDisassembler->view->setHtml(output);
 }

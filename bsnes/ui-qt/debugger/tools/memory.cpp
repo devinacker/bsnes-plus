@@ -36,6 +36,7 @@ MemoryEditor::MemoryEditor() {
   source->addItem("Cartridge ROM");
   source->addItem("Cartridge RAM");
   source->addItem("SA-1 bus");
+  source->addItem("SuperFX bus");
   controlLayout->addWidget(source);
   controlLayout->addSpacing(2);
 
@@ -122,6 +123,7 @@ void MemoryEditor::sourceChanged(int index) {
     case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setSize(SNES::memory::cartrom.size()); break;
     case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setSize(SNES::memory::cartram.size()); break;
     case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setSize(16 * 1024 * 1024); break;
+    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setSize(16 * 1024 * 1024); break;
   }
 
   editor->setOffset(hex(addr->text().toUtf8().data()));
@@ -186,6 +188,9 @@ void MemoryEditor::gotoPrevious(int type) {
   } 
   else if (memorySource == SNES::Debugger::MemorySource::SA1Bus) {
     usage = SNES::sa1.usage;
+  } 
+  else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
+    usage = SNES::superfx.usage;
   } else return;
   
   while (--offset >= 0) {
@@ -225,6 +230,9 @@ void MemoryEditor::gotoNext(int type) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::SA1Bus) {
     usage = SNES::sa1.usage;
+  } 
+  else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
+    usage = SNES::superfx.usage;
   } else return;
   
   while (++offset < size) {
@@ -245,6 +253,7 @@ void MemoryEditor::gotoNext(int type) {
   }
 }
 
+// TODO: export/import expansion chip memory and cartridge RAM/ROM
 void MemoryEditor::exportMemory() {
   string basename = filepath(nall::basename(cartridge.fileName), config().path.data);
 
@@ -309,6 +318,9 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::SA1Bus && addr < 1 << 24) {
     return SNES::sa1.usage[addr];
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::SFXBus && addr < 1 << 24) {
+    return SNES::superfx.usage[addr];
   }
   
   return 0;

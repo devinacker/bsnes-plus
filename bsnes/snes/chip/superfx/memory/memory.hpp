@@ -1,6 +1,6 @@
-uint8 op_read(uint16 addr);
-alwaysinline uint8 peekpipe();
-alwaysinline uint8 pipe();
+debugvirtual uint8 op_read(uint16 addr);
+debugvirtual alwaysinline uint8 peekpipe();
+debugvirtual alwaysinline uint8 pipe();
 
 void cache_flush();
 uint8 cache_mmio_read(uint16 addr);

@@ -11,7 +11,12 @@ namespace SNES {
 #include "timing/timing.cpp"
 #include "disasm/disasm.cpp"
 
-SuperFX superfx;
+#if defined(DEBUGGER)
+  #include "debugger/debugger.cpp"
+  SFXDebugger superfx;
+#else
+  SuperFX superfx;
+#endif
 
 void SuperFX::Enter() { superfx.enter(); }
 
@@ -26,6 +31,8 @@ void SuperFX::enter() {
       synchronize_cpu();
       continue;
     }
+
+    op_step();
 
     (this->*opcode_table[(regs.sfr & 0x0300) + peekpipe()])();
     if(r15_modified == false) regs.r[15]++;

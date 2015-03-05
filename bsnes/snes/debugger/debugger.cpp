@@ -10,7 +10,7 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
     if(breakpoint[i].source != source) continue;
     if(breakpoint[i].mode != mode) continue;
 
-    // account for address mirroring on the S-CPU and SA-1 buses
+    // account for address mirroring on the S-CPU and SA-1 (and other) buses
     if (source == Debugger::Breakpoint::Source::CPUBus) {
       Bus::Page &source_page = bus.page[breakpoint[i].addr >> 8];
       Bus::Page &offset_page = bus.page[addr >> 8];
@@ -20,6 +20,12 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
     } else if (source == Debugger::Breakpoint::Source::SA1Bus) {
       Bus::Page &source_page = sa1bus.page[breakpoint[i].addr >> 8];
       Bus::Page &offset_page = sa1bus.page[addr >> 8];
+
+      if (source_page.access != offset_page.access) continue;
+      if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+    } else if (source == Debugger::Breakpoint::Source::SFXBus) {
+      Bus::Page &source_page = superfxbus.page[breakpoint[i].addr >> 8];
+      Bus::Page &offset_page = superfxbus.page[addr >> 8];
 
       if (source_page.access != offset_page.access) continue;
       if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
@@ -79,6 +85,10 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
       return cartridge.has_sa1() ? vbrbus.read(addr & 0xffffff) : 0;
     } break;
+	
+	case MemorySource::SFXBus: {
+	  return cartridge.has_superfx() ? sfxdebugbus.read(addr & 0xffffff) : 0;
+    } break;
   }
 
   return 0x00;
@@ -114,7 +124,7 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     case MemorySource::CartROM: {
       if (addr < memory::cartrom.size()) {
         memory::cartrom.write_protect(false);
-        return memory::cartrom.write(addr & 0xffffff, data);
+        memory::cartrom.write(addr & 0xffffff, data);
         memory::cartrom.write_protect(true);
       }
     } break;
@@ -126,7 +136,15 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     
     case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
+      memory::cartrom.write_protect(false);
       if (cartridge.has_sa1()) vbrbus.write(addr & 0xffffff, data);
+      memory::cartrom.write_protect(true);
+    } break;
+	
+	case MemorySource::SFXBus: {
+	  memory::cartrom.write_protect(false);
+      if (cartridge.has_superfx()) sfxdebugbus.write(addr & 0xffffff, data);
+      memory::cartrom.write_protect(true);
     } break;
   }
 }
@@ -147,6 +165,7 @@ Debugger::Debugger() {
   step_cpu = false;
   step_smp = false;
   step_sa1 = false;
+  step_sfx = false;
   
   step_type = StepType::None;
 }

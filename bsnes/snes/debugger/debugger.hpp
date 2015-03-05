@@ -6,6 +6,7 @@ public:
     CPUStep,
     SMPStep,
     SA1Step,
+    SFXStep,
   } break_event;
 
   enum { Breakpoints = 8 };
@@ -14,7 +15,7 @@ public:
     unsigned addr;
     signed data;  //-1 = unused
     enum class Mode : unsigned { Exec, Read, Write } mode;
-    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus } source;
+    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus, SFXBus } source;
     unsigned counter;  //number of times breakpoint has been hit since being set
   } breakpoint[Breakpoints];
   unsigned breakpoint_hit;
@@ -23,6 +24,7 @@ public:
   bool step_cpu;
   bool step_smp;
   bool step_sa1;
+  bool step_sfx;
 
   enum class StepType : unsigned { 
     None, StepInto, StepOver, StepOut 
@@ -30,7 +32,7 @@ public:
   int call_count;
   bool step_over_new;
 
-  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM, CartROM, CartRAM, SA1Bus };
+  enum class MemorySource : unsigned { CPUBus, APUBus, APURAM, VRAM, OAM, CGRAM, CartROM, CartRAM, SA1Bus, SFXBus };
   uint8 read(MemorySource, unsigned addr);
   void write(MemorySource, unsigned addr, uint8 data);
 

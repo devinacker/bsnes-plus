@@ -93,6 +93,9 @@ Debugger::Debugger() {
   stepSA1 = new QCheckBox("Step SA-1");
   controlLayout->addWidget(stepSA1);
 
+  stepSFX = new QCheckBox("Step SuperFX");
+  controlLayout->addWidget(stepSFX);
+  
   controlLayout->addSpacing(Style::WidgetSpacing);
 
   traceCPU = new QCheckBox("Trace S-CPU opcodes");
@@ -103,6 +106,9 @@ Debugger::Debugger() {
   
   traceSA1 = new QCheckBox("Trace SA-1 opcodes");
   controlLayout->addWidget(traceSA1);
+  
+  traceSFX = new QCheckBox("Trace SuperFX opcodes");
+  controlLayout->addWidget(traceSFX);
 
   traceMask = new QCheckBox("Enable trace mask");
   controlLayout->addWidget(traceMask);
@@ -142,9 +148,11 @@ Debugger::Debugger() {
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSA1, SIGNAL(released()), this, SLOT(synchronize()));
+  connect(stepSFX, SIGNAL(released()), this, SLOT(synchronize()));
   connect(traceCPU, SIGNAL(stateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
   connect(traceSMP, SIGNAL(stateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
   connect(traceSA1, SIGNAL(stateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
+  connect(traceSFX, SIGNAL(stateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
   connect(traceMask, SIGNAL(stateChanged(int)), tracer, SLOT(setTraceMaskState(int)));
 
   frameCounter = 0;
@@ -187,8 +195,12 @@ void Debugger::modifySystemState(unsigned state) {
 
 void Debugger::synchronize() {
   runBreak->setText(application.debug ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && application.debug && (stepCPU->isChecked() || stepSMP->isChecked() || stepSA1->isChecked());
-  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + stepSA1->isChecked() == 1);
+  bool stepEnabled = SNES::cartridge.loaded() && application.debug && 
+                     (stepCPU->isChecked() || stepSMP->isChecked() || 
+                      stepSA1->isChecked() || stepSFX->isChecked());
+  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + 
+                                          stepSA1->isChecked() + stepSFX->isChecked() == 1)
+                          && !stepSFX->isChecked(); // TODO: implement this for superfx
   
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
@@ -196,6 +208,7 @@ void Debugger::synchronize() {
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
   SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
   SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
+  SNES::debugger.step_sfx = application.debug && stepSFX->isChecked();
 
   memoryEditor->synchronize();
 }
@@ -272,6 +285,15 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
       }
+      
+      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
+        SNES::debugger.step_sfx = true;
+        SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
+        string s = t;
+        s.replace(" ", "&nbsp;");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+      }
     } break;
 
     case SNES::Debugger::BreakEvent::CPUStep: {
@@ -296,6 +318,14 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SA1, SNES::sa1.regs.pc);
+    } break;
+    
+    case SNES::Debugger::BreakEvent::SFXStep: {
+      SNES::superfx.disassemble_opcode(t, SNES::superfx.regs.r[15] + (SNES::superfx.regs.pbr << 16));
+      string s = t;
+      s.replace(" ", "&nbsp;");
+      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      disassembler->refresh(Disassembler::SFX, SNES::superfx.regs.r[15] + (SNES::superfx.regs.pbr << 16));
     } break;
   }
 

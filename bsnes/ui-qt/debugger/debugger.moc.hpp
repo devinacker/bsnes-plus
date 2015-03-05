@@ -27,9 +27,11 @@ public:
   QCheckBox *stepCPU;
   QCheckBox *stepSMP;
   QCheckBox *stepSA1;
+  QCheckBox *stepSFX;
   QCheckBox *traceCPU;
   QCheckBox *traceSMP;
   QCheckBox *traceSA1;
+  QCheckBox *traceSFX;
   QCheckBox *traceMask;
   QWidget *spacer;
 

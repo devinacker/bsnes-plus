@@ -12,7 +12,7 @@ public:
   QVBoxLayout *layout;
   QTabWidget *tab;
 
-  enum Source { CPU, SMP, SA1 };
+  enum Source { CPU, SMP, SA1, SFX };
   void refresh(Source, unsigned);
   Disassembler();
 };
@@ -20,4 +20,5 @@ public:
 extern DisasmWidget *cpuDisassembler;
 extern DisasmWidget *smpDisassembler;
 extern DisasmWidget *sa1Disassembler;
+extern DisasmWidget *sfxDisassembler;
 extern Disassembler *disassembler;

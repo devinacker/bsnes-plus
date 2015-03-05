@@ -16,10 +16,19 @@ public:
   void reset();
   void serialize(serializer&);
 
+  // used by the superfx debugger prior to executing instructions
+  debugvirtual void op_step() {};
+
 private:
   unsigned clockmode;
   unsigned instruction_counter;
 };
 
-extern SuperFX superfx;
+#if defined(DEBUGGER)
+  #include "debugger/debugger.hpp"
+  extern SFXDebugger superfx;
+  extern SFXDebugBus sfxdebugbus;
+#else
+  extern SuperFX superfx;
+#endif
 extern SuperFXBus superfxbus;

@@ -2,6 +2,10 @@ struct SuperFXBus : Bus {
   void init();
 };
 
+struct SFXDebugBus : Bus {
+  void init();
+};
+
 struct SuperFXGSUROM : Memory {
   unsigned size() const;
   uint8 read(unsigned);
