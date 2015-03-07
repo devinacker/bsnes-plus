@@ -81,6 +81,9 @@ void SuperFX::reset() {
   regs.ramaddr = 0x0000;
   regs.reset();
 
+  disassemble_regs = 0;
+  disassemble_lastregs = 0;
+
   memory_reset();
   timing_reset();
 }
