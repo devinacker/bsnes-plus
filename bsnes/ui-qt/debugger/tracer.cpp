@@ -97,6 +97,7 @@ void Tracer::setTraceMaskState(int state) {
     memset(traceMaskCPU, 0x00, (1 << 24) >> 3);
     memset(traceMaskSMP, 0x00, (1 << 16) >> 3);
     memset(traceMaskSA1, 0x00, (1 << 16) >> 3);
+    memset(traceMaskSFX, 0x00, (1 << 16) >> 3);
   }
 }
 
