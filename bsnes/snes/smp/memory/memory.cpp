@@ -11,14 +11,6 @@ alwaysinline void SMP::ram_write(uint16 addr, uint8 data) {
   if(status.ram_writable && !status.ram_disabled) memory::apuram[addr] = data;
 }
 
-uint8 SMP::port_read(uint2 port) const {
-  return memory::apuram[0xf4 + port];
-}
-
-void SMP::port_write(uint2 port, uint8 data) {
-  memory::apuram[0xf4 + port] = data;
-}
-
 alwaysinline uint8 SMP::op_busread(uint16 addr) {
   uint8 r;
   if((addr & 0xfff0) == 0x00f0) {  //00f0-00ff
@@ -45,15 +37,12 @@ alwaysinline uint8 SMP::op_busread(uint16 addr) {
       case 0xf6:    //CPUIO2
       case 0xf7: {  //CPUIO3
         synchronize_cpu();
-        r = cpu.port_read(addr);
+        r = port.cpu_to_smp[addr & 3];
       } break;
 
-      case 0xf8: {  //RAM0
-        r = status.ram0;
-      } break;
-
-      case 0xf9: {  //RAM1
-        r = status.ram1;
+      case 0xf8:    //PORT4
+      case 0xf9: {  //PORT5
+        r = port.aux[addr & 1];
       } break;
 
       case 0xfa:    //T0TARGET
@@ -108,16 +97,15 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
         status.iplrom_enabled = data & 0x80;
 
         if(data & 0x30) {
-          //one-time clearing of APU port read registers,
-          //emulated by simulating CPU writes of 0x00
+          //one-time clearing of APU port read registers
           synchronize_cpu();
           if(data & 0x20) {
-            cpu.port_write(2, 0x00);
-            cpu.port_write(3, 0x00);
+            port.cpu_to_smp[2] = 0;
+            port.cpu_to_smp[3] = 0;
           }
           if(data & 0x10) {
-            cpu.port_write(0, 0x00);
-            cpu.port_write(1, 0x00);
+            port.cpu_to_smp[0] = 0;
+            port.cpu_to_smp[1] = 0;
           }
         }
 
@@ -157,15 +145,12 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
       case 0xf6:    //CPUIO2
       case 0xf7: {  //CPUIO3
         synchronize_cpu();
-        port_write(addr, data);
+        port.smp_to_cpu[addr & 3] = data;
       } break;
 
-      case 0xf8: {  //RAM0
-        status.ram0 = data;
-      } break;
-
-      case 0xf9: {  //RAM1
-        status.ram1 = data;
+      case 0xf8:    //PORT4
+      case 0xf9: {  //PORT5
+        port.aux[addr & 1] = data;
       } break;
 
       case 0xfa: {  //T0TARGET

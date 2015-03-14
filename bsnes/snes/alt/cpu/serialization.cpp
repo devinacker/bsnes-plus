@@ -6,7 +6,6 @@ void CPU::serialize(serializer &s) {
   PPUcounter::serialize(s);
 
   queue.serialize(s);
-  s.array(port_data);
 
   for(unsigned i = 0; i < 8; i++) {
     s.integer(channel[i].dma_enabled);

@@ -44,8 +44,6 @@ void CPU::serialize(serializer &s) {
   s.integer(status.hdma_pending);
   s.integer(status.hdma_mode);
 
-  s.array(status.port);
-
   s.integer(status.wram_addr);
 
   s.integer(status.joypad_strobe_latch);

@@ -19,8 +19,9 @@ void SMP::serialize(serializer &s) {
 
   s.integer(status.dsp_addr);
 
-  s.integer(status.ram0);
-  s.integer(status.ram1);
+  s.array(port.cpu_to_smp);
+  s.array(port.smp_to_cpu);
+  s.array(port.aux);
 
   s.integer(t0.stage0_ticks);
   s.integer(t0.stage1_ticks);

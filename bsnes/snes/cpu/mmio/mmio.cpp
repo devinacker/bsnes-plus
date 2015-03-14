@@ -355,9 +355,6 @@ void CPU::mmio_power() {
 }
 
 void CPU::mmio_reset() {
-  //$2140-217f
-  foreach(port, status.port) port = 0x00;
-
   //$2181-$2183
   status.wram_addr = 0x000000;
 
@@ -413,12 +410,6 @@ void CPU::mmio_reset() {
 uint8 CPU::mmio_read(unsigned addr) {
   addr &= 0xffff;
 
-  //APU
-  if((addr & 0xffc0) == 0x2140) {  //$2140-$217f
-    synchronize_smp();
-    return smp.port_read(addr);
-  }
-
   //DMA
   if((addr & 0xff80) == 0x4300) {  //$4300-$437f
     unsigned i = (addr >> 4) & 7;
@@ -469,13 +460,6 @@ uint8 CPU::mmio_read(unsigned addr) {
 
 void CPU::mmio_write(unsigned addr, uint8 data) {
   addr &= 0xffff;
-
-  //APU
-  if((addr & 0xffc0) == 0x2140) {  //$2140-$217f
-    synchronize_smp();
-    port_write(addr, data);
-    return;
-  }
 
   //DMA
   if((addr & 0xff80) == 0x4300) {  //$4300-$437f

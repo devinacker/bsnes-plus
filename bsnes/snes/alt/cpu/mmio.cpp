@@ -1,11 +1,6 @@
 #ifdef CPU_CPP
 
 uint8 CPU::mmio_read(unsigned addr) {
-  if((addr & 0xffc0) == 0x2140) {
-    synchronize_smp();
-    return smp.port_read(addr & 3);
-  }
-
   switch(addr & 0xffff) {
     case 0x2180: {
       uint8 result = bus.read(0x7e0000 | status.wram_addr);
@@ -98,12 +93,6 @@ uint8 CPU::mmio_read(unsigned addr) {
 }
 
 void CPU::mmio_write(unsigned addr, uint8 data) {
-  if((addr & 0xffc0) == 0x2140) {
-    synchronize_smp();
-    port_write(addr & 3, data);
-    return;
-  }
-
   switch(addr & 0xffff) {
     case 0x2180: {
       bus.write(0x7e0000 | status.wram_addr, data);

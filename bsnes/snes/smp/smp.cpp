@@ -13,6 +13,7 @@ namespace SNES {
 #include "serialization.cpp"
 #include "iplrom.cpp"
 #include "memory/memory.cpp"
+#include "mmio/mmio.cpp"
 #include "timing/timing.cpp"
 
 void SMP::step(unsigned clocks) {
@@ -93,9 +94,16 @@ void SMP::reset() {
   //$00f2
   status.dsp_addr = 0x00;
 
-  //$00f8,$00f9
-  status.ram0 = 0x00;
-  status.ram1 = 0x00;
+  //$00f4-$00f7
+  for(unsigned i = 0; i < 4; i++) {
+    port.cpu_to_smp[i] = 0;
+    port.smp_to_cpu[i] = 0;
+  }
+
+  //$00f8-$00f9
+  for(unsigned i = 0; i < 2; i++) {
+    port.aux[i] = 0;
+  }
 
   t0.stage0_ticks = 0;
   t1.stage0_ticks = 0;
