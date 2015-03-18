@@ -3,7 +3,7 @@ struct VramCanvas : public QWidget {
 public:
     QImage *image;
     void paintEvent(QPaintEvent*);
-	void mousePressEvent(QMouseEvent*);
+    void mousePressEvent(QMouseEvent*);
     VramCanvas();
 signals:
 	void infoChanged(unsigned);
