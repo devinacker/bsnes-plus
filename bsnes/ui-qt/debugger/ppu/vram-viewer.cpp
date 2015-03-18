@@ -37,7 +37,7 @@ VramViewer::VramViewer() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
-  canvas = new Canvas;
+  canvas = new VramCanvas;
   canvas->setFixedSize(512, 512);
   layout->addWidget(canvas);
 
@@ -170,7 +170,7 @@ void VramViewer::setDepth4bpp()  { bpp = 4; refresh(); }
 void VramViewer::setDepth8bpp()  { bpp = 8; refresh(); }
 void VramViewer::setDepthMode7() { bpp = 7; refresh(); }
 
-void Canvas::paintEvent(QPaintEvent*) {
+void VramCanvas::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.drawImage(0, 0, *image);
 }
@@ -186,7 +186,7 @@ void VramViewer::displayInfo(unsigned tile_num) {
 		vramInfo->setText("");
 }
 
-void Canvas::mousePressEvent(QMouseEvent* event) {
+void VramCanvas::mousePressEvent(QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
 	  unsigned column = event->x() / 8;
 	  unsigned row = event->y() / 8;
@@ -195,7 +195,7 @@ void Canvas::mousePressEvent(QMouseEvent* event) {
   }
 }
 
-Canvas::Canvas() {
+VramCanvas::VramCanvas() {
   image = new QImage(512, 512, QImage::Format_RGB32);
   image->fill(0x800000);
 }

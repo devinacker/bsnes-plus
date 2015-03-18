@@ -1,10 +1,10 @@
-class Canvas : public QWidget {
+struct VramCanvas : public QWidget {
 	Q_OBJECT
 public:
     QImage *image;
     void paintEvent(QPaintEvent*);
 	void mousePressEvent(QMouseEvent*);
-    Canvas();
+    VramCanvas();
 signals:
 	void infoChanged(unsigned);
 };
@@ -22,7 +22,7 @@ public:
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
   QLabel *vramInfo;
-  Canvas *canvas;
+  VramCanvas *canvas;
 
   void autoUpdate();
   VramViewer();
