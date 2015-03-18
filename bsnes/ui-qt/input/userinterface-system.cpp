@@ -74,6 +74,16 @@ struct Reset : HotkeyInput {
   }
 } reset;
 
+struct ReloadCartridge : HotkeyInput {
+  void pressed() {
+    utility.modifySystemState(Utility::ReloadCartridge);
+  }
+
+  ReloadCartridge() : HotkeyInput("Reload Cartridge", "input.userInterface.system.reloadCartridge") {
+    userInterfaceSystem.attach(this);
+  }
+} reload;
+
 struct Pause : HotkeyInput {
   void pressed() {
     application.pause = !application.pause;

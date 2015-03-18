@@ -16,7 +16,7 @@ public:
   void updateControllers();
 
   //system-state.cpp
-  enum system_state_t { LoadCartridge, UnloadCartridge, PowerOn, PowerOff, PowerCycle, Reset };
+  enum system_state_t { LoadCartridge, UnloadCartridge, PowerOn, PowerOff, PowerCycle, Reset, ReloadCartridge };
   void modifySystemState(system_state_t state);
 
   //window.cpp

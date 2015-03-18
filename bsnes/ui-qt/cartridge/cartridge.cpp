@@ -65,6 +65,8 @@ bool Cartridge::loadNormal(const char *base) {
   fileName = baseName;
   name = notdir(nall::basename(baseName));
 
+  application.currentRom = base;
+
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
 }
