@@ -22,6 +22,7 @@ public:
   QVBoxLayout *layout;
   QMenu *system;
     QAction *system_load;
+	QAction *system_reload;
     QMenu *system_loadSpecial;
       QAction *system_loadSpecial_bsxSlotted;
       QAction *system_loadSpecial_bsx;
@@ -111,6 +112,7 @@ public slots:
   void loadSuperGameBoyCartridge();
   void power();
   void reset();
+  void reloadCartridge();
   void setPort1None();
   void setPort1Gamepad();
   void setPort1Asciipad();

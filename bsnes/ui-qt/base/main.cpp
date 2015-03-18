@@ -29,6 +29,8 @@ MainWindow::MainWindow() {
 
   system_loadSpecial_superGameBoy = system_loadSpecial->addAction("Load Super &Game Boy Cartridge ...");
 
+  system_reload = system->addAction("Re&load");
+
   system->addSeparator();
 
   system->addAction(system_power = new CheckAction("&Power", 0));
@@ -249,6 +251,7 @@ MainWindow::MainWindow() {
 
   //slots
   connect(system_load, SIGNAL(triggered()), this, SLOT(loadCartridge()));
+  connect(system_reload, SIGNAL(triggered()), this, SLOT(reloadCartridge()));
   connect(system_loadSpecial_bsxSlotted, SIGNAL(triggered()), this, SLOT(loadBsxSlottedCartridge()));
   connect(system_loadSpecial_bsx, SIGNAL(triggered()), this, SLOT(loadBsxCartridge()));
   connect(system_loadSpecial_sufamiTurbo, SIGNAL(triggered()), this, SLOT(loadSufamiTurboCartridge()));
@@ -389,6 +392,10 @@ bool MainWindow::isActive() {
 void MainWindow::loadCartridge() {
   fileBrowser->setWindowTitle("Load Cartridge");
   fileBrowser->loadCartridge(FileBrowser::LoadDirect);
+}
+
+void MainWindow::reloadCartridge() {
+  utility.modifySystemState(Utility::ReloadCartridge);
 }
 
 void MainWindow::loadBsxSlottedCartridge() {
