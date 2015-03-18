@@ -1,3 +1,14 @@
+struct VramCanvas : public QWidget {
+	Q_OBJECT
+public:
+    QImage *image;
+    void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
+    VramCanvas();
+signals:
+	void infoChanged(unsigned);
+};
+
 class VramViewer : public Window {
   Q_OBJECT
 
@@ -10,11 +21,8 @@ public:
   QRadioButton *depthMode7;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
-  struct Canvas : public QWidget {
-    QImage *image;
-    void paintEvent(QPaintEvent*);
-    Canvas();
-  } *canvas;
+  QLabel *vramInfo;
+  VramCanvas *canvas;
 
   void autoUpdate();
   VramViewer();
@@ -26,6 +34,7 @@ public slots:
   void setDepth4bpp();
   void setDepth8bpp();
   void setDepthMode7();
+  void displayInfo(unsigned);
 
 private:
   unsigned bpp;

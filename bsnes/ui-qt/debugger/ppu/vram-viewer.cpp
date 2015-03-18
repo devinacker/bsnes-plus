@@ -37,9 +37,12 @@ VramViewer::VramViewer() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
-  canvas = new Canvas;
+  canvas = new VramCanvas;
   canvas->setFixedSize(512, 512);
   layout->addWidget(canvas);
+
+  vramInfo = new QLabel;
+  layout->addWidget(vramInfo);
 
   bpp = 2;
   depth2bpp->setChecked(true);
@@ -49,6 +52,7 @@ VramViewer::VramViewer() {
   connect(depth4bpp,  SIGNAL(pressed()), this, SLOT(setDepth4bpp()));
   connect(depth8bpp,  SIGNAL(pressed()), this, SLOT(setDepth8bpp()));
   connect(depthMode7, SIGNAL(pressed()), this, SLOT(setDepthMode7()));
+  connect(canvas, SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
 }
 
 void VramViewer::autoUpdate() {
@@ -166,12 +170,32 @@ void VramViewer::setDepth4bpp()  { bpp = 4; refresh(); }
 void VramViewer::setDepth8bpp()  { bpp = 8; refresh(); }
 void VramViewer::setDepthMode7() { bpp = 7; refresh(); }
 
-void VramViewer::Canvas::paintEvent(QPaintEvent*) {
+void VramCanvas::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.drawImage(0, 0, *image);
 }
 
-VramViewer::Canvas::Canvas() {
+void VramViewer::displayInfo(unsigned tile_num) {
+	unsigned vram_addr = (tile_num * bpp * 8);
+	if (vram_addr <= 0xFFFF) {
+		char tmp[256] = "";
+		sprintf(tmp, "VRAM address: %04X", vram_addr);
+	    vramInfo->setText(tmp);
+	}
+	else
+		vramInfo->setText("");
+}
+
+void VramCanvas::mousePressEvent(QMouseEvent* event) {
+  if (event->button() == Qt::LeftButton) {
+	  unsigned column = event->x() / 8;
+	  unsigned row = event->y() / 8;
+	  unsigned tile_num = (row * 64) + column;
+	  emit infoChanged(tile_num);
+  }
+}
+
+VramCanvas::VramCanvas() {
   image = new QImage(512, 512, QImage::Format_RGB32);
   image->fill(0x800000);
 }
