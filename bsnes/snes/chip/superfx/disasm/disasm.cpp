@@ -7,15 +7,15 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr) {
 
   if(!regs.sfr.alt2) {
     if(!regs.sfr.alt1) {
-      disassemble_alt0(t);
+      disassemble_alt0(t, addr);
     } else {
-      disassemble_alt1(t);
+      disassemble_alt1(t, addr);
     }
   } else {
     if(!regs.sfr.alt1) {
-      disassemble_alt2(t);
+      disassemble_alt2(t, addr);
     } else {
-      disassemble_alt3(t);
+      disassemble_alt3(t, addr);
     }
   }
 
@@ -59,10 +59,10 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr) {
   case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
   case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: case id+15
 
-#define op0 regs.pipeline
-#define op1 superfxbus.read((regs.pbr << 16) + regs.r[15] + 0)
-#define op2 superfxbus.read((regs.pbr << 16) + regs.r[15] + 1)
-#define bdest regs.r[15] + (int8_t)op1 + 1
+#define op0 superfxbus.read(addr)
+#define op1 superfxbus.read(addr + 1)
+#define op2 superfxbus.read(addr + 2)
+#define bdest (regs.pbr << 16) + (addr & 0xffff) + (int8_t)op1 + 1
 
 #define R(n) disassemble_regs |= (1 << n)
 #define Ri disassemble_regs |= (1 << (op0 & 15))
@@ -70,7 +70,7 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr) {
 #define Rd disassemble_regs |= (1 << regs.dreg)
 #define Rsd Rs; Rd
 
-void SuperFX::disassemble_alt0(char *output) {
+void SuperFX::disassemble_alt0(char *output, uint32 addr) {
   char t[256] = "";
   switch(op0) {
     case  (0x00): sprintf(t, "stop  "); break;
@@ -127,7 +127,7 @@ void SuperFX::disassemble_alt0(char *output) {
   strcat(output, t);
 }
 
-void SuperFX::disassemble_alt1(char *output) {
+void SuperFX::disassemble_alt1(char *output, uint32 addr) {
   char t[256] = "";
   switch(op0) {
     case  (0x00): sprintf(t, "stop  "); break;
@@ -184,7 +184,7 @@ void SuperFX::disassemble_alt1(char *output) {
   strcat(output, t);
 }
 
-void SuperFX::disassemble_alt2(char *output) {
+void SuperFX::disassemble_alt2(char *output, uint32 addr) {
   char t[256] = "";
   switch(op0) {
     case  (0x00): sprintf(t, "stop  "); break;
@@ -241,7 +241,7 @@ void SuperFX::disassemble_alt2(char *output) {
   strcat(output, t);
 }
 
-void SuperFX::disassemble_alt3(char *output) {
+void SuperFX::disassemble_alt3(char *output, uint32 addr) {
   char t[256] = "";
   switch(op0) {
     case  (0x00): sprintf(t, "stop  "); break;
