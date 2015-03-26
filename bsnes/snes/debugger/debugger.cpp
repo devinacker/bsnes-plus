@@ -24,8 +24,8 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
       if (source_page.access != offset_page.access) continue;
       if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
     } else if (source == Debugger::Breakpoint::Source::SFXBus) {
-      Bus::Page &source_page = superfxbus.page[breakpoint[i].addr >> 8];
-      Bus::Page &offset_page = superfxbus.page[addr >> 8];
+      Bus::Page &source_page = sfxdebugbus.page[breakpoint[i].addr >> 8];
+      Bus::Page &offset_page = sfxdebugbus.page[addr >> 8];
 
       if (source_page.access != offset_page.access) continue;
       if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;

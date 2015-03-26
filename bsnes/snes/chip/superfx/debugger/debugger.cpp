@@ -1,9 +1,6 @@
 #ifdef SUPERFX_CPP
 
 void SFXDebugger::op_step() {
-  // TODO! i have no idea how this will behave when running from cache.
-  // hopefully some playing around later will make it clearer
-
   bool break_event = false;
 
   opcode_pc = regs.r[15] + (regs.pbr << 16);
