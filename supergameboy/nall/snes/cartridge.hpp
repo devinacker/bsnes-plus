@@ -14,6 +14,7 @@ public:
   inline unsigned score_header(const uint8_t *data, unsigned size, unsigned addr);
   inline unsigned gameboy_ram_size(const uint8_t *data, unsigned size);
   inline bool gameboy_has_rtc(const uint8_t *data, unsigned size);
+  inline unsigned sufamiturbo_ram_size(const uint8_t *data, unsigned size);
 
   enum HeaderField {
     CartName    = 0x00,
@@ -117,7 +118,11 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
   }
 
   if(type == TypeSufamiTurbo) {
-    xml << "<cartridge/>";
+    xml << "<cartridge>";
+    if(sufamiturbo_ram_size(data, size) > 0) {
+      xml << "  <ram size='" << hex(sufamiturbo_ram_size(data, size)) << "'/>\n";
+    }
+    xml << "</cartridge>\n";
     xmlMemoryMap = xml;
     return;
   }
@@ -356,18 +361,20 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "        <map mode='linear' address='a0-bf:8000-ffff'/>\n";
     xml << "      </rom>\n";
     xml << "      <ram>\n";
-    xml << "        <map mode='linear' address='60-63:8000-ffff'/>\n";
-    xml << "        <map mode='linear' address='e0-e3:8000-ffff'/>\n";
+    xml << "        <map mode='linear' address='60-63:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='e0-e3:0000-ffff'/>\n";
     xml << "      </ram>\n";
     xml << "    </slot>\n";
     xml << "    <slot id='B'>\n";
     xml << "      <rom>\n";
+    xml << "        <map mode='linear' address='40-5f:0000-7fff'/>\n";
     xml << "        <map mode='linear' address='40-5f:8000-ffff'/>\n";
+    xml << "        <map mode='linear' address='c0-df:0000-7fff'/>\n";
     xml << "        <map mode='linear' address='c0-df:8000-ffff'/>\n";
     xml << "      </rom>\n";
     xml << "      <ram>\n";
-    xml << "        <map mode='linear' address='70-73:8000-ffff'/>\n";
-    xml << "        <map mode='linear' address='f0-f3:8000-ffff'/>\n";
+    xml << "        <map mode='linear' address='70-73:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='f0-f3:0000-ffff'/>\n";
     xml << "      </ram>\n";
     xml << "    </slot>\n";
     xml << "  </sufamiturbo>\n";
@@ -811,10 +818,10 @@ unsigned SNESCartridge::score_header(const uint8_t *data, unsigned size, unsigne
 
 unsigned SNESCartridge::gameboy_ram_size(const uint8_t *data, unsigned size) {
   if(size < 512) return 0;
-  if(data[0x0147] == 0x06) return 512; //MBC2 has 512 nibbles of internal RAM
+  if(data[0x0147] == 0x06) return 512;  //MBC2 has 512 nibbles of internal RAM
   switch(data[0x0149]) {
     case 0x00: return   0 * 1024;
-    case 0x01: return   8 * 1024;
+    case 0x01: return   2 * 1024;
     case 0x02: return   8 * 1024;
     case 0x03: return  32 * 1024;
     case 0x04: return 128 * 1024;
@@ -825,8 +832,13 @@ unsigned SNESCartridge::gameboy_ram_size(const uint8_t *data, unsigned size) {
 
 bool SNESCartridge::gameboy_has_rtc(const uint8_t *data, unsigned size) {
   if(size < 512) return false;
-  if(data[0x0147] == 0x0f ||data[0x0147] == 0x10) return true;
+  if(data[0x0147] == 0x0f || data[0x0147] == 0x10) return true;
   return false;
+}
+
+unsigned SNESCartridge::sufamiturbo_ram_size(const uint8_t *data, unsigned size) {
+  if(size < 0x38) return 0;
+  return data[0x37] * 2048;
 }
 
 }

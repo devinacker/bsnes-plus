@@ -30,6 +30,8 @@ public:
   readonly<Region> region;
   readonly<unsigned> ram_size;
   readonly<unsigned> spc7110_data_rom_offset;
+  readonly<unsigned> st_A_ram_size;
+  readonly<unsigned> st_B_ram_size;
   readonly<SuperGameBoyVersion> supergameboy_version;
   readonly<unsigned> supergameboy_ram_size;
   readonly<unsigned> supergameboy_rtc_size;

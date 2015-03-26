@@ -6,40 +6,88 @@ Cartridge cartridge;
 //================
 
 bool Cartridge::information(const char *filename, Cartridge::Information &info) {
-  if(extension(filename) != "sfc") return false;  //do not parse compressed images
-
   file fp;
   if(fp.open(filename, file::mode::read) == false) return false;
 
-  unsigned offset = 0;
-  if((fp.size() & 0x7fff) == 512) offset = 512;
+  if(striend(filename, ".sfc")) {
+    if(fp.size() < 0x8000) return false;
 
-  uint16_t complement, checksum;
+    unsigned offset = 0;
+    if((fp.size() & 0x7fff) == 512) offset = 512;
 
-  fp.seek(0x7fdc + offset);
-  complement = fp.readl(2);
-  checksum = fp.readl(2);
+    uint16_t complement, checksum;
 
-  unsigned header = offset + (complement + checksum == 65535 ? 0x7fb0 : 0xffb0);
+    fp.seek(0x7fdc + offset);
+    complement = fp.readl(2);
+    checksum = fp.readl(2);
 
-  fp.seek(header + 0x10);
-  char name[22];
-  fp.read((uint8_t*)name, 21);
-  name[21] = 0;
-  info.name = decodeJISX0201(name);
+    unsigned header = offset + (complement + checksum == 65535 ? 0x7fb0 : 0xffb0);
 
-  fp.seek(header + 0x29);
-  uint8_t region = fp.read();
-  info.region = (region <= 1 || region >= 13) ? "NTSC" : "PAL";
+    fp.seek(header + 0x10);
+    char name[22];
+    fp.read((uint8_t*)name, 21);
+    name[21] = 0;
+    info.name = decodeJISX0201(name);
 
-  info.romSize = fp.size() & ~0x7fff;
+    fp.seek(header + 0x29);
+    uint8_t region = fp.read();
+    info.region = (region <= 1 || region >= 13) ? "NTSC" : "PAL";
 
-  fp.seek(header + 0x28);
-  info.ramSize = fp.readl(1);
-  if(info.ramSize) info.ramSize = 1024 << (info.ramSize & 7);
+    info.romSize = fp.size() & ~0x7fff;
 
-  fp.close();
-  return true;
+    fp.seek(header + 0x28);
+    uint8_t ramsize = fp.read();
+    info.ramSize = (ramsize == 0) ? 0 : (1024 << (ramsize & 7));
+
+    return true;
+  } else if(striend(filename, ".gb") || striend(filename, ".gbc")) {
+    if(fp.size() < 0x200) return false;
+
+    fp.seek(0x134);
+    char name[17];
+    fp.read((uint8_t*)name, 16);
+    name[16] = 0;
+    if(name[15] & 0x80) name[15] = 0;  //strip GBC flag
+    info.name = decodeJISX0201(name);
+
+    fp.seek(0x147);
+    uint8_t mbctype   =   fp.read();
+    /*uint8_t romsize =*/ fp.read();
+    uint8_t ramsize   =   fp.read();
+    uint8_t region    =   fp.read();
+
+    info.region = (region == 0) ? "Japan" : "World";
+    info.romSize = fp.size();
+
+    if(mbctype == 0x06) info.ramSize = 256;
+    else switch(ramsize) {
+      case 0x00: info.ramSize =  0; break;
+      case 0x01: info.ramSize =  2 * 1024; break;
+      case 0x02: info.ramSize =  8 * 1024; break;
+      case 0x03: info.ramSize = 32 * 1024; break;
+      case 0x04:
+      case 0x05:
+      default:   info.ramSize = 128 * 1024;
+    }
+
+    return true;
+  } else if(striend(filename, ".st")) {
+    if(fp.size() < 0x40) return false;
+
+    fp.seek(0x10);
+    char name[15];
+    fp.read((uint8_t*)name, 14);
+    name[14] = 0;
+    info.name = decodeJISX0201(name);
+    info.region = "NTSC";
+    info.romSize = fp.size();
+
+    fp.seek(0x37);
+    info.ramSize = fp.read() * 2048;
+
+    return true;
+  }
+  return false;  //do not parse compressed images
 }
 
 bool Cartridge::saveStatesSupported() {
