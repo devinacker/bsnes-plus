@@ -83,6 +83,7 @@ private:
   void parse_xml_sufami_turbo(const char*, bool);
   void parse_xml_gameboy(const char*);
 
+  void xml_parse_memory(xml_element&, Memory&);
   void xml_parse_rom(xml_element&);
   void xml_parse_ram(xml_element&);
   void xml_parse_superfx(xml_element&);

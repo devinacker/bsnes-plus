@@ -213,7 +213,7 @@ public:
     if(buffer.data) {
       delete[] buffer.data;
       buffer.data = 0;
-	}
+    }
   }
 
   pAudioALSA() {
