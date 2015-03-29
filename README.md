@@ -11,13 +11,16 @@ introduce some new features and improvements, mostly aimed at debugging.
 - Cartridge ROM and RAM views in memory editor for mapper-agnostic analysis
 - SA-1 disassembly and debugging
 - SA-1 bus and BW-RAM viewing and (partial) usage logging
+- Super FX disassembly and debugging
+- Super FX bus viewing and usage logging
 
 ## Coming soon
 
+- Improved debugger UI with register editing
+- More coprocesor status viewing in properties window
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats
-- Super FX debugging
 
 ## Building on Windows
 
