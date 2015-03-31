@@ -36,4 +36,6 @@ extern PropertiesWidget *cpuPropertiesTab;
 extern PropertiesWidget *smpPropertiesTab;
 extern PropertiesWidget *ppuPropertiesTab;
 extern PropertiesWidget *dspPropertiesTab;
+extern PropertiesWidget *sa1PropertiesTab;
+extern PropertiesWidget *sfxPropertiesTab;
 extern PropertiesViewer *propertiesViewer;

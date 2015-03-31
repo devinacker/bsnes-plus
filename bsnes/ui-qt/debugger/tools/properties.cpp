@@ -3,6 +3,8 @@ PropertiesWidget *cpuPropertiesTab;
 PropertiesWidget *smpPropertiesTab;
 PropertiesWidget *ppuPropertiesTab;
 PropertiesWidget *dspPropertiesTab;
+PropertiesWidget *sa1PropertiesTab;
+PropertiesWidget *sfxPropertiesTab;
 PropertiesViewer *propertiesViewer;
 
 void PropertiesWidget::refresh() {
@@ -49,6 +51,8 @@ void PropertiesViewer::refresh() {
   smpPropertiesTab->refresh();
   ppuPropertiesTab->refresh();
   dspPropertiesTab->refresh();
+  sa1PropertiesTab->refresh();
+  sfxPropertiesTab->refresh();
 }
 
 void PropertiesViewer::show() {
@@ -85,6 +89,12 @@ PropertiesViewer::PropertiesViewer() {
 
   dspPropertiesTab = new PropertiesWidget(SNES::dsp);
   tabWidget->addTab(dspPropertiesTab, "S-DSP");
+
+  sa1PropertiesTab = new PropertiesWidget(SNES::sa1);
+  tabWidget->addTab(sa1PropertiesTab, "SA-1");
+
+  sfxPropertiesTab = new PropertiesWidget(SNES::superfx);
+  tabWidget->addTab(sfxPropertiesTab, "Super FX");
 
   controlLayout = new QHBoxLayout;
   controlLayout->setAlignment(Qt::AlignRight);
