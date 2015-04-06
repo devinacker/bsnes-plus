@@ -6,11 +6,11 @@ void add_clocks(unsigned clocks);
 
 void rombuffer_sync();
 void rombuffer_update();
-uint8 rombuffer_read();
+debugvirtual uint8 rombuffer_read();
 
 void rambuffer_sync();
-uint8 rambuffer_read(uint16 addr);
-void rambuffer_write(uint16 addr, uint8 data);
+debugvirtual uint8 rambuffer_read(uint16 addr);
+debugvirtual void rambuffer_write(uint16 addr, uint8 data);
 
 void r14_modify(uint16);
 void r15_modify(uint16);

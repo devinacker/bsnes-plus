@@ -18,10 +18,14 @@ public:
 
   void op_step();
   
-  alwaysinline uint8 peekpipe();
-  alwaysinline uint8 pipe();
+  // mark pipelined instruction bytes as executed
   uint8 op_read(uint16 addr);
-  // void op_write(uint32 addr, uint8 data);
+  
+  // mark (and break on) buffered i/o
+  uint8 rombuffer_read();
+
+  uint8 rambuffer_read(uint16 addr);
+  void rambuffer_write(uint16 addr, uint8 data);
 
   SFXDebugger();
   ~SFXDebugger();
