@@ -28,6 +28,9 @@ uint8 SFXDebugger::op_read(uint16 addr) {
   uint32 fulladdr = addr + (regs.pbr << 16);
   usage[fulladdr] |= UsageExec;
   
+  int offset = cartridge.rom_offset(fulladdr);
+  if (offset >= 0) (*cart_usage)[offset] |= UsageExec;
+  
   return SuperFX::op_read(addr);
 }
 
@@ -35,23 +38,23 @@ uint8 SFXDebugger::rombuffer_read() {
   uint32 fulladdr = (regs.rombr << 16) + regs.r[14];
   usage[fulladdr] |= UsageRead;
   
-  uint8 data = SuperFX::rombuffer_read();
+  uint8 data = sfxdebugbus.read(fulladdr);
   
   int offset = cartridge.rom_offset(fulladdr);
   if (offset >= 0) (*cart_usage)[offset] |= UsageRead;
   
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
-  return data;
+  return SuperFX::rombuffer_read();
 }
 
 uint8 SFXDebugger::rambuffer_read(uint16 addr) {
   uint32 fulladdr = 0x700000 + (regs.rambr << 16) + addr;
   usage[fulladdr] |= UsageRead;
   
-  uint8 data = SuperFX::rambuffer_read(addr);
+  uint8 data = sfxdebugbus.read(fulladdr);
   
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
-  return data;
+  return SuperFX::rambuffer_read();
 }
 
 void SFXDebugger::rambuffer_write(uint16 addr, uint8 data) {
