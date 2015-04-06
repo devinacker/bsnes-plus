@@ -93,8 +93,61 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
     return true; \
   }
 
-  // TODO: these
-
+  // internal
+  item("SA-1 MDR", string("0x", hex<2>(regs.mdr)));
+  
+  // $2200
+  item("$2200", "");
+  item("SA-1 IRQ", mmio.sa1_irq);
+  item("SA-1 Ready", mmio.sa1_rdyb);
+  item("SA-1 Reset", mmio.sa1_resb);
+  item("SA-1 NMI", mmio.sa1_nmi);
+  item("S-CPU to SA-1 Message", string("0x", hex<1>(mmio.smeg)));
+  
+  // $2201
+  item("$2201", "");
+  item("S-CPU IRQ", mmio.cpu_irqen);
+  item("DMA IRQ", mmio.chdma_irqen);
+  
+  // $2203-2208
+  item("$2203-$2204", "");
+  item("SA-1 Reset Vector", string("0x", hex<4>(mmio.crv)));
+  item("$2205-$2206", "");
+  item("SA-1 NMI Vector", string("0x", hex<4>(mmio.cnv)));
+  item("$2207-$2208", "");
+  item("SA-1 IRQ Vector", string("0x", hex<4>(mmio.civ)));
+  
+  // $220c-220f
+  item("$220c-$220d", "");
+  item("S-CPU NMI Vector", string("0x", hex<4>(mmio.snv)));
+  item("$220e-$220f", "");
+  item("S-CPU IRQ Vector", string("0x", hex<4>(mmio.siv)));
+  
+  // $2210
+  item("$2210", "");
+  item("Timer Type", mmio.hvselb ? "Linear" : "H/V");
+  item("V-Count Enable", mmio.ven);
+  item("H-Count Enable", mmio.hen);
+  
+  // $2220-2223
+  item("$2220", "");
+  item("Bank C Projection", mmio.cbmode);
+  item("Bank C ($00-$1F)", string("0x", hex<1>(mmio.cb), " (0x", hex<6>(mmio.cb << 20), ")"));
+  
+  item("$2221", "");
+  item("Bank D Projection", mmio.dbmode);
+  item("Bank D ($20-$3F)", string("0x", hex<1>(mmio.db), " (0x", hex<6>(mmio.db << 20), ")"));
+  
+  item("$2222", "");
+  item("Bank E Projection", mmio.ebmode);
+  item("Bank E ($80-$9F)", string("0x", hex<1>(mmio.eb), " (0x", hex<6>(mmio.eb << 20), ")"));
+  
+  item("$2223", "");
+  item("Bank F Projection", mmio.fbmode);
+  item("Bank F ($a0-$bF)", string("0x", hex<1>(mmio.fb), " (0x", hex<6>(mmio.fb << 20), ")"));
+  
+  // TODO: rest of these
+  
   #undef item
   return false;
 }
