@@ -1,9 +1,11 @@
 #ifdef SUPERFX_CPP
 
-void SuperFX::disassemble_opcode(char *output, uint32 addr) {
+void SuperFX::disassemble_opcode(char *output, uint32 addr, bool track_regs) {
   char t[256] = "";
 
   *output = 0;
+  
+  int temp_regs = disassemble_regs;
 
   if(!regs.sfr.alt2) {
     if(!regs.sfr.alt1) {
@@ -34,15 +36,19 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr) {
   strcat(output, t);
   
   // print all current and past used registers
-  for (int i = 0; i < 16; i++) {
-    if ((disassemble_regs | disassemble_lastregs) & (1 << i)) {
-      sprintf(t, "R%-2u:%.4x ", i, (unsigned) regs.r[i]);
-      strcat(output, t);
+  if (track_regs) {
+    for (int i = 0; i < 16; i++) {
+      if ((disassemble_regs | disassemble_lastregs) & (1 << i)) {
+        sprintf(t, "R%-2u:%.4x ", i, (unsigned) regs.r[i]);
+        strcat(output, t);
+      }
     }
+
+    disassemble_lastregs = disassemble_regs;
+    disassemble_regs = 0;
+  } else {
+    disassemble_regs = temp_regs;
   }
-  
-  disassemble_lastregs = disassemble_regs;
-  disassemble_regs = 0;
 }
 
 #define case4(id) \

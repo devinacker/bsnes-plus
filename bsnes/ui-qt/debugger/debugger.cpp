@@ -321,7 +321,7 @@ void Debugger::event() {
     } break;
     
     case SNES::Debugger::BreakEvent::SFXStep: {
-      SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
+      SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc, true);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
