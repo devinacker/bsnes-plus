@@ -297,35 +297,35 @@ void Debugger::event() {
     } break;
 
     case SNES::Debugger::BreakEvent::CPUStep: {
-      SNES::cpu.disassemble_opcode(t, SNES::cpu.regs.pc);
+      SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::CPU, SNES::cpu.regs.pc);
+      disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
     } break;
 
     case SNES::Debugger::BreakEvent::SMPStep: {
-      SNES::smp.disassemble_opcode(t, SNES::smp.regs.pc);
+      SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SMP, SNES::smp.regs.pc);
+      disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
     } break;
     
     case SNES::Debugger::BreakEvent::SA1Step: {
-      SNES::sa1.disassemble_opcode(t, SNES::sa1.regs.pc);
+      SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SA1, SNES::sa1.regs.pc);
+      disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
     } break;
     
     case SNES::Debugger::BreakEvent::SFXStep: {
-      SNES::superfx.disassemble_opcode(t, SNES::superfx.regs.r[15] + (SNES::superfx.regs.pbr << 16));
+      SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SFX, SNES::superfx.regs.r[15] + (SNES::superfx.regs.pbr << 16));
+      disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
     } break;
   }
 

@@ -93,7 +93,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
       if(source == CPU) { SNES::cpu.disassemble_opcode(t, line[i]); t[20] = 0; }
       if(source == SMP) { SNES::smp.disassemble_opcode(t, line[i]); t[23] = 0; }
       if(source == SA1) { SNES::sa1.disassemble_opcode(t, line[i]); t[20] = 0; }
-      if(source == SFX) { SNES::superfx.disassemble_opcode(t, line[i]); t[20] = 0; }
+      if(source == SFX) { SNES::superfx.disassemble_opcode(t, line[i]); t[25] = 0; }
       string text = rtrim(t);
       text.replace(" ", "&nbsp;");
       output << text;

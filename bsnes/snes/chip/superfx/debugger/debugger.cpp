@@ -3,7 +3,9 @@
 void SFXDebugger::op_step() {
   bool break_event = false;
 
-  opcode_pc = regs.r[15] + (regs.pbr << 16);
+  // subtract 1 since r15 will have already advanced one byte
+  // (putting the current opcode in the pipeline)
+  opcode_pc = (regs.pbr << 16) + regs.r[15] - 1;
   usage[opcode_pc] |= UsageExec;
 
   opcode_edge = true;
@@ -103,22 +105,9 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   }
 
   item("$3000-$301f", "")
-  item("Register R0", string("0x", hex<4>(regs.r[0])));
-  item("Register R1", string("0x", hex<4>(regs.r[1])));
-  item("Register R2", string("0x", hex<4>(regs.r[2])));
-  item("Register R3", string("0x", hex<4>(regs.r[3])));
-  item("Register R4", string("0x", hex<4>(regs.r[4])));
-  item("Register R5", string("0x", hex<4>(regs.r[5])));
-  item("Register R6", string("0x", hex<4>(regs.r[6])));
-  item("Register R7", string("0x", hex<4>(regs.r[7])));
-  item("Register R8", string("0x", hex<4>(regs.r[8])));
-  item("Register R9", string("0x", hex<4>(regs.r[9])));
-  item("Register R10", string("0x", hex<4>(regs.r[10])));
-  item("Register R11", string("0x", hex<4>(regs.r[11])));
-  item("Register R12", string("0x", hex<4>(regs.r[12])));
-  item("Register R13", string("0x", hex<4>(regs.r[13])));
-  item("Register R14", string("0x", hex<4>(regs.r[14])));
-  item("Register R15", string("0x", hex<4>(regs.r[15])));
+  for (int i = 0; i < 16; i++) {
+    item(string("Register R", i), string("0x", hex<4>(regs.r[i])))
+  }
   
   item("$3030", "")
   item("Status Flag Register (SFR)", string("0x", hex<4>(regs.sfr)))
@@ -149,7 +138,9 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   case 3: md = "256 colors"; break;
   }
   
-  switch (regs.scmr & 0x24) {
+  if (regs.por & 0x10) {
+    ht = "OBJ mode";
+  } else switch (regs.scmr & 0x24) {
   case 0x00: ht = "128 pixels"; break;
   case 0x04: ht = "160 pixels"; break;
   case 0x20: ht = "192 pixels"; break;
@@ -158,8 +149,8 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   
   item("Color Mode", md)
   item("Screen Height", ht);
-  item("Game Pak WRAM Access", regs.scmr & 0x8 ? "Super FX" : "SNES")
-  item("Game Pak ROM Access", regs.scmr & 0x10 ? "Super FX" : "SNES")
+  item("Game Pak WRAM Access", (regs.scmr & 0x8) ? "Super FX" : "SNES")
+  item("Game Pak ROM Access", (regs.scmr & 0x10) ? "Super FX" : "SNES")
   
   item("$303b", "")
   item("Version Register (VCR)", string("0x", hex<2>(regs.vcr)))
@@ -169,6 +160,13 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   
   item("$303e-$303f", "")
   item("Cache Base Register (CBR)", string("0x", hex<4>(regs.cbr)))
+  
+  item("", "")
+  item("Color Data", string(regs.colr, " (0x", hex<2>(regs.colr), ")"))
+  item("Plot Transparent", (regs.por & 0x1) ? "Disabled" : "Enabled")
+  item("Plot Dither", (regs.por & 0x2) ? "Enabled" : "Disabled")
+  item("COLOR/GETC High Nibble", (regs.por & 0x4) ? "Enabled" : "Disabled")
+  item("COLOR/GETC Freeze High", (regs.por & 0x8) ? "Enabled" : "Disabled")
 
   #undef item
   return false;
