@@ -161,26 +161,31 @@ Debugger::Debugger() {
 }
 
 void Debugger::modifySystemState(unsigned state) {
-  // TODO: include cartridge ROM/RAM and expansion usage in this
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
-  string cartusagefile = usagefile;
   usagefile << "-usage.bin";
   file fp;
 
   if(state == Utility::LoadCartridge) {
     memset(SNES::cpu.cart_usage, 0x00, 1 << 24);
+	
+    memset(SNES::cpu.usage, 0x00, 1 << 24);
+    memset(SNES::smp.usage, 0x00, 1 << 16);
+	
+    memset(SNES::sa1.usage, 0x00, 1 << 24);
+    memset(SNES::superfx.usage, 0x00, 1 << 24);
+	
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
+	  if (SNES::cartridge.has_sa1())     fp.read(SNES::sa1.usage, 1 << 24);
+	  if (SNES::cartridge.has_superfx()) fp.read(SNES::superfx.usage, 1 << 24);
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
-        if (offset >= 0) SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i];
+        if (offset >= 0) SNES::cpu.cart_usage[offset] |= 
+		  SNES::cpu.usage[i] | SNES::sa1.usage[i] | SNES::superfx.usage[i];
       }
-    } else {
-      memset(SNES::cpu.usage, 0x00, 1 << 24);
-      memset(SNES::smp.usage, 0x00, 1 << 16);
     }
   }
 
@@ -188,6 +193,8 @@ void Debugger::modifySystemState(unsigned state) {
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::write)) {
       fp.write(SNES::cpu.usage, 1 << 24);
       fp.write(SNES::smp.usage, 1 << 16);
+	  if (SNES::cartridge.has_sa1())     fp.write(SNES::sa1.usage, 1 << 24);
+	  if (SNES::cartridge.has_superfx()) fp.write(SNES::superfx.usage, 1 << 24);
       fp.close();
     }
   }
