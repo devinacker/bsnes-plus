@@ -69,13 +69,14 @@ uint8 CPUDebugger::op_read(uint32 addr) {
   return data;
 }
 
-// TODO: add DMA read/write breakpoints maybe
 uint8 CPUDebugger::dma_read(uint32 abus) {
   usage[abus] |= UsageRead;
   
   int offset = cartridge.rom_offset(abus);
   if (offset >= 0) cart_usage[offset] |= UsageRead;
   
+  uint8 data = bus.read(abus);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, abus, data);
   return CPU::dma_read(abus);
 }
 
@@ -87,11 +88,14 @@ void CPUDebugger::op_write(uint32 addr, uint8 data) {
 }
 
 // $2180 MMIO-based WRAM access
-// TODO: breakpoints for these too? since this will mostly be triggered via DMA
 #if defined(ALT_CPU_CPP)
 uint8 CPUDebugger::mmio_read(unsigned addr) {
   if (addr & 0xffff == 0x2180) {
-    usage[0x7e0000 | status.wram_addr] |= UsageRead;
+    uint32 fulladdr = 0x7e0000 | status.wram_addr;
+    uint8 data = bus.read(fulladdr);
+  
+    usage[fulladdr] |= UsageRead;
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
   }
   
   return CPU::mmio_read(addr);
@@ -99,19 +103,29 @@ uint8 CPUDebugger::mmio_read(unsigned addr) {
 
 void CPU::mmio_write(unsigned addr, uint8 data) {
   if (addr & 0xffff == 0x2180) {
-    usage[0x7e0000 | status.wram_addr] |= UsageWrite;
+    uint32 fulladdr = 0x7e0000 | status.wram_addr;
+  
+    usage[fulladdr] |= UsageWrite;
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
   }
   
   CPU::mmio_write(addr, data);
 }
 #else
 uint8 CPUDebugger::mmio_r2180() {
-  usage[0x7e0000 | status.wram_addr] |= UsageRead;
+  uint32 fulladdr = 0x7e0000 | status.wram_addr;
+  uint8 data = bus.read(fulladdr);
+ 
+  usage[fulladdr] |= UsageRead;
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
   return CPU::mmio_r2180();
 }
 
 void CPUDebugger::mmio_w2180(uint8 data) {
-  usage[0x7e0000 | status.wram_addr] |= UsageWrite;
+  uint32 fulladdr = 0x7e0000 | status.wram_addr;
+ 
+  usage[fulladdr] |= UsageWrite;
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
   CPU::mmio_w2180(data);
 }
 #endif
