@@ -54,7 +54,7 @@ uint8 SFXDebugger::rambuffer_read(uint16 addr) {
   uint8 data = sfxdebugbus.read(fulladdr);
   
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
-  return SuperFX::rambuffer_read();
+  return SuperFX::rambuffer_read(addr);
 }
 
 void SFXDebugger::rambuffer_write(uint16 addr, uint8 data) {
