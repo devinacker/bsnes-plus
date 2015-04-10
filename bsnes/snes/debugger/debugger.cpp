@@ -8,10 +8,17 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
 
     if(breakpoint[i].data != -1 && breakpoint[i].data != data) continue;
     if(breakpoint[i].source != source) continue;
-    if(breakpoint[i].mode != mode) continue;
-
+    
+    if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
+    
+    // don't account for address mirroring when using a range of addresses
+    // (because the range might span multiple memory sources and it's easier to not deal with that)
+    if (breakpoint[i].addr_end > 0) {
+      if (addr < breakpoint[i].addr) continue;
+      if (addr > breakpoint[i].addr_end) continue;
+      
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
-    if (source == Debugger::Breakpoint::Source::CPUBus) {
+    } else if (source == Debugger::Breakpoint::Source::CPUBus) {
       Bus::Page &source_page = bus.page[breakpoint[i].addr >> 8];
       Bus::Page &offset_page = bus.page[addr >> 8];
 
@@ -24,8 +31,8 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
       if (source_page.access != offset_page.access) continue;
       if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
     } else if (source == Debugger::Breakpoint::Source::SFXBus) {
-      Bus::Page &source_page = sfxdebugbus.page[breakpoint[i].addr >> 8];
-      Bus::Page &offset_page = sfxdebugbus.page[addr >> 8];
+      Bus::Page &source_page = superfxbus.page[breakpoint[i].addr >> 8];
+      Bus::Page &offset_page = superfxbus.page[addr >> 8];
 
       if (source_page.access != offset_page.access) continue;
       if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
@@ -85,9 +92,9 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
       return cartridge.has_sa1() ? vbrbus.read(addr & 0xffffff) : 0;
     } break;
-	
-	case MemorySource::SFXBus: {
-	  return cartridge.has_superfx() ? sfxdebugbus.read(addr & 0xffffff) : 0;
+    
+    case MemorySource::SFXBus: {
+      return cartridge.has_superfx() ? sfxdebugbus.read(addr & 0xffffff) : 0;
     } break;
   }
 
@@ -140,9 +147,9 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
       if (cartridge.has_sa1()) vbrbus.write(addr & 0xffffff, data);
       memory::cartrom.write_protect(true);
     } break;
-	
-	case MemorySource::SFXBus: {
-	  memory::cartrom.write_protect(false);
+    
+    case MemorySource::SFXBus: {
+      memory::cartrom.write_protect(false);
       if (cartridge.has_superfx()) sfxdebugbus.write(addr & 0xffffff, data);
       memory::cartrom.write_protect(true);
     } break;
@@ -156,7 +163,7 @@ Debugger::Debugger() {
     breakpoint[n].enabled = false;
     breakpoint[n].addr = 0;
     breakpoint[n].data = -1;
-    breakpoint[n].mode = Breakpoint::Mode::Exec;
+    breakpoint[n].mode = (unsigned)Breakpoint::Mode::Exec;
     breakpoint[n].source = Breakpoint::Source::CPUBus;
     breakpoint[n].counter = 0;
   }

@@ -1,12 +1,27 @@
 class BreakpointItem : public QWidget {
   Q_OBJECT
 
+enum {
+  BreakEnable,
+  BreakAddrStart,
+  BreakAddrDash,
+  BreakAddrEnd,
+  BreakData,
+  BreakRead,
+  BreakWrite,
+  BreakExecute,
+  BreakSource
+};
+
 public:
-  QHBoxLayout *layout;
+  QGridLayout *layout;
   QCheckBox *enabled;
   QLineEdit *addr;
+  QLineEdit *addr_end;
   QLineEdit *data;
-  QComboBox *mode;
+  QCheckBox *mode_r;
+  QCheckBox *mode_w;
+  QCheckBox *mode_x;
   QComboBox *source;
   BreakpointItem(unsigned id);
 
