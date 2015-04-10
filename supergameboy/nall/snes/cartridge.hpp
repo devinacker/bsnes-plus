@@ -30,14 +30,6 @@ public:
     ResetVector = 0x3c,
   };
 
-  enum Mode {
-    ModeNormal,
-    ModeBsxSlotted,
-    ModeBsx,
-    ModeSufamiTurbo,
-    ModeSuperGameBoy,
-  };
-
   enum Type {
     TypeNormal,
     TypeBsxSlotted,
@@ -57,12 +49,13 @@ public:
   };
 
   enum MemoryMapper {
+    SGBROM,
     LoROM,
     HiROM,
-    ExLoROM,
     ExHiROM,
     SuperFXROM,
     SA1ROM,
+    SDD1ROM,
     SPC7110ROM,
     BSCLoROM,
     BSCHiROM,
@@ -77,24 +70,17 @@ public:
     DSP1HiROM,
   };
 
-  bool loaded;        //is a base cartridge inserted?
-  unsigned crc32;     //crc32 of all cartridges (base+slot(s))
   unsigned rom_size;
   unsigned ram_size;
 
-  Mode mode;
   Type type;
   Region region;
   MemoryMapper mapper;
   DSP1MemoryMapper dsp1_mapper;
 
   bool has_bsx_slot;
-  bool has_superfx;
-  bool has_sa1;
-  bool has_srtc;
-  bool has_sdd1;
-  bool has_spc7110;
   bool has_spc7110rtc;
+  bool has_srtc;
   bool has_cx4;
   bool has_dsp1;
   bool has_dsp2;
@@ -145,76 +131,33 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
   }
   xml << ">\n";
 
-  if(type == TypeSuperGameBoy1Bios) {
+  if(mapper == SGBROM) {
     xml << "  <rom>\n";
-    xml << "    <map mode='linear' address='00-7f:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='00-7d:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='80-ff:8000-ffff'/>\n";
     xml << "  </rom>\n";
-    xml << "  <supergameboy revision='1'>\n";
+    unsigned revision = (type == TypeSuperGameBoy2Bios) ? 2 : 1;
+    xml << "  <supergameboy revision='" << revision << "'>\n";
     xml << "    <map address='00-3f:6000-7fff'/>\n";
     xml << "    <map address='80-bf:6000-7fff'/>\n";
     xml << "  </supergameboy>\n";
-  } else if(type == TypeSuperGameBoy2Bios) {
-    xml << "  <rom>\n";
-    xml << "    <map mode='linear' address='00-7f:8000-ffff'/>\n";
-    xml << "    <map mode='linear' address='80-ff:8000-ffff'/>\n";
-    xml << "  </rom>\n";
-    xml << "  <supergameboy revision='2'>\n";
-    xml << "    <map address='00-3f:6000-7fff'/>\n";
-    xml << "    <map address='80-bf:6000-7fff'/>\n";
-    xml << "  </supergameboy>\n";
-  } else if(has_spc7110) {
-    xml << "  <rom>\n";
-    xml << "    <map mode='shadow' address='00-0f:8000-ffff'/>\n";
-    xml << "    <map mode='shadow' address='80-bf:8000-ffff'/>\n";
-    xml << "    <map mode='linear' address='c0-cf:0000-ffff'/>\n";
-    xml << "  </rom>\n";
-
-    xml << "  <spc7110>\n";
-    xml << "    <mcu>\n";
-    xml << "      <map address='d0-ff:0000-ffff' offset='100000' size='" << hex(size - 0x100000) << "'/>\n";
-    xml << "    </mcu>\n";
-    xml << "    <ram size='" << hex(ram_size) << "'>\n";
-    xml << "      <map mode='linear' address='00:6000-7fff'/>\n";
-    xml << "      <map mode='linear' address='30:6000-7fff'/>\n";
-    xml << "    </ram>\n";
-    xml << "    <mmio>\n";
-    xml << "      <map address='00-3f:4800-483f'/>\n";
-    xml << "      <map address='80-bf:4800-483f'/>\n";
-    xml << "    </mmio>\n";
-    if(has_spc7110rtc) {
-      xml << "    <rtc>\n";
-      xml << "      <map address='00-3f:4840-4842'/>\n";
-      xml << "      <map address='80-bf:4840-4842'/>\n";
-      xml << "    </rtc>\n";
-    }
-    xml << "    <dcu>\n";
-    xml << "      <map address='50:0000-ffff'/>\n";
-    xml << "    </dcu>\n";
-    xml << "  </spc7110>\n";
   } else if(mapper == LoROM) {
     xml << "  <rom>\n";
-    xml << "    <map mode='linear' address='00-7f:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='00-7d:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='80-ff:8000-ffff'/>\n";
     xml << "  </rom>\n";
 
     if(ram_size > 0) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
-      if((rom_size > 0x200000) || (ram_size > 32 * 1024)) {
-        xml << "    <map mode='linear' address='70-7f:0000-7fff'/>\n";
-        xml << "    <map mode='linear' address='f0-ff:0000-7fff'/>\n";
-      } else {
-        xml << "    <map mode='linear' address='70-7f:0000-ffff'/>\n";
-        xml << "    <map mode='linear' address='f0-ff:0000-ffff'/>\n";
-      }
+      const char *range = (rom_size > 0x200000) || (ram_size > 32 * 1024) ? "7fff" : "ffff";
+      xml << "    <map mode='linear' address='70-7d:0000-" << range << "'/>\n";
+      xml << "    <map mode='linear' address='f0-ff:0000-" << range << "'/>\n";
       xml << "  </ram>\n";
     }
   } else if(mapper == HiROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-3f:8000-ffff'/>\n";
-    xml << "    <map mode='linear' address='40-7f:0000-ffff'/>\n";
+    xml << "    <map mode='linear' address='40-7d:0000-ffff'/>\n";
     xml << "    <map mode='shadow' address='80-bf:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='c0-ff:0000-ffff'/>\n";
     xml << "  </rom>\n";
@@ -223,44 +166,19 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
       xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
       xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
-      if((rom_size > 0x200000) || (ram_size > 32 * 1024)) {
-        xml << "    <map mode='linear' address='70-7f:0000-7fff'/>\n";
-      } else {
-        xml << "    <map mode='linear' address='70-7f:0000-ffff'/>\n";
-      }
-      xml << "  </ram>\n";
-    }
-  } else if(mapper == ExLoROM) {
-    xml << "  <rom>\n";
-    xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
-    xml << "    <map mode='linear' address='40-7f:0000-ffff'/>\n";
-    xml << "    <map mode='linear' address='80-bf:8000-ffff'/>\n";
-    xml << "  </rom>\n";
-
-    if(ram_size > 0) {
-      xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='70-7f:0000-7fff'/>\n";
       xml << "  </ram>\n";
     }
   } else if(mapper == ExHiROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-3f:8000-ffff' offset='400000'/>\n";
-    xml << "    <map mode='linear' address='40-7f:0000-ffff' offset='400000'/>\n";
+    xml << "    <map mode='linear' address='40-7d:0000-ffff' offset='400000'/>\n";
     xml << "    <map mode='shadow' address='80-bf:8000-ffff' offset='000000'/>\n";
     xml << "    <map mode='linear' address='c0-ff:0000-ffff' offset='000000'/>\n";
     xml << "  </rom>\n";
 
     if(ram_size > 0) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
-      if((rom_size > 0x200000) || (ram_size > 32 * 1024)) {
-        xml << "    <map mode='linear' address='70-7f:0000-7fff'/>\n";
-      } else {
-        xml << "    <map mode='linear' address='70-7f:0000-ffff'/>\n";
-      }
+      xml << "    <map mode='linear' address='80-bf:6000-7fff'/>\n";
       xml << "  </ram>\n";
     }
   } else if(mapper == SuperFXROM) {
@@ -273,7 +191,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    </rom>\n";
     xml << "    <ram size='" << hex(ram_size) << "'>\n";
     xml << "      <map mode='linear' address='00-3f:6000-7fff' size='2000'/>\n";
-    xml << "      <map mode='linear' address='60-7f:0000-ffff'/>\n";
+    xml << "      <map mode='linear' address='60-7d:0000-ffff'/>\n";
     xml << "      <map mode='linear' address='80-bf:6000-7fff' size='2000'/>\n";
     xml << "      <map mode='linear' address='e0-ff:0000-ffff'/>\n";
     xml << "    </ram>\n";
@@ -303,6 +221,59 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='80-bf:2200-23ff'/>\n";
     xml << "    </mmio>\n";
     xml << "  </sa1>\n";
+  } else if(mapper == SDD1ROM) {
+    xml << "  <rom>\n";
+    xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='40-7d:0000-ffff'/>\n";
+    xml << "    <map mode='linear' address='80-bf:8000-ffff'/>\n";
+    xml << "  </rom>\n";
+
+    if(ram_size > 0) {
+      xml << "  <ram size='" << hex(ram_size) << "'>\n";
+      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='70-7d:0000-7fff'/>\n";
+      xml << "  </ram>\n";
+
+    xml << "  <sdd1>\n";
+    xml << "    <mcu>\n";
+    xml << "      <map address='c0-ff:0000-ffff'/>\n";
+    xml << "    </mcu>\n";
+    xml << "    <mmio>\n";
+    xml << "      <map address='00-3f:4800-4807'/>\n";
+    xml << "      <map address='80-bf:4800-4807'/>\n";
+    xml << "    </mmio>\n";
+    xml << "  </sdd1>\n";
+    }
+  } else if(mapper == SPC7110ROM) {
+    xml << "  <rom>\n";
+    xml << "    <map mode='shadow' address='00-0f:8000-ffff'/>\n";
+    xml << "    <map mode='shadow' address='80-bf:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='c0-cf:0000-ffff'/>\n";
+    xml << "  </rom>\n";
+
+    xml << "  <spc7110>\n";
+    xml << "    <mcu>\n";
+    xml << "      <map address='d0-ff:0000-ffff' offset='100000' size='" << hex(size - 0x100000) << "'/>\n";
+    xml << "    </mcu>\n";
+    xml << "    <ram size='" << hex(ram_size) << "'>\n";
+    xml << "      <map mode='linear' address='00:6000-7fff'/>\n";
+    xml << "      <map mode='linear' address='30:6000-7fff'/>\n";
+    xml << "    </ram>\n";
+    xml << "    <mmio>\n";
+    xml << "      <map address='00-3f:4800-483f'/>\n";
+    xml << "      <map address='80-bf:4800-483f'/>\n";
+    xml << "    </mmio>\n";
+    if(has_spc7110rtc) {
+      xml << "    <rtc>\n";
+      xml << "      <map address='00-3f:4840-4842'/>\n";
+      xml << "      <map address='80-bf:4840-4842'/>\n";
+      xml << "    </rtc>\n";
+    }
+    xml << "    <dcu>\n";
+    xml << "      <map address='50:0000-ffff'/>\n";
+    xml << "    </dcu>\n";
+    xml << "  </spc7110>\n";
   } else if(mapper == BSCLoROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-1f:8000-ffff' offset='000000'/>\n";
@@ -311,7 +282,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map mode='linear' address='a0-bf:8000-ffff' offset='100000'/>\n";
     xml << "  </rom>\n";
     xml << "  <ram size='" << hex(ram_size) << "'>\n";
-    xml << "    <map mode='linear' address='70-7f:0000-7fff'/>\n";
+    xml << "    <map mode='linear' address='70-7d:0000-7fff'/>\n";
     xml << "    <map mode='linear' address='f0-ff:0000-7fff'/>\n";
     xml << "  </ram>\n";
     xml << "  <bsx>\n";
@@ -333,7 +304,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "  <bsx>\n";
     xml << "    <slot>\n";
     xml << "      <map mode='shadow' address='20-3f:8000-ffff'/>\n";
-    xml << "      <map mode='linear' address='60-7f:0000-ffff'/>\n";
+    xml << "      <map mode='linear' address='60-7d:0000-ffff'/>\n";
     xml << "      <map mode='shadow' address='a0-bf:8000-ffff'/>\n";
     xml << "      <map mode='linear' address='e0-ff:0000-ffff'/>\n";
     xml << "    </slot>\n";
@@ -385,18 +356,6 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map address='00-3f:2800-2801'/>\n";
     xml << "    <map address='80-bf:2800-2801'/>\n";
     xml << "  </srtc>\n";
-  }
-
-  if(has_sdd1) {
-    xml << "  <sdd1>\n";
-    xml << "    <mcu>\n";
-    xml << "      <map address='c0-ff:0000-ffff'/>\n";
-    xml << "    </mcu>\n";
-    xml << "    <mmio>\n";
-    xml << "      <map address='00-3f:4800-4807'/>\n";
-    xml << "      <map address='80-bf:4800-4807'/>\n";
-    xml << "    </mmio>\n";
-    xml << "  </sdd1>\n";
   }
 
   if(has_cx4) {
@@ -501,12 +460,8 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   ram_size    = 0;
 
   has_bsx_slot   = false;
-  has_superfx    = false;
-  has_sa1        = false;
-  has_srtc       = false;
-  has_sdd1       = false;
-  has_spc7110    = false;
   has_spc7110rtc = false;
+  has_srtc       = false;
   has_cx4        = false;
   has_dsp1       = false;
   has_dsp2       = false;
@@ -586,11 +541,13 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
 
   if(!memcmp(data + index, "Super GAMEBOY2", 14)) {
     type = TypeSuperGameBoy2Bios;
+    mapper = SGBROM;
     return;
   }
 
   if(!memcmp(data + index, "Super GAMEBOY", 13)) {
     type = TypeSuperGameBoy1Bios;
+    mapper = SGBROM;
     return;
   }
 
@@ -626,11 +583,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
     //standard cart
     type = TypeNormal;
 
-    if(index == 0x7fc0 && size >= 0x401000) {
-      mapper = ExLoROM;
-    } else if(index == 0x7fc0 && mapperid == 0x32) {
-      mapper = ExLoROM;
-    } else if(index == 0x7fc0) {
+    if(index == 0x7fc0) {
       mapper = LoROM;
     } else if(index == 0xffc0) {
       mapper = HiROM;
@@ -640,29 +593,26 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   }
 
   if(mapperid == 0x20 && (rom_type == 0x13 || rom_type == 0x14 || rom_type == 0x15 || rom_type == 0x1a)) {
-    has_superfx = true;
     mapper = SuperFXROM;
     ram_size = 1024 << (data[index - 3] & 7);
     if(ram_size == 1024) ram_size = 0;
   }
 
   if(mapperid == 0x23 && (rom_type == 0x32 || rom_type == 0x34 || rom_type == 0x35)) {
-    has_sa1 = true;
     mapper = SA1ROM;
+  }
+
+  if(mapperid == 0x32 && (rom_type == 0x43 || rom_type == 0x45)) {
+    mapper = SDD1ROM;
+  }
+
+  if(mapperid == 0x3a && (rom_type == 0xf5 || rom_type == 0xf9)) {
+    mapper = SPC7110ROM;
+    has_spc7110rtc = (rom_type == 0xf9);
   }
 
   if(mapperid == 0x35 && rom_type == 0x55) {
     has_srtc = true;
-  }
-
-  if(mapperid == 0x32 && (rom_type == 0x43 || rom_type == 0x45)) {
-    has_sdd1 = true;
-  }
-
-  if(mapperid == 0x3a && (rom_type == 0xf5 || rom_type == 0xf9)) {
-    has_spc7110 = true;
-    has_spc7110rtc = (rom_type == 0xf9);
-    mapper = SPC7110ROM;
   }
 
   if(mapperid == 0x20 && rom_type == 0xf3) {
@@ -803,7 +753,7 @@ unsigned SNESCartridge::score_header(const uint8_t *data, unsigned size, unsigne
 
   if(addr == 0x007fc0 && mapper == 0x20) score += 2;  //0x20 is usually LoROM
   if(addr == 0x00ffc0 && mapper == 0x21) score += 2;  //0x21 is usually HiROM
-  if(addr == 0x007fc0 && mapper == 0x22) score += 2;  //0x22 is usually ExLoROM
+  if(addr == 0x007fc0 && mapper == 0x22) score += 2;  //0x22 is usually SDD1
   if(addr == 0x40ffc0 && mapper == 0x25) score += 2;  //0x25 is usually ExHiROM
 
   if(data[addr + Company] == 0x33) score += 2;        //0x33 indicates extended header
