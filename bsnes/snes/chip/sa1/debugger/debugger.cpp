@@ -4,7 +4,7 @@ void SA1Debugger::op_step() {
   bool break_event = false;
 
   usage[regs.pc] &= ~(UsageFlagM | UsageFlagX);
-  usage[regs.pc] |= UsageExec | (regs.p.m << 1) | (regs.p.x << 0);
+  usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
 
   opcode_edge = true;

@@ -6,7 +6,7 @@ void SFXDebugger::op_step() {
   // subtract 1 since r15 will have already advanced one byte
   // (putting the current opcode in the pipeline)
   opcode_pc = (regs.pbr << 16) + regs.r[15] - 1;
-  usage[opcode_pc] |= UsageExec;
+  usage[opcode_pc] |= UsageOpcode;
 
   opcode_edge = true;
   if(debugger.step_sfx &&

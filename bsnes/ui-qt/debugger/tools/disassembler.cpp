@@ -61,7 +61,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
     if(base == -1) break;
 
     for(unsigned i = 1; i <= 4; i++) {
-      if(usage[(base - i) & mask] & 0x20) {
+      if(usage[(base - i) & mask] & 0x10) {
         line[index] = base - i;
         break;
       }
@@ -73,7 +73,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
     if(base == -1) break;
 
     for(unsigned i = 1; i <= 4; i++) {
-      if(usage[(base + i) & mask] & 0x20) {
+      if(usage[(base + i) & mask] & 0x10) {
         line[index] = base + i;
         break;
       }

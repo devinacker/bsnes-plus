@@ -5,9 +5,10 @@ public:
   function<void ()> step_event;
 
   enum Usage {
-    UsageRead  = 0x80,
-    UsageWrite = 0x40,
-    UsageExec  = 0x20,
+    UsageRead   = 0x80,
+    UsageWrite  = 0x40,
+    UsageExec   = 0x20,
+    UsageOpcode = 0x10,
   };
   uint8 *usage;
   uint16 opcode_pc;

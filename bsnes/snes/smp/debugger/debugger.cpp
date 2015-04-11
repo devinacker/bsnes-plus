@@ -3,7 +3,7 @@
 void SMPDebugger::op_step() {
   bool break_event = false;
 
-  usage[regs.pc] |= UsageExec;
+  usage[regs.pc] |= UsageOpcode;
   opcode_pc = regs.pc;
 
   opcode_edge = true;

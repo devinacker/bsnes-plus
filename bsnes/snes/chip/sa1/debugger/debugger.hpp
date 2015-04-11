@@ -5,11 +5,12 @@ public:
   function<void ()> step_event;
 
   enum Usage {
-    UsageRead  = 0x80,
-    UsageWrite = 0x40,
-    UsageExec  = 0x20,
-    UsageFlagM = 0x02,
-    UsageFlagX = 0x01,
+    UsageRead   = 0x80,
+    UsageWrite  = 0x40,
+    UsageExec   = 0x20,
+    UsageOpcode = 0x10,
+    UsageFlagM  = 0x02,
+    UsageFlagX  = 0x01,
   };
   uint8 *usage;
   uint8 **cart_usage;
