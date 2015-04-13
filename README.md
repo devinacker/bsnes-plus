@@ -1,6 +1,6 @@
 # bsnes-plus
 
-bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic v073u1) intended to
+bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic) intended to
 introduce some new features and improvements, mostly aimed at debugging.
 
 ## What's new
