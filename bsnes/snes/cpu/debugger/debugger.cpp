@@ -76,7 +76,7 @@ uint8 CPUDebugger::dma_read(uint32 abus) {
   if (offset >= 0) cart_usage[offset] |= UsageRead;
   
   uint8 data = bus.read(abus);
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, abus, data);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, abus, data);
   return CPU::dma_read(abus);
 }
 
@@ -95,7 +95,7 @@ uint8 CPUDebugger::mmio_read(unsigned addr) {
     uint8 data = bus.read(fulladdr);
   
     usage[fulladdr] |= UsageRead;
-    debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
   }
   
   return CPU::mmio_read(addr);
@@ -106,7 +106,7 @@ void CPU::mmio_write(unsigned addr, uint8 data) {
     uint32 fulladdr = 0x7e0000 | status.wram_addr;
   
     usage[fulladdr] |= UsageWrite;
-    debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
   }
   
   CPU::mmio_write(addr, data);
@@ -117,7 +117,7 @@ uint8 CPUDebugger::mmio_r2180() {
   uint8 data = bus.read(fulladdr);
  
   usage[fulladdr] |= UsageRead;
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
   return CPU::mmio_r2180();
 }
 
@@ -125,7 +125,7 @@ void CPUDebugger::mmio_w2180(uint8 data) {
   uint32 fulladdr = 0x7e0000 | status.wram_addr;
  
   usage[fulladdr] |= UsageWrite;
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Write, fulladdr, data);
   CPU::mmio_w2180(data);
 }
 #endif
