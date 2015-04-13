@@ -147,21 +147,14 @@ void FileBrowser::onChangeCartridge(const string &path) {
   string patch(filepath(nall::basename(filename), config().path.patch), ".ups");
 
   if(file::exists(filename)) {
-    if(striend(filename, ".sfc")) {
-      Cartridge::Information cartinfo;
-      if(cartridge.information(filename, cartinfo)) {
-        info << "<small><table>";
-        info << "<tr><td><b>Title: </b></td><td>" << cartinfo.name << "</td></tr>";
-        info << "<tr><td><b>Region: </b></td><td>" << cartinfo.region << "</td></tr>";
-        info << "<tr><td><b>ROM: </b></td><td>" << cartinfo.romSize * 8 / 1024 / 1024 << "mbit</td></tr>";
-        info << "<tr><td><b>RAM: </b></td><td>";
-        cartinfo.ramSize ? info << cartinfo.ramSize * 8 / 1024 << "kbit</td></tr>" : info << "None</td></tr>";
-        info << "</table></small>";
-      }
-    } else if(striend(filename, ".st")) {
-      unsigned size = file::size(filename);
+    Cartridge::Information cartinfo;
+    if(cartridge.information(filename, cartinfo)) {
       info << "<small><table>";
-      info << "<tr><td><b>ROM: </b></td><td>" << size * 8 / 1024 / 1024 << "mbit</td></tr>";
+      info << "<tr><td><b>Title: </b></td><td>" << cartinfo.name << "</td></tr>";
+      info << "<tr><td><b>Region: </b></td><td>" << cartinfo.region << "</td></tr>";
+      info << "<tr><td><b>ROM: </b></td><td>" << cartinfo.romSize * 8 / 1024 / 1024 << "mbit</td></tr>";
+      info << "<tr><td><b>RAM: </b></td><td>";
+      cartinfo.ramSize ? info << cartinfo.ramSize * 8 / 1024 << "kbit</td></tr>" : info << "None</td></tr>";
       info << "</table></small>";
     }
   }

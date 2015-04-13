@@ -3,12 +3,9 @@ public:
   enum : bool { Threaded = true };
   array<Processor*> coprocessors;
   alwaysinline void step(unsigned clocks);
-  alwaysinline void synchronize_smp();
+  void synchronize_smp();
   void synchronize_ppu();
   void synchronize_coprocessor();
-
-  uint8 port_read(uint2 port) const;
-  void port_write(uint2 port, uint8 data);
 
   uint8 pio();
   bool joylatch();
@@ -72,9 +69,6 @@ private:
     bool hdma_mode;  //0 = init, 1 = run
 
     //MMIO
-    //$2140-217f
-    uint8 port[4];
-
     //$2181-$2183
     uint17 wram_addr;
 

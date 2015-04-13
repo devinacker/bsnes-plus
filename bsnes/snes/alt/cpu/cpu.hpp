@@ -5,15 +5,13 @@ public:
   enum : bool { Threaded = true };
   array<Processor*> coprocessors;
   alwaysinline void step(unsigned clocks);
-  alwaysinline void synchronize_smp();
+  void synchronize_smp();
   void synchronize_ppu();
   void synchronize_coprocessor();
 
   uint8 pio();
   bool joylatch();
   bool interrupt_pending();
-  uint8 port_read(uint8 port);
-  void port_write(uint8 port, uint8 data);
   debugvirtual uint8 mmio_read(unsigned addr);
   debugvirtual void mmio_write(unsigned addr, uint8 data);
 
@@ -69,9 +67,6 @@ private:
   void hdma_run();
   void hdma_init();
   void dma_reset();
-
-  //registers
-  uint8 port_data[4];
 
   struct Channel {
     bool dma_enabled;

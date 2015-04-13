@@ -30,6 +30,8 @@ public:
   readonly<Region> region;
   readonly<unsigned> ram_size;
   readonly<unsigned> spc7110_data_rom_offset;
+  readonly<unsigned> st_A_ram_size;
+  readonly<unsigned> st_B_ram_size;
   readonly<SuperGameBoyVersion> supergameboy_version;
   readonly<unsigned> supergameboy_ram_size;
   readonly<unsigned> supergameboy_rtc_size;
@@ -81,6 +83,7 @@ private:
   void parse_xml_sufami_turbo(const char*, bool);
   void parse_xml_gameboy(const char*);
 
+  void xml_parse_memory(xml_element&, Memory&);
   void xml_parse_rom(xml_element&);
   void xml_parse_ram(xml_element&);
   void xml_parse_superfx(xml_element&);

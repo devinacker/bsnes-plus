@@ -12,14 +12,6 @@ bool CPU::interrupt_pending() {
   return false;
 }
 
-uint8 CPU::port_read(uint8 port) {
-  return port_data[port & 3];
-}
-
-void CPU::port_write(uint8 port, uint8 data) {
-  port_data[port & 3] = data;
-}
-
 void CPU::op_io() {
   add_clocks(6);
 }

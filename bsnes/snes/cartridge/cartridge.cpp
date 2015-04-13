@@ -34,6 +34,8 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   region = Region::NTSC;
   ram_size = 0;
   spc7110_data_rom_offset = 0x100000;
+  st_A_ram_size = 0;
+  st_B_ram_size = 0;
   supergameboy_version = SuperGameBoyVersion::Version1;
   supergameboy_ram_size = 0;
   supergameboy_rtc_size = 0;
@@ -69,8 +71,8 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   }
 
   if(mode == Mode::SufamiTurbo) {
-    if(memory::stArom.data()) memory::stAram.map(allocate<uint8_t>(128 * 1024, 0xff), 128 * 1024);
-    if(memory::stBrom.data()) memory::stBram.map(allocate<uint8_t>(128 * 1024, 0xff), 128 * 1024);
+    if(st_A_ram_size) memory::stAram.map(allocate<uint8_t>(st_A_ram_size, 0xff), st_A_ram_size);
+    if(st_B_ram_size) memory::stBram.map(allocate<uint8_t>(st_B_ram_size, 0xff), st_B_ram_size);
   }
 
   if(mode == Mode::SuperGameBoy) {

@@ -1,12 +1,9 @@
-class SMP : public Processor, public SMPcore {
+class SMP : public Processor, public SMPcore, public MMIO {
 public:
   enum : bool { Threaded = true };
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_cpu();
   alwaysinline void synchronize_dsp();
-
-  uint8 port_read(uint2 port) const;
-  void port_write(uint2 port, uint8 data);
 
   void enter();
   void power();
@@ -20,6 +17,7 @@ public:
 
 private:
   #include "memory/memory.hpp"
+  #include "mmio/mmio.hpp"
   #include "timing/timing.hpp"
 
   struct {
@@ -41,11 +39,16 @@ private:
 
     //$00f2
     uint8 dsp_addr;
-
-    //$00f8,$00f9
-    uint8 ram0;
-    uint8 ram1;
   } status;
+
+  struct {
+    //$00f4-$00f7
+    uint8 cpu_to_smp[4];
+    uint8 smp_to_cpu[4];
+
+    //$00f8-$00f9
+    uint8 aux[2];
+  } port;
 
   static void Enter();
   debugvirtual void op_step();
