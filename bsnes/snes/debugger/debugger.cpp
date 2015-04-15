@@ -19,23 +19,14 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
       
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
     } else if (source == Debugger::Breakpoint::Source::CPUBus) {
-      Bus::Page &source_page = bus.page[breakpoint[i].addr >> 8];
-      Bus::Page &offset_page = bus.page[addr >> 8];
-
-      if (source_page.access != offset_page.access) continue;
-      if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+      if (!bus.is_mirror(breakpoint[i].addr, addr)) continue;
+      
     } else if (source == Debugger::Breakpoint::Source::SA1Bus) {
-      Bus::Page &source_page = sa1bus.page[breakpoint[i].addr >> 8];
-      Bus::Page &offset_page = sa1bus.page[addr >> 8];
-
-      if (source_page.access != offset_page.access) continue;
-      if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+      if (!sa1bus.is_mirror(breakpoint[i].addr, addr)) continue;
+      
     } else if (source == Debugger::Breakpoint::Source::SFXBus) {
-      Bus::Page &source_page = superfxbus.page[breakpoint[i].addr >> 8];
-      Bus::Page &offset_page = superfxbus.page[addr >> 8];
-
-      if (source_page.access != offset_page.access) continue;
-      if (source_page.offset + breakpoint[i].addr != offset_page.offset + addr) continue;
+      if (!superfxbus.is_mirror(breakpoint[i].addr, addr)) continue;
+      
     } else {
       if (breakpoint[i].addr != addr) continue;
     }

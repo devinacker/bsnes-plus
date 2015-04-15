@@ -80,6 +80,8 @@ struct Bus {
   alwaysinline uint8 read(uint24 addr);
   alwaysinline void write(uint24 addr, uint8 data);
 
+  alwaysinline bool is_mirror(uint24 addr1, uint24 addr2);
+  
   bool load_cart();
   void unload_cart();
 

@@ -66,3 +66,14 @@ void Bus::write(uint24 addr, uint8 data) {
   Page &p = page[addr >> 8];
   p.access->write(p.offset + addr, data);
 }
+
+bool Bus::is_mirror(uint24 addr1, uint24 addr2) {
+  // if the lower bytes of each address are different then they can't be mirrors
+  // since pages are always aligned to 256-byte boundaries
+  if((addr1 ^ addr2) & 0xff) return false;
+
+  // TODO: handle this correctly for MMIO as well (at least on the SNES side)
+  Page &p1 = page[addr1 >> 8];
+  Page &p2 = page[addr2 >> 8];
+  return (p1.access == p2.access) && (p1.offset + addr1 == p2.offset + addr2);
+}
