@@ -115,7 +115,7 @@ void System::power() {
 
   audio.coprocessor_enable(false);
   if(expansion() == ExpansionPortDevice::BSX) bsxbase.enable();
-  if(memory::bsxflash.data()) bsxflash.enable();
+  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.enable();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.enable();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.enable();
 
@@ -137,7 +137,7 @@ void System::power() {
   ppu.power();
 
   if(expansion() == ExpansionPortDevice::BSX) bsxbase.power();
-  if(memory::bsxflash.data()) bsxflash.power();
+  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.power();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.power();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.power();
 
@@ -174,7 +174,7 @@ void System::reset() {
   ppu.reset();
 
   if(expansion() == ExpansionPortDevice::BSX) bsxbase.reset();
-  if(memory::bsxflash.data()) bsxflash.reset();
+  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.reset();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.reset();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.reset();
 

@@ -122,7 +122,7 @@ bool Cartridge::loadNormal(const char *base) {
 bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxflash);
+  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted,
@@ -142,7 +142,7 @@ bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
 bool Cartridge::loadBsx(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxflash);
+  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,

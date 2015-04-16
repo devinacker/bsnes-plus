@@ -17,11 +17,11 @@ void BSXFlash::reset() {
   regs.flash_enable = false;
   regs.read_enable  = false;
   regs.write_enable = false;
-  memory::bsxflash.write_protect(!regs.write_enable);
+  memory::bsxpack.write_protect(!regs.write_enable);
 }
 
 unsigned BSXFlash::size() const {
-  return memory::bsxflash.size();
+  return memory::bsxpack.size();
 }
 
 uint8 BSXFlash::read(unsigned addr) {
@@ -48,7 +48,7 @@ uint8 BSXFlash::read(unsigned addr) {
     }
   }
 
-  return memory::bsxflash.read(addr);
+  return memory::bsxpack.read(addr);
 }
 
 void BSXFlash::write(unsigned addr, uint8 data) {
@@ -67,11 +67,11 @@ void BSXFlash::write(unsigned addr, uint8 data) {
     regs.write_new = data;
 
     if(regs.write_enable && regs.write_old == regs.write_new) {
-      return memory::bsxflash.write(addr, data);
+      return memory::bsxpack.write(addr, data);
     }
   } else {
     if(regs.write_enable) {
-      return memory::bsxflash.write(addr, data);
+      return memory::bsxpack.write(addr, data);
     }
   }
 
@@ -111,7 +111,7 @@ void BSXFlash::write(unsigned addr, uint8 data) {
       regs.write_enable = false;
     }
 
-    memory::bsxflash.write_protect(!regs.write_enable);
+    memory::bsxpack.write_protect(!regs.write_enable);
   }
 }
 

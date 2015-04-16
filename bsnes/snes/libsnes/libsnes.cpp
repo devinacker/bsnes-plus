@@ -133,7 +133,7 @@ bool snes_load_cartridge_bsx_slotted(
   snes_cheat_reset();
   if(rom_data) SNES::memory::cartrom.copy(rom_data, rom_size);
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SNESCartridge(rom_data, rom_size).xmlMemoryMap;
-  if(bsx_data) SNES::memory::bsxflash.copy(bsx_data, bsx_size);
+  if(bsx_data) SNES::memory::bsxpack.copy(bsx_data, bsx_size);
   string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SNESCartridge(bsx_data, bsx_size).xmlMemoryMap;
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted, { xmlrom, xmlbsx });
   SNES::system.power();
@@ -147,7 +147,7 @@ bool snes_load_cartridge_bsx(
   snes_cheat_reset();
   if(rom_data) SNES::memory::cartrom.copy(rom_data, rom_size);
   string xmlrom = (rom_xml && *rom_xml) ? string(rom_xml) : SNESCartridge(rom_data, rom_size).xmlMemoryMap;
-  if(bsx_data) SNES::memory::bsxflash.copy(bsx_data, bsx_size);
+  if(bsx_data) SNES::memory::bsxpack.copy(bsx_data, bsx_size);
   string xmlbsx = (bsx_xml && *bsx_xml) ? string(bsx_xml) : SNESCartridge(bsx_data, bsx_size).xmlMemoryMap;
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx, { xmlrom, xmlbsx });
   SNES::system.power();

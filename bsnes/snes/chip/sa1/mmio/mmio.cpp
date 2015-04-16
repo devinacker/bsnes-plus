@@ -2,10 +2,10 @@
 
 //BS-X flash carts, when present, are mapped to 0x400000+
 Memory& SA1::mmio_access(unsigned &addr) {
-  if(!memory::bsxflash.data()) return memory::vsprom;
+  if(!cartridge.has_bsx_slot()) return memory::vsprom;
   if(addr < 0x400000) return memory::vsprom;
   addr &= 0x3fffff;
-  return bsxflash;
+  return cartridge.bsxpack_access();
 }
 
 //(CCNT) SA-1 control

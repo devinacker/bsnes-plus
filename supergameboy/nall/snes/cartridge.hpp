@@ -70,6 +70,11 @@ public:
     DSP1HiROM,
   };
 
+  enum BSXPackType {
+    FlashROM,
+    MaskROM,
+  };
+
   unsigned rom_size;
   unsigned ram_size;
 
@@ -77,6 +82,7 @@ public:
   Region region;
   MemoryMapper mapper;
   DSP1MemoryMapper dsp1_mapper;
+  BSXPackType bsxpack_type;
 
   bool has_bsx_slot;
   bool has_spc7110rtc;
@@ -98,7 +104,13 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
   string xml = "<?xml version='1.0' encoding='UTF-8'?>\n";
 
   if(type == TypeBsx) {
-    xml << "<cartridge/>";
+    xml << "<cartridge type='";
+    if(bsxpack_type == FlashROM) {
+      xml << "FlashROM";
+    } else {
+      xml << "MaskROM";
+    }
+    xml << "'/>\n";
     xmlMemoryMap = xml;
     return;
   }
@@ -123,20 +135,20 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     return;
   }
 
-  xml << "<cartridge";
+  xml << "<cartridge region='";
   if(region == NTSC) {
-    xml << " region='NTSC'";
+    xml << "NTSC";
   } else {
-    xml << " region='PAL'";
+    xml << "PAL";
   }
-  xml << ">\n";
+  xml << "'>\n";
 
   if(mapper == SGBROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-7d:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='80-ff:8000-ffff'/>\n";
     xml << "  </rom>\n";
-    unsigned revision = (type == TypeSuperGameBoy2Bios) ? 2 : 1;
+    const unsigned revision = (type == TypeSuperGameBoy2Bios) ? 2 : 1;
     xml << "  <supergameboy revision='" << revision << "'>\n";
     xml << "    <map address='00-3f:6000-7fff'/>\n";
     xml << "    <map address='80-bf:6000-7fff'/>\n";
@@ -149,9 +161,9 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
 
     if(ram_size > 0) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      const char *range = (rom_size > 0x200000) || (ram_size > 32 * 1024) ? "7fff" : "ffff";
-      xml << "    <map mode='linear' address='70-7d:0000-" << range << "'/>\n";
-      xml << "    <map mode='linear' address='f0-ff:0000-" << range << "'/>\n";
+      const unsigned range = (rom_size > 0x200000) || (ram_size > 32 * 1024) ? 0x7fff : 0xffff;
+      xml << "    <map mode='linear' address='70-7d:0000-" << hex(range) << "'/>\n";
+      xml << "    <map mode='linear' address='f0-ff:0000-" << hex(range) << "'/>\n";
       xml << "  </ram>\n";
     }
   } else if(mapper == HiROM) {
@@ -221,6 +233,9 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='80-bf:2200-23ff'/>\n";
     xml << "    </mmio>\n";
     xml << "  </sa1>\n";
+    if(has_bsx_slot) {
+      xml << "  <bsx/>";  // Super MMC controls BS-X slot mapping
+    }
   } else if(mapper == SDD1ROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
@@ -234,6 +249,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
       xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
       xml << "    <map mode='linear' address='70-7d:0000-7fff'/>\n";
       xml << "  </ram>\n";
+    }
 
     xml << "  <sdd1>\n";
     xml << "    <mcu>\n";
@@ -244,7 +260,6 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='80-bf:4800-4807'/>\n";
     xml << "    </mmio>\n";
     xml << "  </sdd1>\n";
-    }
   } else if(mapper == SPC7110ROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-0f:8000-ffff'/>\n";
@@ -452,12 +467,13 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
 }
 
 void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
-  type        = TypeUnknown;
-  mapper      = LoROM;
-  dsp1_mapper = DSP1Unmapped;
-  region      = NTSC;
-  rom_size    = size;
-  ram_size    = 0;
+  type         = TypeUnknown;
+  mapper       = LoROM;
+  dsp1_mapper  = DSP1Unmapped;
+  bsxpack_type = FlashROM;
+  region       = NTSC;
+  rom_size     = size;
+  ram_size     = 0;
 
   has_bsx_slot   = false;
   has_spc7110rtc = false;
@@ -512,7 +528,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
       if(n15 == 0x00 || n15 == 0x80 || n15 == 0x84 || n15 == 0x9c || n15 == 0xbc || n15 == 0xfc) {
         if(data[index + 0x1a] == 0x33 || data[index + 0x1a] == 0xff) {
           type = TypeBsx;
-          mapper = BSXROM;
+          bsxpack_type = (data[index + 0x10] == 0x00) ? MaskROM : FlashROM;
           region = NTSC;  //BS-X only released in Japan
           return;
         }
@@ -631,7 +647,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
     has_dsp1 = true;
   }
 
-  if(has_dsp1 == true) {
+  if(has_dsp1) {
     if((mapperid & 0x2f) == 0x20 && size <= 0x100000) {
       dsp1_mapper = DSP1LoROM1MB;
     } else if((mapperid & 0x2f) == 0x20) {
@@ -696,7 +712,7 @@ unsigned SNESCartridge::score_header(const uint8_t *data, unsigned size, unsigne
   uint8_t resetop = data[(addr & ~0x7fff) | (resetvector & 0x7fff)];  //first opcode executed upon reset
   uint8_t mapper  = data[addr + Mapper] & ~0x10;                      //mask off irrelevent FastROM-capable bit
 
-  //$00:[000-7fff] contains uninitialized RAM and MMIO.
+  //$00:[0000-7fff] contains uninitialized RAM and MMIO.
   //reset vector must point to ROM at $00:[8000-ffff] to be considered valid.
   if(resetvector < 0x8000) return 0;
 
