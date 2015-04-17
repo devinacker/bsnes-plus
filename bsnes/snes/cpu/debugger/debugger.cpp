@@ -75,9 +75,9 @@ uint8 CPUDebugger::dma_read(uint32 abus) {
   int offset = cartridge.rom_offset(abus);
   if (offset >= 0) cart_usage[offset] |= UsageRead;
   
-  uint8 data = bus.read(abus);
+  uint8 data = CPU::dma_read(abus);
   debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, abus, data);
-  return CPU::dma_read(abus);
+  return data;
 }
 
 void CPUDebugger::op_write(uint32 addr, uint8 data) {
