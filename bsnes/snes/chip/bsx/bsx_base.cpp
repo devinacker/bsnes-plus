@@ -6,7 +6,7 @@ void BSXBase::init() {
 }
 
 void BSXBase::enable() {
-  for(uint16 i = 0x2188; i <= 0x219f; i++) memory::mmio.map(i, *this);
+  memory::mmio.map(0x2188, 0x219f, *this);
 }
 
 void BSXBase::power() {
@@ -18,8 +18,6 @@ void BSXBase::reset() {
 }
 
 uint8 BSXBase::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   switch(addr) {
     case 0x2188: return regs.r2188;
     case 0x2189: return regs.r2189;
@@ -76,8 +74,6 @@ uint8 BSXBase::mmio_read(unsigned addr) {
 }
 
 void BSXBase::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   switch(addr) {
     case 0x2188: {
       regs.r2188 = data;

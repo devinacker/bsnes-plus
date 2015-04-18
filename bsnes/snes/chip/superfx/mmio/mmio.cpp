@@ -2,7 +2,6 @@
 
 uint8 SuperFX::mmio_read(unsigned addr) {
   cpu.synchronize_coprocessor();
-  addr &= 0xffff;
 
   if(addr >= 0x3100 && addr <= 0x32ff) {
     return cache_mmio_read(addr - 0x3100);
@@ -54,7 +53,6 @@ uint8 SuperFX::mmio_read(unsigned addr) {
 
 void SuperFX::mmio_write(unsigned addr, uint8 data) {
   cpu.synchronize_coprocessor();
-  addr &= 0xffff;
 
   if(addr >= 0x3100 && addr <= 0x32ff) {
     return cache_mmio_write(addr - 0x3100, data);

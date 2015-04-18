@@ -148,7 +148,7 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,
     lstring() << cartridge.baseXml << cartridge.slotAXml);
 
-  loadMemory(baseName, ".srm", SNES::memory::bsxram );
+  loadMemory(baseName, ".srm", SNES::memory::cartram);
   loadMemory(baseName, ".psr", SNES::memory::bsxpram);
 
   fileName = slotAName;
@@ -215,7 +215,7 @@ void Cartridge::saveMemory() {
     } break;
 
     case SNES::Cartridge::Mode::Bsx: {
-      saveMemory(baseName, ".srm", SNES::memory::bsxram );
+      saveMemory(baseName, ".srm", SNES::memory::cartram);
       saveMemory(baseName, ".psr", SNES::memory::bsxpram);
     } break;
 

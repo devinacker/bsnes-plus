@@ -44,8 +44,6 @@ void SuperGameBoy::save() {
 }
 
 uint8 SuperGameBoy::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   if(addr == 0x2181) return mmio[0]->mmio_read(addr);
   if(addr == 0x2182) return mmio[1]->mmio_read(addr);
   if(addr == 0x420b) return mmio[2]->mmio_read(addr);
@@ -54,8 +52,6 @@ uint8 SuperGameBoy::mmio_read(unsigned addr) {
 }
 
 void SuperGameBoy::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   if(addr == 0x2181) {
     row = (row & 0xff00) | (data << 0);
     mmio[0]->mmio_write(addr, data);

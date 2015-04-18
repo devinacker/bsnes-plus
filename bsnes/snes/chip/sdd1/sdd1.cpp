@@ -41,8 +41,6 @@ void SDD1::reset() {
 }
 
 uint8 SDD1::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   if((addr & 0x4380) == 0x4300) {
     return cpu_mmio[addr & 0x7f]->mmio_read(addr);
   }
@@ -58,8 +56,6 @@ uint8 SDD1::mmio_read(unsigned addr) {
 }
 
 void SDD1::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   if((addr & 0x4380) == 0x4300) {
     unsigned channel = (addr >> 4) & 7;
     switch(addr & 15) {

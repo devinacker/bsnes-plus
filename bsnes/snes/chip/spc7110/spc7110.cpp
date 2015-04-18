@@ -191,8 +191,6 @@ void SPC7110::update_time(int offset) {
 }
 
 uint8 SPC7110::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   switch(addr) {
     //==================
     //decompression unit
@@ -339,8 +337,6 @@ uint8 SPC7110::mmio_read(unsigned addr) {
 }
 
 void SPC7110::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   switch(addr) {
     //==================
     //decompression unit

@@ -9,10 +9,6 @@ void Cartridge::serialize(serializer &s) {
     s.array(memory::cartrtc.data(), memory::cartrtc.size());
   }
 
-  if(memory::bsxram.size() != 0 && memory::bsxram.size() != ~0) {
-    s.array(memory::bsxram.data(), memory::bsxram.size());
-  }
-
   if(memory::bsxpram.size() != 0 && memory::bsxpram.size() != ~0) {
     s.array(memory::bsxpram.data(), memory::bsxpram.size());
   }

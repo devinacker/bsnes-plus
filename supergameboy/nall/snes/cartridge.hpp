@@ -329,11 +329,13 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='80-bf:8000-ffff'/>\n";
     xml << "  </rom>\n";
+    xml << "  <ram size='8000'>\n";
+    xml << "    <map mode='linear' address='10-17:5000-5fff'/>\n";
+    xml << "  </ram>\n";
     xml << "  <bsx>\n";
-    xml << "    <mmio>\n";
-    xml << "      <map address='00-3f:5000-5fff'/>\n";
-    xml << "      <map address='80-bf:5000-5fff'/>\n";
-    xml << "    </mmio>\n";
+    xml << "    <mcc>\n";
+    xml << "      <map address='00-0f:5000-5fff'/>\n";
+    xml << "    </mcc>\n";
     xml << "  </bsx>\n";
   } else if(mapper == STROM) {
     xml << "  <rom>\n";

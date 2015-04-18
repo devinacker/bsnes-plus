@@ -203,7 +203,7 @@ uint8_t* snes_get_memory_data(unsigned id) {
       return SNES::memory::cartrtc.data();
     case SNES_MEMORY_BSX_RAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::Bsx) break;
-      return SNES::memory::bsxram.data();
+      return SNES::memory::cartram.data();
     case SNES_MEMORY_BSX_PRAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::Bsx) break;
       return SNES::memory::bsxpram.data();
@@ -239,7 +239,7 @@ unsigned snes_get_memory_size(unsigned id) {
       break;
     case SNES_MEMORY_BSX_RAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::Bsx) break;
-      size = SNES::memory::bsxram.size();
+      size = SNES::memory::cartram.size();
       break;
     case SNES_MEMORY_BSX_PRAM:
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::Bsx) break;

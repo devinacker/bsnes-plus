@@ -74,8 +74,6 @@ void MSU1::reset() {
 }
 
 uint8 MSU1::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   if(addr == 0x2000) {
     return (mmio.data_busy    << 7)
          | (mmio.audio_busy   << 6)
@@ -102,8 +100,6 @@ uint8 MSU1::mmio_read(unsigned addr) {
 }
 
 void MSU1::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   if(addr == 0x2000) {
     mmio.data_offset = (mmio.data_offset & 0xffffff00) | (data <<  0);
   }

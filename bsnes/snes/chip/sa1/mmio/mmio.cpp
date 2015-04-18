@@ -522,8 +522,6 @@ uint8 SA1::mmio_r230e() {
 
 uint8 SA1::mmio_read(unsigned addr) {
   (co_active() == cpu.thread ? cpu.synchronize_coprocessor() : synchronize_cpu());
-  addr &= 0xffff;
-
   switch(addr) {
     case 0x2300: return mmio_r2300();
     case 0x2301: return mmio_r2301();
@@ -547,8 +545,6 @@ uint8 SA1::mmio_read(unsigned addr) {
 
 void SA1::mmio_write(unsigned addr, uint8 data) {
   (co_active() == cpu.thread ? cpu.synchronize_coprocessor() : synchronize_cpu());
-  addr &= 0xffff;
-
   switch(addr) {
     case 0x2200: return mmio_w2200(data);
     case 0x2201: return mmio_w2201(data);

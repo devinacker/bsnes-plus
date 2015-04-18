@@ -22,15 +22,15 @@ private:
   } regs;
 };
 
-class BSXCart : public MMIO {
+class BSXCart : public Memory {
 public:
   void init();
   void enable();
   void power();
   void reset();
 
-  uint8 mmio_read(unsigned addr);
-  void mmio_write(unsigned addr, uint8 data);
+  uint8 read(unsigned addr);
+  void write(unsigned addr, uint8 data);
 
   BSXCart();
   ~BSXCart();

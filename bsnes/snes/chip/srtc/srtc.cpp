@@ -156,8 +156,6 @@ unsigned SRTC::weekday(unsigned year, unsigned month, unsigned day) {
 }
 
 uint8 SRTC::mmio_read(unsigned addr) {
-  addr &= 0xffff;
-
   if(addr == 0x2800) {
     if(rtc_mode != RtcRead) return 0x00;
 
@@ -177,8 +175,6 @@ uint8 SRTC::mmio_read(unsigned addr) {
 }
 
 void SRTC::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
-
   if(addr == 0x2801) {
     data &= 0x0f;  //only the low four bits are used
 

@@ -27,19 +27,31 @@ uint8 UnmappedMMIO::mmio_read(unsigned) { return cpu.regs.mdr; }
 void UnmappedMMIO::mmio_write(unsigned, uint8) {}
 
 MMIO* MMIOAccess::handle(unsigned addr) {
-  return mmio[addr & 0x7fff];
+  return mmio[addr];
 }
 
 void MMIOAccess::map(unsigned addr, MMIO &access) {
-  mmio[addr & 0x7fff] = &access;
+  assert(addr >= Min && addr <= Max);
+  mmio[addr] = &access;
 }
 
+void MMIOAccess::map(unsigned addr_lo, unsigned addr_hi, MMIO &access) {
+  assert(addr_lo <= addr_hi);
+  assert(addr_lo >= Min && addr_lo <= Max);
+  assert(addr_hi >= Min && addr_hi <= Max);
+  for(unsigned addr = addr_lo; addr <= addr_hi; addr++) {
+    mmio[addr] = &access;
+  }
+}
+
+unsigned MMIOAccess::size() const { return 0x8000; }
+
 uint8 MMIOAccess::read(unsigned addr) {
-  return mmio[addr & 0x7fff]->mmio_read(addr);
+  return mmio[addr]->mmio_read(addr);
 }
 
 void MMIOAccess::write(unsigned addr, uint8 data) {
-  mmio[addr & 0x7fff]->mmio_write(addr, data);
+  mmio[addr]->mmio_write(addr, data);
 }
 
 MMIOAccess::MMIOAccess() {
@@ -135,9 +147,9 @@ void Bus::unload_cart() {
 
 void Bus::map_reset() {
   map(MapMode::Direct, 0x00, 0xff, 0x0000, 0xffff, memory::memory_unmapped);
-  map(MapMode::Direct, 0x00, 0x3f, 0x2000, 0x5fff, memory::mmio);
-  map(MapMode::Direct, 0x80, 0xbf, 0x2000, 0x5fff, memory::mmio);
-  for(unsigned i = 0x2000; i <= 0x5fff; i++) memory::mmio.map(i, memory::mmio_unmapped);
+  map(MapMode::Shadow, 0x00, 0x3f, MMIOAccess::Min, MMIOAccess::Max, memory::mmio);
+  map(MapMode::Shadow, 0x80, 0xbf, MMIOAccess::Min, MMIOAccess::Max, memory::mmio);
+  memory::mmio.map(MMIOAccess::Min, MMIOAccess::Max, memory::mmio_unmapped);
 }
 
 void Bus::map_xml() {
@@ -145,7 +157,7 @@ void Bus::map_xml() {
     if(m.memory) {
       map(m.mode, m.banklo, m.bankhi, m.addrlo, m.addrhi, *m.memory, m.offset, m.size);
     } else if(m.mmio) {
-      for(unsigned i = m.addrlo; i <= m.addrhi; i++) memory::mmio.map(i, *m.mmio);
+      memory::mmio.map(m.addrlo, m.addrhi, *m.mmio);
     }
   }
 }

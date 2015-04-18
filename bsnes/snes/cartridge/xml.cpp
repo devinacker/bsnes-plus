@@ -289,7 +289,7 @@ void Cartridge::xml_parse_bsx(xml_element &root) {
   foreach(node, root.element) {
     if(node.name == "slot") {
       xml_parse_memory(node, bsxpack_access());
-    } else if(node.name == "mmio") {
+    } else if(node.name == "mcc") {
       foreach(leaf, node.element) {
         if(leaf.name == "map") {
           Mapping m(bsxcart);

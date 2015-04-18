@@ -160,44 +160,44 @@ void PPU::mmio_update_video_mode() {
 uint8 PPU::mmio_read(unsigned addr) {
   cpu.synchronize_ppu();
 
-  switch(addr & 0xffff) {
-    case 0x2104: case 0x2105: case 0x2106: case 0x2108: case 0x2109: case 0x210a:
-    case 0x2114: case 0x2115: case 0x2116: case 0x2118: case 0x2119: case 0x211a:
-    case 0x2124: case 0x2125: case 0x2126: case 0x2128: case 0x2129: case 0x212a: {
+  switch(addr & 0x3f) {
+    case 0x04: case 0x05: case 0x06: case 0x08: case 0x09: case 0x0a:
+    case 0x14: case 0x15: case 0x16: case 0x18: case 0x19: case 0x1a:
+    case 0x24: case 0x25: case 0x26: case 0x28: case 0x29: case 0x2a: {
       return regs.ppu1_mdr;
     }
 
-    case 0x2134: {  //MPYL
+    case 0x34: {  //MPYL
       unsigned result = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
       regs.ppu1_mdr = result >>  0;
       return regs.ppu1_mdr;
     }
 
-    case 0x2135: {  //MPYM
+    case 0x35: {  //MPYM
       unsigned result = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
       regs.ppu1_mdr = result >>  8;
       return regs.ppu1_mdr;
     }
 
-    case 0x2136: {  //MPYH
+    case 0x36: {  //MPYH
       unsigned result = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
       regs.ppu1_mdr = result >> 16;
       return regs.ppu1_mdr;
     }
 
-    case 0x2137: {  //SLHV
+    case 0x37: {  //SLHV
       if(cpu.pio() & 0x80) latch_counters();
       return cpu.regs.mdr;
     }
 
-    case 0x2138: {  //OAMDATAREAD
+    case 0x38: {  //OAMDATAREAD
       regs.ppu1_mdr = oam_read(regs.oam_addr);
       regs.oam_addr = (regs.oam_addr + 1) & 0x03ff;
       oam.set_first();
       return regs.ppu1_mdr;
     }
 
-    case 0x2139: {  //VMDATALREAD
+    case 0x39: {  //VMDATALREAD
       regs.ppu1_mdr = regs.vram_readbuffer >> 0;
       if(regs.vram_incmode == 0) {
         uint16 addr = get_vram_addr();
@@ -208,7 +208,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu1_mdr;
     }
 
-    case 0x213a: {  //VMDATAHREAD
+    case 0x3a: {  //VMDATAHREAD
       regs.ppu1_mdr = regs.vram_readbuffer >> 8;
       if(regs.vram_incmode == 1) {
         uint16 addr = get_vram_addr();
@@ -219,7 +219,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu1_mdr;
     }
 
-    case 0x213b: {  //CGDATAREAD
+    case 0x3b: {  //CGDATAREAD
       if((regs.cgram_addr & 1) == 0) {
         regs.ppu2_mdr = cgram_read(regs.cgram_addr);
       } else {
@@ -229,7 +229,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu2_mdr;
     }
 
-    case 0x213c: {  //OPHCT
+    case 0x3c: {  //OPHCT
       if(regs.latch_hcounter == 0) {
         regs.ppu2_mdr = regs.hcounter & 0xff;
       } else {
@@ -239,7 +239,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu2_mdr;
     }
 
-    case 0x213d: {  //OPVCT
+    case 0x3d: {  //OPVCT
       if(regs.latch_vcounter == 0) {
         regs.ppu2_mdr = regs.vcounter & 0xff;
       } else {
@@ -249,7 +249,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu2_mdr;
     }
 
-    case 0x213e: {  //STAT77
+    case 0x3e: {  //STAT77
       regs.ppu1_mdr &= 0x10;
       regs.ppu1_mdr |= oam.regs.time_over << 7;
       regs.ppu1_mdr |= oam.regs.range_over << 6;
@@ -257,7 +257,7 @@ uint8 PPU::mmio_read(unsigned addr) {
       return regs.ppu1_mdr;
     }
 
-    case 0x213f: {  //STAT78
+    case 0x3f: {  //STAT78
       regs.latch_hcounter = 0;
       regs.latch_vcounter = 0;
 
@@ -281,15 +281,15 @@ uint8 PPU::mmio_read(unsigned addr) {
 void PPU::mmio_write(unsigned addr, uint8 data) {
   cpu.synchronize_ppu();
 
-  switch(addr & 0xffff) {
-    case 0x2100: {  //INIDISP
+  switch(addr & 0x3f) {
+    case 0x00: {  //INIDISP
       if(regs.display_disable && cpu.vcounter() == display.height) oam.address_reset();
       regs.display_disable = data & 0x80;
       regs.display_brightness = data & 0x0f;
       return;
     }
 
-    case 0x2101: {  //OBSEL
+    case 0x01: {  //OBSEL
       oam.regs.base_size = (data >> 5) & 7;
       oam.regs.nameselect = (data >> 3) & 3;
       oam.regs.tiledata_addr = (data & 3) << 14;
@@ -297,20 +297,20 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2102: {  //OAMADDL
+    case 0x02: {  //OAMADDL
       regs.oam_baseaddr = (regs.oam_baseaddr & 0x0100) | (data << 0);
       oam.address_reset();
       return;
     }
 
-    case 0x2103: {  //OAMADDH
+    case 0x03: {  //OAMADDH
       regs.oam_priority = data & 0x80;
       regs.oam_baseaddr = ((data & 1) << 8) | (regs.oam_baseaddr & 0x00ff);
       oam.address_reset();
       return;
     }
 
-    case 0x2104: {  //OAMDATA
+    case 0x04: {  //OAMDATA
       if((regs.oam_addr & 1) == 0) regs.oam_latchdata = data;
       if(regs.oam_addr & 0x0200) {
         oam_write(regs.oam_addr, data);
@@ -323,7 +323,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2105: {  //BGMODE
+    case 0x05: {  //BGMODE
       bg4.regs.tile_size = data & 0x80;
       bg3.regs.tile_size = data & 0x40;
       bg2.regs.tile_size = data & 0x20;
@@ -334,7 +334,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2106: {  //MOSAIC
+    case 0x06: {  //MOSAIC
       unsigned mosaic_size = (data >> 4) & 15;
       bg4.regs.mosaic = (data & 0x08 ? mosaic_size : 0);
       bg3.regs.mosaic = (data & 0x04 ? mosaic_size : 0);
@@ -343,43 +343,43 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2107: {  //BG1SC
+    case 0x07: {  //BG1SC
       bg1.regs.screen_addr = (data & 0x7c) << 9;
       bg1.regs.screen_size = data & 3;
       return;
     }
 
-    case 0x2108: {  //BG2SC
+    case 0x08: {  //BG2SC
       bg2.regs.screen_addr = (data & 0x7c) << 9;
       bg2.regs.screen_size = data & 3;
       return;
     }
 
-    case 0x2109: {  //BG3SC
+    case 0x09: {  //BG3SC
       bg3.regs.screen_addr = (data & 0x7c) << 9;
       bg3.regs.screen_size = data & 3;
       return;
     }
 
-    case 0x210a: {  //BG4SC
+    case 0x0a: {  //BG4SC
       bg4.regs.screen_addr = (data & 0x7c) << 9;
       bg4.regs.screen_size = data & 3;
       return;
     }
 
-    case 0x210b: {  //BG12NBA
+    case 0x0b: {  //BG12NBA
       bg1.regs.tiledata_addr = (data & 0x07) << 13;
       bg2.regs.tiledata_addr = (data & 0x70) <<  9;
       return;
     }
 
-    case 0x210c: {  //BG34NBA
+    case 0x0c: {  //BG34NBA
       bg3.regs.tiledata_addr = (data & 0x07) << 13;
       bg4.regs.tiledata_addr = (data & 0x70) <<  9;
       return;
     }
 
-    case 0x210d: {  //BG1HOFS
+    case 0x0d: {  //BG1HOFS
       regs.mode7_hoffset = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
 
@@ -388,7 +388,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x210e: {  //BG1VOFS
+    case 0x0e: {  //BG1VOFS
       regs.mode7_voffset = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
 
@@ -397,43 +397,43 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x210f: {  //BG2HOFS
+    case 0x0f: {  //BG2HOFS
       bg2.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg2.regs.hoffset >> 8) & 7);
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2110: {  //BG2VOFS
+    case 0x10: {  //BG2VOFS
       bg2.regs.voffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2111: {  //BG3HOFS
+    case 0x11: {  //BG3HOFS
       bg3.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg3.regs.hoffset >> 8) & 7);
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2112: {  //BG3VOFS
+    case 0x12: {  //BG3VOFS
       bg3.regs.voffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2113: {  //BG4HOFS
+    case 0x13: {  //BG4HOFS
       bg4.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg4.regs.hoffset >> 8) & 7);
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2114: {  //BG4VOFS
+    case 0x14: {  //BG4VOFS
       bg4.regs.voffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
 
-    case 0x2115: {  //VMAIN
+    case 0x15: {  //VMAIN
       regs.vram_incmode = data & 0x80;
       regs.vram_mapping = (data >> 2) & 3;
       switch(data & 3) {
@@ -445,7 +445,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2116: {  //VMADDL
+    case 0x16: {  //VMADDL
       regs.vram_addr = (regs.vram_addr & 0xff00) | (data << 0);
       uint16 addr = get_vram_addr();
       regs.vram_readbuffer  = vram_read(addr + 0) << 0;
@@ -453,7 +453,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2117: {  //VMADDH
+    case 0x17: {  //VMADDH
       regs.vram_addr = (data << 8) | (regs.vram_addr & 0x00ff);
       uint16 addr = get_vram_addr();
       regs.vram_readbuffer  = vram_read(addr + 0) << 0;
@@ -461,67 +461,67 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2118: {  //VMDATAL
+    case 0x18: {  //VMDATAL
       vram_write(get_vram_addr() + 0, data);
       if(regs.vram_incmode == 0) regs.vram_addr += regs.vram_incsize;
       return;
     }
 
-    case 0x2119: {  //VMDATAH
+    case 0x19: {  //VMDATAH
       vram_write(get_vram_addr() + 1, data);
       if(regs.vram_incmode == 1) regs.vram_addr += regs.vram_incsize;
       return;
     }
 
-    case 0x211a: {  //M7SEL
+    case 0x1a: {  //M7SEL
       regs.mode7_repeat = (data >> 6) & 3;
       regs.mode7_vflip = data & 0x02;
       regs.mode7_hflip = data & 0x01;
       return;
     }
 
-    case 0x211b: {  //M7A
+    case 0x1b: {  //M7A
       regs.m7a = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x211c: {  //M7B
+    case 0x1c: {  //M7B
       regs.m7b = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x211d: {  //M7C
+    case 0x1d: {  //M7C
       regs.m7c = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x211e: {  //M7D
+    case 0x1e: {  //M7D
       regs.m7d = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x211f: {  //M7X
+    case 0x1f: {  //M7X
       regs.m7x = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x2120: {  //M7Y
+    case 0x20: {  //M7Y
       regs.m7y = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
       return;
     }
 
-    case 0x2121: {  //CGADD
+    case 0x21: {  //CGADD
       regs.cgram_addr = data << 1;
       return;
     }
 
-    case 0x2122: {  //CGDATA
+    case 0x22: {  //CGDATA
       if((regs.cgram_addr & 1) == 0) {
         regs.cgram_latchdata = data;
       } else {
@@ -532,7 +532,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2123: {  //W12SEL
+    case 0x23: {  //W12SEL
       bg2.window.two_enable = data & 0x80;
       bg2.window.two_invert = data & 0x40;
       bg2.window.one_enable = data & 0x20;
@@ -544,7 +544,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2124: {  //W34SEL
+    case 0x24: {  //W34SEL
       bg4.window.two_enable = data & 0x80;
       bg4.window.two_invert = data & 0x40;
       bg4.window.one_enable = data & 0x20;
@@ -556,7 +556,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2125: {  //WOBJSEL
+    case 0x25: {  //WOBJSEL
       screen.window.two_enable = data & 0x80;
       screen.window.two_invert = data & 0x40;
       screen.window.one_enable = data & 0x20;
@@ -568,27 +568,27 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2126: {  //WH0
+    case 0x26: {  //WH0
       regs.window_one_left = data;
       return;
     }
 
-    case 0x2127: {  //WH1
+    case 0x27: {  //WH1
       regs.window_one_right = data;
       return;
     }
 
-    case 0x2128: {  //WH2
+    case 0x28: {  //WH2
       regs.window_two_left = data;
       return;
     }
 
-    case 0x2129: {  //WH3
+    case 0x29: {  //WH3
       regs.window_two_right = data;
       return;
     }
 
-    case 0x212a: {  //WBGLOG
+    case 0x2a: {  //WBGLOG
       bg4.window.mask = (data >> 6) & 3;
       bg3.window.mask = (data >> 4) & 3;
       bg2.window.mask = (data >> 2) & 3;
@@ -596,13 +596,13 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x212b: {  //WOBJLOG
+    case 0x2b: {  //WOBJLOG
       screen.window.mask = (data >> 2) & 3;
       oam.window.mask = (data >> 0) & 3;
       return;
     }
 
-    case 0x212c: {  //TM
+    case 0x2c: {  //TM
       oam.regs.main_enable = data & 0x10;
       bg4.regs.main_enable = data & 0x08;
       bg3.regs.main_enable = data & 0x04;
@@ -611,7 +611,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x212d: {  //TS
+    case 0x2d: {  //TS
       oam.regs.sub_enable = data & 0x10;
       bg4.regs.sub_enable = data & 0x08;
       bg3.regs.sub_enable = data & 0x04;
@@ -620,7 +620,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x212e: {  //TMW
+    case 0x2e: {  //TMW
       oam.window.main_enable = data & 0x10;
       bg4.window.main_enable = data & 0x08;
       bg3.window.main_enable = data & 0x04;
@@ -629,7 +629,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x212f: {  //TSW
+    case 0x2f: {  //TSW
       oam.window.sub_enable = data & 0x10;
       bg4.window.sub_enable = data & 0x08;
       bg3.window.sub_enable = data & 0x04;
@@ -638,7 +638,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2130: {  //CGWSEL
+    case 0x30: {  //CGWSEL
       screen.window.main_mask = (data >> 6) & 3;
       screen.window.sub_mask = (data >> 4) & 3;
       screen.regs.addsub_mode = data & 0x02;
@@ -646,7 +646,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2131: {  //CGADDSUB
+    case 0x31: {  //CGADDSUB
       screen.regs.color_mode = data & 0x80;
       screen.regs.color_halve = data & 0x40;
       screen.regs.color_enable[6] = data & 0x20;
@@ -659,7 +659,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2132: {  //COLDATA
+    case 0x32: {  //COLDATA
       if(data & 0x80) screen.regs.color_b = data & 0x1f;
       if(data & 0x40) screen.regs.color_g = data & 0x1f;
       if(data & 0x20) screen.regs.color_r = data & 0x1f;
@@ -667,7 +667,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       return;
     }
 
-    case 0x2133: {  //SETINI
+    case 0x33: {  //SETINI
       regs.mode7_extbg = data & 0x40;
       regs.pseudo_hires = data & 0x08;
       regs.overscan = data & 0x04;

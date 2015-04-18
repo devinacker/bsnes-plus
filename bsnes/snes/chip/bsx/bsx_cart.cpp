@@ -60,30 +60,15 @@ void BSXCart::update_memory_map() {
   bus.map(Bus::MapMode::Linear, 0x70, 0x77, 0x0000, 0xffff, memory::bsxpram);
 }
 
-uint8 BSXCart::mmio_read(unsigned addr) {
-  if((addr & 0xf0ffff) == 0x005000) {  //$[00-0f]:5000 MMIO
-    uint8 n = (addr >> 16) & 15;
-    return regs.r[n];
-  }
-
-  if((addr & 0xf8f000) == 0x105000) {  //$[10-17]:[5000-5fff] SRAM
-    return memory::bsxram.read(((addr >> 16) & 7) * 0x1000 + (addr & 0xfff));
-  }
-
-  return 0x00;
+uint8 BSXCart::read(unsigned addr) {
+  uint8 n = (addr >> 16) & 15;
+  return regs.r[n];
 }
 
-void BSXCart::mmio_write(unsigned addr, uint8 data) {
-  if((addr & 0xf0ffff) == 0x005000) {  //$[00-0f]:5000 MMIO
-    uint8 n = (addr >> 16) & 15;
-    regs.r[n] = data;
-    if(n == 0x0e && data & 0x80) update_memory_map();
-    return;
-  }
-
-  if((addr & 0xf8f000) == 0x105000) {  //$[10-17]:[5000-5fff] SRAM
-    return memory::bsxram.write(((addr >> 16) & 7) * 0x1000 + (addr & 0xfff), data);
-  }
+void BSXCart::write(unsigned addr, uint8 data) {
+  uint8 n = (addr >> 16) & 15;
+  regs.r[n] = data;
+  if(n == 0x0e && data & 0x80) update_memory_map();
 }
 
 BSXCart::BSXCart() {

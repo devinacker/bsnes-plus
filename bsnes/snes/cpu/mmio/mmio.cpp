@@ -408,7 +408,6 @@ void CPU::mmio_reset() {
 }
 
 uint8 CPU::mmio_read(unsigned addr) {
-  addr &= 0xffff;
 
   //DMA
   if((addr & 0xff80) == 0x4300) {  //$4300-$437f
@@ -459,7 +458,6 @@ uint8 CPU::mmio_read(unsigned addr) {
 }
 
 void CPU::mmio_write(unsigned addr, uint8 data) {
-  addr &= 0xffff;
 
   //DMA
   if((addr & 0xff80) == 0x4300) {  //$4300-$437f

@@ -115,7 +115,7 @@ private:
 
 namespace memory {
   extern MappedRAM cartrom, cartram, cartrtc;
-  extern MappedRAM bsxpack, bsxram, bsxpram;
+  extern MappedRAM bsxpack, bsxpram;
   extern MappedRAM stArom, stAram;
   extern MappedRAM stBrom, stBram;
   extern MappedRAM gbrom, gbram, gbrtc;
