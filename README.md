@@ -23,7 +23,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 
 ## Building on Windows
 
-- Get mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download
+- Get mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download)
 - Run `mingw32-make`
 
 Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported. 
