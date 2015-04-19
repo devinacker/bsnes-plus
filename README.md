@@ -17,24 +17,22 @@ introduce some new features and improvements, mostly aimed at debugging.
 ## Coming soon
 
 - Improved debugger UI with register editing
-- More coprocesor status viewing in properties window
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats
 
 ## Building on Windows
 
-- Get MinGW
-- Get the latest DirectX SDK; copy its header files into MinGW's include dir, overwriting any existing files  
-  (Additional DirectX headers and libraries no longer included with the SDK are included in `bsnes/directx/`)
-- Get the latest version of `glext.h` from [opengl.org](https://www.opengl.org/registry/#headers) and put it in MinGW's `include/GL/`, overwriting the old one
+- Get mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download
 - Run `mingw32-make`
+
+Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported. 
 
 ## Building on OS X / Unix
 
 - Run `make` (and hope it works)
 
-Building on all platforms requires Qt 4 installed.
+Building on all platforms requires Qt 4 installed, with Qt's `bin` directory in your path.
 
 The snesfilter, snesreader, and supergameboy plugins can all be built by running make (or mingw32-make) after you've configured your environment to build bsnes itself.
 After building, just copy the .dll, .so, or .dylib files into the same directory as bsnes itself.

@@ -37,8 +37,6 @@ endif
 # ruby
 rubyflags := $(if $(finstring .sdl,$(ruby)),`sdl-config --cflags`)
 rubyflags += $(if $(findstring .qt,$(ruby)),$(qtinc))
-# for windows
-rubyflags += -I./directx -L./directx
 
 link += $(if $(findstring .sdl,$(ruby)),`sdl-config --libs`)
 link += $(if $(findstring video.direct3d,$(ruby)),-ld3d9)
