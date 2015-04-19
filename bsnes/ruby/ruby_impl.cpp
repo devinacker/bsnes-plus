@@ -18,7 +18,9 @@
   #include <X11/Xatom.h>
 #elif defined(PLATFORM_OSX)
   #define __INTEL_COMPILER
+  #define decimal CocoaDecimal
   #include <Carbon/Carbon.h>
+  #undef decimal
 #elif defined(PLATFORM_WIN)
   #define _WIN32_WINNT 0x0501
   #define __in
