@@ -8,6 +8,7 @@ public:
 
   Interface();
   void captureScreenshot(uint32_t*, unsigned, unsigned, unsigned);
+  void captureSPC();
   bool saveScreenshot;
   bool framesUpdated;
   unsigned framesExecuted;

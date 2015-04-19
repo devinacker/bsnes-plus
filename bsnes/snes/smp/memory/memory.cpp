@@ -138,6 +138,10 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
         if(!(status.dsp_addr & 0x80)) {
           dsp.write(status.dsp_addr & 0x7f, data);
         }
+        
+        if (dump_spc && status.dsp_addr == 0x4c /* r_kon */ && data) {
+          save_spc_dump();
+        }
       } break;
 
       case 0xf4:    //CPUIO0

@@ -12,6 +12,8 @@ public:
   void serialize(serializer&);
   SMP();
   ~SMP();
+  
+  void save_spc_dump(string path);
 
   static const uint8 iplrom[64];
 
@@ -52,6 +54,10 @@ private:
 
   static void Enter();
   debugvirtual void op_step();
+  
+  bool dump_spc;
+  string spc_path;
+  void save_spc_dump();
 
   friend class SMPcore;
   friend class SMPDebugger;

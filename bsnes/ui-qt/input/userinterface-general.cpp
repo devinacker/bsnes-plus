@@ -52,6 +52,17 @@ struct CaptureScreenshot : HotkeyInput {
   }
 } captureScreenshot;
 
+struct CaptureSPC : HotkeyInput {
+  void pressed() {
+    //tell the S-SMP core to save a SPC after the next note-on
+	interface.captureSPC();
+  }
+
+  CaptureSPC() : HotkeyInput("Capture SPC Dump", "input.userInterface.general.captureSPC") {
+    userInterfaceGeneral.attach(this);
+  }
+} captureSPC;
+
 //put here instead of in a separate "Audio Settings" group,
 //because there is only one audio option at present
 struct MuteAudioOutput : HotkeyInput {

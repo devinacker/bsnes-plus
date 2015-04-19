@@ -152,6 +152,8 @@ MainWindow::MainWindow() {
   tools_movies_recordFromHere = tools_movies->addAction("Record Movie (starting from here)");
 
   tools_captureScreenshot = tools->addAction("&Capture Screenshot");
+  
+  tools_captureSPC = tools->addAction("Capture &SPC Dump");
 
   #if 0
   //this will crash on Qt 4.6.0/Windows, because QObject::sender() returns a non-QObject*, non-null pointer
@@ -304,6 +306,7 @@ MainWindow::MainWindow() {
   connect(tools_movies_recordFromPowerOn, SIGNAL(triggered()), this, SLOT(recordMovieFromPowerOn()));
   connect(tools_movies_recordFromHere, SIGNAL(triggered()), this, SLOT(recordMovieFromHere()));
   connect(tools_captureScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
+  connect(tools_captureSPC, SIGNAL(triggered()), this, SLOT(saveSPC()));
   connect(tools_cheatEditor, SIGNAL(triggered()), this, SLOT(showCheatEditor()));
   connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
   connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
@@ -586,6 +589,11 @@ void MainWindow::recordMovieFromHere() {
 void MainWindow::saveScreenshot() {
   //tell SNES::Interface to save a screenshot at the next video_refresh() event
   interface.saveScreenshot = true;
+}
+
+void MainWindow::saveSPC() {
+  //tell the S-SMP core to save a SPC after the next note-on
+  interface.captureSPC();
 }
 
 void MainWindow::loadState() {

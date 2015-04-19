@@ -93,6 +93,23 @@ void Interface::captureScreenshot(uint32_t *data, unsigned pitch, unsigned width
   utility.showMessage("Screenshot saved.");
 }
 
+void Interface::captureSPC() {
+  if(SNES::cartridge.loaded() == false) return; 
+
+  string basename = nall::basename(cartridge.fileName);
+  string filename;
+  int filenum = 0;
+  
+  do {
+    filename = basename;
+    filename << "-" << integer<3, '0'>(filenum++) << ".spc";
+  } while (file::exists(filename()));
+
+  // SPC will be saved after the next note-on event
+  SNES::smp.save_spc_dump(filename());
+  utility.showMessage(string("Saving ", filename));
+}
+
 Interface::Interface() {
   saveScreenshot = false;
 }

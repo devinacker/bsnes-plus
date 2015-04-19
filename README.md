@@ -13,6 +13,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 - SA-1 bus and BW-RAM viewing and (partial) usage logging
 - Super FX disassembly and debugging
 - Super FX bus viewing and usage logging
+- SPC file dumping
 
 ## Coming soon
 
