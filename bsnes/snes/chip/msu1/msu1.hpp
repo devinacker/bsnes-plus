@@ -13,6 +13,7 @@ public:
   void serialize(serializer&);
 
 private:
+  bool boot;
   file datafile;
   file audiofile;
 
@@ -21,6 +22,7 @@ private:
     AudioBusy      = 0x40,
     AudioRepeating = 0x20,
     AudioPlaying   = 0x10,
+    AudioError     = 0x08,
     Revision       = 0x01,
   };
 
@@ -36,6 +38,7 @@ private:
     bool audio_busy;
     bool audio_repeat;
     bool audio_play;
+    bool audio_error;
   } mmio;
 };
 

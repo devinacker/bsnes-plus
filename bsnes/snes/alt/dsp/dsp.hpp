@@ -6,6 +6,7 @@ public:
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_smp();
 
+  bool mute();
   uint8 read(uint8 addr);
   void write(uint8 addr, uint8 data);
 
