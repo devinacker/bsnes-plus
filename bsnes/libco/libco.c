@@ -5,9 +5,13 @@
 */
 
 #if defined(__GNUC__) && defined(__i386__)
-  #include "x86.c"
+  #include "x86_gcc.c"
 #elif defined(__GNUC__) && defined(__amd64__)
-  #include "amd64.c"
+  #if defined(_WIN32)
+    #include "amd64.c"
+  #else
+    #include "amd64_sysv.c"
+  #endif
 #elif defined(__GNUC__) && defined(_ARCH_PPC)
   #include "ppc.c"
 #elif defined(__GNUC__)
