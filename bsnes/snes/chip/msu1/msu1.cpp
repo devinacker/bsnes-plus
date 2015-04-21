@@ -10,6 +10,11 @@ MSU1 msu1;
 void MSU1::Enter() { msu1.enter(); }
 
 void MSU1::enter() {
+  if(boot == true) {
+    boot = false;
+    for(unsigned addr = 0x2000; addr <= 0x2007; addr++) mmio_write(addr, 0x00);
+  }
+
   while(true) {
     if(scheduler.sync == Scheduler::SynchronizeMode::All) {
       scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
@@ -36,8 +41,11 @@ void MSU1::enter() {
       }
     }
 
-    left  = sclamp<16>((double)left  * (double)mmio.audio_volume / 255.0);
-    right = sclamp<16>((double)right * (double)mmio.audio_volume / 255.0);
+    signed lchannel = (double)left  * (double)mmio.audio_volume / 255.0;
+    signed rchannel = (double)right * (double)mmio.audio_volume / 255.0;
+    left  = sclamp<16>(lchannel);
+    right = sclamp<16>(rchannel);
+    if(dsp.mute()) left = 0, right = 0;
 
     audio.coprocessor_sample(left, right);
     step(1);
@@ -62,6 +70,7 @@ void MSU1::power() {
 
 void MSU1::reset() {
   create(MSU1::Enter, 44100);
+  boot = true;
 
   mmio.data_offset  = 0;
   mmio.audio_offset = 0;
@@ -71,6 +80,7 @@ void MSU1::reset() {
   mmio.audio_busy   = true;
   mmio.audio_repeat = false;
   mmio.audio_play   = false;
+  mmio.audio_error  = false;
 }
 
 uint8 MSU1::mmio_read(unsigned addr) {
@@ -79,6 +89,7 @@ uint8 MSU1::mmio_read(unsigned addr) {
          | (mmio.audio_busy   << 6)
          | (mmio.audio_repeat << 5)
          | (mmio.audio_play   << 4)
+         | (mmio.audio_error  << 3)
          | (Revision          << 0);
   }
 
@@ -137,6 +148,7 @@ void MSU1::mmio_write(unsigned addr, uint8 data) {
     mmio.audio_busy   = false;
     mmio.audio_repeat = false;
     mmio.audio_play   = false;
+    mmio.audio_error  = !audiofile.open();
   }
 
   if(addr == 0x2006) {
