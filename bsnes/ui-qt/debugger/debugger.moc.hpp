@@ -18,6 +18,7 @@ public:
 
   QHBoxLayout *layout;
   QTextEdit *console;
+  QVBoxLayout *consoleLayout;
   QVBoxLayout *controlLayout;
   QHBoxLayout *commandLayout;
   QToolButton *runBreak;

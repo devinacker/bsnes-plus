@@ -6,6 +6,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 ## What's new
 
 - "Step over" and "step out" buttons in debugger
+- Improved debugger UI with register editing
 - Improved handling of address mirroring for breakpoints (extends to the entire address space, not just RAM)
 - Real-time code and data highlighting in memory editor, with fast searching for known code/data locations and unexplored regions
 - Cartridge ROM and RAM views in memory editor for mapper-agnostic analysis
@@ -17,7 +18,6 @@ introduce some new features and improvements, mostly aimed at debugging.
 
 ## Coming soon
 
-- Improved debugger UI with register editing
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats

@@ -7,6 +7,8 @@ Debugger *debugger;
 
 #include "tracer.cpp"
 
+#include "registeredit.cpp"
+
 #include "tools/disassembler.cpp"
 #include "tools/breakpoint.cpp"
 #include "tools/memory.cpp"
@@ -47,6 +49,10 @@ Debugger::Debugger() {
   menu_misc_clear = menu_misc->addAction("Clear Console");
   menu_misc_options = menu_misc->addAction("Options ...");
 
+  consoleLayout = new QVBoxLayout;
+  consoleLayout->setSpacing(0);
+  layout->addLayout(consoleLayout);
+  
   console = new QTextEdit;
   console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   console->setReadOnly(true);
@@ -54,7 +60,20 @@ Debugger::Debugger() {
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   console->setMinimumWidth((92 + 4) * console->fontMetrics().width(' '));
   console->setMinimumHeight((25 + 1) * console->fontMetrics().height());
-  layout->addWidget(console);
+  consoleLayout->addWidget(console);
+
+  QTabWidget *editTabs = new QTabWidget;
+  editTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  registerEditCPU = new RegisterEditCPU(SNES::cpu.regs);
+  editTabs->addTab(registerEditCPU, "CPU Registers");
+  registerEditSMP = new RegisterEditSMP;
+  editTabs->addTab(registerEditSMP, "SMP Registers");
+  registerEditSA1 = new RegisterEditCPU(SNES::sa1.regs);
+  editTabs->addTab(registerEditSA1, "SA-1 Registers");
+  registerEditSFX = new RegisterEditSFX;
+  editTabs->addTab(registerEditSFX, "SuperFX Registers");
+  editTabs->setTabPosition(QTabWidget::South);
+  consoleLayout->addWidget(editTabs);
 
   controlLayout = new QVBoxLayout;
   controlLayout->setSpacing(0);
@@ -212,10 +231,17 @@ void Debugger::synchronize() {
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
+  
+  // todo: factor in whether or not cartridge actually contains SA1/SuperFX
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
   SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
   SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
   SNES::debugger.step_sfx = application.debug && stepSFX->isChecked();
+
+  registerEditCPU->setEnabled(SNES::debugger.step_cpu);
+  registerEditSMP->setEnabled(SNES::debugger.step_smp);
+  registerEditSA1->setEnabled(SNES::debugger.step_sa1);
+  registerEditSFX->setEnabled(SNES::debugger.step_sfx);
 
   memoryEditor->synchronize();
 }
@@ -354,6 +380,11 @@ void Debugger::autoUpdate() {
   vramViewer->autoUpdate();
   oamViewer->autoUpdate();
   cgramViewer->autoUpdate();
+  
+  registerEditCPU->synchronize();
+  registerEditSA1->synchronize();
+  registerEditSMP->synchronize();
+  registerEditSFX->synchronize();
 }
 
 #endif
