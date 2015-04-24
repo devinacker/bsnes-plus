@@ -1,4 +1,4 @@
-# bsnes-plus
+﻿# bsnes-plus
 
 bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic) intended to
 introduce some new features and improvements, mostly aimed at debugging.
@@ -21,6 +21,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats
+- IPS soft patching
 
 ## Building on Windows
 
@@ -41,3 +42,10 @@ After building, just copy the .dll, .so, or .dylib files into the same directory
 This fork of bsnes doesn't include the alternate UI based on byuu's `phoenix` library. The purpose of this fork is primarily to add additional UI functionality and I have no intention of implementing every new feature twice using completely different libraries just to keep both versions of the UI at parity.
 
 bsnes v073 and its derivatives are licensed under the GPL v2; see *Help > License...* for more information.
+
+## Contributors
+
+- Devin Acker (@devinacker)
+- Alex W. Jackson (@awjackson)
+- Michał Ziąbkowski (@mziab)
+- Maximilian Rehkopf (@mrehkopf)
