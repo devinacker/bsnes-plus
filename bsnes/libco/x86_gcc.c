@@ -1,5 +1,5 @@
 /*
-  libco.x86_gcc (2015-04-20)
+  libco.x86_gcc (2015-04-22)
   author: byuu, Alex W. Jackson
   license: public domain
 */
@@ -46,13 +46,22 @@ void co_delete(cothread_t handle) {
   free(handle);
 }
 
-void co_switch(cothread_t to) {
-  register cothread_t from = co_active_handle;
+/*
+  The compiler *must not* create a stack frame for this function!
+  Unfortunately, GCC does not support __attribute__((naked)) on x86,
+  so we must do the best we can by forcing omit-frame-pointer and
+  explicitly specifying a volatile register for the local variable
+  (some GCCs have brain damage and may put a local variable in ebp
+  even when volatile registers are available)
+*/
+void __attribute__((optimize("omit-frame-pointer"))) co_switch(cothread_t to) {
+  register cothread_t from __asm__("edx") = co_active_handle;
   co_active_handle = to;
 
   __asm__ __volatile__(
     "movl %%esp,(%[from])       \n\t" /* save old stack pointer */
     "movl (%[to]),%%esp         \n\t" /* load new stack pointer */
+    "popl %%eax                 \n\t" /* pop return address off stack */
 
     "movl %%ebp, 4(%[from])     \n\t" /* backup non-volatile registers */
     "movl %%esi, 8(%[from])     \n\t"
@@ -64,10 +73,11 @@ void co_switch(cothread_t to) {
     "movl 12(%[to]),%%edi       \n\t"
     "movl 16(%[to]),%%ebx       \n\t"
 
+    "jmp *%%eax                 \n\t" /* jump to "to" thread */
     : /* no outputs */
     : [to] "r" (to), [from] "r" (from)
+    : "eax"
   );
-  /* returns to "to" thread */
 }
 
 #ifdef __cplusplus

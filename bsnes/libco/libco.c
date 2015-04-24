@@ -5,12 +5,16 @@
 */
 
 #if defined(__GNUC__) && defined(__i386__)
-  #include "x86_gcc.c"
+  #if defined(LIBCO_NO_INLINE_ASM)
+    #include "x86.c"
+  #else
+    #include "x86_gcc.c"
+  #endif
 #elif defined(__GNUC__) && defined(__amd64__)
-  #if defined(_WIN32)
+  #if defined(LIBCO_NO_INLINE_ASM)
     #include "amd64.c"
   #else
-    #include "amd64_sysv.c"
+    #include "amd64_gcc.c"
   #endif
 #elif defined(__GNUC__) && defined(_ARCH_PPC)
   #include "ppc.c"
