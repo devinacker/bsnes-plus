@@ -29,7 +29,7 @@ AboutWindow::AboutWindow() {
 
   info = new QLabel(string() <<
     "<table width='100%'><tr>"
-    "<td align='left'><b>bsnes-plus version</b> " << SNES::Info::Version << "</td>"
+    "<td align='left'><b>bsnes-plus version</b> " << SNES::Info::Version << " (" __DATE__ ")</td>"
     "<td align='right'><b>" << SNES::Info::Profile <<" profile"
 #if defined(DEBUGGER)
     " with debugger"
@@ -38,7 +38,7 @@ AboutWindow::AboutWindow() {
     "<td align='left'><b>Project homepage:</b></td>"
     "<td align='right'><a href='https://github.com/devinacker/bsnes-plus'>https://github.com/devinacker/bsnes-plus</a></td>"
     "</tr><tr>"
-    "<td align='left'><b>Based on bsnes-classic v073u1:</b></td>"
+    "<td align='left'><b>Based on bsnes-classic:</b></td>"
     "<td align='right'><a href='http://code.google.com/p/bsnes-classic'>http://code.google.com/p/bsnes-classic</a></td>"
     "</tr></table>"
   );
