@@ -5,7 +5,7 @@ public:
   string baseName;    //physical cartridge file name
   string slotAName;   //Sufami Turbo slot A file name or BS-X slot file name
   string slotBName;   //Sufami Turbo slot B file name
-  bool patchApplied;  //true if UPS patch was applied to image
+  string patchApplied;  //filename of the patch if one was applied to image
 
   string baseXml;
   string slotAXml;
@@ -36,6 +36,8 @@ private:
   bool loadCartridge(string&, string&, SNES::MappedRAM&);
   bool loadMemory(const char*, const char*, SNES::MappedRAM&);
   bool saveMemory(const char*, const char*, SNES::MappedRAM&);
+  bool applyBPS(string&, uint8_t *&data, unsigned &size);
+  bool applyUPS(string&, uint8_t *&data, unsigned &size);
   string decodeJISX0201(const char*);
 };
 

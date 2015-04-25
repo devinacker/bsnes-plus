@@ -25,9 +25,15 @@ void Utility::modifySystemState(system_state_t systemState) {
         << "It is unlikely that this title will work properly.</p>");
       }
 
-      showMessage(string()
-      << "Loaded " << cartridge.name
-      << (cartridge.patchApplied ? ", and applied UPS patch." : "."));
+
+      string msgString = string() << "Loaded " << cartridge.name;
+
+      if(cartridge.patchApplied != "")
+        msgString << ", and applied " << cartridge.patchApplied << " patch.";
+      else
+        msgString << ".";
+
+      showMessage(msgString);
       mainWindow->setWindowTitle(string() << cartridge.name << " - " << SNES::Info::Name << " v" << SNES::Info::Version);
       #if defined(DEBUGGER)
       debugger->echo(string() << "Loaded " << cartridge.name << ".<br>");
