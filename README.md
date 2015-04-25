@@ -15,6 +15,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 - Super FX disassembly and debugging
 - Super FX bus viewing and usage logging
 - SPC file dumping
+- Multiple emulation improvements backported from bsnes/higan (mostly via bsnes-classic)
 
 ## Coming soon
 
