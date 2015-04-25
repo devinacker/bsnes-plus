@@ -23,9 +23,6 @@
   #undef decimal
 #elif defined(PLATFORM_WIN)
   #define _WIN32_WINNT 0x0501
-  #define __in
-  #define __out
-  #define __reserved
   #include <windows.h>
 #endif
 
