@@ -34,6 +34,7 @@ namespace nall {
   private:
     struct placeholder {
       virtual const std::type_info& type() const = 0;
+      virtual ~placeholder() {}
     } *container;
 
     template<typename T> struct holder : placeholder {

@@ -32,12 +32,14 @@ public:
     if(name == Audio::Synchronize) return true;
     if(name == Audio::Frequency) return true;
     if(name == Audio::Latency) return true;
+    return false;
   }
 
   any get(const string& name) {
     if(name == Audio::Synchronize) return settings.synchronize;
     if(name == Audio::Frequency) return settings.frequency;
     if(name == Audio::Latency) return settings.latency;
+    return false;
   }
 
   bool set(const string& name, const any& value) {
@@ -62,6 +64,8 @@ public:
       }
       return true;
     }
+
+    return false;
   }
 
   void sample(uint16_t left, uint16_t right) {

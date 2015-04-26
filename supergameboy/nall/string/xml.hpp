@@ -19,7 +19,7 @@ struct xml_element : xml_attribute {
 
 protected:
   void parse_doctype(const char *&data);
-  bool parse_head(string data);
+  void parse_head(string data);
   bool parse_body(const char *&data);
   friend xml_element xml_parse(const char *data);
 };
@@ -116,7 +116,7 @@ inline void xml_element::parse_doctype(const char *&data) {
   throw "...";
 }
 
-inline bool xml_element::parse_head(string data) {
+inline void xml_element::parse_head(string data) {
   data.qreplace("\t", " ");
   data.qreplace("\r", " ");
   data.qreplace("\n", " ");

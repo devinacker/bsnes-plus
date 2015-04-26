@@ -30,7 +30,7 @@ bool AudioInterface::cap(const string& name) {
 any AudioInterface::get(const string& name) {
   if(name == Audio::Volume) return volume;
   if(name == Audio::Resample) return resample_enabled;
-  if(name == Audio::ResampleRatio);
+  if(name == Audio::ResampleRatio) return r_step;
 
   return p ? p->get(name) : false;
 }

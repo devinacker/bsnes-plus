@@ -34,7 +34,7 @@ void PPU::build_window_table(uint8 bg, bool screen) {
   }
 
   if(regs.window1_enabled[bg] == true && regs.window2_enabled[bg] == false) {
-    if(regs.window1_invert[bg] == true) set ^= clr ^= set ^= clr;
+    if(regs.window1_invert[bg] == true) std::swap(set, clr);
     for(unsigned x = 0; x < 256; x++) {
       table[x] = (x >= window1_left && x <= window1_right) ? set : clr;
     }
@@ -42,7 +42,7 @@ void PPU::build_window_table(uint8 bg, bool screen) {
   }
 
   if(regs.window1_enabled[bg] == false && regs.window2_enabled[bg] == true) {
-    if(regs.window2_invert[bg] == true) set ^= clr ^= set ^= clr;
+    if(regs.window2_invert[bg] == true) std::swap(set, clr);
     for(unsigned x = 0; x < 256; x++) {
       table[x] = (x >= window2_left && x <= window2_right) ? set : clr;
     }

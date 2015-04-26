@@ -54,7 +54,12 @@ void co_delete(cothread_t handle) {
   (some GCCs have brain damage and may put a local variable in ebp
   even when volatile registers are available)
 */
-void __attribute__((optimize("omit-frame-pointer"))) co_switch(cothread_t to) {
+#ifdef __clang__
+  #define NAKED __attribute__((naked))
+#else
+  #define NAKED __attribute__((optimize("omit-frame-pointer")))
+#endif
+void NAKED co_switch(cothread_t to) {
   register cothread_t from __asm__("edx") = co_active_handle;
   co_active_handle = to;
 

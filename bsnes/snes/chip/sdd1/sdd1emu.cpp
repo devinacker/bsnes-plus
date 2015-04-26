@@ -258,13 +258,14 @@ uint8 SDD1_PEM::getBit(uint8 context) {
 
   bit=(BG[pState->code_num])->getBit(&endOfRun);
 
-  if (endOfRun)
+  if (endOfRun) {
     if (bit) {
       if (!(currStatus & 0xfe)) (pContInfo->MPS)^=0x01;
       (pContInfo->status)=pState->nextIfLPS;
     }
     else
       (pContInfo->status)=pState->nextIfMPS;
+  }
 
   return bit^currentMPS;
 

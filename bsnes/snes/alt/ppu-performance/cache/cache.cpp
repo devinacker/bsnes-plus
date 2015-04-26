@@ -107,6 +107,7 @@ uint8* PPU::Cache::tile(unsigned bpp, unsigned tile) {
   switch(bpp) {
     case 0: return tile_2bpp(tile);
     case 1: return tile_4bpp(tile);
+    default:
     case 2: return tile_8bpp(tile);
   }
 }

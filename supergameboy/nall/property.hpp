@@ -6,8 +6,7 @@
 //access to type; and all other code has readonly access.
 //
 //this code relies on extended friend semantics from C++0x to work, as it
-//declares a friend class via a template paramter. it also exploits a bug in
-//G++ 4.x to work even in C++98 mode.
+//declares a friend class via a template parameter.
 //
 //if compiling elsewhere, simply remove the friend class and private semantics
 
@@ -50,8 +49,6 @@
 
 namespace nall {
   template<typename C> struct property {
-    template<typename T> struct traits { typedef T type; };
-
     template<typename T> struct readonly {
       const T* operator->() const { return &value; }
       const T& operator()() const { return value; }
@@ -61,7 +58,7 @@ namespace nall {
       operator T&() { return value; }
       const T& operator=(const T& value_) { return value = value_; }
       T value;
-      friend class traits<C>::type;
+      friend C;
     };
 
     template<typename T> struct writeonly {
@@ -73,7 +70,7 @@ namespace nall {
       T* operator->() { return &value; }
       operator T&() { return value; }
       T value;
-      friend class traits<C>::type;
+      friend C;
     };
 
     template<typename T> struct readwrite {

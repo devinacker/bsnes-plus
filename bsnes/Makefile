@@ -8,8 +8,8 @@ ifeq ($(ui),)
 endif
 
 # compiler
-c       := $(compiler) -std=gnu99
-cpp     := $(subst cc,++,$(compiler)) -std=gnu++0x
+c       := $(compiler) -x c -std=gnu99
+cpp     := $(compiler) -std=gnu++0x
 flags   := -O3 -fomit-frame-pointer -I. -I$(snes)
 link    :=
 objects :=

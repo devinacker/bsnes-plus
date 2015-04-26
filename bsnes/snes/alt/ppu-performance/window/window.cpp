@@ -41,10 +41,10 @@ void PPU::LayerWindow::render(bool screen) {
     bool one_mask = (x >= ppu.regs.window_one_left && x <= ppu.regs.window_one_right) ^ one_invert;
     bool two_mask = (x >= ppu.regs.window_two_left && x <= ppu.regs.window_two_right) ^ two_invert;
     switch(mask) {
-      case 0: output[x] = one_mask | two_mask == 1; break;
-      case 1: output[x] = one_mask & two_mask == 1; break;
-      case 2: output[x] = one_mask ^ two_mask == 1; break;
-      case 3: output[x] = one_mask ^ two_mask == 0; break;
+      case 0: output[x] =  (one_mask | two_mask); break;
+      case 1: output[x] =  (one_mask & two_mask); break;
+      case 2: output[x] =  (one_mask ^ two_mask); break;
+      case 3: output[x] = !(one_mask ^ two_mask); break;
     }
   }
 }
@@ -87,10 +87,10 @@ void PPU::ColorWindow::render(bool screen) {
     bool one_mask = (x >= ppu.regs.window_one_left && x <= ppu.regs.window_one_right) ^ one_invert;
     bool two_mask = (x >= ppu.regs.window_two_left && x <= ppu.regs.window_two_right) ^ two_invert;
     switch(mask) {
-      case 0: output[x] = one_mask | two_mask == 1 ? set : clr; break;
-      case 1: output[x] = one_mask & two_mask == 1 ? set : clr; break;
-      case 2: output[x] = one_mask ^ two_mask == 1 ? set : clr; break;
-      case 3: output[x] = one_mask ^ two_mask == 0 ? set : clr; break;
+      case 0: output[x] = (one_mask | two_mask) ? set : clr; break;
+      case 1: output[x] = (one_mask & two_mask) ? set : clr; break;
+      case 2: output[x] = (one_mask ^ two_mask) ? set : clr; break;
+      case 3: output[x] = (one_mask ^ two_mask) ? clr : set; break;
     }
   }
 }

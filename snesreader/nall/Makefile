@@ -30,9 +30,9 @@ endif
 
 ifeq ($(compiler),)
   ifeq ($(platform),osx)
-    compiler := gcc-mp-4.4
+    compiler := clang++
   else
-    compiler := gcc
+    compiler := g++
   endif
 endif
 

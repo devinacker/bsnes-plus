@@ -97,13 +97,12 @@ namespace nall {
       if(!fp) return;  //file not open
       buffer_flush();
 
-      uintmax_t req_offset = file_offset;
+      unsigned req_offset;
       switch(mode) {
         case seek_absolute: req_offset  = offset; break;
-        case seek_relative: req_offset += offset; break;
+        case seek_relative: req_offset = (offset < 0 && -offset > file_offset) ? 0 : file_offset + offset; break;
       }
 
-      if(req_offset < 0) req_offset = 0;  //cannot seek before start of file
       if(req_offset > file_size) {
         if(file_mode == mode_read) {      //cannot seek past end of file
           req_offset = file_size;
