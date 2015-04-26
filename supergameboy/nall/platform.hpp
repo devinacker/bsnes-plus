@@ -64,7 +64,7 @@
 //inline expansion
 //================
 
-#if defined(__GNUC__)
+#if defined(__clang__) || defined(__GNUC__)
   #define noinline      __attribute__((noinline))
   #define inline        inline
   #define alwaysinline  inline __attribute__((always_inline))
