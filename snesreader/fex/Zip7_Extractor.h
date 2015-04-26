@@ -24,9 +24,13 @@ protected:
 
 	virtual blargg_err_t data_v( void const** out );
 	
+	bool utf16ToUtf8( unsigned char* dest, size_t* destLen, const short* src, size_t srcLen );
+	
 private:
 	Zip7_Extractor_Impl* impl;
 	int index;
+	blargg_vector<char> name8;
+	blargg_vector<wchar_t> name16;
 	
 	blargg_err_t zip7_err( int err );
 };

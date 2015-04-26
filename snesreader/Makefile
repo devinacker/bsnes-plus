@@ -22,7 +22,7 @@ objects += Binary_Extractor blargg_common blargg_errors Data_Reader fex File_Ext
 # zlib
 objects += adler32 crc32 inffast inflate inftrees zutil
 # 7-zip
-objects += 7zAlloc 7zBuf 7zCrc 7zDecode 7zExtract 7zHeader 7zIn 7zItem 7zStream Bcj2 Bra86 LzmaDec
+objects += 7zAlloc 7zBuf 7zCrc 7zCrcOpt 7zDec 7zIn 7zStream Bcj2 Bra86 Bra CpuArch LzmaDec Lzma2Dec Ppmd7 Ppmd7Dec
 # unrar
 # objects += archive arcread coder crc encname extract getbits model rarvm rarvmtbl rawread suballoc unicode unpack unpack15 unpack20 unrar unrar_misc unrar_open
 # micro-bunzip
@@ -101,15 +101,18 @@ obj/zutil.o   : zlib/zutil.c zlib/*
 obj/7zAlloc.o  : 7z_C/7zAlloc.c 7z_C/*
 obj/7zBuf.o    : 7z_C/7zBuf.c 7z_C/*
 obj/7zCrc.o    : 7z_C/7zCrc.c 7z_C/*
-obj/7zDecode.o : 7z_C/7zDecode.c 7z_C/*
-obj/7zExtract.o: 7z_C/7zExtract.c 7z_C/*
-obj/7zHeader.o : 7z_C/7zHeader.c 7z_C/*
+obj/7zCrcOpt.o : 7z_C/7zCrcOpt.c 7z_C/*
+obj/7zDec.o    : 7z_C/7zDec.c 7z_C/*
 obj/7zIn.o     : 7z_C/7zIn.c 7z_C/*
-obj/7zItem.o   : 7z_C/7zItem.c 7z_C/*
 obj/7zStream.o : 7z_C/7zStream.c 7z_C/*
 obj/Bcj2.o     : 7z_C/Bcj2.c 7z_C/*
+obj/Bra.o      : 7z_C/Bra.c 7z_C/*
 obj/Bra86.o    : 7z_C/Bra86.c 7z_C/*
+obj/CpuArch.o  : 7z_C/CpuArch.c 7z_C/*
 obj/LzmaDec.o  : 7z_C/LzmaDec.c 7z_C/*
+obj/Lzma2Dec.o : 7z_C/Lzma2Dec.c 7z_C/*
+obj/Ppmd7.o    : 7z_C/Ppmd7.c 7z_C/*
+obj/Ppmd7Dec.o : 7z_C/Ppmd7Dec.c 7z_C/*
 
 ####################
 ### micro-bunzip ###

@@ -12,7 +12,7 @@
 typedef const char* blargg_err_t; // 0 on success, otherwise error string
 
 // Success; no error
-blargg_err_t const blargg_ok = NULL;
+blargg_err_t const blargg_ok = 0;
 
 // BLARGG_RESTRICT: equivalent to C99's restrict, where supported
 #if __GNUC__ >= 3 || _MSC_VER >= 1100
@@ -191,11 +191,6 @@ struct blargg_callback
 	blargg_callback() { f = NULL; }
 	void operator () ( T callback, void* user_data = NULL ) { f = callback; data = user_data; }
 };
-
-#ifndef _WIN32
-	// Not supported on any other platforms
-	#undef BLARGG_UTF8_PATHS
-#endif
 
 BLARGG_DEPRECATED( typedef signed   int blargg_long; )
 BLARGG_DEPRECATED( typedef unsigned int blargg_ulong; )

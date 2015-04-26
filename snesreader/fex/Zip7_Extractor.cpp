@@ -2,9 +2,13 @@
 
 #include "Zip7_Extractor.h"
 
-#include "7z_C/7zExtract.h"
+extern "C" {
+#include "7z_C/7z.h"
 #include "7z_C/7zAlloc.h"
 #include "7z_C/7zCrc.h"
+}
+
+#include <time.h>
 
 /* Copyright (C) 2005-2009 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -66,7 +70,7 @@ extern "C"
 		ISeekInStream* stream = STATIC_CAST(ISeekInStream*,vstream);
 		Zip7_Extractor_Impl* impl = STATIC_CAST(Zip7_Extractor_Impl*,stream);
 		
-		assert( mode != SZ_SEEK_CUR ); // never used
+		// assert( mode != SZ_SEEK_CUR ); // never used
 		
 		if ( mode == SZ_SEEK_END )
 		{
@@ -75,7 +79,7 @@ extern "C"
 			return SZ_OK;
 		}
 		
-		assert( mode == SZ_SEEK_SET );
+		// assert( mode == SZ_SEEK_SET );
 		blargg_err_t err = impl->in->seek( *pos );
 		if ( err )
 		{
@@ -197,6 +201,74 @@ void Zip7_Extractor::close_v()
 	}
 }
 
+// This method was taken from ogre-7z (thanks), and is thus LGPL
+bool Zip7_Extractor::utf16ToUtf8( unsigned char* dest, size_t* destLen, const short* src, size_t srcLen )
+{
+	static const unsigned char sUtf8Limits[5] = { 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+
+	size_t destPos = 0, srcPos = 0;
+	for(;;)
+	{
+		unsigned int numAdds;
+		unsigned long value;
+		if( srcPos == srcLen )
+		{
+			*destLen = destPos;
+			return true;
+		}
+
+		value = src[srcPos++];
+		if( value < 0x80 )
+		{
+			if( dest )
+			{
+				dest[destPos] = (char)value;
+			}
+			destPos++;
+			continue;
+		}
+
+		if( value >= 0xD800 && value < 0xE000 )
+		{
+			unsigned long c2;
+			if( value >= 0xDC00 || srcPos == srcLen )
+				break;
+
+			c2 = src[srcPos++];
+			if( c2 < 0xDC00 || c2 >= 0xE000 )
+				break;
+
+			value = (((value - 0xD800) << 10) | (c2 - 0xDC00)) + 0x10000;
+		}
+
+		for( numAdds = 1; numAdds < 5; numAdds++ )
+		{
+			if( value < (((UInt32)1) << (numAdds * 5 + 6)) )
+				break;
+		}
+
+		if( dest )
+		{
+			dest[destPos] = (char)(sUtf8Limits[numAdds - 1] + (value >> (6 * numAdds)));
+		}
+
+		destPos++;
+		do
+		{
+			numAdds--;
+			if( dest )
+			{
+				dest[destPos] = (char)(0x80 + ((value >> (6 * numAdds)) & 0x3F));
+			}
+			destPos++;
+		}
+		while( numAdds != 0 );
+	}
+
+	*destLen = destPos;
+	return false;
+}
+
 blargg_err_t Zip7_Extractor::next_v()
 {
 	while ( ++index < (int) impl->db.db.NumFiles )
@@ -204,14 +276,44 @@ blargg_err_t Zip7_Extractor::next_v()
 		CSzFileItem const& item = impl->db.db.Files [index];
 		if ( !item.IsDir )
 		{
-			// TODO: Support date.
-			// NTFS representation, stored as 64-bit value.
-			// Divide by 10000000 (ten million) to get seconds
-			//item.MTime.Low + (.High << 32)
-			// How to convert to DOS style?
-			
-			set_name( item.Name );
-			set_info( item.Size, 0, (item.FileCRCDefined ? item.FileCRC : 0) );
+			unsigned long date = 0;
+			if ( item.MTimeDefined )
+			{
+				const UInt64 epoch = ((UInt64)0x019db1de << 32) + 0xd53e8000;
+				/* 0x019db1ded53e8000ULL: 1970-01-01 00:00:00 (UTC) */
+				struct tm tm;
+
+				UInt64 time = ((UInt64)item.MTime.High << 32) + item.MTime.Low - epoch;
+				time /= 1000000;
+
+				time_t _time = time;
+				
+			#ifdef _WIN32
+				tm = *localtime( &_time );
+			#else
+				localtime_r( &_time, &tm );
+			#endif
+
+				date = (( tm.tm_sec >> 1 ) & 0x1F) |
+					(( tm.tm_min & 0x3F ) << 5 ) |
+					(( tm.tm_hour & 0x1F ) << 11 ) |
+					(( tm.tm_mday & 0x1F ) << 16 ) |
+					(( ( tm.tm_mon + 1 ) & 0x0F ) << 21 ) |
+					(( ( tm.tm_year - 80 ) & 0x7F ) << 25 );
+			}
+
+			size_t name_length = SzArEx_GetFileNameUtf16( &impl->db, index, 0 );
+			size_t utf8_length = 0;
+			name16.resize( name_length );
+			SzArEx_GetFileNameUtf16( &impl->db, index, ( UInt16 * ) name16.begin() );
+			unsigned char temp[1024];
+			utf16ToUtf8( temp, &utf8_length, (const short*)name16.begin(), name_length - 1 );
+			temp[utf8_length] = '\0';
+
+			name8.resize( utf8_length + 1 );
+			memcpy( name8.begin(), temp, utf8_length + 1 );
+			set_name( name8.begin(), name16.begin() );
+			set_info( item.Size, 0, (item.CrcDefined ? item.Crc : 0) );
 			break;
 		}
 	}
@@ -242,7 +344,7 @@ blargg_err_t Zip7_Extractor::data_v( void const** out )
 	impl->in_err = NULL;
 	size_t offset = 0;
 	size_t count  = 0;
-	RETURN_ERR( zip7_err( SzAr_Extract( &impl->db, &impl->look.s, index,
+	RETURN_ERR( zip7_err( SzArEx_Extract( &impl->db, &impl->look.s, index,
 			&impl->block_index, &impl->buf, &impl->buf_size,
 			&offset, &count, &zip7_alloc, &zip7_alloc_temp ) ) );
 	assert( count == (size_t) size() );
