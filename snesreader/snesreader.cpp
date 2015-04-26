@@ -18,7 +18,7 @@ extern "C" char* uncompressStream(int, int);  //micro-bunzip
 using namespace nall;
 
 dllexport const char* snesreader_supported() {
-  return "*.zip *.z *.7z *.rar *.gz *.bz2 *.jma";
+  return "*.zip *.z *.7z *.gz *.bz2 *.jma";
 }
 
 void snesreader_apply_ips(const char *filename, uint8_t *&data, unsigned &size) {
@@ -199,7 +199,6 @@ dllexport bool snesreader_load(string &filename, uint8_t *&data, unsigned &size)
   if(striend(filename, ".zip")
   || striend(filename, ".z")
   || striend(filename, ".7z")
-  || striend(filename, ".rar")
   || striend(filename, ".gz")) {
     success = snesreader_load_fex(filename, data, size);
   } else if(striend(filename, ".bz2")) {
