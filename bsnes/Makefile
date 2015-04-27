@@ -25,6 +25,7 @@ objects :=
 ifeq ($(platform),x)
   link += -s -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
+	osxbundle := ../bsnes+.app
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
@@ -57,8 +58,11 @@ objects := $(patsubst %,obj/%.o,$(objects))
 # targets
 build: ui_build $(objects)
 ifeq ($(platform),osx)
-	test -d ../bsnes.app || mkdir -p ../bsnes.app/Contents/MacOS
-	$(strip $(cpp) -o ../bsnes.app/Contents/MacOS/bsnes $(objects) $(link))
+	test -d $(osxbundle) || mkdir -p $(osxbundle)/Contents/MacOS
+	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/bsnes $(objects) $(link))
+	mkdir -p $(osxbundle)/Contents/Resources
+	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
+	cp -f data/Info.plist $(osxbundle)/Contents/Info.plist
 else
 	$(strip $(cpp) -o out/bsnes $(objects) $(link))
 endif
