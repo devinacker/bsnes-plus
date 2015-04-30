@@ -10,7 +10,7 @@ endif
 # compiler
 c       := $(compiler) -x c -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
-flags   := -O3 -fomit-frame-pointer -I. -I$(snes)
+flags   := -I. -I$(snes) -fomit-frame-pointer
 link    :=
 objects :=
 
@@ -20,6 +20,17 @@ objects :=
 
 # profile-guided optimization
 # flags += -fprofile-use
+
+# silence warnings
+flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
+
+# build for debugging if $(DEBUG) == 1, otherwise optimize
+# (investigate: why does the build crash when using -O0 just a few emulated cycles?)
+ifeq ($(DEBUG), 1)
+  flags += -O1 -g
+else
+  flags += -O3
+endif
 
 # platform
 ifeq ($(platform),x)
@@ -96,6 +107,9 @@ clean: ui_clean
 	-@$(call delete,*.ilk)
 	-@$(call delete,*.pdb)
 	-@$(call delete,*.manifest)
+ifeq ($(platform),osx)
+	rm -rf $(osxbundle)
+endif
 
 archive-all:
 	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh
