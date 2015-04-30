@@ -8,35 +8,26 @@ ifeq ($(ui),)
 endif
 
 # compiler
-c       := $(compiler) -x c -std=gnu99
+c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
-flags   := -I. -I$(snes) -fomit-frame-pointer
+flags   := -I. -I$(snes)
 link    :=
 objects :=
 
-# profile-guided instrumentation
-# flags += -fprofile-generate
-# link += -lgcov
-
-# profile-guided optimization
-# flags += -fprofile-use
-
-# silence warnings
-flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
-
-# build for debugging if $(DEBUG) == 1, otherwise optimize
-# (investigate: why does the build crash when using -O0 just a few emulated cycles?)
 ifeq ($(DEBUG), 1)
-  flags += -O1 -g
+  flags += -O0 -g
 else
-  flags += -O3
+  flags += -O3 -fomit-frame-pointer
 endif
+
+flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 # platform
 ifeq ($(platform),x)
   link += -s -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
 	osxbundle := ../bsnes+.app
+	flags += -march=native
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
