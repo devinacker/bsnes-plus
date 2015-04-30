@@ -14,6 +14,9 @@ flags   := -O3 -fomit-frame-pointer -I. -I$(snes)
 link    :=
 objects :=
 
+# comment this line to enable asserts
+flags += -DNDEBUG
+
 # profile-guided instrumentation
 # flags += -fprofile-generate
 # link += -lgcov
