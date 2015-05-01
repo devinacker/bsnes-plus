@@ -95,11 +95,11 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   memory::gbram.write_protect(false);
   memory::gbrtc.write_protect(false);
 
-  unsigned checksum = ~0;                                         foreach(n, memory::cartrom) checksum = crc32_adjust(checksum, n);
-  if(memory::bsxpack.size() != 0 && memory::bsxpack.size() != ~0) foreach(n, memory::bsxpack) checksum = crc32_adjust(checksum, n);
-  if(memory::stArom.size()  != 0 && memory::stArom.size()  != ~0) foreach(n, memory::stArom ) checksum = crc32_adjust(checksum, n);
-  if(memory::stBrom.size()  != 0 && memory::stBrom.size()  != ~0) foreach(n, memory::stBrom ) checksum = crc32_adjust(checksum, n);
-  if(memory::gbrom.size()   != 0 && memory::gbrom.size()   != ~0) foreach(n, memory::gbrom  ) checksum = crc32_adjust(checksum, n);
+  unsigned checksum = ~0;         foreach(n, memory::cartrom) checksum = crc32_adjust(checksum, n);
+  if(memory::bsxpack.size() != 0) foreach(n, memory::bsxpack) checksum = crc32_adjust(checksum, n);
+  if(memory::stArom.size()  != 0) foreach(n, memory::stArom ) checksum = crc32_adjust(checksum, n);
+  if(memory::stBrom.size()  != 0) foreach(n, memory::stBrom ) checksum = crc32_adjust(checksum, n);
+  if(memory::gbrom.size()   != 0) foreach(n, memory::gbrom  ) checksum = crc32_adjust(checksum, n);
   crc32 = ~checksum;
 
   sha256_ctx sha;
@@ -138,7 +138,7 @@ void Cartridge::unload() {
 }
 
 Memory& Cartridge::bsxpack_access() {
-  if(memory::bsxpack.size() == 0 || memory::bsxpack.size() == ~0) return memory::memory_unmapped;
+  if(memory::bsxpack.size() == 0) return memory::memory_unmapped;
   return (bsxpack_type == BSXPackType::FlashROM) ? (Memory&)bsxflash : (Memory&)memory::bsxpack;
 }
 

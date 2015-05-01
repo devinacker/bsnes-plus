@@ -263,6 +263,5 @@ unsigned snes_get_memory_size(unsigned id) {
       break;
   }
 
-  if(size == -1U) size = 0;
   return size;
 }
