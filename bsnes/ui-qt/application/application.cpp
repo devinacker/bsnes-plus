@@ -68,7 +68,7 @@ int Application::main(int &argc, char **argv) {
   utf8_args(argc, argv);
   #elif defined(PLATFORM_OSX)
   //Use big icon for OSX
-  app->setWindowIcon(QIcon(":/bsnes_256.png"));
+  app->setWindowIcon(QIcon(":/bsnes_512.png"));
   #else
   app->setWindowIcon(QIcon(":/bsnes.png"));
   #endif
