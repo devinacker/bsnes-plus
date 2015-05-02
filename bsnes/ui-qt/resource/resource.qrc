@@ -2,6 +2,7 @@
 <RCC version="1.0">
   <qresource>
     <file alias="bsnes.png">../../data/bsnes.png</file>
+    <file alias="bsnes_512.png">../../data/bsnes_512.png</file>
     <file alias="cheats.xml">../../data/cheats.xml</file>
 
     <file alias="logo.png">../data/logo.png</file>
