@@ -107,7 +107,7 @@ clean: ui_clean
 	-@$(call delete,*.pdb)
 	-@$(call delete,*.manifest)
 ifeq ($(platform),osx)
-	rm -rf $(osxbundle)
+	@rm -rf $(osxbundle)
 endif
 
 archive-all:
