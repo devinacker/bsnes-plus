@@ -244,78 +244,6 @@
 		2A35CDF21AEE788E00C9236B /* utility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
 		2A35CDF31AEE788E00C9236B /* varint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = varint.hpp; sourceTree = "<group>"; };
 		2A35CDF41AEE788E00C9236B /* vector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = vector.hpp; sourceTree = "<group>"; };
-		2A35CDF61AEE788E00C9236B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		2A35CDF71AEE788E00C9236B /* about.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = about.moc; sourceTree = "<group>"; };
-		2A35CDF81AEE788E00C9236B /* advanced.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = advanced.moc; sourceTree = "<group>"; };
-		2A35CDF91AEE788E00C9236B /* application.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = application.moc; sourceTree = "<group>"; };
-		2A35CDFA1AEE788E00C9236B /* audio.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = audio.moc; sourceTree = "<group>"; };
-		2A35CDFB1AEE788E00C9236B /* breakpoint.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = breakpoint.moc; sourceTree = "<group>"; };
-		2A35CDFC1AEE788E00C9236B /* cgram-viewer.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "cgram-viewer.moc"; sourceTree = "<group>"; };
-		2A35CDFD1AEE788E00C9236B /* cheateditor.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = cheateditor.moc; sourceTree = "<group>"; };
-		2A35CDFE1AEE788E00C9236B /* cheatfinder.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = cheatfinder.moc; sourceTree = "<group>"; };
-		2A35CDFF1AEE788E00C9236B /* check-action.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "check-action.moc"; sourceTree = "<group>"; };
-		2A35CE001AEE788E00C9236B /* debugger-options.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "debugger-options.moc"; sourceTree = "<group>"; };
-		2A35CE011AEE788E00C9236B /* debugger.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = debugger.moc; sourceTree = "<group>"; };
-		2A35CE021AEE788E00C9236B /* disassembler.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = disassembler.moc; sourceTree = "<group>"; };
-		2A35CE031AEE788E00C9236B /* effecttoggle.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = effecttoggle.moc; sourceTree = "<group>"; };
-		2A35CE041AEE788E00C9236B /* file-dialog.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "file-dialog.moc"; sourceTree = "<group>"; };
-		2A35CE051AEE788E00C9236B /* filebrowser.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = filebrowser.moc; sourceTree = "<group>"; };
-		2A35CE061AEE788E00C9236B /* hex-editor.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "hex-editor.moc"; sourceTree = "<group>"; };
-		2A35CE071AEE788E00C9236B /* htmlviewer.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = htmlviewer.moc; sourceTree = "<group>"; };
-		2A35CE081AEE788E00C9236B /* input.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = input.moc; sourceTree = "<group>"; };
-		2A35CE091AEE788E00C9236B /* libco.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = libco.o; sourceTree = "<group>"; };
-		2A35CE0A1AEE788E00C9236B /* loader.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = loader.moc; sourceTree = "<group>"; };
-		2A35CE0B1AEE788E00C9236B /* main.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.moc; sourceTree = "<group>"; };
-		2A35CE0C1AEE788E00C9236B /* memory.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = memory.moc; sourceTree = "<group>"; };
-		2A35CE0D1AEE788E00C9236B /* oam-viewer.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "oam-viewer.moc"; sourceTree = "<group>"; };
-		2A35CE0E1AEE788E00C9236B /* paths.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = paths.moc; sourceTree = "<group>"; };
-		2A35CE0F1AEE788E00C9236B /* profile.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = profile.moc; sourceTree = "<group>"; };
-		2A35CE101AEE788E00C9236B /* properties.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = properties.moc; sourceTree = "<group>"; };
-		2A35CE111AEE788E00C9236B /* radio-action.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "radio-action.moc"; sourceTree = "<group>"; };
-		2A35CE121AEE788E00C9236B /* registeredit.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = registeredit.moc; sourceTree = "<group>"; };
-		2A35CE131AEE788E00C9236B /* resource.rcc */ = {isa = PBXFileReference; lastKnownFileType = text; path = resource.rcc; sourceTree = "<group>"; };
-		2A35CE141AEE788E00C9236B /* ruby.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = ruby.o; sourceTree = "<group>"; };
-		2A35CE151AEE788E00C9236B /* settings.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = settings.moc; sourceTree = "<group>"; };
-		2A35CE161AEE788E00C9236B /* snes-bsx.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-bsx.o"; sourceTree = "<group>"; };
-		2A35CE171AEE788E00C9236B /* snes-cartridge.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-cartridge.o"; sourceTree = "<group>"; };
-		2A35CE181AEE788E00C9236B /* snes-cheat.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-cheat.o"; sourceTree = "<group>"; };
-		2A35CE191AEE788E00C9236B /* snes-cpu.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-cpu.o"; sourceTree = "<group>"; };
-		2A35CE1A1AEE788E00C9236B /* snes-cpucore.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-cpucore.o"; sourceTree = "<group>"; };
-		2A35CE1B1AEE788E00C9236B /* snes-cx4.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-cx4.o"; sourceTree = "<group>"; };
-		2A35CE1C1AEE788E00C9236B /* snes-dsp.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-dsp.o"; sourceTree = "<group>"; };
-		2A35CE1D1AEE788E00C9236B /* snes-memory.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-memory.o"; sourceTree = "<group>"; };
-		2A35CE1E1AEE788E00C9236B /* snes-msu1.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-msu1.o"; sourceTree = "<group>"; };
-		2A35CE1F1AEE788E00C9236B /* snes-necdsp.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-necdsp.o"; sourceTree = "<group>"; };
-		2A35CE201AEE788E00C9236B /* snes-obc1.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-obc1.o"; sourceTree = "<group>"; };
-		2A35CE211AEE788E00C9236B /* snes-ppu.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-ppu.o"; sourceTree = "<group>"; };
-		2A35CE221AEE788E00C9236B /* snes-sa1.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-sa1.o"; sourceTree = "<group>"; };
-		2A35CE231AEE788E00C9236B /* snes-sdd1.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-sdd1.o"; sourceTree = "<group>"; };
-		2A35CE241AEE788E00C9236B /* snes-serial.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-serial.o"; sourceTree = "<group>"; };
-		2A35CE251AEE788E00C9236B /* snes-smp.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-smp.o"; sourceTree = "<group>"; };
-		2A35CE261AEE788E00C9236B /* snes-smpcore.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-smpcore.o"; sourceTree = "<group>"; };
-		2A35CE271AEE788E00C9236B /* snes-spc7110.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-spc7110.o"; sourceTree = "<group>"; };
-		2A35CE281AEE788E00C9236B /* snes-srtc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-srtc.o"; sourceTree = "<group>"; };
-		2A35CE291AEE788E00C9236B /* snes-st0018.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-st0018.o"; sourceTree = "<group>"; };
-		2A35CE2A1AEE788E00C9236B /* snes-superfx.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-superfx.o"; sourceTree = "<group>"; };
-		2A35CE2B1AEE788E00C9236B /* snes-supergameboy.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-supergameboy.o"; sourceTree = "<group>"; };
-		2A35CE2C1AEE788E00C9236B /* snes-system.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "snes-system.o"; sourceTree = "<group>"; };
-		2A35CE2D1AEE788E00C9236B /* statemanager.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = statemanager.moc; sourceTree = "<group>"; };
-		2A35CE2E1AEE788E00C9236B /* stateselect.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = stateselect.moc; sourceTree = "<group>"; };
-		2A35CE2F1AEE788E00C9236B /* tools.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = tools.moc; sourceTree = "<group>"; };
-		2A35CE301AEE788E00C9236B /* tracer.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = tracer.moc; sourceTree = "<group>"; };
-		2A35CE311AEE788E00C9236B /* ui-base.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-base.o"; sourceTree = "<group>"; };
-		2A35CE321AEE788E00C9236B /* ui-cartridge.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-cartridge.o"; sourceTree = "<group>"; };
-		2A35CE331AEE788E00C9236B /* ui-debugger.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-debugger.o"; sourceTree = "<group>"; };
-		2A35CE341AEE788E00C9236B /* ui-input.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-input.o"; sourceTree = "<group>"; };
-		2A35CE351AEE788E00C9236B /* ui-main.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-main.o"; sourceTree = "<group>"; };
-		2A35CE361AEE788E00C9236B /* ui-movie.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-movie.o"; sourceTree = "<group>"; };
-		2A35CE371AEE788E00C9236B /* ui-settings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-settings.o"; sourceTree = "<group>"; };
-		2A35CE381AEE788E00C9236B /* ui-state.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-state.o"; sourceTree = "<group>"; };
-		2A35CE391AEE788E00C9236B /* ui-tools.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "ui-tools.o"; sourceTree = "<group>"; };
-		2A35CE3A1AEE788E00C9236B /* video.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = video.moc; sourceTree = "<group>"; };
-		2A35CE3B1AEE788E00C9236B /* vram-viewer.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = "vram-viewer.moc"; sourceTree = "<group>"; };
-		2A35CE3C1AEE788E00C9236B /* window.moc */ = {isa = PBXFileReference; lastKnownFileType = text; path = window.moc; sourceTree = "<group>"; };
-		2A35CE3E1AEE788E00C9236B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		2A35CE411AEE788E00C9236B /* alsa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = alsa.cpp; sourceTree = "<group>"; };
 		2A35CE421AEE788E00C9236B /* ao.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ao.cpp; sourceTree = "<group>"; };
 		2A35CE431AEE788E00C9236B /* directsound.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = directsound.cpp; sourceTree = "<group>"; };
@@ -483,7 +411,7 @@
 		2A35CF321AEE788E00C9236B /* cpu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cpu.hpp; sourceTree = "<group>"; };
 		2A35CF341AEE788E00C9236B /* debugger.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = debugger.cpp; sourceTree = "<group>"; };
 		2A35CF351AEE788E00C9236B /* debugger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = debugger.hpp; sourceTree = "<group>"; };
-		2A35CF371AEE788E00C9236B /* dma.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dma.cpp; sourceTree = "<group>"; };
+		2A35CF371AEE788E00C9236B /* dma.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = dma.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		2A35CF381AEE788E00C9236B /* dma.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = dma.hpp; sourceTree = "<group>"; };
 		2A35CF3A1AEE788E00C9236B /* memory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = memory.cpp; sourceTree = "<group>"; };
 		2A35CF3B1AEE788E00C9236B /* memory.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = memory.hpp; sourceTree = "<group>"; };
@@ -573,7 +501,7 @@
 		2A35CFAA1AEE788E00C9236B /* system.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = system.hpp; sourceTree = "<group>"; };
 		2A35CFAC1AEE788E00C9236B /* video.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = video.cpp; sourceTree = "<group>"; };
 		2A35CFAD1AEE788E00C9236B /* video.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = video.hpp; sourceTree = "<group>"; };
-		2A35CFB11AEE788E00C9236B /* application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = application.cpp; sourceTree = "<group>"; };
+		2A35CFB11AEE788E00C9236B /* application.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = application.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		2A35CFB21AEE788E00C9236B /* application.moc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = application.moc.hpp; sourceTree = "<group>"; };
 		2A35CFB31AEE788E00C9236B /* init.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = init.cpp; sourceTree = "<group>"; };
 		2A35CFB51AEE788E00C9236B /* about.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = about.cpp; sourceTree = "<group>"; };
@@ -692,7 +620,7 @@
 		2A35D0391AEE788E00C9236B /* utility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
 		2A35D03A1AEE788E00C9236B /* window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		2A35D03B1AEE7A9E00C9236B /* bsnes+.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "bsnes+.app"; path = "../bsnes+.app"; sourceTree = "<group>"; };
-		2ACADCBD1AF257A30001E28A /* bsnes-plus-xc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "bsnes-plus-xc"; path = "/Users/optiroc/Development/bsnes-plus/project/build/Debug/bsnes-plus-xc"; sourceTree = "<absolute>"; };
+		2AA104641AF2EB7000D94A42 /* bsnes-plus-xc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "bsnes-plus-xc"; path = "/Users/optiroc/Development/bsnes-plus/project/build/Debug/bsnes-plus-xc"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -721,8 +649,6 @@
 				2A35CDA01AEE788E00C9236B /* launcher */,
 				2A35CDA71AEE788E00C9236B /* libco */,
 				2A35CDB31AEE788E00C9236B /* nall */,
-				2A35CDF51AEE788E00C9236B /* obj */,
-				2A35CE3D1AEE788E00C9236B /* out */,
 				2A35CE3F1AEE788E00C9236B /* ruby */,
 				2A35CE631AEE788E00C9236B /* snes */,
 				2A35CFAF1AEE788E00C9236B /* ui-qt */,
@@ -865,92 +791,6 @@
 				2A35CDEE1AEE788E00C9236B /* xml.hpp */,
 			);
 			path = string;
-			sourceTree = "<group>";
-		};
-		2A35CDF51AEE788E00C9236B /* obj */ = {
-			isa = PBXGroup;
-			children = (
-				2A35CDF61AEE788E00C9236B /* .gitignore */,
-				2A35CDF71AEE788E00C9236B /* about.moc */,
-				2A35CDF81AEE788E00C9236B /* advanced.moc */,
-				2A35CDF91AEE788E00C9236B /* application.moc */,
-				2A35CDFA1AEE788E00C9236B /* audio.moc */,
-				2A35CDFB1AEE788E00C9236B /* breakpoint.moc */,
-				2A35CDFC1AEE788E00C9236B /* cgram-viewer.moc */,
-				2A35CDFD1AEE788E00C9236B /* cheateditor.moc */,
-				2A35CDFE1AEE788E00C9236B /* cheatfinder.moc */,
-				2A35CDFF1AEE788E00C9236B /* check-action.moc */,
-				2A35CE001AEE788E00C9236B /* debugger-options.moc */,
-				2A35CE011AEE788E00C9236B /* debugger.moc */,
-				2A35CE021AEE788E00C9236B /* disassembler.moc */,
-				2A35CE031AEE788E00C9236B /* effecttoggle.moc */,
-				2A35CE041AEE788E00C9236B /* file-dialog.moc */,
-				2A35CE051AEE788E00C9236B /* filebrowser.moc */,
-				2A35CE061AEE788E00C9236B /* hex-editor.moc */,
-				2A35CE071AEE788E00C9236B /* htmlviewer.moc */,
-				2A35CE081AEE788E00C9236B /* input.moc */,
-				2A35CE091AEE788E00C9236B /* libco.o */,
-				2A35CE0A1AEE788E00C9236B /* loader.moc */,
-				2A35CE0B1AEE788E00C9236B /* main.moc */,
-				2A35CE0C1AEE788E00C9236B /* memory.moc */,
-				2A35CE0D1AEE788E00C9236B /* oam-viewer.moc */,
-				2A35CE0E1AEE788E00C9236B /* paths.moc */,
-				2A35CE0F1AEE788E00C9236B /* profile.moc */,
-				2A35CE101AEE788E00C9236B /* properties.moc */,
-				2A35CE111AEE788E00C9236B /* radio-action.moc */,
-				2A35CE121AEE788E00C9236B /* registeredit.moc */,
-				2A35CE131AEE788E00C9236B /* resource.rcc */,
-				2A35CE141AEE788E00C9236B /* ruby.o */,
-				2A35CE151AEE788E00C9236B /* settings.moc */,
-				2A35CE161AEE788E00C9236B /* snes-bsx.o */,
-				2A35CE171AEE788E00C9236B /* snes-cartridge.o */,
-				2A35CE181AEE788E00C9236B /* snes-cheat.o */,
-				2A35CE191AEE788E00C9236B /* snes-cpu.o */,
-				2A35CE1A1AEE788E00C9236B /* snes-cpucore.o */,
-				2A35CE1B1AEE788E00C9236B /* snes-cx4.o */,
-				2A35CE1C1AEE788E00C9236B /* snes-dsp.o */,
-				2A35CE1D1AEE788E00C9236B /* snes-memory.o */,
-				2A35CE1E1AEE788E00C9236B /* snes-msu1.o */,
-				2A35CE1F1AEE788E00C9236B /* snes-necdsp.o */,
-				2A35CE201AEE788E00C9236B /* snes-obc1.o */,
-				2A35CE211AEE788E00C9236B /* snes-ppu.o */,
-				2A35CE221AEE788E00C9236B /* snes-sa1.o */,
-				2A35CE231AEE788E00C9236B /* snes-sdd1.o */,
-				2A35CE241AEE788E00C9236B /* snes-serial.o */,
-				2A35CE251AEE788E00C9236B /* snes-smp.o */,
-				2A35CE261AEE788E00C9236B /* snes-smpcore.o */,
-				2A35CE271AEE788E00C9236B /* snes-spc7110.o */,
-				2A35CE281AEE788E00C9236B /* snes-srtc.o */,
-				2A35CE291AEE788E00C9236B /* snes-st0018.o */,
-				2A35CE2A1AEE788E00C9236B /* snes-superfx.o */,
-				2A35CE2B1AEE788E00C9236B /* snes-supergameboy.o */,
-				2A35CE2C1AEE788E00C9236B /* snes-system.o */,
-				2A35CE2D1AEE788E00C9236B /* statemanager.moc */,
-				2A35CE2E1AEE788E00C9236B /* stateselect.moc */,
-				2A35CE2F1AEE788E00C9236B /* tools.moc */,
-				2A35CE301AEE788E00C9236B /* tracer.moc */,
-				2A35CE311AEE788E00C9236B /* ui-base.o */,
-				2A35CE321AEE788E00C9236B /* ui-cartridge.o */,
-				2A35CE331AEE788E00C9236B /* ui-debugger.o */,
-				2A35CE341AEE788E00C9236B /* ui-input.o */,
-				2A35CE351AEE788E00C9236B /* ui-main.o */,
-				2A35CE361AEE788E00C9236B /* ui-movie.o */,
-				2A35CE371AEE788E00C9236B /* ui-settings.o */,
-				2A35CE381AEE788E00C9236B /* ui-state.o */,
-				2A35CE391AEE788E00C9236B /* ui-tools.o */,
-				2A35CE3A1AEE788E00C9236B /* video.moc */,
-				2A35CE3B1AEE788E00C9236B /* vram-viewer.moc */,
-				2A35CE3C1AEE788E00C9236B /* window.moc */,
-			);
-			path = obj;
-			sourceTree = "<group>";
-		};
-		2A35CE3D1AEE788E00C9236B /* out */ = {
-			isa = PBXGroup;
-			children = (
-				2A35CE3E1AEE788E00C9236B /* .gitignore */,
-			);
-			path = out;
 			sourceTree = "<group>";
 		};
 		2A35CE3F1AEE788E00C9236B /* ruby */ = {
@@ -2126,7 +1966,7 @@
 			);
 			name = "bsnes-plus-xc";
 			productName = "bsnes-plus-xc";
-			productReference = 2ACADCBD1AF257A30001E28A /* bsnes-plus-xc */;
+			productReference = 2AA104641AF2EB7000D94A42 /* bsnes-plus-xc */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -2474,6 +2314,7 @@
 				2ACADCC41AF257A30001E28A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
