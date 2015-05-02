@@ -317,7 +317,7 @@ void Cartridge::xml_parse_sufamiturbo(xml_element &root) {
       }
 
       Memory &rom = (slotid == 0) ? memory::stArom : memory::stBrom;
-      if(rom.size() == -1U) continue;
+      if(rom.size() == 0) continue;
       Memory &ram = (slotid == 0) ? memory::stAram : memory::stBram;
       unsigned ram_size = (slotid == 0) ? st_A_ram_size : st_B_ram_size;
 

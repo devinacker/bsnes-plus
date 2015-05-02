@@ -114,9 +114,9 @@ void SuperGameBoy::power() {
   audio.coprocessor_enable(true);
   audio.coprocessor_frequency(cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1 ? 2147727.0 : 2097152.0);
 
-  sgb_rom(memory::gbrom.data(), memory::gbrom.size() == -1U ? 0 : memory::gbrom.size());
-  sgb_ram(memory::gbram.data(), memory::gbram.size() == -1U ? 0 : memory::gbram.size());
-  sgb_rtc(memory::gbrtc.data(), memory::gbrtc.size() == -1U ? 0 : memory::gbrtc.size());
+  sgb_rom(memory::gbrom.data(), memory::gbrom.size());
+  sgb_ram(memory::gbram.data(), memory::gbram.size());
+  sgb_rtc(memory::gbrtc.data(), memory::gbrtc.size());
 
   bool version = (cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1) ? 0 : 1;
   if(sgb_init) sgb_init(version);
