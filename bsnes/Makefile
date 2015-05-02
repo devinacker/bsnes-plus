@@ -14,21 +14,20 @@ flags   := -I. -I$(snes)
 link    :=
 objects :=
 
-<<<<<<< HEAD
 ifeq ($(DEBUG), 1)
   flags += -O0 -g
 else
   flags += -O3 -fomit-frame-pointer
 endif
-=======
+
 # comment this line to enable asserts
 flags += -DNDEBUG
 
 # profile-guided instrumentation
 # flags += -fprofile-generate
 # link += -lgcov
->>>>>>> 5e29045c7e7c77dd6cb42d3a98fdb7c2c56d0d6f
 
+# silence warnings
 flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 # platform
