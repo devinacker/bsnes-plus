@@ -18,10 +18,10 @@ public:
   alwaysinline bool   field   () const;
   alwaysinline uint16 vcounter() const;
   alwaysinline uint16 hcounter() const;
+  alwaysinline uint16 lineclocks() const;
   alwaysinline uint16 fieldlines() const;
 
   inline uint16 hdot() const;
-  inline uint16 lineclocks() const;
 
   alwaysinline uint16 vcounter(unsigned offset) const;
   alwaysinline uint16 hcounter(unsigned offset) const;
@@ -36,8 +36,8 @@ private:
   struct {
     uint16 hcounter;
     uint16 vcounter;
-    uint16 fieldlines;
-    bool interlace;
+    uint16 lineclocks;
+    uint16 fieldlines[2];
     bool field;
   } status;
 
