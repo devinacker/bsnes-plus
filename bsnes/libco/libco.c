@@ -4,6 +4,11 @@
   license: public domain
 */
 
+/* -O0 causes clang to miscompile the inline asm co_switch() functions */
+#if defined(__clang__) && !defined(__OPTIMIZE__)
+  #define LIBCO_NO_INLINE_ASM
+#endif
+
 #if defined(__GNUC__) && defined(__i386__)
   #if defined(LIBCO_NO_INLINE_ASM)
     #include "x86.c"

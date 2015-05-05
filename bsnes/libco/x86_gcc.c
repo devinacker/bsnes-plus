@@ -55,7 +55,11 @@ void co_delete(cothread_t handle) {
   even when volatile registers are available)
 */
 #ifdef __clang__
-  #define NAKED __attribute__((naked))
+  #ifndef __OPTIMIZE__
+    #error "libco: please enable optimization or define LIBCO_NO_INLINE_ASM"
+  #else
+    #define NAKED __attribute__((naked))
+  #endif
 #else
   #define NAKED __attribute__((optimize("omit-frame-pointer")))
 #endif
