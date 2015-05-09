@@ -1,19 +1,11 @@
-//this should only be called by CPU::PPUcounter::tick();
-//keeps track of previous counter positions in history table
 void PPUcounter::tick() {
   status.hcounter += 2;  //increment by smallest unit of time
   if(status.hcounter == lineclocks()) {
     status.hcounter = 0;
     vcounter_tick();
   }
-
-  history.index = (history.index + 1) & History::Mask;
-  history.vcounter[history.index] = status.vcounter;
-  history.hcounter[history.index] = status.hcounter;
 }
 
-//this should only be called by PPU::PPUcounter::tick(n);
-//allows stepping by more than the smallest unit of time
 void PPUcounter::tick(unsigned clocks) {
   status.hcounter += clocks;
   if(status.hcounter >= lineclocks()) {
@@ -25,6 +17,8 @@ void PPUcounter::tick(unsigned clocks) {
 //internal
 void PPUcounter::vcounter_tick() {
   ++status.vcounter;
+
+  status.prev_lineclocks = status.lineclocks;
   status.lineclocks = 1364;
 
   if(vcounter() == 128) {
@@ -51,10 +45,30 @@ bool   PPUcounter::field     () const { return status.field; }
 uint16 PPUcounter::vcounter  () const { return status.vcounter; }
 uint16 PPUcounter::hcounter  () const { return status.hcounter; }
 uint16 PPUcounter::lineclocks() const { return status.lineclocks; }
+uint16 PPUcounter::prev_lineclocks() const { return status.prev_lineclocks; }
 uint16 PPUcounter::fieldlines() const { return status.fieldlines[status.field]; }
 
-uint16 PPUcounter::vcounter(unsigned offset) const { return history.vcounter[(history.index - (offset >> 1)) & History::Mask]; }
-uint16 PPUcounter::hcounter(unsigned offset) const { return history.hcounter[(history.index - (offset >> 1)) & History::Mask]; }
+uint16 PPUcounter::vcounter_future(unsigned offset) const {
+  if(hcounter() + offset < lineclocks()) return vcounter();
+  // crossed scanline boundary
+  if(vcounter() + 1 < fieldlines()) return vcounter() + 1;
+  // crossed field boundary
+  return 0;
+}
+
+uint16 PPUcounter::vcounter_past(unsigned offset) const {
+  if(offset <= hcounter()) return vcounter();
+  //crossed scanline boundary
+  if(vcounter() > 0) return vcounter() - 1;
+  //crossed field boundary; return last line in *previous* field
+  return status.fieldlines[!status.field] - 1;
+}
+
+uint16 PPUcounter::hcounter_past(unsigned offset) const {
+  if(offset <= hcounter()) return hcounter() - offset;
+  //crossed scanline boundary
+  return hcounter() + prev_lineclocks() - offset;
+}
 
 //one PPU dot = 4 CPU clocks
 //
@@ -76,14 +90,7 @@ uint16 PPUcounter::hdot() const {
 void PPUcounter::reset() {
   status.hcounter      = 0;
   status.vcounter      = 0;
-  status.lineclocks    = 1364;
+  status.lineclocks    = status.prev_lineclocks = 1364;
   status.fieldlines[0] = status.fieldlines[1] = (system.region() == System::Region::NTSC ? 262 : 312);
   status.field         = 0;
-
-  history.index        = 0;
-
-  for(unsigned i = 0; i < History::Depth; i++) {
-    history.vcounter[i] = 0;
-    history.hcounter[i] = 0;
-  }
 }
