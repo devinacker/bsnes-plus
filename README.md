@@ -31,11 +31,15 @@ introduce some new features and improvements, mostly aimed at debugging.
 
 Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported. 
 
-## Building on OS X / Unix
-
-- Run `make` (and hope it works)
+## Building on OS X / Linux
 
 Building on all platforms requires Qt 4 installed, with Qt's `bin` directory in your path.
+As there is no ``configure`` step, make sure necessary Qt4/X11 packages are installed. On a Debian/Ubuntu system, it would require a command like:
+```
+apt-get install libqt4-dev libqt4-dev-bin libxv-dev libsdl1.2-dev libao-dev libopenal-dev g++
+```
+
+Afterwards, run ``make`` and if everything works out correctly you will find the output binary in the ``out/`` directory.
 
 The snesfilter, snesreader, and supergameboy plugins can all be built by running make (or mingw32-make) after you've configured your environment to build bsnes itself.
 After building, just copy the .dll, .so, or .dylib files into the same directory as bsnes itself.
