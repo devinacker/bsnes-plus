@@ -32,7 +32,6 @@ private:
     uint16 interrupt_vector;
 
     unsigned clock_count;
-    unsigned line_clocks;
 
     //timing
     bool irq_lock;
