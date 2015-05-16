@@ -2,6 +2,14 @@
 
 unsigned Memory::size() const { return 0; }
 
+bool Memory::debugger_access() {
+#if defined(DEBUGGER)
+  return debugger.bus_access;
+#else
+  return false;
+#endif
+}
+
 //StaticRAM
 
 uint8* StaticRAM::data() { return data_; }
@@ -45,7 +53,7 @@ uint8* MappedRAM::data() { return data_; }
 unsigned MappedRAM::size() const { return size_; }
 
 uint8 MappedRAM::read(unsigned addr) { return data_[addr]; }
-void MappedRAM::write(unsigned addr, uint8 n) { if(!write_protect_) data_[addr] = n; }
+void MappedRAM::write(unsigned addr, uint8 n) { if(!write_protect_ || debugger_access()) data_[addr] = n; }
 const uint8& MappedRAM::operator[](unsigned addr) const { return data_[addr]; }
 MappedRAM::MappedRAM() : data_(0), size_(0), write_protect_(false) {}
 

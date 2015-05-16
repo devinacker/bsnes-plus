@@ -99,7 +99,7 @@ void SDD1::mmio_write(unsigned addr, uint8 data) {
 //the actual S-DD1 transfer can occur on any channel, but it is most likely limited to
 //one transfer per $420b write (for spooling purposes). however, this is not known for certain.
 uint8 SDD1::read(unsigned addr) {
-  if(sdd1_enable & xfer_enable) {
+  if((sdd1_enable & xfer_enable) && !debugger_access()) {
     //at least one channel has S-DD1 decompression enabled ...
     for(unsigned i = 0; i < 8; i++) {
       if(sdd1_enable & xfer_enable & (1 << i)) {
@@ -139,6 +139,7 @@ uint8 SDD1::read(unsigned addr) {
 }
 
 void SDD1::write(unsigned addr, uint8 data) {
+  memory::cartrom.write(mmc[(addr >> 20) & 3] + (addr & 0x0fffff), data);
 }
 
 SDD1::SDD1() {

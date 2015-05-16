@@ -299,11 +299,16 @@ void MemoryEditor::importMemory(SNES::Memory &memory, const string &filename) co
 }
 
 uint8_t MemoryEditor::reader(unsigned addr) {
-  return SNES::debugger.read(memorySource, addr);
+  SNES::debugger.bus_access = true;
+  uint8_t data = SNES::debugger.read(memorySource, addr);
+  SNES::debugger.bus_access = false;
+  return data;
 }
 
 void MemoryEditor::writer(unsigned addr, uint8_t data) {
+  SNES::debugger.bus_access = true;
   SNES::debugger.write(memorySource, addr, data);
+  SNES::debugger.bus_access = false;
 }
 
 uint8_t MemoryEditor::usage(unsigned addr) {

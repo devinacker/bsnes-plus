@@ -72,12 +72,12 @@ void SuperGameBoy::mmio_write(unsigned addr, uint8 data) {
 }
 
 uint8 SuperGameBoy::read(unsigned addr) {
-  if(sgb_read) return sgb_read(addr);
+  if(sgb_read && !debugger_access()) return sgb_read(addr);
   return 0x00;
 }
 
 void SuperGameBoy::write(unsigned addr, uint8 data) {
-  if(sgb_write) sgb_write(addr, data);
+  if(sgb_write && !debugger_access()) sgb_write(addr, data);
 }
 
 void SuperGameBoy::init() {

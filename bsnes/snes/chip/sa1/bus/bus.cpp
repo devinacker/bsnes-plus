@@ -87,6 +87,7 @@ uint8 VSPROM::read(unsigned addr) {
 }
 
 void VSPROM::write(unsigned addr, uint8 data) {
+  memory::cartrom.write(addr, data);
 }
 
 //=======
@@ -98,12 +99,12 @@ unsigned SA1IRAM::size() const {
 }
 
 uint8 SA1IRAM::read(unsigned addr) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
   return memory::iram.read(addr);
 }
 
 void SA1IRAM::write(unsigned addr, uint8 data) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
   memory::iram.write(addr, data);
 }
 
@@ -116,12 +117,12 @@ unsigned CPUIRAM::size() const {
 }
 
 uint8 CPUIRAM::read(unsigned addr) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   return memory::iram.read(addr);
 }
 
 void CPUIRAM::write(unsigned addr, uint8 data) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   memory::iram.write(addr, data);
 }
 
@@ -134,12 +135,12 @@ unsigned SA1BWRAM::size() const {
 }
 
 uint8 SA1BWRAM::read(unsigned addr) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
   return memory::cartram.read(addr);
 }
 
 void SA1BWRAM::write(unsigned addr, uint8 data) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
   memory::cartram.write(addr, data);
 }
 
@@ -152,13 +153,13 @@ unsigned CC1BWRAM::size() const {
 }
 
 uint8 CC1BWRAM::read(unsigned addr) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   if(dma) return sa1.dma_cc1_read(addr);
   return memory::cartram.read(addr);
 }
 
 void CC1BWRAM::write(unsigned addr, uint8 data) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   memory::cartram.write(addr, data);
 }
 
@@ -171,7 +172,7 @@ unsigned BitmapRAM::size() const {
 }
 
 uint8 BitmapRAM::read(unsigned addr) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
 
   if(sa1.mmio.bbf == 0) {
     //4bpp
@@ -195,7 +196,7 @@ uint8 BitmapRAM::read(unsigned addr) {
 }
 
 void BitmapRAM::write(unsigned addr, uint8 data) {
-  sa1.synchronize_cpu();
+  if(!debugger_access()) sa1.synchronize_cpu();
 
   if(sa1.mmio.bbf == 0) {
     //4bpp

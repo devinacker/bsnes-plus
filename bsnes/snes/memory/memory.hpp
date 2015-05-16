@@ -2,6 +2,7 @@ struct Memory {
   virtual inline unsigned size() const;
   virtual uint8 read(unsigned addr) = 0;
   virtual void write(unsigned addr, uint8 data) = 0;
+  static alwaysinline bool debugger_access();
 };
 
 struct MMIO {

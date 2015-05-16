@@ -42,8 +42,6 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
 uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
   switch(source) {
     case MemorySource::CPUBus: {
-      //do not read from memory-mapped registers that could affect program behavior
-      if(((addr - 0x2000) & 0x40c000) == 0x000000) break;  //$00-3f:2000-5fff MMIO
       return bus.read(addr & 0xffffff);
     } break;
 
@@ -95,11 +93,7 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
 void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
   switch(source) {
     case MemorySource::CPUBus: {
-      //do not write to memory-mapped registers that could affect program behavior
-      if(((addr - 0x2000) & 0x40c000) == 0x000000) break;  //$00-3f:2000-5fff MMIO
-      memory::cartrom.write_protect(false);
       bus.write(addr & 0xffffff, data);
-      memory::cartrom.write_protect(true);
     } break;
 
     case MemorySource::APURAM: {
@@ -164,6 +158,7 @@ Debugger::Debugger() {
   step_smp = false;
   step_sa1 = false;
   step_sfx = false;
+  bus_access = false;
   
   step_type = StepType::None;
 }
