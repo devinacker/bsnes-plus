@@ -38,7 +38,9 @@ uint8 SFXDebugger::rombuffer_read() {
   uint32 fulladdr = (regs.rombr << 16) + regs.r[14];
   usage[fulladdr] |= UsageRead;
   
-  uint8 data = sfxdebugbus.read(fulladdr);
+  SNES::debugger.bus_access = true;
+  uint8 data = superfxbus.read(fulladdr);
+  SNES::debugger.bus_access = false;
   
   int offset = cartridge.rom_offset(fulladdr);
   if (offset >= 0) (*cart_usage)[offset] |= UsageRead;
@@ -51,7 +53,9 @@ uint8 SFXDebugger::rambuffer_read(uint16 addr) {
   uint32 fulladdr = 0x700000 + (regs.rambr << 16) + addr;
   usage[fulladdr] |= UsageRead;
   
-  uint8 data = sfxdebugbus.read(fulladdr);
+  SNES::debugger.bus_access = true;
+  uint8 data = superfxbus.read(fulladdr);
+  SNES::debugger.bus_access = false;
   
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Read, fulladdr, data);
   return SuperFX::rambuffer_read(addr);

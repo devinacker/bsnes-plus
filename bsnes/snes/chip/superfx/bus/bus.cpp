@@ -1,7 +1,6 @@
 #ifdef SUPERFX_CPP
 
 SuperFXBus superfxbus;
-SFXDebugBus sfxdebugbus;
 
 namespace memory {
   SuperFXGSUROM gsurom;
@@ -17,15 +16,6 @@ void SuperFXBus::init() {
   map(MapMode::Linear, 0x00, 0x3f, 0x8000, 0xffff, memory::gsurom);
   map(MapMode::Linear, 0x40, 0x5f, 0x0000, 0xffff, memory::gsurom);
   map(MapMode::Linear, 0x60, 0x7f, 0x0000, 0xffff, memory::gsuram);
-}
-
-void SFXDebugBus::init() {
-  map(MapMode::Direct, 0x00, 0xff, 0x0000, 0xffff, memory::memory_unmapped);
-
-  map(MapMode::Linear, 0x00, 0x3f, 0x0000, 0x7fff, memory::cartrom);
-  map(MapMode::Linear, 0x00, 0x3f, 0x8000, 0xffff, memory::cartrom);
-  map(MapMode::Linear, 0x40, 0x5f, 0x0000, 0xffff, memory::cartrom);
-  map(MapMode::Linear, 0x60, 0x7f, 0x0000, 0xffff, memory::cartram);
 }
 
 //ROM / RAM access from the SuperFX CPU

@@ -83,7 +83,7 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     } break;
     
     case MemorySource::SFXBus: {
-      return cartridge.has_superfx() ? sfxdebugbus.read(addr & 0xffffff) : 0;
+      return cartridge.has_superfx() ? superfxbus.read(addr & 0xffffff) : 0;
     } break;
   }
 
@@ -115,9 +115,7 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     
     case MemorySource::CartROM: {
       if (addr < memory::cartrom.size()) {
-        memory::cartrom.write_protect(false);
         memory::cartrom.write(addr & 0xffffff, data);
-        memory::cartrom.write_protect(true);
       }
     } break;
     
@@ -128,15 +126,11 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     
     case MemorySource::SA1Bus: {
       // VBR bus already excludes MMIO (and doesn't sync to the S-CPU like the normal SA-1 bus does)
-      memory::cartrom.write_protect(false);
       if (cartridge.has_sa1()) vbrbus.write(addr & 0xffffff, data);
-      memory::cartrom.write_protect(true);
     } break;
     
     case MemorySource::SFXBus: {
-      memory::cartrom.write_protect(false);
-      if (cartridge.has_superfx()) sfxdebugbus.write(addr & 0xffffff, data);
-      memory::cartrom.write_protect(true);
+      if (cartridge.has_superfx()) superfxbus.write(addr & 0xffffff, data);
     } break;
   }
 }

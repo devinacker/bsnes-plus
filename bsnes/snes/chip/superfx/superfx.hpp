@@ -27,7 +27,6 @@ private:
 #if defined(DEBUGGER)
   #include "debugger/debugger.hpp"
   extern SFXDebugger superfx;
-  extern SFXDebugBus sfxdebugbus;
 #else
   extern SuperFX superfx;
 #endif
