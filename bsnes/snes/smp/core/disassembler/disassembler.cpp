@@ -37,7 +37,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0x07: sprintf(t, "or    a,($%.3x+x)", opdp0);                   break;
     case 0x08: sprintf(t, "or    a,#$%.2x", op0);                        break;
     case 0x09: sprintf(t, "or    $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0x0a: sprintf(t, "or1   c,$%.4x:%d", opw & 0x1fff, opw >> 13);  break;
+    case 0x0a: sprintf(t, "or1   c,$%.4x,%d", opw & 0x1fff, opw >> 13);  break;
     case 0x0b: sprintf(t, "asl   $%.3x", opdp0);                         break;
     case 0x0c: sprintf(t, "asl   $%.4x", opw);                           break;
     case 0x0d: sprintf(t, "push  p");                                    break;
@@ -69,7 +69,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0x27: sprintf(t, "and   a,($%.3x+x)", opdp0);                   break;
     case 0x28: sprintf(t, "and   a,#$%.2x", op0);                        break;
     case 0x29: sprintf(t, "and   $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0x2a: sprintf(t, "or1   c,!$%.4x:%d", opw & 0x1fff, opw >> 13); break;
+    case 0x2a: sprintf(t, "or1   c,!$%.4x,%d", opw & 0x1fff, opw >> 13); break;
     case 0x2b: sprintf(t, "rol   $%.3x", opdp0);                         break;
     case 0x2c: sprintf(t, "rol   $%.4x", opw);                           break;
     case 0x2d: sprintf(t, "push  a");                                    break;
@@ -101,7 +101,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0x47: sprintf(t, "eor   a,($%.3x+x)", opdp0);                   break;
     case 0x48: sprintf(t, "eor   a,#$%.2x", op0);                        break;
     case 0x49: sprintf(t, "eor   $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0x4a: sprintf(t, "and1  c,$%.4x:%d", opw & 0x1fff, opw >> 13);  break;
+    case 0x4a: sprintf(t, "and1  c,$%.4x,%d", opw & 0x1fff, opw >> 13);  break;
     case 0x4b: sprintf(t, "lsr   $%.3x", opdp0);                         break;
     case 0x4c: sprintf(t, "lsr   $%.4x", opw);                           break;
     case 0x4d: sprintf(t, "push  x");                                    break;
@@ -133,7 +133,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0x67: sprintf(t, "cmp   a,($%.3x+x)", opdp0);                   break;
     case 0x68: sprintf(t, "cmp   a,#$%.2x", op0);                        break;
     case 0x69: sprintf(t, "cmp   $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0x6a: sprintf(t, "and1  c,!$%.4x:%d", opw & 0x1fff, opw >> 13); break;
+    case 0x6a: sprintf(t, "and1  c,!$%.4x,%d", opw & 0x1fff, opw >> 13); break;
     case 0x6b: sprintf(t, "ror   $%.3x", opdp0);                         break;
     case 0x6c: sprintf(t, "ror   $%.4x", opw);                           break;
     case 0x6d: sprintf(t, "push  y");                                    break;
@@ -165,7 +165,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0x87: sprintf(t, "adc   a,($%.3x+x)", opdp0);                   break;
     case 0x88: sprintf(t, "adc   a,#$%.2x", op0);                        break;
     case 0x89: sprintf(t, "adc   $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0x8a: sprintf(t, "eor1  c,$%.4x:%d", opw & 0x1fff, opw >> 13);  break;
+    case 0x8a: sprintf(t, "eor1  c,$%.4x,%d", opw & 0x1fff, opw >> 13);  break;
     case 0x8b: sprintf(t, "dec   $%.3x", opdp0);                         break;
     case 0x8c: sprintf(t, "dec   $%.4x", opw);                           break;
     case 0x8d: sprintf(t, "mov   y,#$%.2x", op0);                        break;
@@ -197,7 +197,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0xa7: sprintf(t, "sbc   a,($%.3x+x)", opdp0);                   break;
     case 0xa8: sprintf(t, "sbc   a,#$%.2x", op0);                        break;
     case 0xa9: sprintf(t, "sbc   $%.3x,$%.3x", opdp1, opdp0);            break;
-    case 0xaa: sprintf(t, "mov1  c,$%.4x:%d", opw & 0x1fff, opw >> 13);  break;
+    case 0xaa: sprintf(t, "mov1  c,$%.4x,%d", opw & 0x1fff, opw >> 13);  break;
     case 0xab: sprintf(t, "inc   $%.3x", opdp0);                         break;
     case 0xac: sprintf(t, "inc   $%.4x", opw);                           break;
     case 0xad: sprintf(t, "cmp   y,#$%.2x", op0);                        break;
@@ -229,7 +229,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0xc7: sprintf(t, "mov   ($%.3x+x),a", opdp0);                   break;
     case 0xc8: sprintf(t, "cmp   x,#$%.2x", op0);                        break;
     case 0xc9: sprintf(t, "mov   $%.4x,x", opw);                         break;
-    case 0xca: sprintf(t, "mov1  $%.4x:%d,c", opw & 0x1fff, opw >> 13);  break;
+    case 0xca: sprintf(t, "mov1  $%.4x,%d,c", opw & 0x1fff, opw >> 13);  break;
     case 0xcb: sprintf(t, "mov   $%.3x,y", opdp0);                       break;
     case 0xcc: sprintf(t, "mov   $%.4x,y", opw);                         break;
     case 0xcd: sprintf(t, "mov   x,#$%.2x", op0);                        break;
@@ -261,7 +261,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
     case 0xe7: sprintf(t, "mov   a,($%.3x+x)", opdp0);                   break;
     case 0xe8: sprintf(t, "mov   a,#$%.2x", op0);                        break;
     case 0xe9: sprintf(t, "mov   x,$%.4x", opw);                         break;
-    case 0xea: sprintf(t, "not1  c,$%.4x:%d", opw & 0x1fff, opw >> 13);  break;
+    case 0xea: sprintf(t, "not1  c,$%.4x,%d", opw & 0x1fff, opw >> 13);  break;
     case 0xeb: sprintf(t, "mov   y,$%.3x", opdp0);                       break;
     case 0xec: sprintf(t, "mov   y,$%.4x", opw);                         break;
     case 0xed: sprintf(t, "notc");                                       break;

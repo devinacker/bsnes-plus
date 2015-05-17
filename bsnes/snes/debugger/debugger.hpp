@@ -29,6 +29,7 @@ public:
   bool step_smp;
   bool step_sa1;
   bool step_sfx;
+  bool bus_access;
 
   enum class StepType : unsigned { 
     None, StepInto, StepOver, StepOut 

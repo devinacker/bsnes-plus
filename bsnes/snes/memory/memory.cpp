@@ -47,11 +47,13 @@ void MMIOAccess::map(unsigned addr_lo, unsigned addr_hi, MMIO &access) {
 unsigned MMIOAccess::size() const { return 0x8000; }
 
 uint8 MMIOAccess::read(unsigned addr) {
-  return mmio[addr]->mmio_read(addr);
+  if(!debugger_access()) return mmio[addr]->mmio_read(addr);
+
+  return 0;
 }
 
 void MMIOAccess::write(unsigned addr, uint8 data) {
-  mmio[addr]->mmio_write(addr, data);
+  if(!debugger_access()) mmio[addr]->mmio_write(addr, data);
 }
 
 MMIOAccess::MMIOAccess() {

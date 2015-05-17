@@ -1,7 +1,7 @@
 #ifdef NECDSP_CPP
 
 uint8 NECDSP::read(unsigned addr) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   if((addr & srmask) == srtest) return sr_read();
   if((addr & drmask) == drtest) return dr_read();
   if((addr & dpmask) == dptest) return dp_read(addr);
@@ -9,7 +9,7 @@ uint8 NECDSP::read(unsigned addr) {
 }
 
 void NECDSP::write(unsigned addr, uint8 data) {
-  cpu.synchronize_coprocessor();
+  if(!debugger_access()) cpu.synchronize_coprocessor();
   if((addr & srmask) == srtest) return sr_write(data);
   if((addr & drmask) == drtest) return dr_write(data);
   if((addr & dpmask) == dptest) return dp_write(addr, data);
@@ -23,6 +23,8 @@ void NECDSP::sr_write(uint8 data) {
 }
 
 uint8 NECDSP::dr_read() {
+  if(debugger_access()) return regs.dr >> 0;
+
   if(regs.sr.drc == 0) {
     //16-bit
     if(regs.sr.drs == 0) {
