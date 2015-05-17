@@ -21,58 +21,6 @@ dllexport const char* snesreader_supported() {
   return "*.zip *.z *.7z *.gz *.bz2 *.jma";
 }
 
-void snesreader_apply_ips(const char *filename, uint8_t *&data, unsigned &size) {
-  file fp;
-  if(fp.open(filename, file::mode_read) == false) return;
-
-  unsigned psize = fp.size();
-  uint8_t *pdata = new uint8_t[psize];
-  fp.read(pdata, psize);
-  fp.close();
-
-  if(psize < 8 || pdata[0] != 'P' || pdata[1] != 'A' || pdata[2] != 'T' || pdata[3] != 'C' || pdata[4] != 'H') { delete[] pdata; return; }
-
-  unsigned outsize = 0;
-  uint8_t *outdata = new uint8_t[16 * 1024 * 1024];
-  memset(outdata, 0, 16 * 1024 * 1024);
-  memcpy(outdata, data, size);
-
-  unsigned offset = 5;
-  while(offset < psize - 3) {
-    unsigned addr;
-    addr  = pdata[offset++] << 16;
-    addr |= pdata[offset++] <<  8;
-    addr |= pdata[offset++] <<  0;
-
-    unsigned size;
-    size  = pdata[offset++] << 8;
-    size |= pdata[offset++] << 0;
-
-    if(size == 0) {
-      //RLE
-      size  = pdata[offset++] << 8;
-      size |= pdata[offset++] << 0;
-
-      for(unsigned n = addr; n < addr + size;) {
-        outdata[n++] = pdata[offset];
-        if(n > outsize) outsize = n;
-      }
-      offset++;
-    } else {
-      //uncompressed
-      for(unsigned n = addr; n < addr + size;) {
-        outdata[n++] = pdata[offset++];
-        if(n > outsize) outsize = n;
-      }
-    }
-  }
-
-  delete[] pdata;
-  delete[] data;
-  data = outdata;
-  size = max(size, outsize);
-}
-
 bool snesreader_load_normal(const char *filename, uint8_t *&data, unsigned &size) {
   file fp;
   if(fp.open(filename, file::mode_read) == false) return false;
@@ -209,18 +157,5 @@ dllexport bool snesreader_load(string &filename, uint8_t *&data, unsigned &size)
     success = snesreader_load_normal(filename, data, size);
   }
 
-  if(success == false) return false;
-
-  //apply IPS patch, if it exists
-  string patchname = filename;
-  for(int i = patchname.length() - 1; i >= 0; i--) {
-    if(patchname[i] == '.') { patchname[i] = 0; break; }
-  }
-  patchname << ".ips";
-  if(file::exists(patchname)) snesreader_apply_ips(patchname, data, size);
-
-  //remove copier header, if it exists
-  if((size & 0x7fff) == 512) memmove(data, data + 512, size -= 512);
-
-  return true;
+  return success;
 }

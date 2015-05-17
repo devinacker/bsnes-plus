@@ -144,7 +144,9 @@ void FileBrowser::onChangeCartridge(const string &path) {
 
   string info;
   string image(nall::basename(filename), ".png");
-  string patch(filepath(nall::basename(filename), config().path.patch), ".ups");
+  string patchUPS(filepath(nall::basename(filename), config().path.patch), ".ups");
+  string patchBPS(filepath(nall::basename(filename), config().path.patch), ".bps");
+  string patchIPS(filepath(nall::basename(filename), config().path.patch), ".ips");
 
   if(file::exists(filename)) {
     Cartridge::Information cartinfo;
@@ -162,7 +164,7 @@ void FileBrowser::onChangeCartridge(const string &path) {
   if(info == "") info = "<small><font color='#808080'>No preview available</font></small>";
   previewInfo->setText(info);
   previewImage->setStyleSheet(string() << "background: url('" << image << "') center left no-repeat;");
-  previewApplyPatch->setVisible(file::exists(patch));
+  previewApplyPatch->setVisible(file::exists(patchUPS) || file::exists(patchBPS) || file::exists(patchIPS));
 }
 
 void FileBrowser::onAcceptCartridge(const string &path) {

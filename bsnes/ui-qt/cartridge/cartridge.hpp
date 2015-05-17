@@ -38,6 +38,7 @@ private:
   bool saveMemory(const char*, const char*, SNES::MappedRAM&);
   bool applyBPS(string&, uint8_t *&data, unsigned &size);
   bool applyUPS(string&, uint8_t *&data, unsigned &size);
+  bool applyIPS(string&, uint8_t *&data, unsigned &size);
   string decodeJISX0201(const char*);
 };
 
