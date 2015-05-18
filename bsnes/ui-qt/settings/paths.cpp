@@ -73,7 +73,7 @@ PathSettingsWindow::PathSettingsWindow() {
   gamePath  = new PathSettingWidget(config().path.rom,   "Games:",         "Remember last path",  "Default Game Path");
   savePath  = new PathSettingWidget(config().path.save,  "Save RAM:",      "Same as loaded game", "Default Save RAM Path");
   statePath = new PathSettingWidget(config().path.state, "Save states:",   "Same as loaded game", "Default Save State Path");
-  patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS patches:",   "Same as loaded game", "Default BPS/UPS Patch Path");
+  patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path");
   cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path");
   dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path");
 
