@@ -15,14 +15,15 @@ introduce some new features and improvements, mostly aimed at debugging.
 - Super FX disassembly and debugging
 - Super FX bus viewing and usage logging
 - SPC file dumping
+- IPS and BPS soft patching
 - Multiple emulation improvements backported from bsnes/higan (mostly via bsnes-classic)
 
 ## Coming soon
 
+- Rewritten memory editor
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats
-- IPS soft patching
 
 ## Building on Windows
 
