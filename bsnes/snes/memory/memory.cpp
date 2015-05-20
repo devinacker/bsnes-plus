@@ -27,7 +27,7 @@ uint8 UnmappedMMIO::mmio_read(unsigned) { return cpu.regs.mdr; }
 void UnmappedMMIO::mmio_write(unsigned, uint8) {}
 
 MMIO* MMIOAccess::handle(unsigned addr) {
-  return mmio[addr];
+  return mmio[addr & 0x7fff];
 }
 
 void MMIOAccess::map(unsigned addr, MMIO &access) {
@@ -47,13 +47,13 @@ void MMIOAccess::map(unsigned addr_lo, unsigned addr_hi, MMIO &access) {
 unsigned MMIOAccess::size() const { return 0x8000; }
 
 uint8 MMIOAccess::read(unsigned addr) {
-  if(!debugger_access()) return mmio[addr]->mmio_read(addr);
+  if(!debugger_access()) return mmio[addr & 0x7fff]->mmio_read(addr & 0x7fff);
 
   return 0;
 }
 
 void MMIOAccess::write(unsigned addr, uint8 data) {
-  if(!debugger_access()) mmio[addr]->mmio_write(addr, data);
+  if(!debugger_access()) mmio[addr & 0x7fff]->mmio_write(addr & 0x7fff, data);
 }
 
 MMIOAccess::MMIOAccess() {
