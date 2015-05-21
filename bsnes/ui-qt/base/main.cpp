@@ -155,9 +155,6 @@ MainWindow::MainWindow() {
   
   tools_captureSPC = tools->addAction("Capture &SPC Dump");
 
-  #if 0
-  //this will crash on Qt 4.6.0/Windows, because QObject::sender() returns a non-QObject*, non-null pointer
-  //since we don't know what other Qt toolkits have this bug, it's safer to just disable the feature by default
   tools->addSeparator();
 
   tools_loadState = tools->addMenu("&Load Quick State");
@@ -175,7 +172,6 @@ MainWindow::MainWindow() {
     connect(saveAction, SIGNAL(triggered()), this, SLOT(saveState()));
     tools_saveState->addAction(saveAction);
   }
-  #endif
 
   tools->addSeparator();
 
