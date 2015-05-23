@@ -80,6 +80,7 @@ using namespace ruby;
 #include "tools/cheatfinder.moc.hpp"
 #include "tools/statemanager.moc.hpp"
 #include "tools/effecttoggle.moc.hpp"
+#include "tools/soundviewer.moc.hpp"
 
 #include "utility/utility.hpp"
 

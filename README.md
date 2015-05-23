@@ -14,13 +14,17 @@ introduce some new features and improvements, mostly aimed at debugging.
 - SA-1 bus and BW-RAM viewing and (partial) usage logging
 - Super FX disassembly and debugging
 - Super FX bus viewing and usage logging
+
+Non-debugging features:
+
 - SPC file dumping
+- SPC output visualizer (keyboards & peak meters)
 - IPS and BPS soft patching
 - Multiple emulation improvements backported from bsnes/higan (mostly via bsnes-classic)
 
 ## Coming soon
 
-- Rewritten memory editor
+- Rewritten memory editor and breakpoint editor
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
 - Similar addressing improvements for cheats

@@ -41,6 +41,7 @@ void Application::init() {
   #endif
   settingsWindow = new SettingsWindow;
   toolsWindow = new ToolsWindow;
+  soundViewerWindow = new SoundViewerWindow;
 
   //if emulator crashes while initializing drivers, next run will disable them all.
   //this will allow user to choose different driver settings.

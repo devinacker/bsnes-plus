@@ -185,6 +185,8 @@ MainWindow::MainWindow() {
   #if !defined(PROFILE_COMPATIBILITY) && !defined(PROFILE_PERFORMANCE)
   tools_effectToggle->setVisible(false);
   #endif
+  
+  tools_soundViewer = tools->addAction("Sound &Viewer ...");
 
   tools_debugger = tools->addAction("&Debugger ...");
   #if !defined(DEBUGGER)
@@ -307,6 +309,7 @@ MainWindow::MainWindow() {
   connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
   connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
   connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
+  connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
   connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
   connect(help_license, SIGNAL(triggered()), this, SLOT(showLicense()));
@@ -610,6 +613,8 @@ void MainWindow::showCheatEditor()  { toolsWindow->tab->setCurrentIndex(0); tool
 void MainWindow::showCheatFinder()  { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
 void MainWindow::showStateManager() { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
 void MainWindow::showEffectToggle() { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
+
+void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 
 void MainWindow::showDebugger() {
   #if defined(DEBUGGER)
