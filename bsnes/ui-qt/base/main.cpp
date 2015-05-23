@@ -155,9 +155,6 @@ MainWindow::MainWindow() {
   
   tools_captureSPC = tools->addAction("Capture &SPC Dump");
 
-  #if 0
-  //this will crash on Qt 4.6.0/Windows, because QObject::sender() returns a non-QObject*, non-null pointer
-  //since we don't know what other Qt toolkits have this bug, it's safer to just disable the feature by default
   tools->addSeparator();
 
   tools_loadState = tools->addMenu("&Load Quick State");
@@ -175,7 +172,6 @@ MainWindow::MainWindow() {
     connect(saveAction, SIGNAL(triggered()), this, SLOT(saveState()));
     tools_saveState->addAction(saveAction);
   }
-  #endif
 
   tools->addSeparator();
 
@@ -189,6 +185,8 @@ MainWindow::MainWindow() {
   #if !defined(PROFILE_COMPATIBILITY) && !defined(PROFILE_PERFORMANCE)
   tools_effectToggle->setVisible(false);
   #endif
+  
+  tools_soundViewer = tools->addAction("Sound &Viewer ...");
 
   tools_debugger = tools->addAction("&Debugger ...");
   #if !defined(DEBUGGER)
@@ -311,6 +309,7 @@ MainWindow::MainWindow() {
   connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
   connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
   connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
+  connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
   connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
   connect(help_license, SIGNAL(triggered()), this, SLOT(showLicense()));
@@ -614,6 +613,8 @@ void MainWindow::showCheatEditor()  { toolsWindow->tab->setCurrentIndex(0); tool
 void MainWindow::showCheatFinder()  { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
 void MainWindow::showStateManager() { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
 void MainWindow::showEffectToggle() { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
+
+void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 
 void MainWindow::showDebugger() {
   #if defined(DEBUGGER)

@@ -382,6 +382,9 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
     }
   }
 
+  //remove copier header, if it exists
+  if((size & 0x7fff) == 512) memmove(data, data + 512, size -= 512);
+  
   name = string(nall::basename(filename), ".xml");
   if(patchApplied == "" && file::exists(name)) {
     //prefer manually created XML cartridge mapping
@@ -390,9 +393,6 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
     //generate XML mapping from data via heuristics
     xml = SNESCartridge(data, size).xmlMemoryMap;
   }
-
-  //remove copier header, if it exists
-  if((size & 0x7fff) == 512) memmove(data, data + 512, size -= 512);
 
   memory.copy(data, size);
   delete[] data;
