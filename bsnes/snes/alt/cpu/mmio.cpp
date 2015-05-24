@@ -131,7 +131,7 @@ void CPU::mmio_write(unsigned addr, uint8 data) {
       status.nmi_enabled = data & 0x80;
       status.virq_enabled = data & 0x20;
       status.hirq_enabled = data & 0x10;
-      status.auto_joypad_poll_enabled = data & 0x01;
+      status.auto_joypad_poll = data & 0x01;
 
       if(!nmi_enabled && status.nmi_enabled && status.nmi_line) {
         status.nmi_transition = true;
@@ -184,22 +184,22 @@ void CPU::mmio_write(unsigned addr, uint8 data) {
     }
 
     case 0x4207: {
-      status.htime = (status.htime & 0x0100) | (data << 0);
+      status.hirq_pos = (status.hirq_pos & 0x0100) | (data << 0);
       return;
     }
 
     case 0x4208: {
-      status.htime = ((data & 1) << 8) | (status.htime & 0x00ff);
+      status.hirq_pos = ((data & 1) << 8) | (status.hirq_pos & 0x00ff);
       return;
     }
 
     case 0x4209: {
-      status.vtime = (status.vtime & 0x0100) | (data << 0);
+      status.virq_pos = (status.virq_pos & 0x0100) | (data << 0);
       return;
     }
 
     case 0x420a: {
-      status.vtime = ((data & 1) << 8) | (status.vtime & 0x00ff);
+      status.virq_pos = ((data & 1) << 8) | (status.virq_pos & 0x00ff);
       return;
     }
 

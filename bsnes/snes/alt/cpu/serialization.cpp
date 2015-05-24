@@ -53,7 +53,7 @@ void CPU::serialize(serializer &s) {
   s.integer(status.nmi_enabled);
   s.integer(status.virq_enabled);
   s.integer(status.hirq_enabled);
-  s.integer(status.auto_joypad_poll_enabled);
+  s.integer(status.auto_joypad_poll);
 
   s.integer(status.pio);
 
@@ -62,8 +62,8 @@ void CPU::serialize(serializer &s) {
   s.integer(status.wrdiva);
   s.integer(status.wrdivb);
 
-  s.integer(status.htime);
-  s.integer(status.vtime);
+  s.integer(status.hirq_pos);
+  s.integer(status.virq_pos);
 
   s.integer(status.rom_speed);
 
