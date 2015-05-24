@@ -58,7 +58,7 @@ Debugger::Debugger() {
   console->setReadOnly(true);
   console->setFont(QFont(Style::Monospace));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  console->setMinimumWidth((92 + 4) * console->fontMetrics().width(' '));
+  console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
   console->setMinimumHeight((25 + 1) * console->fontMetrics().height());
   consoleLayout->addWidget(console);
 
@@ -186,24 +186,24 @@ void Debugger::modifySystemState(unsigned state) {
 
   if(state == Utility::LoadCartridge) {
     memset(SNES::cpu.cart_usage, 0x00, 1 << 24);
-	
+    
     memset(SNES::cpu.usage, 0x00, 1 << 24);
     memset(SNES::smp.usage, 0x00, 1 << 16);
-	
+    
     memset(SNES::sa1.usage, 0x00, 1 << 24);
     memset(SNES::superfx.usage, 0x00, 1 << 24);
-	
+    
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
-	  if (SNES::cartridge.has_sa1())     fp.read(SNES::sa1.usage, 1 << 24);
-	  if (SNES::cartridge.has_superfx()) fp.read(SNES::superfx.usage, 1 << 24);
+      if (SNES::cartridge.has_sa1())     fp.read(SNES::sa1.usage, 1 << 24);
+      if (SNES::cartridge.has_superfx()) fp.read(SNES::superfx.usage, 1 << 24);
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
         if (offset >= 0) SNES::cpu.cart_usage[offset] |= 
-		  SNES::cpu.usage[i] | SNES::sa1.usage[i] | SNES::superfx.usage[i];
+          SNES::cpu.usage[i] | SNES::sa1.usage[i] | SNES::superfx.usage[i];
       }
     }
   }
@@ -212,8 +212,8 @@ void Debugger::modifySystemState(unsigned state) {
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::write)) {
       fp.write(SNES::cpu.usage, 1 << 24);
       fp.write(SNES::smp.usage, 1 << 16);
-	  if (SNES::cartridge.has_sa1())     fp.write(SNES::sa1.usage, 1 << 24);
-	  if (SNES::cartridge.has_superfx()) fp.write(SNES::superfx.usage, 1 << 24);
+      if (SNES::cartridge.has_sa1())     fp.write(SNES::sa1.usage, 1 << 24);
+      if (SNES::cartridge.has_superfx()) fp.write(SNES::superfx.usage, 1 << 24);
       fp.close();
     }
   }
@@ -296,6 +296,7 @@ void Debugger::event() {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
         string s = t;
+        s.append(" F:").append(integer<2>(frameCounter));
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
@@ -314,6 +315,7 @@ void Debugger::event() {
         SNES::debugger.step_sa1 = true;
         SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
         string s = t;
+        s.append(" F:").append(integer<2>(frameCounter));
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
@@ -332,6 +334,7 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::CPUStep: {
       SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
       string s = t;
+      s.append(" F:").append(integer<2>(frameCounter));
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
@@ -348,6 +351,7 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
       string s = t;
+      s.append(" F:").append(integer<2>(frameCounter));
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
