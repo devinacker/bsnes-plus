@@ -33,8 +33,6 @@ public:
   
 #endif
 
-  bool opcode_edge;  //true right before an opcode execues, used to skip over opcodes
-
   void op_step();
   uint8_t op_readpc();
   uint8 op_read(uint32 addr);

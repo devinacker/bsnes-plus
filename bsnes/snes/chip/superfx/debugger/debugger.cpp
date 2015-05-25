@@ -8,7 +8,6 @@ void SFXDebugger::op_step() {
   opcode_pc = (regs.pbr << 16) + regs.r[15] - 1;
   usage[opcode_pc] |= UsageOpcode;
 
-  opcode_edge = true;
   if(debugger.step_sfx &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
@@ -20,8 +19,6 @@ void SFXDebugger::op_step() {
     debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Exec, opcode_pc, 0x00);
   }
   if(step_event) step_event();
-  
-  opcode_edge = false;
 }
 
 uint8 SFXDebugger::op_read(uint16 addr) {
@@ -73,7 +70,6 @@ SFXDebugger::SFXDebugger() {
   usage = new uint8[1 << 24]();
   cart_usage = &SNES::cpu.cart_usage;
   opcode_pc = 0;
-  opcode_edge = false;
 }
 
 SFXDebugger::~SFXDebugger() {

@@ -144,12 +144,12 @@ void CPU::reset() {
   status.nmi_enabled = false;
   status.virq_enabled = false;
   status.hirq_enabled = false;
-  status.auto_joypad_poll_enabled = false;
+  status.auto_joypad_poll = false;
 
   status.pio = 0xff;
 
-  status.htime = 0x0000;
-  status.vtime = 0x0000;
+  status.hirq_pos = 0x0000;
+  status.virq_pos = 0x0000;
 
   status.rom_speed = 8;
 

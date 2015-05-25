@@ -37,13 +37,21 @@ void PPUcounter::vcounter_tick() {
   } else if(vcounter() == status.fieldlines[status.field]) {
     status.vcounter = 0;
     status.field = !status.field;
+    frame_tick();
   }
   if(scanline) scanline();
+}
+
+void PPUcounter::frame_tick() {
+  if (++status.frame == (system.region() == System::Region::NTSC ? 60 : 50)) {
+    status.frame = 0;
+  }
 }
 
 bool   PPUcounter::field     () const { return status.field; }
 uint16 PPUcounter::vcounter  () const { return status.vcounter; }
 uint16 PPUcounter::hcounter  () const { return status.hcounter; }
+uint8  PPUcounter::framecounter() const { return status.frame; }
 uint16 PPUcounter::lineclocks() const { return status.lineclocks; }
 uint16 PPUcounter::prev_lineclocks() const { return status.prev_lineclocks; }
 uint16 PPUcounter::fieldlines() const { return status.fieldlines[status.field]; }
@@ -90,6 +98,7 @@ uint16 PPUcounter::hdot() const {
 void PPUcounter::reset() {
   status.hcounter      = 0;
   status.vcounter      = 0;
+  status.frame         = 0;
   status.lineclocks    = status.prev_lineclocks = 1364;
   status.fieldlines[0] = status.fieldlines[1] = (system.region() == System::Region::NTSC ? 262 : 312);
   status.field         = 0;

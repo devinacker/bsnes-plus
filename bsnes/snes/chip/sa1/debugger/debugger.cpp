@@ -7,7 +7,6 @@ void SA1Debugger::op_step() {
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
 
-  opcode_edge = true;
   if(debugger.step_sa1 &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
@@ -36,8 +35,6 @@ void SA1Debugger::op_step() {
       debugger.call_count--;
     }
   }
-  
-  opcode_edge = false;
 }
 
 alwaysinline uint8_t SA1Debugger::op_readpc() {
@@ -76,7 +73,6 @@ SA1Debugger::SA1Debugger() {
   usage = new uint8[1 << 24]();
   cart_usage = &SNES::cpu.cart_usage;
   opcode_pc = 0x8000;
-  opcode_edge = false;
 }
 
 SA1Debugger::~SA1Debugger() {

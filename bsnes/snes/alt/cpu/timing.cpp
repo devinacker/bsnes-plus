@@ -31,13 +31,13 @@ void CPU::add_clocks(unsigned clocks) {
   if(status.hirq_enabled) {
     if(status.virq_enabled) {
       unsigned cpu_time = vcounter() * 1364 + hcounter();
-      unsigned irq_time = status.vtime * 1364 + status.htime * 4;
+      unsigned irq_time = status.virq_pos * 1364 + status.hirq_pos * 4;
       if(cpu_time > irq_time) irq_time += fieldlines() * 1364;
       bool irq_valid = status.irq_valid;
       status.irq_valid = cpu_time <= irq_time && cpu_time + clocks > irq_time;
       if(!irq_valid && status.irq_valid) status.irq_line = true;
     } else {
-      unsigned irq_time = status.htime * 4;
+      unsigned irq_time = status.hirq_pos * 4;
       if(hcounter() > irq_time) irq_time += 1364;
       bool irq_valid = status.irq_valid;
       status.irq_valid = hcounter() <= irq_time && hcounter() + clocks > irq_time;
@@ -46,7 +46,7 @@ void CPU::add_clocks(unsigned clocks) {
     if(status.irq_line) status.irq_transition = true;
   } else if(status.virq_enabled) {
     bool irq_valid = status.irq_valid;
-    status.irq_valid = vcounter() == status.vtime;
+    status.irq_valid = vcounter() == status.virq_pos;
     if(!irq_valid && status.irq_valid) status.irq_line = true;
     if(status.irq_line) status.irq_transition = true;
   } else {
@@ -85,7 +85,7 @@ void CPU::scanline() {
     status.nmi_line = false;
   }
 
-  if(status.auto_joypad_poll_enabled && vcounter() == (ppu.overscan() == false ? 227 : 242)) {
+  if(status.auto_joypad_poll && vcounter() == (ppu.overscan() == false ? 227 : 242)) {
     input.poll();
     run_auto_joypad_poll();
   }
