@@ -12,7 +12,6 @@ public:
   };
   uint8 *usage;
   uint16 opcode_pc;
-  bool opcode_edge;
 
   void op_step();
   uint8_t op_readpc();

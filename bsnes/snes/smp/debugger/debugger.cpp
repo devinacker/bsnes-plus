@@ -6,7 +6,6 @@ void SMPDebugger::op_step() {
   usage[regs.pc] |= UsageOpcode;
   opcode_pc = regs.pc;
 
-  opcode_edge = true;
   if(debugger.step_smp &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
@@ -36,8 +35,6 @@ void SMPDebugger::op_step() {
     }
   }
   
-  opcode_edge = false;
-
   SMP::op_step();
   synchronize_cpu();
 }
@@ -65,7 +62,6 @@ void SMPDebugger::op_write(uint16 addr, uint8 data) {
 SMPDebugger::SMPDebugger() {
   usage = new uint8[1 << 16]();
   opcode_pc = 0xffc0;
-  opcode_edge = false;
 }
 
 SMPDebugger::~SMPDebugger() {

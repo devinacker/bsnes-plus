@@ -12,7 +12,6 @@ void CPUDebugger::op_step() {
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
 
-  opcode_edge = true;
   if(debugger.step_cpu &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
@@ -41,8 +40,6 @@ void CPUDebugger::op_step() {
       debugger.call_count--;
     }
   }
-  
-  opcode_edge = false;
 
   CPU::op_step();
   synchronize_smp();
@@ -134,7 +131,6 @@ CPUDebugger::CPUDebugger() {
   usage = new uint8[1 << 24]();
   cart_usage = new uint8[1 << 24]();
   opcode_pc = 0x8000;
-  opcode_edge = false;
 }
 
 CPUDebugger::~CPUDebugger() {
@@ -168,11 +164,7 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   item("NMI Enable", status.nmi_enabled);
   item("H-IRQ Enable", status.hirq_enabled);
   item("V-IRQ Enable", status.virq_enabled);
-#if defined(ALT_CPU_CPP)
-  item("Auto Joypad Poll", status.auto_joypad_poll_enabled);
-#else
   item("Auto Joypad Poll", status.auto_joypad_poll);
-#endif
 
   //$4201
   item("$4201", "");
@@ -196,19 +188,11 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
 
   //$4207-$4208
   item("$4207-$4208", "");
-#if defined(ALT_CPU_CPP)
-  item("H-Time", string("0x", hex<4>(status.htime)));
-#else
   item("H-Time", string("0x", hex<4>(status.hirq_pos)));
-#endif
 
   //$4209-$420a
   item("$4209-$420a", "");
-#if defined(ALT_CPU_CPP)
-  item("V-Time", string("0x", hex<4>(status.vtime)));
-#else
   item("V-Time", string("0x", hex<4>(status.virq_pos)));
-#endif
 
   //$420b
   unsigned dma_enable = 0;
