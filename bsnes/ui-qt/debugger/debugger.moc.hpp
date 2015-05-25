@@ -40,7 +40,6 @@ public:
   void echo(const char *message);
   void event();
   void frameTick();
-  unsigned frameCount() const { return frameCounter; }
   void autoUpdate();
   Debugger();
 

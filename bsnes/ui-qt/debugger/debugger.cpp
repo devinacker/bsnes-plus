@@ -296,7 +296,6 @@ void Debugger::event() {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
         string s = t;
-        s.append(" F:").append(integer<2>(frameCounter));
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
@@ -315,7 +314,6 @@ void Debugger::event() {
         SNES::debugger.step_sa1 = true;
         SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
         string s = t;
-        s.append(" F:").append(integer<2>(frameCounter));
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
@@ -334,7 +332,6 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::CPUStep: {
       SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
       string s = t;
-      s.append(" F:").append(integer<2>(frameCounter));
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
@@ -351,7 +348,6 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
       string s = t;
-      s.append(" F:").append(integer<2>(frameCounter));
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);

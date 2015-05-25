@@ -18,6 +18,7 @@ public:
   alwaysinline bool   field   () const;
   alwaysinline uint16 vcounter() const;
   alwaysinline uint16 hcounter() const;
+  alwaysinline uint8  frame   () const;
   alwaysinline uint16 lineclocks() const;
   alwaysinline uint16 prev_lineclocks() const;
   alwaysinline uint16 fieldlines() const;
@@ -34,10 +35,12 @@ public:
 
 private:
   inline void vcounter_tick();
+  inline void frame_tick();
 
   struct {
     uint16 hcounter;
     uint16 vcounter;
+    uint8  frame;
     uint16 lineclocks;
     uint16 prev_lineclocks;
     uint16 fieldlines[2];
