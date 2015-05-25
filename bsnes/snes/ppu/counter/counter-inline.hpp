@@ -51,7 +51,7 @@ void PPUcounter::frame_tick() {
 bool   PPUcounter::field     () const { return status.field; }
 uint16 PPUcounter::vcounter  () const { return status.vcounter; }
 uint16 PPUcounter::hcounter  () const { return status.hcounter; }
-uint8  PPUcounter::frame     () const { return status.frame; }
+uint8  PPUcounter::framecounter() const { return status.frame; }
 uint16 PPUcounter::lineclocks() const { return status.lineclocks; }
 uint16 PPUcounter::prev_lineclocks() const { return status.prev_lineclocks; }
 uint16 PPUcounter::fieldlines() const { return status.fieldlines[status.field]; }

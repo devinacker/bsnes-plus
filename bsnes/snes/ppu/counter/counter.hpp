@@ -18,7 +18,7 @@ public:
   alwaysinline bool   field   () const;
   alwaysinline uint16 vcounter() const;
   alwaysinline uint16 hcounter() const;
-  alwaysinline uint8  frame   () const;
+  alwaysinline uint8  framecounter() const;
   alwaysinline uint16 lineclocks() const;
   alwaysinline uint16 prev_lineclocks() const;
   alwaysinline uint16 fieldlines() const;
