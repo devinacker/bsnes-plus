@@ -177,6 +177,10 @@ Debugger::Debugger() {
   frameCounter = 0;
   synchronize();
   resize(855, 425);
+  
+  QTimer *updateTimer = new QTimer(this);
+  connect(updateTimer, SIGNAL(timeout()), this, SLOT(frameTick()));
+  updateTimer->start(15);
 }
 
 void Debugger::modifySystemState(unsigned state) {
@@ -366,12 +370,20 @@ void Debugger::event() {
   autoUpdate();
 }
 
-//called once every time a video frame is rendered, used to update "auto refresh" tool windows
+// update "auto refresh" tool windows
 void Debugger::frameTick() {
-  if(++frameCounter >= (SNES::system.region() == SNES::System::Region::NTSC ? 60 : 50)) {
-    frameCounter = 0;
+  unsigned frame = SNES::cpu.framecounter();
+  if (frameCounter == frame) return;
+
+  if (frame < frameCounter) {
     autoUpdate();
+  } else {
+    // update memory editor every time since once per second isn't very useful
+	// (TODO: and PPU viewers, maybe?) 
+    memoryEditor->autoUpdate();
   }
+  
+  frameCounter = frame;
 }
 
 void Debugger::autoUpdate() {

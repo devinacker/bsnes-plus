@@ -40,9 +40,6 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
   }
 
   state.frame();
-  #if defined(DEBUGGER)
-  debugger->frameTick();
-  #endif
 
   //frame counter
   static signed frameCount = 0;
