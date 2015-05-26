@@ -14,6 +14,8 @@ public:
   virtual void last_cycle() = 0;
   virtual bool interrupt_pending() = 0;
 
+  virtual uint8 disassembler_read(uint32 addr);
+
   void op_io_irq();
   void op_io_cond2();
   void op_io_cond4(uint16 x, uint16 y);
