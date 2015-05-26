@@ -1,6 +1,8 @@
+#define DSP_THREADED true
+
 class DSP : public Processor {
 public:
-  enum : bool { Threaded = true };
+  enum : bool { Threaded = DSP_THREADED };
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_smp();
 
@@ -17,6 +19,9 @@ public:
   ~DSP();
 
 private:
+#if !DSP_THREADED
+  unsigned phase;
+#endif
   //global registers
   enum global_reg_t {
     r_mvoll = 0x0c, r_mvolr = 0x1c,
