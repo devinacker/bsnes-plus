@@ -3,6 +3,10 @@
 void DSP::serialize(serializer &s) {
   Processor::serialize(s);
 
+#if !DSP_THREADED
+  s.integer(phase);
+#endif
+
   s.array(state.regs, 128);
   state.echo_hist[0].serialize(s);
   state.echo_hist[1].serialize(s);

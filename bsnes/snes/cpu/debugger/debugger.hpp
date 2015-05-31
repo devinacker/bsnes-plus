@@ -39,6 +39,8 @@ public:
   uint8 dma_read(uint32 abus);
   void op_write(uint32 addr, uint8 data);
 
+  uint8 disassembler_read(uint32 addr);
+
   CPUDebugger();
   ~CPUDebugger();
 };

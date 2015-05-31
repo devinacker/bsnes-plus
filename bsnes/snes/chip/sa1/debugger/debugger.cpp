@@ -1,5 +1,13 @@
 #ifdef SA1_CPP
 
+uint8 SA1Debugger::disassembler_read(uint32 addr)
+{
+  debugger.bus_access = true;
+  uint8 data = sa1bus.read(addr);
+  debugger.bus_access = false;
+  return data;
+}
+
 void SA1Debugger::op_step() {
   bool break_event = false;
 

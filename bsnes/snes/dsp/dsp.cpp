@@ -40,167 +40,212 @@ void DSP::synchronize_smp() {
 void DSP::Enter() { dsp.enter(); }
 
 void DSP::enter() {
+#if DSP_THREADED
+  #define PHASE(n)
+  #define TICK tick()
   while(true) {
     if(scheduler.sync == Scheduler::SynchronizeMode::All) {
       scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
     }
-
+#else
+  #define PHASE(n) case n:
+  #define TICK return tick()
+  switch(phase & 31) {
+#endif
+    PHASE(0)
     voice_5(voice[0]);
     voice_2(voice[1]);
-    tick();
+    TICK;
 
+    PHASE(1)
     voice_6(voice[0]);
     voice_3(voice[1]);
-    tick();
+    TICK;
 
+    PHASE(2)
     voice_7(voice[0]);
     voice_4(voice[1]);
     voice_1(voice[3]);
-    tick();
+    TICK;
 
+    PHASE(3)
     voice_8(voice[0]);
     voice_5(voice[1]);
     voice_2(voice[2]);
-    tick();
+    TICK;
 
+    PHASE(4)
     voice_9(voice[0]);
     voice_6(voice[1]);
     voice_3(voice[2]);
-    tick();
+    TICK;
 
+    PHASE(5)
     voice_7(voice[1]);
     voice_4(voice[2]);
     voice_1(voice[4]);
-    tick();
+    TICK;
 
+    PHASE(6)
     voice_8(voice[1]);
     voice_5(voice[2]);
     voice_2(voice[3]);
-    tick();
+    TICK;
 
+    PHASE(7)
     voice_9(voice[1]);
     voice_6(voice[2]);
     voice_3(voice[3]);
-    tick();
+    TICK;
 
+    PHASE(8)
     voice_7(voice[2]);
     voice_4(voice[3]);
     voice_1(voice[5]);
-    tick();
+    TICK;
 
+    PHASE(9)
     voice_8(voice[2]);
     voice_5(voice[3]);
     voice_2(voice[4]);
-    tick();
+    TICK;
 
+    PHASE(10)
     voice_9(voice[2]);
     voice_6(voice[3]);
     voice_3(voice[4]);
-    tick();
+    TICK;
 
+    PHASE(11)
     voice_7(voice[3]);
     voice_4(voice[4]);
     voice_1(voice[6]);
-    tick();
+    TICK;
 
+    PHASE(12)
     voice_8(voice[3]);
     voice_5(voice[4]);
     voice_2(voice[5]);
-    tick();
+    TICK;
 
+    PHASE(13)
     voice_9(voice[3]);
     voice_6(voice[4]);
     voice_3(voice[5]);
-    tick();
+    TICK;
 
+    PHASE(14)
     voice_7(voice[4]);
     voice_4(voice[5]);
     voice_1(voice[7]);
-    tick();
+    TICK;
 
+    PHASE(15)
     voice_8(voice[4]);
     voice_5(voice[5]);
     voice_2(voice[6]);
-    tick();
+    TICK;
 
+    PHASE(16)
     voice_9(voice[4]);
     voice_6(voice[5]);
     voice_3(voice[6]);
-    tick();
+    TICK;
 
+    PHASE(17)
     voice_1(voice[0]);
     voice_7(voice[5]);
     voice_4(voice[6]);
-    tick();
+    TICK;
 
+    PHASE(18)
     voice_8(voice[5]);
     voice_5(voice[6]);
     voice_2(voice[7]);
-    tick();
+    TICK;
 
+    PHASE(19)
     voice_9(voice[5]);
     voice_6(voice[6]);
     voice_3(voice[7]);
-    tick();
+    TICK;
 
+    PHASE(20)
     voice_1(voice[1]);
     voice_7(voice[6]);
     voice_4(voice[7]);
-    tick();
+    TICK;
 
+    PHASE(21)
     voice_8(voice[6]);
     voice_5(voice[7]);
     voice_2(voice[0]);
-    tick();
+    TICK;
 
+    PHASE(22)
     voice_3a(voice[0]);
     voice_9(voice[6]);
     voice_6(voice[7]);
     echo_22();
-    tick();
+    TICK;
 
+    PHASE(23)
     voice_7(voice[7]);
     echo_23();
-    tick();
+    TICK;
 
+    PHASE(24)
     voice_8(voice[7]);
     echo_24();
-    tick();
+    TICK;
 
+    PHASE(25)
     voice_3b(voice[0]);
     voice_9(voice[7]);
     echo_25();
-    tick();
+    TICK;
 
+    PHASE(26)
     echo_26();
-    tick();
+    TICK;
 
+    PHASE(27)
     misc_27();
     echo_27();
-    tick();
+    TICK;
 
+    PHASE(28)
     misc_28();
     echo_28();
-    tick();
+    TICK;
 
+    PHASE(29)
     misc_29();
     echo_29();
-    tick();
+    TICK;
 
+    PHASE(30)
     misc_30();
     voice_3c(voice[0]);
     echo_30();
-    tick();
+    TICK;
 
+    PHASE(31)
     voice_4(voice[0]);
     voice_1(voice[2]);
-    tick();
+    TICK;
   }
+#undef PHASE
+#undef TICK
 }
 
 void DSP::tick() {
   step(3 * 8);
+#if DSP_THREADED
   synchronize_smp();
+#else
+  phase++;
+#endif
 }
 
 /* register interface for S-SMP $00f2,$00f3 */
@@ -283,7 +328,13 @@ void DSP::power() {
 }
 
 void DSP::reset() {
+#if DSP_THREADED
   create(Enter, system.apu_frequency());
+#else
+  frequency = system.apu_frequency();
+  clock = 0;
+  phase = 0;
+#endif
 
   REG(flg) = 0xe0;
 
