@@ -1,4 +1,4 @@
-﻿# bsnes-plus
+# bsnes-plus
 
 bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic) intended to
 introduce some new features and improvements, mostly aimed at debugging.
@@ -35,9 +35,15 @@ Non-debugging features:
 - Install Qt 4.8.6 (http://download.qt.io/archive/qt/) and make sure its `bin` directory is in your path
 - Run `mingw32-make`
 
-Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported. 
+Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported.
 
-## Building on OS X / Linux / other *nix
+## Building on OS X
+
+- Install a C++ toolchain ([Xcode](https://developer.apple.com) is probably the easiest route)  
+- Install Qt 4.8 (get [Brew](http://brew.sh) and run `brew install qt`)  
+- Run `make`from the bsnes directory.  
+
+## Building on Linux / other *nix
 
 As there is no ``configure`` step, make sure necessary Qt4/X11 packages are installed. On a Debian/Ubuntu system, it would require a command like:
 ```

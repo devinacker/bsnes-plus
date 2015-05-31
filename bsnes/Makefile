@@ -8,11 +8,17 @@ ifeq ($(ui),)
 endif
 
 # compiler
-c       := $(compiler) -x c -std=gnu99
+c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
-flags   := -O3 -fomit-frame-pointer -I. -I$(snes)
+flags   := -I. -I$(snes)
 link    :=
 objects :=
+
+ifeq ($(DEBUG), 1)
+  flags += -O0 -g
+else
+  flags += -O3 -fomit-frame-pointer
+endif
 
 # comment this line to enable asserts
 flags += -DNDEBUG
@@ -21,14 +27,16 @@ flags += -DNDEBUG
 # flags += -fprofile-generate
 # link += -lgcov
 
-# profile-guided optimization
-# flags += -fprofile-use
+# silence warnings
+flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 # platform
 ifeq ($(platform),x)
   link += -s -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
 	osxbundle := ../bsnes+.app
+	flags += -march=native
+	link += -F/usr/local/lib
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
@@ -99,6 +107,9 @@ clean: ui_clean
 	-@$(call delete,*.ilk)
 	-@$(call delete,*.pdb)
 	-@$(call delete,*.manifest)
+ifeq ($(platform),osx)
+	@rm -rf $(osxbundle)
+endif
 
 archive-all:
 	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh
