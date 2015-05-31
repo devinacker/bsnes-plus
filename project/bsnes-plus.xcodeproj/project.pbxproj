@@ -670,7 +670,9 @@
 				2A08E0CB1AF57F54003D554D /* frameworks */,
 				2A35D03C1AEE7AB200C9236B /* products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		2A35CD951AEE788E00C9236B /* bsnes */ = {
 			isa = PBXGroup;

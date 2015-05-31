@@ -7,3 +7,8 @@
 *.rcc
 *.so
 *.so.1
+bsnes+.app
+project/bsnes-plus.xcodeproj/xcuserdata
+project/bsnes-plus.xcodeproj/project.xcworkspace/xcuserdata
+bsnes-plus.xccheckout
+redist
