@@ -36,6 +36,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
 	osxbundle := ../bsnes+.app
 	flags += -march=native
+	link += -F/usr/local/lib
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
