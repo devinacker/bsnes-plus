@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A08E0CD1AF57F7D003D554D /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A08E0CC1AF57F7D003D554D /* QtCore.framework */; };
-		2A08E0CF1AF57F86003D554D /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A08E0CE1AF57F86003D554D /* QtGui.framework */; };
-		2A08E0D11AF57F8E003D554D /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A08E0D01AF57F8E003D554D /* QtOpenGL.framework */; };
 		2ACADCC61AF25BE20001E28A /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CFA91AEE788E00C9236B /* system.cpp */; };
 		2ACADCC71AF25BE60001E28A /* serialization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CFA81AEE788E00C9236B /* serialization.cpp */; };
 		2ACADCC81AF25C5C0001E28A /* ruby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CE531AEE788E00C9236B /* ruby.cpp */; };
@@ -160,6 +157,9 @@
 		2ACADD5F1AF261780001E28A /* system-state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35D0371AEE788E00C9236B /* system-state.cpp */; };
 		2ACADD601AF261780001E28A /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35D0381AEE788E00C9236B /* utility.cpp */; };
 		2ACADD611AF261780001E28A /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35D03A1AEE788E00C9236B /* window.cpp */; };
+		2AD9DCCE1B1C49B0001481D3 /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AD9DCCB1B1C49B0001481D3 /* QtCore.framework */; };
+		2AD9DCCF1B1C49B0001481D3 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AD9DCCC1B1C49B0001481D3 /* QtGui.framework */; };
+		2AD9DCD01B1C49B0001481D3 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AD9DCCD1B1C49B0001481D3 /* QtOpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,9 +174,6 @@
 
 /* Begin PBXFileReference section */
 		2A08E0C41AF5759C003D554D /* bsnes-plus-xc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "bsnes-plus-xc"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A08E0CC1AF57F7D003D554D /* QtCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtCore.framework; path = ../../../../../Library/Frameworks/QtCore.framework; sourceTree = "<group>"; };
-		2A08E0CE1AF57F86003D554D /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = ../../../../../Library/Frameworks/QtGui.framework; sourceTree = "<group>"; };
-		2A08E0D01AF57F8E003D554D /* QtOpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtOpenGL.framework; path = ../../../../../Library/Frameworks/QtOpenGL.framework; sourceTree = "<group>"; };
 		2A35CD991AEE788E00C9236B /* bsnes.desktop */ = {isa = PBXFileReference; lastKnownFileType = text; path = bsnes.desktop; sourceTree = "<group>"; };
 		2A35CD9A1AEE788E00C9236B /* bsnes.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bsnes.icns; sourceTree = "<group>"; };
 		2A35CD9B1AEE788E00C9236B /* bsnes.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = bsnes.ico; sourceTree = "<group>"; };
@@ -637,6 +634,9 @@
 		2A35D0391AEE788E00C9236B /* utility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
 		2A35D03A1AEE788E00C9236B /* window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		2A35D03B1AEE7A9E00C9236B /* bsnes+.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "bsnes+.app"; path = "../bsnes+.app"; sourceTree = "<group>"; };
+		2AD9DCCB1B1C49B0001481D3 /* QtCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtCore.framework; path = ../../../../../usr/local/lib/QtCore.framework; sourceTree = "<group>"; };
+		2AD9DCCC1B1C49B0001481D3 /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = ../../../../../usr/local/lib/QtGui.framework; sourceTree = "<group>"; };
+		2AD9DCCD1B1C49B0001481D3 /* QtOpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtOpenGL.framework; path = ../../../../../usr/local/lib/QtOpenGL.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -644,9 +644,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A08E0D11AF57F8E003D554D /* QtOpenGL.framework in Frameworks */,
-				2A08E0CD1AF57F7D003D554D /* QtCore.framework in Frameworks */,
-				2A08E0CF1AF57F86003D554D /* QtGui.framework in Frameworks */,
+				2AD9DCD01B1C49B0001481D3 /* QtOpenGL.framework in Frameworks */,
+				2AD9DCCE1B1C49B0001481D3 /* QtCore.framework in Frameworks */,
+				2AD9DCCF1B1C49B0001481D3 /* QtGui.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -656,9 +656,9 @@
 		2A08E0CB1AF57F54003D554D /* frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2A08E0CC1AF57F7D003D554D /* QtCore.framework */,
-				2A08E0CE1AF57F86003D554D /* QtGui.framework */,
-				2A08E0D01AF57F8E003D554D /* QtOpenGL.framework */,
+				2AD9DCCB1B1C49B0001481D3 /* QtCore.framework */,
+				2AD9DCCC1B1C49B0001481D3 /* QtGui.framework */,
+				2AD9DCCD1B1C49B0001481D3 /* QtOpenGL.framework */,
 			);
 			name = frameworks;
 			sourceTree = "<group>";
@@ -2225,6 +2225,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG = 1;
+				PATH = "$PATH:/usr/local/bin";
 			};
 			name = Debug;
 		};
@@ -2232,6 +2233,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG = 0;
+				PATH = "$PATH:/usr/local/bin";
 			};
 			name = Release;
 		};
@@ -2259,6 +2261,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					/usr/local/lib,
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2285,9 +2288,9 @@
 					"$(SRCROOT)/../bsnes",
 					"$(SRCROOT)/../bsnes/snes",
 					"$(SRCROOT)/../bsnes/obj",
-					/Library/Frameworks/QtCore.framework/Versions/4/Headers,
-					/Library/Frameworks/QtGui.framework/Versions/4/Headers,
-					/Library/Frameworks/QtOpenGL.framework/Versions/4/Headers,
+					/usr/local/lib/QtCore.framework/Versions/4/Headers,
+					/usr/local/lib/QtGui.framework/Versions/4/Headers,
+					/usr/local/lib/QtOpenGL.framework/Versions/4/Headers,
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -2324,6 +2327,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					/usr/local/lib,
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -2346,9 +2350,9 @@
 					"$(SRCROOT)/../bsnes",
 					"$(SRCROOT)/../bsnes/snes",
 					"$(SRCROOT)/../bsnes/obj",
-					/Library/Frameworks/QtCore.framework/Versions/4/Headers,
-					/Library/Frameworks/QtGui.framework/Versions/4/Headers,
-					/Library/Frameworks/QtOpenGL.framework/Versions/4/Headers,
+					/usr/local/lib/QtCore.framework/Versions/4/Headers,
+					/usr/local/lib/QtGui.framework/Versions/4/Headers,
+					/usr/local/lib/QtOpenGL.framework/Versions/4/Headers,
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
