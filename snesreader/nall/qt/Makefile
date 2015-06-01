@@ -22,8 +22,9 @@ ifeq ($(platform),x)
   qtlib := `pkg-config --libs $(qtlibs)`
 else ifeq ($(platform),osx)
   qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/4/Headers)
-
   qtlib := -L/Library/Frameworks
+  qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/4/Headers)
+  qtlib := -L/usr/local/lib
   qtlib += $(foreach lib,$(qtlibs),-framework $(lib))
   qtlib += -framework Carbon
   qtlib += -framework Cocoa

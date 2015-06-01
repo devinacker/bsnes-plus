@@ -12,7 +12,8 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags := -fPIC $(flags)
+  flags += -fPIC $(flags) -march=native
+	link += -F/usr/local/lib
 endif
 
 objects := snesreader
