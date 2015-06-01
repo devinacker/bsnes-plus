@@ -3,6 +3,8 @@
 bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic) intended to
 introduce some new features and improvements, mostly aimed at debugging.
 
+Optiroc/bsnes-plus fork improves the OS X builds (pulled upstream) and an Xcode project for easier emulator debugging on Mac.
+
 ## What's new
 
 - "Step over" and "step out" buttons in debugger
