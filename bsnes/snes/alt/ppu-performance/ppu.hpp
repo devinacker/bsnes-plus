@@ -1,6 +1,9 @@
 class PPU : public Processor, public PPUcounter, public MMIO {
 public:
   enum : bool { Threaded = true };
+  enum : bool { SupportsLayerEnable = true };
+  enum : bool { SupportsFrameSkip = true };
+
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_cpu();
 

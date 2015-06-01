@@ -52,8 +52,8 @@ ToolsWindow::ToolsWindow() {
   tab->addTab(cheatEditorArea, "Cheat Editor");
   tab->addTab(cheatFinderArea, "Cheat Finder");
   tab->addTab(stateManagerArea, "State Manager");
-  #if defined(PROFILE_COMPATIBILITY) || defined(PROFILE_PERFORMANCE)
-  tab->addTab(effectToggleArea, "Effect Toggle");
-  #endif
+  if(SNES::PPU::SupportsLayerEnable || SNES::DSP::SupportsChannelEnable)
+    tab->addTab(effectToggleArea, "Effect Toggle");
+
   layout->addWidget(tab);
 }
