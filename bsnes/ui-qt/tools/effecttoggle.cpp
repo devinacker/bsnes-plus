@@ -94,30 +94,56 @@ EffectToggleWindow::EffectToggleWindow() {
   channel7->setChecked(true);
   layout->addWidget(channel7, 8, 3);
 
-  connect(bg1pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg1pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg2pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg2pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg3pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg3pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg4pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(bg4pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(oampri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(oampri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(oampri2, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(oampri3, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel0, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel1, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel2, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel3, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel4, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel5, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel6, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
-  connect(channel7, SIGNAL(stateChanged(int)), this, SLOT(synchronize()));
+  if(SNES::PPU::SupportsLayerEnable) {
+    connect(bg1pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg1pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg2pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg2pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg3pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg3pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg4pri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(bg4pri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(oampri0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(oampri1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(oampri2, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+    connect(oampri3, SIGNAL(stateChanged(int)), this, SLOT(synchronize_ppu()));
+  } else {
+    bg1pri0->setEnabled(false);
+    bg1pri1->setEnabled(false);
+    bg2pri0->setEnabled(false);
+    bg2pri1->setEnabled(false);
+    bg3pri0->setEnabled(false);
+    bg3pri1->setEnabled(false);
+    bg4pri0->setEnabled(false);
+    bg4pri1->setEnabled(false);
+    oampri0->setEnabled(false);
+    oampri1->setEnabled(false);
+    oampri2->setEnabled(false);
+    oampri3->setEnabled(false);
+  }
+
+  if(SNES::DSP::SupportsChannelEnable) {
+    connect(channel0, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel1, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel2, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel3, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel4, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel5, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel6, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+    connect(channel7, SIGNAL(stateChanged(int)), this, SLOT(synchronize_dsp()));
+  } else {
+    channel0->setEnabled(false);
+    channel1->setEnabled(false);
+    channel2->setEnabled(false);
+    channel3->setEnabled(false);
+    channel4->setEnabled(false);
+    channel5->setEnabled(false);
+    channel6->setEnabled(false);
+    channel7->setEnabled(false);
+  }
 }
 
-void EffectToggleWindow::synchronize() {
-  #if defined(PROFILE_COMPATIBILITY) || defined(PROFILE_PERFORMANCE)
+void EffectToggleWindow::synchronize_ppu() {
   SNES::ppu.layer_enable(0, 0, bg1pri0->isChecked());
   SNES::ppu.layer_enable(0, 1, bg1pri1->isChecked());
   SNES::ppu.layer_enable(1, 0, bg2pri0->isChecked());
@@ -130,7 +156,9 @@ void EffectToggleWindow::synchronize() {
   SNES::ppu.layer_enable(4, 1, oampri1->isChecked());
   SNES::ppu.layer_enable(4, 2, oampri2->isChecked());
   SNES::ppu.layer_enable(4, 3, oampri3->isChecked());
+}
 
+void EffectToggleWindow::synchronize_dsp() {
   SNES::dsp.channel_enable(0, channel0->isChecked());
   SNES::dsp.channel_enable(1, channel1->isChecked());
   SNES::dsp.channel_enable(2, channel2->isChecked());
@@ -139,5 +167,4 @@ void EffectToggleWindow::synchronize() {
   SNES::dsp.channel_enable(5, channel5->isChecked());
   SNES::dsp.channel_enable(6, channel6->isChecked());
   SNES::dsp.channel_enable(7, channel7->isChecked());
-  #endif
 }

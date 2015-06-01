@@ -182,9 +182,8 @@ MainWindow::MainWindow() {
   tools_stateManager = tools->addAction("&State Manager ...");
 
   tools_effectToggle = tools->addAction("Effect &Toggle ...");
-  #if !defined(PROFILE_COMPATIBILITY) && !defined(PROFILE_PERFORMANCE)
-  tools_effectToggle->setVisible(false);
-  #endif
+  if(!SNES::PPU::SupportsLayerEnable && !SNES::DSP::SupportsChannelEnable)
+    tools_effectToggle->setVisible(false);
   
   tools_soundViewer = tools->addAction("Sound &Viewer ...");
 

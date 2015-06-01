@@ -51,9 +51,9 @@ struct Speedup : HotkeyInput {
   bool syncAudio;
 
   void pressed() {
-    #if defined(PROFILE_COMPATIBILITY) || defined(PROFILE_PERFORMANCE)
-    SNES::ppu.set_frameskip(9);
-    #endif
+    if(SNES::PPU::SupportsFrameSkip)
+      SNES::ppu.set_frameskip(9);
+
     config().system.speed = 4;
     utility.updateEmulationSpeed();
     syncVideo = config().video.synchronize;
@@ -70,9 +70,9 @@ struct Speedup : HotkeyInput {
   }
 
   void released() {
-    #if defined(PROFILE_COMPATIBILITY) || defined(PROFILE_PERFORMANCE)
-    SNES::ppu.set_frameskip(0);
-    #endif
+    if(SNES::PPU::SupportsFrameSkip)
+      SNES::ppu.set_frameskip(0);
+
     config().system.speed = 2;
     utility.updateEmulationSpeed();
     if(syncVideo) {

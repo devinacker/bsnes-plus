@@ -3,6 +3,8 @@
 class DSP : public Processor, public ChipDebugger {
 public:
   enum : bool { Threaded = false };
+  enum : bool { SupportsChannelEnable = true };
+
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_smp();
 
