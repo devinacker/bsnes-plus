@@ -34,9 +34,9 @@ flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 ifeq ($(platform),x)
   link += -s -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
-	osxbundle := ../bsnes+.app
-	flags += -march=native
-	link += -F/usr/local/lib
+  osxbundle := ../bsnes+.app
+  flags += -march=native
+  link += -F/usr/local/lib
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole

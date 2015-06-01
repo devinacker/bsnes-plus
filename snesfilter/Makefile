@@ -3,10 +3,19 @@ include nall/Makefile
 qtlibs := QtCore QtGui
 include nall/qt/Makefile
 
-c     := $(compiler) -x c -std=gnu99
+c     := $(compiler) -xc -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -O3 -I. -Iobj -fomit-frame-pointer $(qtinc)
+flags := -I. -Iobj $(qtinc)
 link  :=
+
+ifeq ($(DEBUG), 1)
+  flags += -O0 -g
+else
+  flags += -O3 -fomit-frame-pointer
+endif
+
+# silence warnings
+flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 ifeq ($(platform),x)
   flags := -fPIC -fopenmp $(flags)
