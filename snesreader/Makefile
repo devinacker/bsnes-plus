@@ -22,6 +22,7 @@ ifeq ($(platform),x)
   link += -s
 else ifeq ($(platform),osx)
   flags := -fPIC $(flags)
+  link += -F/usr/local/lib
 endif
 
 objects := snesreader
