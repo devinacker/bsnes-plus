@@ -59,7 +59,7 @@ compile = \
 
 %.o: $<; $(call compile)
 
-all: build;
+all: build plugins;
 
 include $(snes)/Makefile
 include $(ui)/Makefile
@@ -78,7 +78,7 @@ else
 	$(strip $(cpp) -o out/bsnes $(objects) $(link))
 endif
 
-install: build
+install: build plugins
 ifeq ($(platform),x)
 	install -D -m 755 out/bsnes $(DESTDIR)$(prefix)/bin/bsnes
 	install -D -m 644 data/bsnes.png $(DESTDIR)$(prefix)/share/pixmaps/bsnes.png
@@ -87,13 +87,6 @@ ifeq ($(platform),x)
 	cp data/cheats.xml ~/.bsnes/cheats.xml
 	chmod 777 ~/.bsnes ~/.bsnes/cheats.xml
 else ifeq ($(platform),osx)
-	mkdir -p $(osxbundle)/Contents/Frameworks
-	@$(MAKE) -C ../snesreader
-	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
-#	@$(MAKE) -C ../snesfilter
-#	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
-	@$(MAKE) -C ../supergameboy
-	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 	mv -f $(osxbundle) /Applications/bsnes+.app
 	test -d ~/.bsnes || mkdir ~/.bsnes
 	cp data/cheats.xml ~/.bsnes/cheats.xml
@@ -111,6 +104,17 @@ else ifeq ($(platform),osx)
 	rm -rf /Applications/bsnes+.app
 else
 	@echo Install not available for current platform
+endif
+
+plugins: build
+	@$(MAKE) -C ../snesreader
+#	@$(MAKE) -C ../snesfilter
+	@$(MAKE) -C ../supergameboy
+ifeq ($(platform),osx)
+	mkdir -p $(osxbundle)/Contents/Frameworks
+	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
+#	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
 clean: ui_clean
