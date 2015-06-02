@@ -18,15 +18,18 @@ endif
 flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 ifeq ($(platform),x)
-  flags := -fPIC $(flags)
-  link += -s -lpthread
+  flags := -fPIC -fopenmp $(flags)
+  link += -s -fopenmp -lpthread -lgomp
 else ifeq ($(platform),osx)
+# TODO: openmp not currently supported in Apple clang
+#  flags := -fPIC -fopenmp $(flags)
+#  link += -fopenmp -lpthread -lgomp 
   flags := -fPIC $(flags)
   link += -lpthread
   link += -F/usr/local/lib
 else ifeq ($(platform),win)
-  flags := $(flags)
-  link += -lpthread
+  flags := -fopenmp $(flags)
+  link += -fopenmp -lpthread
 endif
 
 objects := snesfilter

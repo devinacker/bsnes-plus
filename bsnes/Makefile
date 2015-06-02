@@ -106,7 +106,7 @@ else
 	@echo Install not available for current platform
 endif
 
-plugins: build
+plugins:
 	@$(MAKE) -C ../snesreader
 	@$(MAKE) -C ../snesfilter
 	@$(MAKE) -C ../supergameboy
