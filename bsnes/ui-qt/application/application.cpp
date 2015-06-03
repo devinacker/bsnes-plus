@@ -62,15 +62,16 @@ void Application::locateFile(string &filename, bool createDataDirectory) {
 
 int Application::main(int &argc, char **argv) {
   app = new App(argc, argv);
-  #if defined(PLATFORM_WIN)
+  #if !defined(PLATFORM_WIN)
+    #if defined(PLATFORM_OSX)
+    app->setWindowIcon(QIcon(":/bsnes_512.png"));
+    #else
+    app->setWindowIcon(QIcon(":/bsnes.png"));
+    #endif
+  #else
   //Windows port uses 256x256 icon from resource file
   CoInitialize(0);
   utf8_args(argc, argv);
-  #elif defined(PLATFORM_OSX)
-  //Use big icon for OSX
-  app->setWindowIcon(QIcon(":/bsnes_512.png"));
-  #else
-  app->setWindowIcon(QIcon(":/bsnes.png"));
   #endif
 
   initPaths(argv[0]);
