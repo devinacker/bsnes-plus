@@ -8,6 +8,11 @@
 #include <nall/string.hpp>
 #include <nall/utility.hpp>
 
+#if defined(PLATFORM_OSX)
+  #include <mach-o/dyld.h>
+  #include <limits.h>
+  #include <libgen.h>
+#endif
 #if defined(PLATFORM_X) || defined(PLATFORM_OSX)
   #include <dlfcn.h>
 #elif defined(PLATFORM_WIN)
@@ -59,8 +64,14 @@ namespace nall {
   }
   #elif defined(PLATFORM_OSX)
   inline bool library::open(const char *name, const char *path) {
+    char pathbuf[PATH_MAX + 1];
+    uint32_t bufsize = sizeof(pathbuf);
+    _NSGetExecutablePath(pathbuf, &bufsize);
+    char *bundle_dir = dirname(pathbuf);
+    
     if(handle) close();
     handle = (uintptr_t)dlopen(string(path, *path && !strend(path, "/") ? "/" : "", "lib", name, ".dylib"), RTLD_LAZY);
+    if(!handle) handle = (uintptr_t)dlopen(string(bundle_dir, "/../Frameworks/lib", name, ".dylib"), RTLD_LAZY);
     if(!handle) handle = (uintptr_t)dlopen(string("/usr/local/lib/lib", name, ".dylib"), RTLD_LAZY);
     return handle;
   }
