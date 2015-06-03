@@ -110,12 +110,12 @@ else
 endif
 
 install:
-ifeq ($(platform),osx)
-	cp libsupergameboy.dylib /usr/local/lib/libsupergameboy.dylib
-else
+ifeq ($(platform),x)
 	install -D -m 755 libsupergameboy.a $(DESTDIR)$(prefix)/lib
 	install -D -m 755 libsupergameboy.so $(DESTDIR)$(prefix)/lib
 	ldconfig -n $(DESTDIR)$(prefix)/lib
+else
+	@echo Install not available for current platform
 endif
 
 clean:
