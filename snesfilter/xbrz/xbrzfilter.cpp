@@ -1,6 +1,7 @@
 #include "xbrz.h"
-#include "xbrzfilter.hpp"
+#include "xbrzfilter.moc.hpp"
 #include "xbrz.cpp"
+#include "xbrzfilter.moc"
 
 // https://github.com/snes9xgit/snes9x/blob/1d140638da49554dac5bc5e39f44d438264a1451/win32/render.cpp#L2656
 #ifdef _WIN32
@@ -83,23 +84,43 @@ void stretchImage32To16(const uint32_t* src, int srcWidth, int srcHeight,
 
 // Implementation
 
-void XbrzFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
-  if(width > 256 || height > 240) return filter_direct.size(outwidth, outheight, width, height);
+void XbrzFilter::bind(configuration &config) {
+  config.attach(factor = 2, "snesfilter.xbrz.factor");
+}
 
+void XbrzFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
   outwidth  = factor * width;
   outheight = factor * height;
 }
 
-// Not thread-safe, but we don't need to alloc a large array everytime
-static std::vector<uint32_t> src_32;
-
 void XbrzFilter::render(uint32_t *output, unsigned outpitch, const uint16_t *input, unsigned pitch, unsigned width, unsigned height) {
-  if(width > 256 || height > 240) {
-    filter_direct.render(output, outpitch, input, pitch, width, height);
-    return;
-  }
-
   src_32.resize(width * height);
   ::copyImage16To32(input, width, height, pitch, src_32.data(), 0, height);
   xbrz::scale(factor, src_32.data(), width, height, pitch / 2, output, outpitch, xbrz::RGB);
 }
+
+QWidget *XbrzFilter::settings() {
+  if (!widget) {
+    widget = new QWidget;
+    widget->setWindowTitle("xBRZ Filter Configuration");
+
+    auto *layout = new QHBoxLayout(widget);
+    layout->addWidget(new QLabel("Scale factor: ", widget));
+
+    auto *factorSlider = new QSlider(Qt::Horizontal, widget);
+    factorSlider->setMinimum(2);
+    factorSlider->setMaximum(5);
+    factorSlider->setValue(factor);
+    layout->addWidget(factorSlider);
+
+    widget->setLayout(layout);
+
+    connect(factorSlider, SIGNAL(valueChanged(int)), this, SLOT(factorChanged(int)));
+  }
+  return widget;
+}
+
+void XbrzFilter::factorChanged(int value) {
+    factor = value;
+}
+
