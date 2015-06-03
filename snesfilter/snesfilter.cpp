@@ -28,9 +28,10 @@ configuration *config;
 #include "lq2x/lq2x.cpp"
 #include "hq2x/hq2x.cpp"
 #include "ntsc/ntsc.cpp"
+#include "xbrz2x/xbrz2x.cpp"
 
 dllexport const char* snesfilter_supported() {
-  return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;NTSC";
+  return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;xBRZ2x;NTSC";
 }
 
 dllexport void snesfilter_configuration(configuration &config_) {
@@ -54,7 +55,8 @@ dllexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &ou
     case 5:  return filter_supereagle.size(outwidth, outheight, width, height);
     case 6:  return filter_lq2x.size(outwidth, outheight, width, height);
     case 7:  return filter_hq2x.size(outwidth, outheight, width, height);
-    case 8:  return filter_ntsc.size(outwidth, outheight, width, height);
+    case 8:  return filter_xbrz2x.size(outwidth, outheight, width, height);
+    case 9:  return filter_ntsc.size(outwidth, outheight, width, height);
   }
 }
 
@@ -71,13 +73,14 @@ dllexport void snesfilter_render(
     case 5:  return filter_supereagle.render(output, outpitch, input, pitch, width, height);
     case 6:  return filter_lq2x.render(output, outpitch, input, pitch, width, height);
     case 7:  return filter_hq2x.render(output, outpitch, input, pitch, width, height);
-    case 8:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
+    case 8:  return filter_xbrz2x.render(output, outpitch, input, pitch, width, height);
+    case 9:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
   }
 }
 
 dllexport QWidget* snesfilter_settings(unsigned filter) {
   switch(filter) {
     default: return 0;
-    case 8:  return filter_ntsc.settings();
+    case 9:  return filter_ntsc.settings();
   }
 }
