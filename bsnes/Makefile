@@ -7,6 +7,9 @@ ifeq ($(ui),)
   ui := ui-qt
 endif
 
+# build version
+version := v073+1
+
 # compiler
 c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
@@ -115,6 +118,15 @@ ifeq ($(platform),osx)
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
 #	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
+endif
+
+distribution: clean build plugins
+ifeq ($(platform),osx)
+	@rm -f ../bsnes_$(version)_osx.zip
+	@zip -9 -r ../bsnes_$(version)_osx.zip $(osxbundle)
+	@rm -rf $(osxbundle)
+else
+	@echo Distribution building not available for current platform
 endif
 
 clean: ui_clean
