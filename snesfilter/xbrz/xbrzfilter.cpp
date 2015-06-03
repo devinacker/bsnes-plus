@@ -1,5 +1,5 @@
 #include "xbrz.h"
-#include "xbrz2x.hpp"
+#include "xbrzfilter.hpp"
 #include "xbrz.cpp"
 
 // https://github.com/snes9xgit/snes9x/blob/1d140638da49554dac5bc5e39f44d438264a1451/win32/render.cpp#L2656
@@ -86,8 +86,8 @@ void stretchImage32To16(const uint32_t* src, int srcWidth, int srcHeight,
 void XbrzFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
   if(width > 256 || height > 240) return filter_direct.size(outwidth, outheight, width, height);
 
-  outwidth  = 2 * width;
-  outheight = 2 * height;
+  outwidth  = factor * width;
+  outheight = factor * height;
 }
 
 // Not thread-safe, but we don't need to alloc a large array everytime
@@ -101,5 +101,5 @@ void XbrzFilter::render(uint32_t *output, unsigned outpitch, const uint16_t *inp
 
   src_32.resize(width * height);
   ::copyImage16To32(input, width, height, pitch, src_32.data(), 0, height);
-  xbrz::scale(2, src_32.data(), width, height, pitch / 2, output, outpitch, xbrz::RGB);
+  xbrz::scale(factor, src_32.data(), width, height, pitch / 2, output, outpitch, xbrz::RGB);
 }

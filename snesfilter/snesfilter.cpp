@@ -28,7 +28,7 @@ configuration *config;
 #include "lq2x/lq2x.cpp"
 #include "hq2x/hq2x.cpp"
 #include "ntsc/ntsc.cpp"
-#include "xbrz2x/xbrz2x.cpp"
+#include "xbrz/xbrzfilter.cpp"
 
 dllexport const char* snesfilter_supported() {
   return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;xBRZ2x;NTSC";
