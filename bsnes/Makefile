@@ -15,9 +15,9 @@ link    :=
 objects :=
 
 ifeq ($(DEBUG), 1)
-  flags += -O0 -g
+  flags += -O0 -g -DDEBUG
 else
-  flags += -O3 -fomit-frame-pointer
+  flags += -O3 -fomit-frame-pointer -DNDEBUG -march=native
 endif
 
 # comment this line to enable asserts
@@ -108,12 +108,12 @@ endif
 
 plugins: build
 	@$(MAKE) -C ../snesreader
-#	@$(MAKE) -C ../snesfilter
+	@$(MAKE) -C ../snesfilter
 	@$(MAKE) -C ../supergameboy
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
-#	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 

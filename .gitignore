@@ -7,3 +7,4 @@
 *.rcc
 *.so
 *.so.1
+/bsnes+.app

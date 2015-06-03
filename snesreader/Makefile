@@ -9,9 +9,9 @@ flags := -I. -Iobj
 link  :=
 
 ifeq ($(DEBUG), 1)
-  flags += -O0 -g
+  flags += -O0 -g -DDEBUG
 else
-  flags += -O3 -fomit-frame-pointer
+  flags += -O3 -fomit-frame-pointer -DNDEBUG -march=native
 endif
 
 # silence warnings
