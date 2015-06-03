@@ -595,14 +595,14 @@ void MainWindow::saveSPC() {
 }
 
 void MainWindow::loadState() {
-  QAction *action = dynamic_cast<QAction*>(sender());
+  QAction *action = qobject_cast<QAction*>(sender());
   if(action == 0) return;
   unsigned slot = action->data().toUInt();
   state.load(slot);
 }
 
 void MainWindow::saveState() {
-  QAction *action = dynamic_cast<QAction*>(sender());
+  QAction *action = qobject_cast<QAction*>(sender());
   if(action == 0) return;
   unsigned slot = action->data().toUInt();
   state.save(slot);
