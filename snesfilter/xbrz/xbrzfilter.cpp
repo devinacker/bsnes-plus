@@ -86,6 +86,7 @@ void stretchImage32To16(const uint32_t* src, int srcWidth, int srcHeight,
 
 void XbrzFilter::bind(configuration &config) {
   config.attach(factor = 2, "snesfilter.xbrz.factor");
+  config.attach(nearestNeighbor = false, "snesfilter.xbrz.nearestNeighbor");
 }
 
 void XbrzFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
@@ -96,7 +97,11 @@ void XbrzFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, u
 void XbrzFilter::render(uint32_t *output, unsigned outpitch, const uint16_t *input, unsigned pitch, unsigned width, unsigned height) {
   src_32.resize(width * height);
   ::copyImage16To32(input, width, height, pitch, src_32.data(), 0, height);
-  xbrz::scale(factor, src_32.data(), width, height, pitch / 2, output, outpitch, xbrz::RGB);
+  if (nearestNeighbor) {
+    xbrz::nearestNeighborScale(src_32.data(), width, height, pitch / 2, output, width * factor, height * factor, outpitch, xbrz::NN_SCALE_SLICE_TARGET, 0, height * factor);
+  } else {
+    xbrz::scale(factor, src_32.data(), width, height, pitch / 2, output, outpitch, xbrz::RGB);
+  }
 }
 
 QWidget *XbrzFilter::settings() {
@@ -104,23 +109,40 @@ QWidget *XbrzFilter::settings() {
     widget = new QWidget;
     widget->setWindowTitle("xBRZ Filter Configuration");
 
-    auto *layout = new QHBoxLayout(widget);
-    layout->addWidget(new QLabel("Scale factor: ", widget));
+    auto *layoutV = new QVBoxLayout(widget);
+
+    auto *layoutH1 = new QHBoxLayout(widget);
+    layoutH1->addWidget(new QLabel("Scale factor: ", widget));
 
     auto *factorSlider = new QSlider(Qt::Horizontal, widget);
     factorSlider->setMinimum(2);
     factorSlider->setMaximum(5);
     factorSlider->setValue(factor);
-    layout->addWidget(factorSlider);
+    layoutH1->addWidget(factorSlider);
 
-    widget->setLayout(layout);
+    layoutV->addLayout(layoutH1);
+
+
+    auto *checkbox = new QCheckBox("Nearest neighbor scale", widget);
+    checkbox->setChecked(nearestNeighbor);
+    layoutV->addWidget(checkbox);
+
+    widget->setLayout(layoutV);
+
+    widget->setWindowFlags(Qt::WindowTitleHint);
+    widget->setFixedSize(widget->sizeHint());
 
     connect(factorSlider, SIGNAL(valueChanged(int)), this, SLOT(factorChanged(int)));
+    connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(nearestNeighborChanged(int)));
   }
   return widget;
 }
 
 void XbrzFilter::factorChanged(int value) {
-    factor = value;
+  factor = value;
+}
+
+void XbrzFilter::nearestNeighborChanged(int value) {
+  nearestNeighbor = !!value;
 }
 

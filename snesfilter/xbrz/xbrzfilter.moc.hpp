@@ -12,9 +12,11 @@ private:
   
 private:
   unsigned factor;
+  bool nearestNeighbor;
   std::vector<uint32_t> src_32;
 
 private slots:
   void factorChanged(int value);
+  void nearestNeighborChanged(int value);
 } filter_xbrz;
 
