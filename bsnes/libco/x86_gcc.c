@@ -1,11 +1,12 @@
 /*
-  libco.x86_gcc (2015-04-22)
+  libco.x86_gcc (2015-06-21)
   author: byuu, Alex W. Jackson
   license: public domain
 */
 
 #define LIBCO_C
 #include "libco.h"
+
 #include <assert.h>
 #include <stdlib.h>
 
@@ -17,7 +18,7 @@ static thread_local long co_active_buffer[64];
 static thread_local cothread_t co_active_handle = 0;
 
 static void crash() {
-  assert(0); /* called only if cothread_t entrypoint returns */
+  assert(0);  /* called only if cothread_t entrypoint returns */
 }
 
 cothread_t co_active() {
@@ -29,14 +30,14 @@ cothread_t co_create(unsigned int size, void (*entrypoint)(void)) {
   cothread_t handle;
 
   if(!co_active_handle) co_active_handle = &co_active_buffer;
-  size += 256; /* allocate additional space for storage */
-  size &= ~15; /* align stack to 16-byte boundary */
+  size += 256;  /* allocate additional space for storage */
+  size &= ~15;  /* align stack to 16-byte boundary */
 
   if(handle = (cothread_t)malloc(size)) {
-    long *p = (long*)((char*)handle + size); /* seek to top of stack */
-    *--p = (long)crash;                      /* crash if entrypoint returns */
-    *--p = (long)entrypoint;                 /* start of function */
-    *(long*)handle = (long)p;                /* stack pointer */
+    long *p = (long*)((char*)handle + size);  /* seek to top of stack */
+    *--p = (long)crash;                       /* crash if entrypoint returns */
+    *--p = (long)entrypoint;                  /* start of function */
+    *(long*)handle = (long)p;                 /* stack pointer */
   }
 
   return handle;

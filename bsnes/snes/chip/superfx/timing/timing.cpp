@@ -72,14 +72,17 @@ void SuperFX::update_speed() {
   if(clockmode == 2) {
     cache_access_speed  = 1;
     memory_access_speed = 5;
-    regs.cfgr.ms0 = 0;  //cannot use high-speed multiplication in 21MHz mode
     return;
   }
 
   //default: allow S-CPU to select mode
   cache_access_speed  = (regs.clsr ? 1 : 2);
   memory_access_speed = (regs.clsr ? 5 : 6);
-  if(regs.clsr) regs.cfgr.ms0 = 0;  //cannot use high-speed multiplication in 21MHz mode
+  //According to docs, CLSR and MS0 should not both be set to 1.
+  //Previously it was believed that setting CLSR forced MS0 to 0, but
+  //hardware tests show that this is not the case. It is possible that
+  //multiplication may not work reliably when CLSR and MS0 are both set.
+  //if(regs.clsr) regs.cfgr.ms0 = 0;
 }
 
 void SuperFX::timing_reset() {

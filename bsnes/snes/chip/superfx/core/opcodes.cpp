@@ -366,7 +366,7 @@ template<int n> void SuperFX::op_mult_r() {
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(2);
+  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
 }
 
 //$80-8f(alt1): umult rN
@@ -375,7 +375,7 @@ template<int n> void SuperFX::op_umult_r() {
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(2);
+  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
 }
 
 //$80-8f(alt2): mult #N
@@ -384,7 +384,7 @@ template<int n> void SuperFX::op_mult_i() {
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(2);
+  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
 }
 
 //$80-8f(alt3): umult #N
@@ -393,7 +393,7 @@ template<int n> void SuperFX::op_umult_i() {
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(2);
+  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
 }
 
 //$90: sbk
