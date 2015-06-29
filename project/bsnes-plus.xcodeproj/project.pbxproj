@@ -2009,7 +2009,7 @@
 		2A35CD8B1AEE77C300C9236B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = bsnes;
 				TargetAttributes = {
 					2A35CD8F1AEE77C300C9236B = {
@@ -2210,6 +2210,9 @@
 		2A35CD901AEE77C300C9236B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				MACOSX_DEPLOYMENT_TARGET = "";
+				ONLY_ACTIVE_ARCH = YES;
 				PATH = "$PATH:/usr/local/Trolltech/Qt-4.8.6/bin";
 			};
 			name = Debug;
@@ -2217,6 +2220,7 @@
 		2A35CD911AEE77C300C9236B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PATH = "$PATH:/usr/local/Trolltech/Qt-4.8.6/bin";
 			};
 			name = Release;
@@ -2241,7 +2245,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -2293,10 +2296,10 @@
 					/usr/local/lib/QtOpenGL.framework/Versions/4/Headers,
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.10;
 				USER_HEADER_SEARCH_PATHS = ". $(SRCROOT)/../bsnes $(SRCROOT)/../bsnes/snes $(SRCROOT)/../bsnes/obj /Library/Frameworks/QtCore.framework/Versions/4/Headers /Library/Frameworks/QtGui.framework/Versions/4/Headers /Library/Frameworks/QtOpenGL.framework/Versions/4/Headers";
 				VALID_ARCHS = x86_64;
 			};
@@ -2306,7 +2309,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -2355,9 +2357,9 @@
 					/usr/local/lib/QtOpenGL.framework/Versions/4/Headers,
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				SDKROOT = macosx10.10;
 				USER_HEADER_SEARCH_PATHS = ". $(SRCROOT)/../bsnes $(SRCROOT)/../bsnes/snes $(SRCROOT)/../bsnes/obj /Library/Frameworks/QtCore.framework/Versions/4/Headers /Library/Frameworks/QtGui.framework/Versions/4/Headers /Library/Frameworks/QtOpenGL.framework/Versions/4/Headers";
 				VALID_ARCHS = x86_64;
 			};
