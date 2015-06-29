@@ -58,7 +58,21 @@ void co_delete(cothread_t handle) {
   #ifndef __OPTIMIZE__
     #error "libco: please enable optimization or define LIBCO_NO_INLINE_ASM"
   #else
-    #define NAKED __attribute__((naked))
+    /*
+      (optiroc@gmail.com 20150629)
+      Since clang 3.7 (7.0 with apple versioning) some changes where made to __asm__ and naked functions
+      Errors introduced:
+        error: parameter references not allowed in naked functions
+        error: non-ASM statement in naked function is not supported
+
+      Simply defining NAKED to nothing seems to work with both optimized and
+      unoptimized builds. Not sure if this fix is kosher, though.
+    */
+    #if (defined __apple_build_version__ && __clang_major__ >= 7) || (!(defined __apple_build_version__) && __clang_major__ >= 3 && __clang_minor__ >= 7)
+      #define NAKED
+    #else
+      #define NAKED __attribute__((naked))
+    #endif
   #endif
 #else
   #define NAKED __attribute__((optimize("omit-frame-pointer")))
