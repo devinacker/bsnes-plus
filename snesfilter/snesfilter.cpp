@@ -1,9 +1,9 @@
 #include "snesfilter.hpp"
 
 #if defined(_WIN32)
-  #define dllexport __declspec(dllexport)
+  #define bsnesexport __declspec(dllexport)
 #else
-  #define dllexport
+  #define bsnesexport
 #endif
 
 #include <stdio.h>
@@ -29,22 +29,22 @@ configuration *config;
 #include "hq2x/hq2x.cpp"
 #include "ntsc/ntsc.cpp"
 
-dllexport const char* snesfilter_supported() {
+bsnesexport const char* snesfilter_supported() {
   return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;NTSC";
 }
 
-dllexport void snesfilter_configuration(configuration &config_) {
+bsnesexport void snesfilter_configuration(configuration &config_) {
   config = &config_;
   if(config) {
     filter_ntsc.bind(*config);
   }
 }
 
-dllexport void snesfilter_colortable(const uint32_t *colortable_) {
+bsnesexport void snesfilter_colortable(const uint32_t *colortable_) {
   colortable = colortable_;
 }
 
-dllexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
+bsnesexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
   switch(filter) {
     default: return filter_direct.size(outwidth, outheight, width, height);
     case 1:  return filter_pixellate2x.size(outwidth, outheight, width, height);
@@ -58,7 +58,7 @@ dllexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &ou
   }
 }
 
-dllexport void snesfilter_render(
+bsnesexport void snesfilter_render(
   unsigned filter, uint32_t *output, unsigned outpitch,
   const uint16_t *input, unsigned pitch, unsigned width, unsigned height
 ) {
@@ -75,7 +75,7 @@ dllexport void snesfilter_render(
   }
 }
 
-dllexport QWidget* snesfilter_settings(unsigned filter) {
+bsnesexport QWidget* snesfilter_settings(unsigned filter) {
   switch(filter) {
     default: return 0;
     case 8:  return filter_ntsc.settings();
