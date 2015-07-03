@@ -24,10 +24,6 @@ struct Configuration {
     unsigned version;
   } ppu2;
 
-  struct SuperFX {
-    unsigned speed;
-  } superfx;
-
   Configuration();
 };
 
