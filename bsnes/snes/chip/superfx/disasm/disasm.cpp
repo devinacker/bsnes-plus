@@ -87,8 +87,8 @@ void SuperFX::disassemble_alt0(char *output, uint32 addr) {
     case  (0x03): sprintf(t, "lsr   "); Rsd; break;
     case  (0x04): sprintf(t, "rol   "); Rsd; break;
     case  (0x05): sprintf(t, "bra   $%.4x", bdest); break;
-    case  (0x06): sprintf(t, "blt   $%.4x", bdest); break;
-    case  (0x07): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x06): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x07): sprintf(t, "blt   $%.4x", bdest); break;
     case  (0x08): sprintf(t, "bne   $%.4x", bdest); break;
     case  (0x09): sprintf(t, "beq   $%.4x", bdest); break;
     case  (0x0a): sprintf(t, "bpl   $%.4x", bdest); break;
@@ -144,8 +144,8 @@ void SuperFX::disassemble_alt1(char *output, uint32 addr) {
     case  (0x03): sprintf(t, "lsr   "); Rsd; break;
     case  (0x04): sprintf(t, "rol   "); Rsd; break;
     case  (0x05): sprintf(t, "bra   $%.4x", bdest); break;
-    case  (0x06): sprintf(t, "blt   $%.4x", bdest); break;
-    case  (0x07): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x06): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x07): sprintf(t, "blt   $%.4x", bdest); break;
     case  (0x08): sprintf(t, "bne   $%.4x", bdest); break;
     case  (0x09): sprintf(t, "beq   $%.4x", bdest); break;
     case  (0x0a): sprintf(t, "bpl   $%.4x", bdest); break;
@@ -201,8 +201,8 @@ void SuperFX::disassemble_alt2(char *output, uint32 addr) {
     case  (0x03): sprintf(t, "lsr   "); Rsd; break;
     case  (0x04): sprintf(t, "rol   "); Rsd; break;
     case  (0x05): sprintf(t, "bra   $%.4x", bdest); break;
-    case  (0x06): sprintf(t, "blt   $%.4x", bdest); break;
-    case  (0x07): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x06): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x07): sprintf(t, "blt   $%.4x", bdest); break;
     case  (0x08): sprintf(t, "bne   $%.4x", bdest); break;
     case  (0x09): sprintf(t, "beq   $%.4x", bdest); break;
     case  (0x0a): sprintf(t, "bpl   $%.4x", bdest); break;
@@ -258,8 +258,8 @@ void SuperFX::disassemble_alt3(char *output, uint32 addr) {
     case  (0x03): sprintf(t, "lsr   "); Rsd; break;
     case  (0x04): sprintf(t, "rol   "); Rsd; break;
     case  (0x05): sprintf(t, "bra   $%.4x", bdest); break;
-    case  (0x06): sprintf(t, "blt   $%.4x", bdest); break;
-    case  (0x07): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x06): sprintf(t, "bge   $%.4x", bdest); break;
+    case  (0x07): sprintf(t, "blt   $%.4x", bdest); break;
     case  (0x08): sprintf(t, "bne   $%.4x", bdest); break;
     case  (0x09): sprintf(t, "beq   $%.4x", bdest); break;
     case  (0x0a): sprintf(t, "bpl   $%.4x", bdest); break;
