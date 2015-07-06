@@ -18,8 +18,6 @@ Configuration::Configuration() {
 
   ppu1.version = 1;
   ppu2.version = 3;
-
-  superfx.speed = 0;  //0 = auto-select, 1 = force 10.74MHz, 2 = force 21.48MHz
 }
 
 #endif

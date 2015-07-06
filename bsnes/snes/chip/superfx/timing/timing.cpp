@@ -1,5 +1,14 @@
 #ifdef SUPERFX_CPP
 
+unsigned SuperFX::cache_access_speed() {
+  return regs.clsr.divider;
+}
+
+unsigned SuperFX::memory_access_speed() {
+  //5 cycles at 21.4 MHz, 3 cycles (6 clocks) at 10.7 MHz
+  return regs.clsr.divider + 4;
+}
+
 void SuperFX::add_clocks(unsigned clocks) {
   if(regs.romcl) {
     regs.romcl -= min(clocks, regs.romcl);
@@ -26,7 +35,7 @@ void SuperFX::rombuffer_sync() {
 
 void SuperFX::rombuffer_update() {
   regs.sfr.r = 1;
-  regs.romcl = memory_access_speed;
+  regs.romcl = memory_access_speed();
 }
 
 uint8 SuperFX::rombuffer_read() {
@@ -45,7 +54,7 @@ uint8 SuperFX::rambuffer_read(uint16 addr) {
 
 void SuperFX::rambuffer_write(uint16 addr, uint8 data) {
   rambuffer_sync();
-  regs.ramcl = memory_access_speed;
+  regs.ramcl = memory_access_speed();
   regs.ramar = addr;
   regs.ramdr = data;
 }
@@ -60,33 +69,7 @@ void SuperFX::r15_modify(uint16 data) {
   r15_modified = true;
 }
 
-void SuperFX::update_speed() {
-  //force SuperFX1 mode?
-  if(clockmode == 1) {
-    cache_access_speed  = 2;
-    memory_access_speed = 6;
-    return;
-  }
-
-  //force SuperFX2 mode?
-  if(clockmode == 2) {
-    cache_access_speed  = 1;
-    memory_access_speed = 5;
-    return;
-  }
-
-  //default: allow S-CPU to select mode
-  cache_access_speed  = (regs.clsr ? 1 : 2);
-  memory_access_speed = (regs.clsr ? 5 : 6);
-  //According to docs, CLSR and MS0 should not both be set to 1.
-  //Previously it was believed that setting CLSR forced MS0 to 0, but
-  //hardware tests show that this is not the case. It is possible that
-  //multiplication may not work reliably when CLSR and MS0 are both set.
-  //if(regs.clsr) regs.cfgr.ms0 = 0;
-}
-
 void SuperFX::timing_reset() {
-  update_speed();
   r15_modified = false;
 
   regs.romcl = 0;

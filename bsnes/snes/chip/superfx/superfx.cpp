@@ -28,24 +28,17 @@ void SuperFX::enter() {
 
     if(regs.sfr.g == 0) {
       add_clocks(6);
-      synchronize_cpu();
       continue;
     }
 
     op_step();
 
-    (this->*opcode_table[(regs.sfr & 0x0300) + peekpipe()])();
+    op_exec(peekpipe());
     if(r15_modified == false) regs.r[15]++;
-
-    if(++instruction_counter >= 128) {
-      instruction_counter = 0;
-      synchronize_cpu();
-    }
   }
 }
 
 void SuperFX::init() {
-  initialize_opcode_table();
   regs.r[14].on_modify = { &SuperFX::r14_modify, this };
   regs.r[15].on_modify = { &SuperFX::r15_modify, this };
 }
@@ -54,14 +47,13 @@ void SuperFX::enable() {
 }
 
 void SuperFX::power() {
-  clockmode = config.superfx.speed;
+  regs.clsr  = 0;
   reset();
 }
 
 void SuperFX::reset() {
   create(SuperFX::Enter, system.cpu_frequency());
   superfxbus.init();
-  instruction_counter = 0;
 
   for(unsigned n = 0; n < 16; n++) regs.r[n] = 0x0000;
   regs.sfr   = 0x0000;

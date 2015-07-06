@@ -50,69 +50,69 @@ void SuperFX::op_bra() {
   regs.r[15] += (int8)pipe();
 }
 
-//$06 blt e
-void SuperFX::op_blt() {
-  int e = (int8)pipe();
-  if((regs.sfr.s ^ regs.sfr.ov) == 0) regs.r[15] += e;
+//$06 bge e
+void SuperFX::op_bge() {
+  int8 e = pipe();
+  if(regs.sfr.s == regs.sfr.ov) regs.r[15] += e;
 }
 
-//$07 bge e
-void SuperFX::op_bge() {
-  int e = (int8)pipe();
-  if((regs.sfr.s ^ regs.sfr.ov) == 1) regs.r[15] += e;
+//$07 blt e
+void SuperFX::op_blt() {
+  int8 e = pipe();
+  if(regs.sfr.s != regs.sfr.ov) regs.r[15] += e;
 }
 
 //$08 bne e
 void SuperFX::op_bne() {
-  int e = (int8)pipe();
-  if(regs.sfr.z == 0) regs.r[15] += e;
+  int8 e = pipe();
+  if(!regs.sfr.z) regs.r[15] += e;
 }
 
 //$09 beq e
 void SuperFX::op_beq() {
-  int e = (int8)pipe();
-  if(regs.sfr.z == 1) regs.r[15] += e;
+  int8 e = pipe();
+  if(regs.sfr.z) regs.r[15] += e;
 }
 
 //$0a bpl e
 void SuperFX::op_bpl() {
-  int e = (int8)pipe();
-  if(regs.sfr.s == 0) regs.r[15] += e;
+  int8 e = pipe();
+  if(!regs.sfr.s) regs.r[15] += e;
 }
 
 //$0b bmi e
 void SuperFX::op_bmi() {
-  int e = (int8)pipe();
-  if(regs.sfr.s == 1) regs.r[15] += e;
+  int8 e = pipe();
+  if(regs.sfr.s) regs.r[15] += e;
 }
 
 //$0c bcc e
 void SuperFX::op_bcc() {
-  int e = (int8)pipe();
-  if(regs.sfr.cy == 0) regs.r[15] += e;
+  int8 e = pipe();
+  if(!regs.sfr.cy) regs.r[15] += e;
 }
 
 //$0d bcs e
 void SuperFX::op_bcs() {
-  int e = (int8)pipe();
-  if(regs.sfr.cy == 1) regs.r[15] += e;
+  int8 e = pipe();
+  if(regs.sfr.cy) regs.r[15] += e;
 }
 
 //$0e bvc e
 void SuperFX::op_bvc() {
-  int e = (int8)pipe();
-  if(regs.sfr.ov == 0) regs.r[15] += e;
+  int8 e = pipe();
+  if(!regs.sfr.ov) regs.r[15] += e;
 }
 
 //$0f bvs e
 void SuperFX::op_bvs() {
-  int e = (int8)pipe();
-  if(regs.sfr.ov == 1) regs.r[15] += e;
+  int8 e = pipe();
+  if(regs.sfr.ov) regs.r[15] += e;
 }
 
 //$10-1f(b0): to rN
 //$10-1f(b1): move rN
-template<int n> void SuperFX::op_to_r() {
+void SuperFX::op_to_move(unsigned n) {
   if(regs.sfr.b == 0) {
     regs.dreg = n;
   } else {
@@ -122,24 +122,19 @@ template<int n> void SuperFX::op_to_r() {
 }
 
 //$20-2f: with rN
-template<int n> void SuperFX::op_with_r() {
+void SuperFX::op_with(unsigned n) {
   regs.sreg = n;
   regs.dreg = n;
   regs.sfr.b = 1;
 }
 
 //$30-3b(alt0): stw (rN)
-template<int n> void SuperFX::op_stw_ir() {
-  regs.ramaddr = regs.r[n];
-  rambuffer_write(regs.ramaddr ^ 0, regs.sr() >> 0);
-  rambuffer_write(regs.ramaddr ^ 1, regs.sr() >> 8);
-  regs.reset();
-}
-
 //$30-3b(alt1): stb (rN)
-template<int n> void SuperFX::op_stb_ir() {
+void SuperFX::op_stw_stb(unsigned n) {
   regs.ramaddr = regs.r[n];
   rambuffer_write(regs.ramaddr, regs.sr());
+  if(!regs.sfr.alt1)
+    rambuffer_write(regs.ramaddr ^ 1, regs.sr() >> 8);
   regs.reset();
 }
 
@@ -172,19 +167,13 @@ void SuperFX::op_alt3() {
 }
 
 //$40-4b(alt0): ldw (rN)
-template<int n> void SuperFX::op_ldw_ir() {
-  regs.ramaddr = regs.r[n];
-  uint16_t data;
-  data  = rambuffer_read(regs.ramaddr ^ 0) << 0;
-  data |= rambuffer_read(regs.ramaddr ^ 1) << 8;
-  regs.dr() = data;
-  regs.reset();
-}
-
 //$40-4b(alt1): ldb (rN)
-template<int n> void SuperFX::op_ldb_ir() {
+void SuperFX::op_ldw_ldb(unsigned n) {
   regs.ramaddr = regs.r[n];
-  regs.dr() = rambuffer_read(regs.ramaddr);
+  unsigned data = rambuffer_read(regs.ramaddr);
+  if(!regs.sfr.alt1)
+    data |= rambuffer_read(regs.ramaddr ^ 1) << 8;
+  regs.dr() = data;
   regs.reset();
 }
 
@@ -231,43 +220,18 @@ void SuperFX::op_not() {
   regs.reset();
 }
 
+unsigned SuperFX::reg_or_imm(unsigned n) {
+  return regs.sfr.alt2 ? n : regs.r[n];
+}
+
 //$50-5f(alt0): add rN
-template<int n> void SuperFX::op_add_r() {
-  int r = regs.sr() + regs.r[n];
-  regs.sfr.ov = ~(regs.sr() ^ regs.r[n]) & (regs.r[n] ^ r) & 0x8000;
-  regs.sfr.s  = (r & 0x8000);
-  regs.sfr.cy = (r >= 0x10000);
-  regs.sfr.z  = ((uint16_t)r == 0);
-  regs.dr() = r;
-  regs.reset();
-}
-
 //$50-5f(alt1): adc rN
-template<int n> void SuperFX::op_adc_r() {
-  int r = regs.sr() + regs.r[n] + regs.sfr.cy;
-  regs.sfr.ov = ~(regs.sr() ^ regs.r[n]) & (regs.r[n] ^ r) & 0x8000;
-  regs.sfr.s  = (r & 0x8000);
-  regs.sfr.cy = (r >= 0x10000);
-  regs.sfr.z  = ((uint16_t)r == 0);
-  regs.dr() = r;
-  regs.reset();
-}
-
 //$50-5f(alt2): add #N
-template<int n> void SuperFX::op_add_i() {
-  int r = regs.sr() + n;
-  regs.sfr.ov = ~(regs.sr() ^ n) & (n ^ r) & 0x8000;
-  regs.sfr.s  = (r & 0x8000);
-  regs.sfr.cy = (r >= 0x10000);
-  regs.sfr.z  = ((uint16_t)r == 0);
-  regs.dr() = r;
-  regs.reset();
-}
-
 //$50-5f(alt3): adc #N
-template<int n> void SuperFX::op_adc_i() {
-  int r = regs.sr() + n + regs.sfr.cy;
-  regs.sfr.ov = ~(regs.sr() ^ n) & (n ^ r) & 0x8000;
+void SuperFX::op_add_adc(unsigned n) {
+  unsigned b = reg_or_imm(n);
+  unsigned r = regs.sr() + b + (regs.sfr.alt1 & regs.sfr.cy);
+  regs.sfr.ov = (regs.sr() ^ r) & (b ^ r) & 0x8000;
   regs.sfr.s  = (r & 0x8000);
   regs.sfr.cy = (r >= 0x10000);
   regs.sfr.z  = ((uint16_t)r == 0);
@@ -276,31 +240,12 @@ template<int n> void SuperFX::op_adc_i() {
 }
 
 //$60-6f(alt0): sub rN
-template<int n> void SuperFX::op_sub_r() {
-  int r = regs.sr() - regs.r[n];
-  regs.sfr.ov = (regs.sr() ^ regs.r[n]) & (regs.sr() ^ r) & 0x8000;
-  regs.sfr.s  = (r & 0x8000);
-  regs.sfr.cy = (r >= 0);
-  regs.sfr.z  = ((uint16_t)r == 0);
-  regs.dr() = r;
-  regs.reset();
-}
-
 //$60-6f(alt1): sbc rN
-template<int n> void SuperFX::op_sbc_r() {
-  int r = regs.sr() - regs.r[n] - !regs.sfr.cy;
-  regs.sfr.ov = (regs.sr() ^ regs.r[n]) & (regs.sr() ^ r) & 0x8000;
-  regs.sfr.s  = (r & 0x8000);
-  regs.sfr.cy = (r >= 0);
-  regs.sfr.z  = ((uint16_t)r == 0);
-  regs.dr() = r;
-  regs.reset();
-}
-
 //$60-6f(alt2): sub #N
-template<int n> void SuperFX::op_sub_i() {
-  int r = regs.sr() - n;
-  regs.sfr.ov = (regs.sr() ^ n) & (regs.sr() ^ r) & 0x8000;
+void SuperFX::op_sub_sbc(unsigned n) {
+  int b = reg_or_imm(n);
+  int r = regs.sr() - b - (regs.sfr.alt1 & !regs.sfr.cy);
+  regs.sfr.ov = (regs.sr() ^ b) & (regs.sr() ^ r) & 0x8000;
   regs.sfr.s  = (r & 0x8000);
   regs.sfr.cy = (r >= 0);
   regs.sfr.z  = ((uint16_t)r == 0);
@@ -309,9 +254,10 @@ template<int n> void SuperFX::op_sub_i() {
 }
 
 //$60-6f(alt3): cmp rN
-template<int n> void SuperFX::op_cmp_r() {
-  int r = regs.sr() - regs.r[n];
-  regs.sfr.ov = (regs.sr() ^ regs.r[n]) & (regs.sr() ^ r) & 0x8000;
+void SuperFX::op_cmp(unsigned n) {
+  int b = regs.r[n];
+  int r = regs.sr() - b;
+  regs.sfr.ov = (regs.sr() ^ b) & (regs.sr() ^ r) & 0x8000;
   regs.sfr.s  = (r & 0x8000);
   regs.sfr.cy = (r >= 0);
   regs.sfr.z  = ((uint16_t)r == 0);
@@ -329,71 +275,38 @@ void SuperFX::op_merge() {
 }
 
 //$71-7f(alt0): and rN
-template<int n> void SuperFX::op_and_r() {
-  regs.dr() = regs.sr() & regs.r[n];
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
 //$71-7f(alt1): bic rN
-template<int n> void SuperFX::op_bic_r() {
-  regs.dr() = regs.sr() & ~regs.r[n];
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
 //$71-7f(alt2): and #N
-template<int n> void SuperFX::op_and_i() {
-  regs.dr() = regs.sr() & n;
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
 //$71-7f(alt3): bic #N
-template<int n> void SuperFX::op_bic_i() {
-  regs.dr() = regs.sr() & ~n;
+void SuperFX::op_and_bic(unsigned n) {
+  unsigned b = reg_or_imm(n);
+  if(regs.sfr.alt1) b = ~b;
+  regs.dr() = regs.sr() & b;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
 }
 
 //$80-8f(alt0): mult rN
-template<int n> void SuperFX::op_mult_r() {
-  regs.dr() = (int8)regs.sr() * (int8)regs.r[n];
+//$80-8f(alt2): mult #N
+void SuperFX::op_mult(unsigned n) {
+  int8 b = reg_or_imm(n);
+  regs.dr() = (int8)regs.sr() * b;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
+  if(!regs.cfgr.ms0) add_clocks(regs.clsr.divider);
 }
 
 //$80-8f(alt1): umult rN
-template<int n> void SuperFX::op_umult_r() {
-  regs.dr() = (uint8)regs.sr() * (uint8)regs.r[n];
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
-}
-
-//$80-8f(alt2): mult #N
-template<int n> void SuperFX::op_mult_i() {
-  regs.dr() = (int8)regs.sr() * (int8)n;
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
-}
-
 //$80-8f(alt3): umult #N
-template<int n> void SuperFX::op_umult_i() {
-  regs.dr() = (uint8)regs.sr() * (uint8)n;
+void SuperFX::op_umult(unsigned n) {
+  uint8 b = reg_or_imm(n);
+  regs.dr() = (uint8)regs.sr() * b;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
-  if(!regs.cfgr.ms0) add_clocks(cache_access_speed);
+  if(!regs.cfgr.ms0) add_clocks(regs.clsr.divider);
 }
 
 //$90: sbk
@@ -404,7 +317,7 @@ void SuperFX::op_sbk() {
 }
 
 //$91-94: link #N
-template<int n> void SuperFX::op_link() {
+void SuperFX::op_link(unsigned n) {
   regs.r[11] = regs.r[15] + n;
   regs.reset();
 }
@@ -418,18 +331,11 @@ void SuperFX::op_sex() {
 }
 
 //$96(alt0): asr
-void SuperFX::op_asr() {
-  regs.sfr.cy = (regs.sr() & 1);
-  regs.dr() = (int16_t)regs.sr() >> 1;
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
 //$96(alt1): div2
-void SuperFX::op_div2() {
-  regs.sfr.cy = (regs.sr() & 1);
-  regs.dr() = ((int16_t)regs.sr() >> 1) + ((regs.sr() + 1) >> 16);
+void SuperFX::op_asr_div2() {
+  int16 r = regs.sr();
+  regs.sfr.cy = (r & 1);
+  regs.dr() = (r == -1 && regs.sfr.alt1) ? 0 : r >> 1;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
@@ -446,13 +352,13 @@ void SuperFX::op_ror() {
 }
 
 //$98-9d(alt0): jmp rN
-template<int n> void SuperFX::op_jmp_r() {
+void SuperFX::op_jmp(unsigned n) {
   regs.r[15] = regs.r[n];
   regs.reset();
 }
 
 //$98-9d(alt1): ljmp rN
-template<int n> void SuperFX::op_ljmp_r() {
+void SuperFX::op_ljmp(unsigned n) {
   regs.pbr = regs.r[n] & 0x7f;
   regs.r[15] = regs.sr();
   regs.cbr = regs.r[15] & 0xfff0;
@@ -469,46 +375,35 @@ void SuperFX::op_lob() {
 }
 
 //$9f(alt0): fmult
-void SuperFX::op_fmult() {
-  uint32_t result = (int16_t)regs.sr() * (int16_t)regs.r[6];
-  regs.dr() = result >> 16;
-  regs.sfr.s  = (regs.dr() & 0x8000);
-  regs.sfr.cy = (result & 0x8000);
-  regs.sfr.z  = (regs.dr() == 0);
-  regs.reset();
-  add_clocks(4 + (regs.cfgr.ms0 << 2));
-}
-
 //$9f(alt1): lmult
-void SuperFX::op_lmult() {
-  uint32_t result = (int16_t)regs.sr() * (int16_t)regs.r[6];
-  regs.r[4] = result;
+void SuperFX::op_fmult_lmult() {
+  int result = (int16_t)regs.sr() * (int16_t)regs.r[6];
+  if(regs.sfr.alt1) regs.r[4] = result;
   regs.dr() = result >> 16;
   regs.sfr.s  = (regs.dr() & 0x8000);
   regs.sfr.cy = (result & 0x8000);
   regs.sfr.z  = (regs.dr() == 0);
   regs.reset();
-  add_clocks(4 + (regs.cfgr.ms0 << 2));
+  add_clocks((regs.cfgr.ms0 ? 3 : 7) * regs.clsr.divider);
 }
 
 //$a0-af(alt0): ibt rN,#pp
-template<int n> void SuperFX::op_ibt_r() {
+void SuperFX::op_ibt(unsigned n) {
   regs.r[n] = (int8)pipe();
   regs.reset();
 }
 
 //$a0-af(alt1): lms rN,(yy)
-template<int n> void SuperFX::op_lms_r() {
+void SuperFX::op_lms(unsigned n) {
   regs.ramaddr = pipe() << 1;
-  uint16_t data;
-  data  = rambuffer_read(regs.ramaddr ^ 0) << 0;
+  unsigned data = rambuffer_read(regs.ramaddr);
   data |= rambuffer_read(regs.ramaddr ^ 1) << 8;
   regs.r[n] = data;
   regs.reset();
 }
 
 //$a0-af(alt2): sms (yy),rN
-template<int n> void SuperFX::op_sms_r() {
+void SuperFX::op_sms(unsigned n) {
   regs.ramaddr = pipe() << 1;
   rambuffer_write(regs.ramaddr ^ 0, regs.r[n] >> 0);
   rambuffer_write(regs.ramaddr ^ 1, regs.r[n] >> 8);
@@ -517,7 +412,7 @@ template<int n> void SuperFX::op_sms_r() {
 
 //$b0-bf(b0): from rN
 //$b0-bf(b1): moves rN
-template<int n> void SuperFX::op_from_r() {
+void SuperFX::op_from_moves(unsigned n) {
   if(regs.sfr.b == 0) {
     regs.sreg = n;
   } else {
@@ -538,39 +433,27 @@ void SuperFX::op_hib() {
 }
 
 //$c1-cf(alt0): or rN
-template<int n> void SuperFX::op_or_r() {
-  regs.dr() = regs.sr() | regs.r[n];
+//$c1-cf(alt2): or #N
+void SuperFX::op_or(unsigned n) {
+  unsigned b = reg_or_imm(n);
+  regs.dr() = regs.sr() | b;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
 }
 
 //$c1-cf(alt1): xor rN
-template<int n> void SuperFX::op_xor_r() {
-  regs.dr() = regs.sr() ^ regs.r[n];
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
-//$c1-cf(alt2): or #N
-template<int n> void SuperFX::op_or_i() {
-  regs.dr() = regs.sr() | n;
-  regs.sfr.s = (regs.dr() & 0x8000);
-  regs.sfr.z = (regs.dr() == 0);
-  regs.reset();
-}
-
 //$c1-cf(alt3): xor #N
-template<int n> void SuperFX::op_xor_i() {
-  regs.dr() = regs.sr() ^ n;
+void SuperFX::op_xor(unsigned n) {
+  unsigned b = reg_or_imm(n);
+  regs.dr() = regs.sr() ^ b;
   regs.sfr.s = (regs.dr() & 0x8000);
   regs.sfr.z = (regs.dr() == 0);
   regs.reset();
 }
 
 //$d0-de: inc rN
-template<int n> void SuperFX::op_inc_r() {
+void SuperFX::op_inc(unsigned n) {
   regs.r[n]++;
   regs.sfr.s = (regs.r[n] & 0x8000);
   regs.sfr.z = (regs.r[n] == 0);
@@ -586,7 +469,7 @@ void SuperFX::op_getc() {
 //$df(alt2): ramb
 void SuperFX::op_ramb() {
   rambuffer_sync();
-  regs.rambr = regs.sr();
+  regs.rambr = regs.sr() & 1;
   regs.reset();
 }
 
@@ -598,7 +481,7 @@ void SuperFX::op_romb() {
 }
 
 //$e0-ee: dec rN
-template<int n> void SuperFX::op_dec_r() {
+void SuperFX::op_dec(unsigned n) {
   regs.r[n]--;
   regs.sfr.s = (regs.r[n] & 0x8000);
   regs.sfr.z = (regs.r[n] == 0);
@@ -630,27 +513,25 @@ void SuperFX::op_getbs() {
 }
 
 //$f0-ff(alt0): iwt rN,#xx
-template<int n> void SuperFX::op_iwt_r() {
-  uint16_t data;
-  data  = pipe() << 0;
+void SuperFX::op_iwt(unsigned n) {
+  unsigned data = pipe();
   data |= pipe() << 8;
   regs.r[n] = data;
   regs.reset();
 }
 
 //$f0-ff(alt1): lm rN,(xx)
-template<int n> void SuperFX::op_lm_r() {
+void SuperFX::op_lm(unsigned n) {
   regs.ramaddr  = pipe() << 0;
   regs.ramaddr |= pipe() << 8;
-  uint16_t data;
-  data  = rambuffer_read(regs.ramaddr ^ 0) << 0;
+  unsigned data = rambuffer_read(regs.ramaddr);
   data |= rambuffer_read(regs.ramaddr ^ 1) << 8;
   regs.r[n] = data;
   regs.reset();
 }
 
 //$f0-ff(alt2): sm (xx),rN
-template<int n> void SuperFX::op_sm_r() {
+void SuperFX::op_sm(unsigned n) {
   regs.ramaddr  = pipe() << 0;
   regs.ramaddr |= pipe() << 8;
   rambuffer_write(regs.ramaddr ^ 0, regs.r[n] >> 0);

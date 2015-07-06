@@ -95,7 +95,6 @@ void SuperFX::mmio_write(unsigned addr, uint8 data) {
 
     case 0x3037: {
       regs.cfgr = data;
-      update_speed();
     } break;
 
     case 0x3038: {
@@ -104,7 +103,6 @@ void SuperFX::mmio_write(unsigned addr, uint8 data) {
 
     case 0x3039: {
       regs.clsr = data;
-      update_speed();
     } break;
 
     case 0x303a: {
