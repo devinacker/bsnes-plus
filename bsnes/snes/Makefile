@@ -38,14 +38,14 @@ endif
 obj/libco.o  : libco/libco.c libco/*
 obj/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
 
-obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/)
+obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/) $(call rwildcard,$(snes)/debugger)
 obj/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
 obj/snes-cpucore.o  : $(snes)/cpu/core/core.cpp $(call rwildcard,$(snes)/cpu/core/)
 obj/snes-smpcore.o  : $(snes)/smp/core/core.cpp $(call rwildcard,$(snes)/smp/core/)
-obj/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/)
-obj/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/)
-obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/)
-obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/)
+obj/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/) $(call rwildcard,$(snes)/debugger) $(call rwildcard,$(snes)/cpu/debugger)
+obj/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/) $(call rwildcard,$(snes)/debugger)
+obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/) $(call rwildcard,$(snes)/debugger)
+obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/) $(call rwildcard,$(snes)/debugger)
 obj/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/cartridge/)
 obj/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
 
