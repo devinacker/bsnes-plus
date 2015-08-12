@@ -2,7 +2,6 @@ class BreakpointItem : public QWidget {
   Q_OBJECT
 
 enum {
-  BreakEnable,
   BreakAddrStart,
   BreakAddrDash,
   BreakAddrEnd,
@@ -15,7 +14,6 @@ enum {
 
 public:
   QGridLayout *layout;
-  QCheckBox *enabled;
   QLineEdit *addr;
   QLineEdit *addr_end;
   QLineEdit *data;
@@ -26,6 +24,7 @@ public:
   BreakpointItem(unsigned id);
 
 public slots:
+  void init();
   void toggle();
 
 private:
