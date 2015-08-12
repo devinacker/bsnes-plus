@@ -50,8 +50,8 @@ obj/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/
 obj/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
 
 obj/snes-supergameboy.o: $(snes)/chip/supergameboy/supergameboy.cpp $(call rwildcard,$(snes)/chip/supergameboy/)
-obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/)
-obj/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/)
+obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/) $(call rwildcard,$(snes)/debugger)
+obj/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/) $(call rwildcard,$(snes)/debugger)
 obj/snes-necdsp.o      : $(snes)/chip/necdsp/necdsp.cpp $(call rwildcard,$(snes)/chip/necdsp/)
 obj/snes-bsx.o         : $(snes)/chip/bsx/bsx.cpp $(snes)/chip/bsx/*
 obj/snes-srtc.o        : $(snes)/chip/srtc/srtc.cpp $(snes)/chip/srtc/*
