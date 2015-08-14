@@ -34,13 +34,8 @@ uint8 SuperFXGSUROM::read(unsigned addr) {
   return memory::cartrom.read(addr);
 }
 
+//can't happen, except from the debugger
 void SuperFXGSUROM::write(unsigned addr, uint8 data) {
-  if(!debugger_access()) {
-    while(!superfx.regs.scmr.ron && scheduler.sync != Scheduler::SynchronizeMode::All) {
-      superfx.add_clocks(6);
-      superfx.synchronize_cpu();
-    }
-  }
   memory::cartrom.write(addr, data);
 }
 

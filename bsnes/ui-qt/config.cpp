@@ -5,7 +5,6 @@ Configuration &config() {
 
 bool Configuration::load(const char *filename) {
   if(configuration::load(filename) == false) return false;
-  SNES::config.superfx.speed = max(0, min(2, SNES::config.superfx.speed));
   video.context = (video.isFullscreen == false) ? &video.windowed : &video.fullscreen;
   return true;
 }
@@ -28,7 +27,7 @@ Configuration::Configuration() {
   attach(SNES::config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
   attach(SNES::config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
 
-  attach(SNES::config.superfx.speed = 0, "superfx.speed", "0 = Auto-select, 1 = Force 10.74MHz, 2 = Force 21.48MHz");
+  //TODO: add superfx frequency
 
   //internal
   attach(system.profile = "", "system.profile");

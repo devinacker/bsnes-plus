@@ -108,7 +108,7 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   item("Screen Base Register (SCBR)", string("0x", hex<2>(regs.scbr)))
   
   item("$3039", "")
-  item("Clock Register (CLSR)", regs.clsr ? "21.4 MHz" : "10.7 MHz")
+  item("Clock Register (CLSR)", regs.clsr.divider > 1 ? "21.4 MHz" : "10.7 MHz")
   
   item("$303a", "")
   string md, ht;

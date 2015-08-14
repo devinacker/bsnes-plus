@@ -1,9 +1,9 @@
 #include "snesreader.hpp"
 
 #if defined(_WIN32)
-  #define dllexport __declspec(dllexport)
+  #define bsnesexport __declspec(dllexport)
 #else
-  #define dllexport
+  #define bsnesexport
 #endif
 
 #include "fex/fex.h"
@@ -17,7 +17,7 @@ extern "C" char* uncompressStream(int, int);  //micro-bunzip
 #include <nall/string.hpp>
 using namespace nall;
 
-dllexport const char* snesreader_supported() {
+bsnesexport const char* snesreader_supported() {
   return "*.zip *.z *.7z *.gz *.bz2 *.jma";
 }
 
@@ -140,7 +140,7 @@ bool snesreader_load_jma(const char *filename, uint8_t *&data, unsigned &size) {
   }
 }
 
-dllexport bool snesreader_load(string &filename, uint8_t *&data, unsigned &size) {
+bsnesexport bool snesreader_load(string &filename, uint8_t *&data, unsigned &size) {
   if(file::exists(filename) == false) return false;
 
   bool success = false;

@@ -3,10 +3,6 @@
 void SuperFX::serialize(serializer &s) {
   Processor::serialize(s);
 
-  //superfx.hpp
-  s.integer(clockmode);
-  s.integer(instruction_counter);
-
   //core/registers.hpp
   s.integer(regs.pipeline);
   s.integer(regs.ramaddr);
@@ -66,13 +62,13 @@ void SuperFX::serialize(serializer &s) {
   s.integer(regs.cfgr.irq);
   s.integer(regs.cfgr.ms0);
 
-  s.integer(regs.clsr);
+  s.integer(regs.clsr.divider);
 
   s.integer(regs.romcl);
   s.integer(regs.romdr);
 
-  s.integer(regs.ramcl);
   s.integer(regs.ramar);
+  s.integer(regs.ramcl);
   s.integer(regs.ramdr);
 
   s.integer(regs.sreg);
@@ -88,8 +84,6 @@ void SuperFX::serialize(serializer &s) {
   }
 
   //timing/timing.hpp
-  s.integer(cache_access_speed);
-  s.integer(memory_access_speed);
   s.integer(r15_modified);
 }
 

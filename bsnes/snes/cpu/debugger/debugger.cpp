@@ -41,7 +41,7 @@ void CPUDebugger::op_step() {
       debugger.step_over_new = false;
     }
   
-    uint8 opcode = CPU::op_read(opcode_pc);
+    uint8 opcode = disassembler_read(opcode_pc);
     if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
       debugger.call_count++;
     } else if (opcode == 0x60 || opcode == 0x6b) {

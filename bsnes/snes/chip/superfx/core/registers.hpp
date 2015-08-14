@@ -38,7 +38,7 @@ struct sfr_t {
   bool ih;    //immediate higher 8-bit flag
   bool il;    //immediate lower 8-bit flag
   bool alt2;  //ALT2 mode
-  bool alt1;  //ALT2 instruction mode
+  bool alt1;  //ALT1 mode
   bool r;     //ROM r14 read flag
   bool g;     //GO flag
   bool ov;    //overflow flag
@@ -124,6 +124,15 @@ struct cfgr_t {
   }
 };
 
+struct clsr_t {
+  uint8 divider;
+
+  clsr_t& operator=(uint8 data) {
+    divider = data & 1 ? 1 : 2;
+    return *this;
+  }
+};
+
 struct regs_t {
   uint8 pipeline;
   uint16 ramaddr;
@@ -141,16 +150,16 @@ struct regs_t {
   bool bramr;       //back-up RAM register
   uint8 vcr;        //version code register
   cfgr_t cfgr;      //config register
-  bool clsr;        //clock select register
+  clsr_t clsr;      //clock select register
 
-  unsigned romcl;   //clock ticks until romdr is valid
+  uint8 romcl;      //clock ticks until romdr is valid
   uint8 romdr;      //ROM buffer data register
 
-  unsigned ramcl;   //clock ticks until ramdr is valid
   uint16 ramar;     //RAM buffer address register
+  uint8 ramcl;      //clock ticks until ramdr is valid
   uint8 ramdr;      //RAM buffer data register
 
-  unsigned sreg, dreg;
+  uint8 sreg, dreg;
   reg16_t& sr() { return r[sreg]; }  //source register (from)
   reg16_t& dr() { return r[dreg]; }  //destination register (to)
 

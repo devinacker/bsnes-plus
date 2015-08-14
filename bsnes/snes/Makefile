@@ -38,20 +38,20 @@ endif
 obj/libco.o  : libco/libco.c libco/*
 obj/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
 
-obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/)
+obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/) $(call rwildcard,$(snes)/debugger)
 obj/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
 obj/snes-cpucore.o  : $(snes)/cpu/core/core.cpp $(call rwildcard,$(snes)/cpu/core/)
 obj/snes-smpcore.o  : $(snes)/smp/core/core.cpp $(call rwildcard,$(snes)/smp/core/)
-obj/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/)
-obj/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/)
-obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/)
-obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/)
+obj/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/) $(call rwildcard,$(snes)/debugger) $(call rwildcard,$(snes)/cpu/debugger)
+obj/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/) $(call rwildcard,$(snes)/debugger)
+obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/) $(call rwildcard,$(snes)/debugger)
+obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/) $(call rwildcard,$(snes)/debugger)
 obj/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/cartridge/)
 obj/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
 
 obj/snes-supergameboy.o: $(snes)/chip/supergameboy/supergameboy.cpp $(call rwildcard,$(snes)/chip/supergameboy/)
-obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/)
-obj/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/)
+obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/) $(call rwildcard,$(snes)/debugger)
+obj/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/) $(call rwildcard,$(snes)/debugger)
 obj/snes-necdsp.o      : $(snes)/chip/necdsp/necdsp.cpp $(call rwildcard,$(snes)/chip/necdsp/)
 obj/snes-bsx.o         : $(snes)/chip/bsx/bsx.cpp $(snes)/chip/bsx/*
 obj/snes-srtc.o        : $(snes)/chip/srtc/srtc.cpp $(snes)/chip/srtc/*

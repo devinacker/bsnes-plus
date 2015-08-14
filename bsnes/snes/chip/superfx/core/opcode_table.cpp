@@ -1,270 +1,118 @@
 #ifdef SUPERFX_CPP
 
-void SuperFX::initialize_opcode_table() {
-  #define op4(id, name) \
-    op(id+ 0, name< 1>) op(id+ 1, name< 2>) op(id+ 2, name< 3>) op(id+ 3, name< 4>)
+void SuperFX::op_exec(uint8 opcode) {
+  switch(opcode) {
 
-  #define op6(id, name) \
-    op(id+ 0, name< 8>) op(id+ 1, name< 9>) op(id+ 2, name<10>) op(id+ 3, name<11>) \
-    op(id+ 4, name<12>) op(id+ 5, name<13>)
+#define op(id, name)   case id: return op_##name();
 
-  #define op12(id, name) \
-    op(id+ 0, name< 0>) op(id+ 1, name< 1>) op(id+ 2, name< 2>) op(id+ 3, name< 3>) \
-    op(id+ 4, name< 4>) op(id+ 5, name< 5>) op(id+ 6, name< 6>) op(id+ 7, name< 7>) \
-    op(id+ 8, name< 8>) op(id+ 9, name< 9>) op(id+10, name<10>) op(id+11, name<11>)
+#define op4(id, name)  case id+ 0: case id+ 1: case id+ 2: case id+ 3: return op_##name(opcode & 15);
 
-  #define op15l(id, name) \
-    op(id+ 0, name< 0>) op(id+ 1, name< 1>) op(id+ 2, name< 2>) op(id+ 3, name< 3>) \
-    op(id+ 4, name< 4>) op(id+ 5, name< 5>) op(id+ 6, name< 6>) op(id+ 7, name< 7>) \
-    op(id+ 8, name< 8>) op(id+ 9, name< 9>) op(id+10, name<10>) op(id+11, name<11>) \
-    op(id+12, name<12>) op(id+13, name<13>) op(id+14, name<14>)
+#define op12(id, name) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                       case id+ 8: case id+ 9: case id+10: case id+11: return op_##name(opcode & 15);
 
-  #define op15h(id, name) \
-    op(id+ 0, name< 1>) op(id+ 1, name< 2>) op(id+ 2, name< 3>) op(id+ 3, name< 4>) \
-    op(id+ 4, name< 5>) op(id+ 5, name< 6>) op(id+ 6, name< 7>) op(id+ 7, name< 8>) \
-    op(id+ 8, name< 9>) op(id+ 9, name<10>) op(id+10, name<11>) op(id+11, name<12>) \
-    op(id+12, name<13>) op(id+13, name<14>) op(id+14, name<15>)
+#define op15(id, name) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                       case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: \
+                       return op_##name(opcode & 15);
 
-  #define op16(id, name) \
-    op(id+ 0, name< 0>) op(id+ 1, name< 1>) op(id+ 2, name< 2>) op(id+ 3, name< 3>) \
-    op(id+ 4, name< 4>) op(id+ 5, name< 5>) op(id+ 6, name< 6>) op(id+ 7, name< 7>) \
-    op(id+ 8, name< 8>) op(id+ 9, name< 9>) op(id+10, name<10>) op(id+11, name<11>) \
-    op(id+12, name<12>) op(id+13, name<13>) op(id+14, name<14>) op(id+15, name<15>)
+#define op16(id, name) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                       case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: case id+15: \
+                       return op_##name(opcode & 15);
 
-  //======
-  // ALT0
-  //======
+#define opalt1(id, name, name1) case id: return (!regs.sfr.alt1) ? op_##name() : op_##name1();
 
-  #define op(id, name) opcode_table[  0 + id] = &SuperFX::op_##name;
-  op   (0x00, stop)
-  op   (0x01, nop)
-  op   (0x02, cache)
-  op   (0x03, lsr)
-  op   (0x04, rol)
-  op   (0x05, bra)
-  op   (0x06, blt)
-  op   (0x07, bge)
-  op   (0x08, bne)
-  op   (0x09, beq)
-  op   (0x0a, bpl)
-  op   (0x0b, bmi)
-  op   (0x0c, bcc)
-  op   (0x0d, bcs)
-  op   (0x0e, bvc)
-  op   (0x0f, bvs)
-  op16 (0x10, to_r)
-  op16 (0x20, with_r)
-  op12 (0x30, stw_ir)
-  op   (0x3c, loop)
-  op   (0x3d, alt1)
-  op   (0x3e, alt2)
-  op   (0x3f, alt3)
-  op12 (0x40, ldw_ir)
-  op   (0x4c, plot)
-  op   (0x4d, swap)
-  op   (0x4e, color)
-  op   (0x4f, not)
-  op16 (0x50, add_r)
-  op16 (0x60, sub_r)
-  op   (0x70, merge)
-  op15h(0x71, and_r)
-  op16 (0x80, mult_r)
-  op   (0x90, sbk)
-  op4  (0x91, link)
-  op   (0x95, sex)
-  op   (0x96, asr)
-  op   (0x97, ror)
-  op6  (0x98, jmp_r)
-  op   (0x9e, lob)
-  op   (0x9f, fmult)
-  op16 (0xa0, ibt_r)
-  op16 (0xb0, from_r)
-  op   (0xc0, hib)
-  op15h(0xc1, or_r)
-  op15l(0xd0, inc_r)
-  op   (0xdf, getc)
-  op15l(0xe0, dec_r)
-  op   (0xef, getb)
-  op16 (0xf0, iwt_r)
-  #undef op
+#define op6alt1(id, name, name1) case id+0: case id+1: case id+2: case id+3: case id+4: case id+5: \
+                                 return (!regs.sfr.alt1) ? op_##name(opcode & 15) : op_##name1(opcode & 15);
 
-  //======
-  // ALT1
-  //======
+#define op15a1(id, name, name1) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                                case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: \
+                                return (!regs.sfr.alt1) ? op_##name(opcode & 15) : op_##name1(opcode & 15);
 
-  #define op(id, name) opcode_table[256 + id] = &SuperFX::op_##name;
-  op   (0x00, stop)
-  op   (0x01, nop)
-  op   (0x02, cache)
-  op   (0x03, lsr)
-  op   (0x04, rol)
-  op   (0x05, bra)
-  op   (0x06, blt)
-  op   (0x07, bge)
-  op   (0x08, bne)
-  op   (0x09, beq)
-  op   (0x0a, bpl)
-  op   (0x0b, bmi)
-  op   (0x0c, bcc)
-  op   (0x0d, bcs)
-  op   (0x0e, bvc)
-  op   (0x0f, bvs)
-  op16 (0x10, to_r)
-  op16 (0x20, with_r)
-  op12 (0x30, stb_ir)
-  op   (0x3c, loop)
-  op   (0x3d, alt1)
-  op   (0x3e, alt2)
-  op   (0x3f, alt3)
-  op12 (0x40, ldb_ir)
-  op   (0x4c, rpix)
-  op   (0x4d, swap)
-  op   (0x4e, cmode)
-  op   (0x4f, not)
-  op16 (0x50, adc_r)
-  op16 (0x60, sbc_r)
-  op   (0x70, merge)
-  op15h(0x71, bic_r)
-  op16 (0x80, umult_r)
-  op   (0x90, sbk)
-  op4  (0x91, link)
-  op   (0x95, sex)
-  op   (0x96, div2)
-  op   (0x97, ror)
-  op6  (0x98, ljmp_r)
-  op   (0x9e, lob)
-  op   (0x9f, lmult)
-  op16 (0xa0, lms_r)
-  op16 (0xb0, from_r)
-  op   (0xc0, hib)
-  op15h(0xc1, xor_r)
-  op15l(0xd0, inc_r)
-  op   (0xdf, getc)
-  op15l(0xe0, dec_r)
-  op   (0xef, getbh)
-  op16 (0xf0, lm_r)
-  #undef op
+#define op16a1(id, name, name1) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                                case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: case id+15: \
+                                return (!regs.sfr.alt1) ? op_##name(opcode & 15) : op_##name1(opcode & 15);
 
-  //======
-  // ALT2
-  //======
+#define op16a3(id, name, name3) case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+                                case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: case id+15: \
+                                return (regs.sfr.alt1 & regs.sfr.alt2) ? op_##name3(opcode & 15) : op_##name(opcode & 15);
 
-  #define op(id, name) opcode_table[512 + id] = &SuperFX::op_##name;
-  op   (0x00, stop)
-  op   (0x01, nop)
-  op   (0x02, cache)
-  op   (0x03, lsr)
-  op   (0x04, rol)
-  op   (0x05, bra)
-  op   (0x06, blt)
-  op   (0x07, bge)
-  op   (0x08, bne)
-  op   (0x09, beq)
-  op   (0x0a, bpl)
-  op   (0x0b, bmi)
-  op   (0x0c, bcc)
-  op   (0x0d, bcs)
-  op   (0x0e, bvc)
-  op   (0x0f, bvs)
-  op16 (0x10, to_r)
-  op16 (0x20, with_r)
-  op12 (0x30, stw_ir)
-  op   (0x3c, loop)
-  op   (0x3d, alt1)
-  op   (0x3e, alt2)
-  op   (0x3f, alt3)
-  op12 (0x40, ldw_ir)
-  op   (0x4c, plot)
-  op   (0x4d, swap)
-  op   (0x4e, color)
-  op   (0x4f, not)
-  op16 (0x50, add_i)
-  op16 (0x60, sub_i)
-  op   (0x70, merge)
-  op15h(0x71, and_i)
-  op16 (0x80, mult_i)
-  op   (0x90, sbk)
-  op4  (0x91, link)
-  op   (0x95, sex)
-  op   (0x96, asr)
-  op   (0x97, ror)
-  op6  (0x98, jmp_r)
-  op   (0x9e, lob)
-  op   (0x9f, fmult)
-  op16 (0xa0, sms_r)
-  op16 (0xb0, from_r)
-  op   (0xc0, hib)
-  op15h(0xc1, or_i)
-  op15l(0xd0, inc_r)
-  op   (0xdf, ramb)
-  op15l(0xe0, dec_r)
-  op   (0xef, getbl)
-  op16 (0xf0, sm_r)
-  #undef op
+#define op16a12(id, name, name1, name2) \
+  case id+ 0: case id+ 1: case id+ 2: case id+ 3: case id+ 4: case id+ 5: case id+ 6: case id+ 7: \
+  case id+ 8: case id+ 9: case id+10: case id+11: case id+12: case id+13: case id+14: case id+15: \
+  return regs.sfr.alt1 ? op_##name1(opcode & 15) : \
+         regs.sfr.alt2 ? op_##name2(opcode & 15) : op_##name(opcode & 15);
 
-  //======
-  // ALT3
-  //======
+#define opalt23(id, name, name2, name3) case id: \
+  return (!regs.sfr.alt2) ? op_##name() : \
+         (!regs.sfr.alt1) ? op_##name2() : op_##name3();
 
-  #define op(id, name) opcode_table[768 + id] = &SuperFX::op_##name;
-  op   (0x00, stop)
-  op   (0x01, nop)
-  op   (0x02, cache)
-  op   (0x03, lsr)
-  op   (0x04, rol)
-  op   (0x05, bra)
-  op   (0x06, blt)
-  op   (0x07, bge)
-  op   (0x08, bne)
-  op   (0x09, beq)
-  op   (0x0a, bpl)
-  op   (0x0b, bmi)
-  op   (0x0c, bcc)
-  op   (0x0d, bcs)
-  op   (0x0e, bvc)
-  op   (0x0f, bvs)
-  op16 (0x10, to_r)
-  op16 (0x20, with_r)
-  op12 (0x30, stb_ir)
-  op   (0x3c, loop)
-  op   (0x3d, alt1)
-  op   (0x3e, alt2)
-  op   (0x3f, alt3)
-  op12 (0x40, ldb_ir)
-  op   (0x4c, rpix)
-  op   (0x4d, swap)
-  op   (0x4e, cmode)
-  op   (0x4f, not)
-  op16 (0x50, adc_i)
-  op16 (0x60, cmp_r)
-  op   (0x70, merge)
-  op15h(0x71, bic_i)
-  op16 (0x80, umult_i)
-  op   (0x90, sbk)
-  op4  (0x91, link)
-  op   (0x95, sex)
-  op   (0x96, div2)
-  op   (0x97, ror)
-  op6  (0x98, ljmp_r)
-  op   (0x9e, lob)
-  op   (0x9f, lmult)
-  op16 (0xa0, lms_r)
-  op16 (0xb0, from_r)
-  op   (0xc0, hib)
-  op15h(0xc1, xor_i)
-  op15l(0xd0, inc_r)
-  op   (0xdf, romb)
-  op15l(0xe0, dec_r)
-  op   (0xef, getbs)
-  op16 (0xf0, lm_r)
-  #undef op
+#define opa123(id, name, name1, name2, name3) case id: \
+  return (!regs.sfr.alt2) ? ((!regs.sfr.alt1) ? op_##name()  : op_##name1()) : \
+                            ((!regs.sfr.alt1) ? op_##name2() : op_##name3());
 
-  #undef op4
-  #undef op6
-  #undef op12
-  #undef op15l
-  #undef op15h
-  #undef op16
+op     (0x00, stop)
+op     (0x01, nop)
+op     (0x02, cache)
+op     (0x03, lsr)
+op     (0x04, rol)
+op     (0x05, bra)
+op     (0x06, bge)
+op     (0x07, blt)
+op     (0x08, bne)
+op     (0x09, beq)
+op     (0x0a, bpl)
+op     (0x0b, bmi)
+op     (0x0c, bcc)
+op     (0x0d, bcs)
+op     (0x0e, bvc)
+op     (0x0f, bvs)
+op16   (0x10, to_move)
+op16   (0x20, with)
+op12   (0x30, stw_stb)
+op     (0x3c, loop)
+op     (0x3d, alt1)
+op     (0x3e, alt2)
+op     (0x3f, alt3)
+op12   (0x40, ldw_ldb)
+opalt1 (0x4c, plot, rpix)
+op     (0x4d, swap)
+opalt1 (0x4e, color, cmode)
+op     (0x4f, not)
+op16   (0x50, add_adc)
+op16a3 (0x60, sub_sbc, cmp)
+op     (0x70, merge)
+op15   (0x71, and_bic)
+op16a1 (0x80, mult, umult)
+op     (0x90, sbk)
+op4    (0x91, link)
+op     (0x95, sex)
+op     (0x96, asr_div2)
+op     (0x97, ror)
+op6alt1(0x98, jmp, ljmp)
+op     (0x9e, lob)
+op     (0x9f, fmult_lmult)
+op16a12(0xa0, ibt, lms, sms)
+op16   (0xb0, from_moves)
+op     (0xc0, hib)
+op15a1 (0xc1, or, xor)
+op15   (0xd0, inc)
+opalt23(0xdf, getc, ramb, romb)
+op15   (0xe0, dec)
+opa123 (0xef, getb, getbh, getbl, getbs)
+op16a12(0xf0, iwt, lm, sm)
+
+#undef op
+#undef op4
+#undef op12
+#undef op15
+#undef op16
+#undef opalt1
+#undef op6alt1
+#undef op15a1
+#undef op16a1
+#undef op16a3
+#undef op16a12
+#undef opalt23
+#undef opa123
+  }
 }
-
 #endif
