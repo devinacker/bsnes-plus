@@ -4,10 +4,6 @@
 #include "xbrzfilter.moc"
 
 // https://github.com/snes9xgit/snes9x/blob/1d140638da49554dac5bc5e39f44d438264a1451/win32/render.cpp#L2656
-#ifdef _WIN32
-    #define R5G6B5 // windows port uses RGB565
-#endif
-
 #ifdef R5G6B5
 	#define	Mask_2	0x07E0	// 00000 111111 00000
 	#define	Mask13	0xF81F	// 11111 000000 11111
