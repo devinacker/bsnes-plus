@@ -10,20 +10,33 @@
 # $(qtlib) -- libraries for linking
 
 ifeq ($(moc),)
-moc := moc
+  ifeq ($(qtpath),)
+    moc := moc
+  else
+    moc := $(qtpath)/bin/moc
+  endif
 endif
 
 ifeq ($(rcc),)
-rcc := rcc
+  ifeq ($(qtpath),)
+    rcc := rcc
+  else
+    rcc := $(qtpath)/bin/rcc
+  endif
 endif
 
 ifeq ($(platform),x)
   qtinc := `pkg-config --cflags $(qtlibs)`
   qtlib := `pkg-config --libs $(qtlibs)`
 else ifeq ($(platform),osx)
-  qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/4/Headers)
+  ifeq ($(qtpath),)
+    qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/4/Headers)
+    qtlib := -L/Library/Frameworks
+  else
+    qtinc := $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/4/Headers)
+    qtlib := -L$(qtpath)/lib -F$(qtpath)/lib
+  endif
   qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/4/Headers)
-  qtlib := -L/Library/Frameworks
   qtlib += $(foreach lib,$(qtlibs),-framework $(lib))
   qtlib += -framework Carbon
   qtlib += -framework Cocoa

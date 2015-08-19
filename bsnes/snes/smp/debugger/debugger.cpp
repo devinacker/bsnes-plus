@@ -27,7 +27,7 @@ void SMPDebugger::op_step() {
       debugger.step_over_new = false;
     }
   
-    uint8 opcode = SMP::op_read(opcode_pc);
+    uint8 opcode = memory::apuram[opcode_pc];
     if (opcode == 0x3f || opcode == 0x4f || (opcode & 0xf) == 0x01) {
       debugger.call_count++;
     } else if (opcode == 0x6f) {
