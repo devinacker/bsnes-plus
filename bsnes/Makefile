@@ -21,6 +21,7 @@ ifeq ($(DEBUG), 1)
   flags += -O0 -g
 else
   flags += -O3 -fomit-frame-pointer
+  link += -s
 endif
 
 # comment this line to enable asserts
@@ -35,7 +36,7 @@ flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
 
 # platform
 ifeq ($(platform),x)
-  link += -s -ldl -lX11 -lXext
+  link += -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
   flags += -march=native
@@ -43,7 +44,7 @@ else ifeq ($(platform),osx)
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
-  link += -mthreads -s -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32
+  link += -mthreads -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32
   link += -Wl,-enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
 else
   unknown_platform: help;

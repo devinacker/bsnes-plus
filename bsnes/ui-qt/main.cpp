@@ -24,7 +24,6 @@ const char defaultStylesheet[] =
 
 #include "check-action.moc"
 #include "file-dialog.moc"
-#include "hex-editor.moc"
 #include "radio-action.moc"
 #include "window.moc"
 
