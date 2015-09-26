@@ -1,25 +1,11 @@
-class MemHexEditor : public HexEditor {
-  Q_OBJECT
-  
-public:
-  function<uint8_t (unsigned)> usage;
-  enum Usage {
-    UsageRead  = 0x80,
-    UsageWrite = 0x40,
-    UsageExec  = 0x20,
-  };
-  
-  void refresh();
-  unsigned offset() const { return editorOffset; };
-  unsigned size() const { return editorSize; };
-};
+#include "qhexedit2/qhexedit.moc.hpp"
 
 class MemoryEditor : public Window {
   Q_OBJECT
 
 public:
   QHBoxLayout *layout;
-  MemHexEditor *editor;
+  QHexEdit *editor;
   QVBoxLayout *controlLayout;
   QComboBox *source;
   QLineEdit *addr;

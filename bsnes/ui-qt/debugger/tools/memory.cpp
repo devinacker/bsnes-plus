@@ -1,4 +1,10 @@
 #include "memory.moc"
+#include "qhexedit.moc"
+#include "commands.moc"
+
+#include "qhexedit2/qhexedit.cpp"
+#include "qhexedit2/commands.cpp"
+
 MemoryEditor *memoryEditor;
 
 MemoryEditor::MemoryEditor() {
@@ -12,16 +18,12 @@ MemoryEditor::MemoryEditor() {
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  editor = new MemHexEditor;
+  editor = new QHexEdit;
   editor->reader = { &MemoryEditor::reader, this };
   editor->writer = { &MemoryEditor::writer, this };
   editor->usage  = { &MemoryEditor::usage, this };
-  editor->setFont(QFont(Style::Monospace));
-  editor->setMinimumWidth((editor->lineWidth() + 3) * editor->fontMetrics().width(' '));
-  editor->setMinimumHeight((16 + 1) * editor->fontMetrics().height());
-  editor->setSize(16 * 1024 * 1024);
   memorySource = SNES::Debugger::MemorySource::CPUBus;
-  layout->addWidget(editor);
+  layout->addWidget(editor, 1);
 
   controlLayout = new QVBoxLayout;
   controlLayout->setSpacing(0);
@@ -83,15 +85,18 @@ MemoryEditor::MemoryEditor() {
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(exportButton, SIGNAL(released()), this, SLOT(exportMemory()));
   connect(importButton, SIGNAL(released()), this, SLOT(importMemory()));
+  
+  sourceChanged(0);
 }
 
 void MemoryEditor::autoUpdate() {
-  if(SNES::cartridge.loaded() && autoUpdateBox->isChecked()) editor->refresh();
+  if(SNES::cartridge.loaded() && autoUpdateBox->isChecked()) {
+    editor->refresh(false);
+  }
 }
 
 void MemoryEditor::synchronize() {
   if(SNES::cartridge.loaded() == false) {
-    editor->setHtml("");
     source->setEnabled(false);
     addr->setEnabled(false);
     autoUpdateBox->setEnabled(false);
@@ -115,53 +120,47 @@ void MemoryEditor::show() {
 
 void MemoryEditor::sourceChanged(int index) {
   switch(index) { default:
-    case 0: memorySource = SNES::Debugger::MemorySource::CPUBus; editor->setSize(16 * 1024 * 1024); break;
-    case 1: memorySource = SNES::Debugger::MemorySource::APURAM; editor->setSize(64 * 1024);        break;
-    case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setSize(64 * 1024);        break;
-    case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setSize(544);              break;
-    case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setSize(512);              break;
-    case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setSize(SNES::memory::cartrom.size()); break;
-    case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setSize(SNES::memory::cartram.size()); break;
-    case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setSize(16 * 1024 * 1024); break;
-    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setSize(16 * 1024 * 1024); break;
+    case 0: memorySource = SNES::Debugger::MemorySource::CPUBus; editor->setEditorSize(16 * 1024 * 1024); break;
+    case 1: memorySource = SNES::Debugger::MemorySource::APURAM; editor->setEditorSize(64 * 1024);        break;
+    case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(64 * 1024);        break;
+    case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setEditorSize(544);              break;
+    case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setEditorSize(512);              break;
+    case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setEditorSize(SNES::memory::cartrom.size()); break;
+    case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setEditorSize(SNES::memory::cartram.size()); break;
+    case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setEditorSize(16 * 1024 * 1024); break;
+    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(16 * 1024 * 1024); break;
   }
 
-  editor->setOffset(hex(addr->text().toUtf8().data()));
-  editor->refresh();
+  updateOffset();
 }
 
 void MemoryEditor::refresh() {
-  if(SNES::cartridge.loaded() == false) {
-    editor->setHtml("");
-  } else {
-    if (memorySource == SNES::Debugger::MemorySource::CartROM) {
-      editor->setSize(SNES::memory::cartrom.size());
-    }
-  
-    editor->refresh();
-  }
+  editor->refresh();
 }
 
 void MemoryEditor::updateOffset() {
-  editor->setOffset(hex(addr->text().toUtf8().data()));
+  int offset = hex(addr->text().toUtf8().data());
+  
+  editor->verticalScrollBar()->setValue(offset / BYTES_PER_LINE);
+  editor->setCursorPosition(2 * offset);
   refresh();
 }
 
 
 void MemoryEditor::prevCode() {
-  gotoPrevious(MemHexEditor::UsageExec);
+  gotoPrevious(QHexEdit::UsageExec);
 }
 
 void MemoryEditor::nextCode() {
-  gotoNext(MemHexEditor::UsageExec);
+  gotoNext(QHexEdit::UsageExec);
 }
 
 void MemoryEditor::prevData() {
-  gotoPrevious(MemHexEditor::UsageRead | MemHexEditor::UsageWrite);
+  gotoPrevious(QHexEdit::UsageRead | QHexEdit::UsageWrite);
 }
 
 void MemoryEditor::nextData() {
-  gotoNext(MemHexEditor::UsageRead | MemHexEditor::UsageWrite);
+  gotoNext(QHexEdit::UsageRead | QHexEdit::UsageWrite);
 }
 
 void MemoryEditor::prevUnknown() {
@@ -173,7 +172,7 @@ void MemoryEditor::nextUnknown() {
 }
 
 void MemoryEditor::gotoPrevious(int type) {
-  int offset = (int)editor->offset();
+  int offset = (int)editor->cursorPosition() / 2;
   bool found = false;
   SNES::uint8 *usage;
   
@@ -214,8 +213,8 @@ void MemoryEditor::gotoPrevious(int type) {
 }
 
 void MemoryEditor::gotoNext(int type) {
-  int offset = (int)editor->offset();
-  unsigned size = editor->size();
+  int offset = (int)editor->cursorPosition() / 2;
+  unsigned size = editor->editorSize();
   bool found = true;
   SNES::uint8 *usage;
   
@@ -299,16 +298,22 @@ void MemoryEditor::importMemory(SNES::Memory &memory, const string &filename) co
 }
 
 uint8_t MemoryEditor::reader(unsigned addr) {
-  SNES::debugger.bus_access = true;
-  uint8_t data = SNES::debugger.read(memorySource, addr);
-  SNES::debugger.bus_access = false;
-  return data;
+  if (SNES::cartridge.loaded()) {
+    SNES::debugger.bus_access = true;
+    uint8_t data = SNES::debugger.read(memorySource, addr);
+    SNES::debugger.bus_access = false;
+    return data;
+  }
+  
+  return 0;
 }
 
 void MemoryEditor::writer(unsigned addr, uint8_t data) {
-  SNES::debugger.bus_access = true;
-  SNES::debugger.write(memorySource, addr, data);
-  SNES::debugger.bus_access = false;
+  if (SNES::cartridge.loaded()) {
+    SNES::debugger.bus_access = true;
+    SNES::debugger.write(memorySource, addr, data);
+    SNES::debugger.bus_access = false;
+  }
 }
 
 uint8_t MemoryEditor::usage(unsigned addr) {
@@ -329,46 +334,4 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   }
   
   return 0;
-}
-
-void MemHexEditor::refresh() {
-  string output;
-  char temp[256];
-  unsigned offset = editorOffset;
-
-  for(unsigned y = 0; y < editorRows; y++) {
-    if(offset >= editorSize) break;
-    sprintf(temp, "%.4x:%.4x", (offset >> 16) & 0xffff, (offset >> 0) & 0xffff);
-    output << "<font color='#404040'>" << temp << "</font>&nbsp;&nbsp;";
-
-    for(unsigned x = 0; x < editorColumns; x++) {
-      if(offset >= editorSize) break;
-      sprintf(temp, "%.2x", reader ? reader(offset) : 0x00);
-      
-      string color;
-      uint8_t this_usage = usage ? usage(offset) : 0;
-      
-      if (this_usage & UsageExec && this_usage & UsageRead) {
-        color = (x & 1) ? "#800080" : "#ff00ff";
-      } else if (this_usage & UsageExec) {
-        // code: red text
-        color = (x & 1) ? "#800000" : "#ff0000";
-      } else if (this_usage & UsageRead || this_usage & UsageWrite) {
-        // data: blue text
-        color = (x & 1) ? "#000080" : "#0000ff";
-      } else {
-        // unknown: grey text
-        color = (x & 1) ? "#404040" : "#808080";
-      }
-      
-      output << "<font color='" << color << "'>" << temp << "</font>";
-      if(x != (editorColumns - 1)) output << "&nbsp;";
-      
-      offset++;
-    }
-
-    if(y != (editorRows - 1)) output << "<br>";
-  }
-
-  setHtml(output);
 }

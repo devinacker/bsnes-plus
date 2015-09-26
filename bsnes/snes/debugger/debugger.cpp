@@ -78,11 +78,13 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     } break;
     
     case MemorySource::SA1Bus: {
-      return sa1bus.read(addr & 0xffffff);
+	  if (cartridge.has_sa1())
+        return sa1bus.read(addr & 0xffffff);
     } break;
     
     case MemorySource::SFXBus: {
-      return superfxbus.read(addr & 0xffffff);
+	  if (cartridge.has_superfx())
+        return superfxbus.read(addr & 0xffffff);
     } break;
   }
 
@@ -124,11 +126,11 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     } break;
     
     case MemorySource::SA1Bus: {
-      sa1bus.write(addr & 0xffffff, data);
+      if (cartridge.has_sa1()) sa1bus.write(addr & 0xffffff, data);
     } break;
     
     case MemorySource::SFXBus: {
-      superfxbus.write(addr & 0xffffff, data);
+      if (cartridge.has_superfx()) superfxbus.write(addr & 0xffffff, data);
     } break;
   }
 }

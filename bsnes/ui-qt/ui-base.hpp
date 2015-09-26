@@ -17,7 +17,6 @@
 #include "template/concept.hpp"
 #include "template/check-action.moc.hpp"
 #include "template/file-dialog.moc.hpp"
-#include "template/hex-editor.moc.hpp"
 #include "template/radio-action.moc.hpp"
 #include "template/window.moc.hpp"
 using namespace nall;
