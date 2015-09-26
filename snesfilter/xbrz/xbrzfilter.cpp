@@ -112,7 +112,7 @@ QWidget *XbrzFilter::settings() {
 
     auto *factorSlider = new QSlider(Qt::Horizontal, widget);
     factorSlider->setMinimum(2);
-    factorSlider->setMaximum(5);
+    factorSlider->setMaximum(6);
     factorSlider->setValue(factor);
     layoutH1->addWidget(factorSlider);
 

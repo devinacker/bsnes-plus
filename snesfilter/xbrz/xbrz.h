@@ -35,12 +35,13 @@ http://board.byuu.org/viewtopic.php?f=10&t=2248
 - support multithreading
 - support 64-bit architectures
 - support processing image slices
+- support scaling up to 6xBRZ
 */
 
 enum ColorFormat //from high bits -> low bits, 8 bit per channel
 {
-    ARGB, //including alpha channel, BGRA byte order on little-endian machines
     RGB,  //8 bit for each red, green, blue, upper 8 bits unused
+    ARGB, //including alpha channel, BGRA byte order on little-endian machines
 };
 
 /*
@@ -50,11 +51,10 @@ enum ColorFormat //from high bits -> low bits, 8 bit per channel
    Just make sure you enlarge the source image slice by 2 rows on top and 2 on bottom (this is the additional range the xBRZ algorithm is using during analysis)
    Caveat: If there are multiple changed slices, make sure they do not overlap after adding these additional rows in order to avoid a memory race condition
    in the target image data if you are using multiple threads for processing each enlarged slice!
-
 THREAD-SAFETY: - parts of the same image may be scaled by multiple threads as long as the [yFirst, yLast) ranges do not overlap!
-               - there is a minor inefficiency for the first row of a slice, so avoid processing single rows only; suggestion: process 6 rows at least
+               - there is a minor inefficiency for the first row of a slice, so avoid processing single rows only; suggestion: process 8-16 rows at least
 */
-void scale(size_t factor, //valid range: 2 - 5
+void scale(size_t factor, //valid range: 2 - 6
            const uint32_t* src, int srcWidth, int srcHeight, int srcPitch,
            uint32_t* trg, int trgPitch,
            ColorFormat colFmt,
