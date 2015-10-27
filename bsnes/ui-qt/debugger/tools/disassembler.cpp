@@ -49,7 +49,7 @@ void Disassembler::refresh(Source source, unsigned addr) {
   if(source == CPU) { usage = SNES::cpu.usage; mask = (1 << 24) - 1; }
   if(source == SMP) { usage = SNES::smp.usage; mask = (1 << 16) - 1; }
   if(source == SA1) { usage = SNES::sa1.usage; mask = (1 << 24) - 1; }
-  if(source == SFX) { usage = SNES::superfx.usage; mask = (1 << 24) - 1; }
+  if(source == SFX) { usage = SNES::superfx.usage; mask = (1 << 23) - 1; }
 
   int line[25];
   for(unsigned i = 0; i < 25; i++) line[i] = -1;

@@ -67,7 +67,7 @@ void SFXDebugger::rambuffer_write(uint16 addr, uint8 data) {
 }
 
 SFXDebugger::SFXDebugger() {
-  usage = new uint8[1 << 24]();
+  usage = new uint8[1 << 23]();
   cart_usage = &SNES::cpu.cart_usage;
   opcode_pc = 0;
 }
