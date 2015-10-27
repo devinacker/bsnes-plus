@@ -206,8 +206,10 @@ void Debugger::modifySystemState(unsigned state) {
       
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
-        if (offset >= 0) SNES::cpu.cart_usage[offset] |= 
-          SNES::cpu.usage[i] | SNES::sa1.usage[i] | SNES::superfx.usage[i];
+        if (offset >= 0) 
+		  SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
+		if (offset >= 0 && i < 0x600000)
+		  SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
   }
