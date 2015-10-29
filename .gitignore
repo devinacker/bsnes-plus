@@ -8,3 +8,5 @@
 *.so
 *.so.1
 /bsnes+.app
+*.patch
+*.rar

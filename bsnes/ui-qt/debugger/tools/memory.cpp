@@ -128,7 +128,7 @@ void MemoryEditor::sourceChanged(int index) {
     case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setEditorSize(SNES::memory::cartrom.size()); break;
     case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setEditorSize(SNES::memory::cartram.size()); break;
     case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setEditorSize(16 * 1024 * 1024); break;
-    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(16 * 1024 * 1024); break;
+    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(8 * 1024 * 1024); break;
   }
 
   updateOffset();
@@ -329,7 +329,7 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   else if (memorySource == SNES::Debugger::MemorySource::SA1Bus && addr < 1 << 24) {
     return SNES::sa1.usage[addr];
   }
-  else if (memorySource == SNES::Debugger::MemorySource::SFXBus && addr < 1 << 24) {
+  else if (memorySource == SNES::Debugger::MemorySource::SFXBus && addr < 1 << 23) {
     return SNES::superfx.usage[addr];
   }
   
