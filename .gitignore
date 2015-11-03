@@ -7,6 +7,9 @@
 *.rcc
 *.so
 *.so.1
+*.patch
+*.rar
+*.so.1
 bsnes+.app
 project/bsnes-plus.xcodeproj/xcuserdata
 project/bsnes-plus.xcodeproj/project.xcworkspace/xcuserdata

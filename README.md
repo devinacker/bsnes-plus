@@ -9,6 +9,7 @@ Optiroc/bsnes-plus fork improves the OS X builds (pulled upstream) and adds an X
 
 - "Step over" and "step out" buttons in debugger
 - Improved debugger UI with register editing
+- Redesigned memory editor and breakpoint editor
 - Improved handling of address mirroring for breakpoints (extends to the entire address space, not just RAM)
 - Real-time code and data highlighting in memory editor, with fast searching for known code/data locations and unexplored regions
 - Cartridge ROM and RAM views in memory editor for mapper-agnostic analysis
@@ -26,9 +27,10 @@ Non-debugging features:
 
 ## Coming soon
 
-- Rewritten memory editor and breakpoint editor
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
+- Searching in memory editor
+- Automatic saving/loading breakpoints between sessions
 - Similar addressing improvements for cheats
 
 ## Building on Windows
