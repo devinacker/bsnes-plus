@@ -305,7 +305,7 @@ private:
 
     // Private utility functions
     void init();
-	QByteArray getBuffer(qint64 pos, qint64 size);
+    QByteArray getBuffer(qint64 pos, qint64 size);
     void readBuffers();
     QString toReadable(const QByteArray &ba);
 
@@ -357,7 +357,7 @@ private:
     qint64 _cursorPosition;                     // absolute positioin of cursor, 1 Byte == 2 tics
     QRect _cursorRect;                          // physical dimensions of cursor
     QByteArray _data;                           // QHexEdit's data, when setup with QByteArray
-	qint64 _editorSize;
+    qint64 _editorSize;
     QByteArray _dataShown;                      // data in the current View
     QByteArray _hexDataShown;                   // data in view, transformed to hex
     qint64 _lastEventSize;                      // size, which was emitted last time

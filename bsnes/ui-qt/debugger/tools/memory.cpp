@@ -269,6 +269,8 @@ void MemoryEditor::search() {
   QVBoxLayout *vbox = new QVBoxLayout;
   dlg.setLayout(vbox);
   
+  vbox->addWidget(new QLabel("Enter a hex string, or \"ASCII text\" (in quotes)"));
+  
   QLineEdit *edit = new QLineEdit;
   edit->setFont(QFont(Style::Monospace));
   // TODO: put existing search string in box
@@ -303,7 +305,15 @@ void MemoryEditor::search() {
   grid->addWidget(bbox);
   
   if (dlg.exec()) {
-    searchStr = QByteArray::fromHex(edit->text().toUtf8());
+    QString searchText = edit->text().trimmed();
+	
+	// try quoted text
+	if (searchText.startsWith("\"") && searchText.endsWith("\"")) {
+	  searchStr = searchText.mid(1, searchText.size() - 2).toUtf8();
+    } else {
+	  searchStr = QByteArray::fromHex(edit->text().toUtf8());
+	}
+	
     int offset = (int)editor->cursorPosition() / 2;
     
     if (searchDown->isChecked()) {

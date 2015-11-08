@@ -27,7 +27,6 @@ Non-debugging features:
 
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
-- Searching in memory editor
 - Automatic saving/loading breakpoints between sessions
 - Similar addressing improvements for cheats
 
