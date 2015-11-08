@@ -53,22 +53,32 @@ MemoryEditor::MemoryEditor() {
 
   toolLayout = new QHBoxLayout;
   controlLayout->addLayout(toolLayout);
-  #define tool(widget, icon, text, slot) \
+  #define tool(widget, icon, text, slot, accel) \
     widget = new QToolButton; \
     toolLayout->addWidget(widget); \
     widget->setAutoRaise(true); \
-    widget->setIcon(QIcon(":16x16/mem-" icon ".png")); \
-    widget->setToolTip(text); \
-    connect(widget, SIGNAL(released()), this, SLOT(slot()))
-  tool(prevCodeButton, "prev-code",    "Previous Code",    prevCode);
-  tool(nextCodeButton, "next-code",    "Next Code",        nextCode);
-  tool(prevDataButton, "prev-data",    "Previous Data",    prevData);
-  tool(nextDataButton, "next-data",    "Next Data",        nextData);
-  tool(prevUnkButton,  "prev-unknown", "Previous Unknown", prevUnknown);
-  tool(nextUnkButton,  "next-unknown", "Next Unknown",     nextUnknown);
-  #undef tool
+    widget->setDefaultAction(new QAction(this)); \
+    widget->defaultAction()->setIcon(QIcon(":16x16/mem-" icon ".png")); \
+    widget->defaultAction()->setToolTip(text); \
+    widget->defaultAction()->setShortcut(accel); \
+    connect(widget->defaultAction(), SIGNAL(triggered()), this, SLOT(slot()))
+  tool(prevCodeButton, "prev-code",    "Previous Code",    prevCode, 0);
+  tool(nextCodeButton, "next-code",    "Next Code",        nextCode, 0);
+  tool(prevDataButton, "prev-data",    "Previous Data",    prevData, 0);
+  tool(nextDataButton, "next-data",    "Next Data",        nextData, 0);
+  tool(prevUnkButton,  "prev-unknown", "Previous Unknown", prevUnknown, 0);
+  tool(nextUnkButton,  "next-unknown", "Next Unknown",     nextUnknown, 0);
   toolLayout->addStretch();
-
+  
+  toolLayout = new QHBoxLayout;
+  controlLayout->addLayout(toolLayout);
+  tool(findButton,     "find",         "Find in Memory (Ctrl+F)",  search, Qt::Key_F | Qt::CTRL);
+  // TODO: other icons for these maybe
+  tool(findPrevButton, "prev-unknown", "Find again up (Shift+F3)", searchPrev, Qt::Key_F3 | Qt::SHIFT);
+  tool(findNextButton, "next-unknown", "Find again down (F3)",     searchNext, Qt::Key_F3);
+  toolLayout->addStretch();
+  #undef tool
+  
   spacer = new QWidget;
   spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
   controlLayout->addWidget(spacer);
@@ -249,6 +259,88 @@ void MemoryEditor::gotoNext(int type) {
     updateOffset();
   } else {
     QMessageBox::information(this, "Memory Editor", "Reached end of memory.", QMessageBox::Ok);
+  }
+}
+
+void MemoryEditor::search() {
+  QDialog dlg(this);
+  dlg.setWindowTitle("Search Memory");
+  
+  QVBoxLayout *vbox = new QVBoxLayout;
+  dlg.setLayout(vbox);
+  
+  QLineEdit *edit = new QLineEdit;
+  edit->setFont(QFont(Style::Monospace));
+  // TODO: put existing search string in box
+  vbox->addWidget(edit);
+  
+  QGridLayout *grid = new QGridLayout;
+  vbox->addLayout(grid);
+  
+  grid->addWidget(new QLabel("Search:"), 0, 0);
+  grid->addWidget(new QLabel("Start from:"), 1, 0);
+  QButtonGroup bgrpSearch, bgrpStart;
+  
+  QRadioButton *searchDown = new QRadioButton("Down");
+  bgrpSearch.addButton(searchDown);
+  grid->addWidget(searchDown, 0, 1);
+  searchDown->setChecked(true);
+  QRadioButton *searchUp = new QRadioButton("Up");
+  bgrpSearch.addButton(searchUp);
+  grid->addWidget(searchUp, 0, 2);
+  
+  QRadioButton *searchFromEnd = new QRadioButton("From start/end");
+  bgrpStart.addButton(searchFromEnd);
+  grid->addWidget(searchFromEnd, 1, 1);
+  searchFromEnd->setChecked(true);
+  QRadioButton *searchFromCur = new QRadioButton("From cursor");
+  bgrpStart.addButton(searchFromCur);
+  grid->addWidget(searchFromCur, 1, 2);
+  
+  QDialogButtonBox *bbox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(bbox, SIGNAL(accepted()), &dlg, SLOT(accept()));
+  connect(bbox, SIGNAL(rejected()), &dlg, SLOT(reject()));
+  grid->addWidget(bbox);
+  
+  if (dlg.exec()) {
+    searchStr = QByteArray::fromHex(edit->text().toUtf8());
+    int offset = (int)editor->cursorPosition() / 2;
+    
+    if (searchDown->isChecked()) {
+      searchPos = searchFromEnd->isChecked() ? -1 : offset;
+      searchNext();	  
+    } else {
+      searchPos = searchFromEnd->isChecked() ? editor->editorSize() : offset;
+      searchPrev();
+    }
+  }
+}
+
+void MemoryEditor::searchNext() {
+  if (searchStr.size() == 0) return;
+
+  searchPos = editor->indexOf(searchStr, searchPos + 1);
+
+  if (searchPos >= 0) {
+    addr->setText(QString::number(searchPos, 16));
+    updateOffset();
+  } else {
+    QMessageBox::information(this, "Memory Editor", "Reached end of memory.", QMessageBox::Ok);
+    searchPos = -1;
+  }
+}
+
+void MemoryEditor::searchPrev() {
+  if (searchStr.size() == 0) return;
+
+  searchPos = editor->lastIndexOf(searchStr, searchPos - 1);
+
+  if (searchPos >= 0) {
+    addr->setText(QString::number(searchPos, 16));
+    updateOffset();
+  } else {
+    QMessageBox::information(this, "Memory Editor", "Reached beginning of memory.", QMessageBox::Ok);
+    searchPos = editor->editorSize();
   }
 }
 

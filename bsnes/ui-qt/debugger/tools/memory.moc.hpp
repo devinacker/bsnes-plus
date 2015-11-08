@@ -20,6 +20,10 @@ public:
   QToolButton *prevUnkButton;
   QToolButton *nextUnkButton;
   
+  QToolButton *findButton;
+  QToolButton *findNextButton;
+  QToolButton *findPrevButton;
+  
   QWidget *spacer;
   QPushButton *exportButton;
   QPushButton *importButton;
@@ -33,6 +37,10 @@ public:
   uint8_t usage(unsigned addr);
 
   MemoryEditor();
+  
+private:
+  QByteArray searchStr;
+  int searchPos;
 
 public slots:
   void show();
@@ -48,6 +56,10 @@ public slots:
   void nextUnknown();
   void gotoPrevious(int);
   void gotoNext(int);
+  
+  void search();
+  void searchNext();
+  void searchPrev();
   
   void exportMemory();
   void importMemory();

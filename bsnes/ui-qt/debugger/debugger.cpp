@@ -82,22 +82,30 @@ Debugger::Debugger() {
   commandLayout = new QHBoxLayout;
   controlLayout->addLayout(commandLayout);
 
-  // TODO: icons/hotkeys instead of text
+  // TODO: icons instead of text
   runBreak = new QToolButton;
-  runBreak->setText("Brk");
+  runBreak->setDefaultAction(new QAction("Brk", this));
+  runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
+  runBreak->defaultAction()->setShortcut(Qt::Key_F5);
   commandLayout->addWidget(runBreak);
   commandLayout->addSpacing(Style::WidgetSpacing);
 
   stepInstruction = new QToolButton;
-  stepInstruction->setText("Step");
+  stepInstruction->setDefaultAction(new QAction("Step", this));
+  stepInstruction->defaultAction()->setToolTip("Step through current instruction (F6)");
+  stepInstruction->defaultAction()->setShortcut(Qt::Key_F6);
   commandLayout->addWidget(stepInstruction);
 
   stepOver = new QToolButton;
-  stepOver->setText("Over");
+  stepOver->setDefaultAction(new QAction("Over", this));
+  stepOver->defaultAction()->setToolTip("Step over current instruction (F7)");
+  stepOver->defaultAction()->setShortcut(Qt::Key_F7);
   commandLayout->addWidget(stepOver);
 
   stepOut = new QToolButton;
-  stepOut->setText("Out");
+  stepOut->setDefaultAction(new QAction("Out", this));
+  stepOut->defaultAction()->setToolTip("Step out of current routine (F8)");
+  stepOut->defaultAction()->setShortcut(Qt::Key_F8);
   commandLayout->addWidget(stepOut);
 
   controlLayout->addSpacing(Style::WidgetSpacing);
@@ -158,11 +166,11 @@ Debugger::Debugger() {
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
   connect(menu_misc_options, SIGNAL(triggered()), debuggerOptions, SLOT(show()));
 
-  connect(runBreak, SIGNAL(released()), this, SLOT(toggleRunStatus()));
+  connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
   
-  connect(stepInstruction, SIGNAL(released()), this, SLOT(stepAction()));
-  connect(stepOver, SIGNAL(released()), this, SLOT(stepOverAction()));
-  connect(stepOut, SIGNAL(released()), this, SLOT(stepOutAction()));
+  connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
+  connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
+  connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
   
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
@@ -226,7 +234,7 @@ void Debugger::modifySystemState(unsigned state) {
 }
 
 void Debugger::synchronize() {
-  runBreak->setText(application.debug ? "Run" : "Break");
+  runBreak->defaultAction()->setText(application.debug ? "Run" : "Break");
   bool stepEnabled = SNES::cartridge.loaded() && application.debug && 
                      (stepCPU->isChecked() || stepSMP->isChecked() || 
                       stepSA1->isChecked() || stepSFX->isChecked());

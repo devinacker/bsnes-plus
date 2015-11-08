@@ -261,21 +261,62 @@ void QHexEdit::ensureVisible()
     viewport()->update();
 }
 
-qint64 QHexEdit::indexOf(const QByteArray &ba, qint64 from)
+#define BUFFER_SIZE 0x10000
+
+QByteArray QHexEdit::getBuffer(qint64 pos, qint64 size)
 {
-    /* TODO! */
-    return 0;
+    QByteArray buffer;
+
+    for (qint64 i = pos; i >= 0 && i < _editorSize && i < pos + size; i++)
+        buffer.append(reader(i));
+        
+    return buffer;
 }
 
-bool QHexEdit::isModified()
+qint64 QHexEdit::indexOf(const QByteArray &ba, qint64 from)
 {
-    return _modified;
+    qint64 result = -1;
+    QByteArray buffer;
+
+    for (qint64 pos=from; pos < _editorSize; pos += BUFFER_SIZE)
+    {
+        buffer = getBuffer(pos, BUFFER_SIZE + ba.size() - 1);
+        int findPos = buffer.indexOf(ba);
+        if (findPos >= 0)
+        {
+            result = pos + (qint64)findPos;
+            break;
+        }
+    }
+    return result;
 }
 
 qint64 QHexEdit::lastIndexOf(const QByteArray &ba, qint64 from)
 {
-    /* TODO! */
-    return 0;
+    qint64 result = -1;
+    QByteArray buffer;
+
+    for (qint64 pos=from; pos > 0; pos -= BUFFER_SIZE)
+    {
+        qint64 sPos = pos - BUFFER_SIZE - (qint64)ba.size() + 1;
+        if (sPos < 0)
+            sPos = 0;
+        buffer = getBuffer(sPos, pos - sPos);
+        int findPos = buffer.lastIndexOf(ba);
+        if (findPos >= 0)
+        {
+            result = sPos + (qint64)findPos;
+            break;
+        }
+    }
+    return result;
+}
+
+#undef BUFFER_SIZE
+
+bool QHexEdit::isModified()
+{
+    return _modified;
 }
 
 void QHexEdit::redo()
@@ -835,9 +876,9 @@ void QHexEdit::dataChangedPrivate(int)
 void QHexEdit::refresh(bool showCursor)
 {
     if (showCursor)
-	    ensureVisible();
+        ensureVisible();
     readBuffers();
-	viewport()->update();
+    viewport()->update();
 }
 
 void QHexEdit::readBuffers()

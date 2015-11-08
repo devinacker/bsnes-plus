@@ -305,6 +305,7 @@ private:
 
     // Private utility functions
     void init();
+	QByteArray getBuffer(qint64 pos, qint64 size);
     void readBuffers();
     QString toReadable(const QByteArray &ba);
 
