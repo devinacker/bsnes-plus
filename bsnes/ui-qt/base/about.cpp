@@ -39,7 +39,7 @@ AboutWindow::AboutWindow() {
     "<td align='right'><a href='https://github.com/devinacker/bsnes-plus'>https://github.com/devinacker/bsnes-plus</a></td>"
     "</tr><tr>"
     "<td align='left'><b>Based on bsnes-classic:</b></td>"
-    "<td align='right'><a href='http://code.google.com/p/bsnes-classic'>http://code.google.com/p/bsnes-classic</a></td>"
+    "<td align='right'><a href='https://github.com/awjackson/bsnes-classic'>https://github.com/awjackson/bsnes-classic</a></td>"
     "</tr></table>"
   );
   layout->addWidget(info);
