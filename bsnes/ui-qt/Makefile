@@ -35,7 +35,7 @@ else
 endif
 
 # ruby
-rubyflags := $(if $(finstring .sdl,$(ruby)),`sdl-config --cflags`)
+rubyflags := $(if $(findstring .sdl,$(ruby)),`sdl-config --cflags`)
 rubyflags += $(if $(findstring .qt,$(ruby)),$(qtinc))
 
 # gross hack because at some point gcc optimization started breaking rawinput
