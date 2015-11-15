@@ -38,6 +38,11 @@ endif
 rubyflags := $(if $(finstring .sdl,$(ruby)),`sdl-config --cflags`)
 rubyflags += $(if $(findstring .qt,$(ruby)),$(qtinc))
 
+# gross hack because at some point gcc optimization started breaking rawinput
+ifeq ($(platform),win)
+  rubyflags += -O0
+endif
+
 link += $(if $(findstring .sdl,$(ruby)),`sdl-config --libs`)
 link += $(if $(findstring video.direct3d,$(ruby)),-ld3d9)
 link += $(if $(findstring video.directdraw,$(ruby)),-lddraw)
