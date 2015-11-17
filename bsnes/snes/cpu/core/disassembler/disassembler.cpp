@@ -197,7 +197,7 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
     case 0x3f: sprintf(t, "and $%.6x,x [%.6x]", op24, decode(OPTYPE_LONGX, op24, addr)); break;
     case 0x40: sprintf(t, "rti                   "); break;
     case 0x41: sprintf(t, "eor ($%.2x,x)   [%.6x]", op8, decode(OPTYPE_IDPX, op8, addr)); break;
-    case 0x42: sprintf(t, "wdm                   "); break;
+    case 0x42: sprintf(t, "wdm #$%.2x              ", op8); break;
     case 0x43: sprintf(t, "eor $%.2x,s     [%.6x]", op8, decode(OPTYPE_SR, op8, addr)); break;
     case 0x44: sprintf(t, "mvp $%.2x,$%.2x           ", op1, op8); break;
     case 0x45: sprintf(t, "eor $%.2x       [%.6x]", op8, decode(OPTYPE_DP, op8, addr)); break;

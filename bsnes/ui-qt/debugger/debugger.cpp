@@ -215,9 +215,9 @@ void Debugger::modifySystemState(unsigned state) {
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
         if (offset >= 0) 
-		  SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
-		if (offset >= 0 && i < 0x600000)
-		  SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
+          SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
+        if (offset >= 0 && i < 0x600000)
+          SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
   }
@@ -304,17 +304,37 @@ void Debugger::event() {
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
-      echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
-
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
+      
+      if (n < SNES::Debugger::Breakpoints)
+        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
+      else if (n == SNES::Debugger::SoftBreakCPU)
+        echo(string() << "Software breakpoint hit (CPU).<br>");
+      else if (n == SNES::Debugger::SoftBreakSA1)
+        echo(string() << "Software breakpoint hit (SA-1).<br>");
+      else break;
+        
+      if(n == SNES::Debugger::SoftBreakCPU
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+        break;
       }
 
+      if(n == SNES::Debugger::SoftBreakSA1
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
+        SNES::debugger.step_sa1 = true;
+        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
+        string s = t;
+        s.replace(" ", "&nbsp;");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        break;
+      }
+      
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
@@ -322,15 +342,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
-      }
-      
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
-        SNES::debugger.step_sa1 = true;
-        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
-        string s = t;
-        s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        break;
       }
       
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
@@ -340,6 +352,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+        break;
       }
     } break;
 
@@ -389,7 +402,7 @@ void Debugger::frameTick() {
     autoUpdate();
   } else {
     // update memory editor every time since once per second isn't very useful
-	// (TODO: and PPU viewers, maybe?) 
+    // (TODO: and PPU viewers, maybe?) 
     memoryEditor->autoUpdate();
   }
   
