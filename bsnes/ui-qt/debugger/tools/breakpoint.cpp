@@ -108,4 +108,12 @@ BreakpointEditor::BreakpointEditor() {
     breakpoint[n] = new BreakpointItem(n);
     layout->addWidget(breakpoint[n]);
   }
+  
+  breakOnWDM = new QCheckBox("Break on WDM (CPU/SA-1 opcode 0x42)");
+  connect(breakOnWDM, SIGNAL(toggled(bool)), this, SLOT(toggle()));
+  layout->addWidget(breakOnWDM);
+}
+
+void BreakpointEditor::toggle() {
+  SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
 }

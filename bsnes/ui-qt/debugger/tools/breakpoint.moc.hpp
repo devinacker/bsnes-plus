@@ -37,8 +37,12 @@ class BreakpointEditor : public Window {
 public:
   QVBoxLayout *layout;
   BreakpointItem *breakpoint[SNES::Debugger::Breakpoints];
+  QCheckBox *breakOnWDM;
 
   BreakpointEditor();
+  
+public slots:
+  void toggle();
 };
 
 extern BreakpointEditor *breakpointEditor;

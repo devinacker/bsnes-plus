@@ -78,12 +78,12 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     } break;
     
     case MemorySource::SA1Bus: {
-	  if (cartridge.has_sa1())
+      if (cartridge.has_sa1())
         return sa1bus.read(addr & 0xffffff);
     } break;
     
     case MemorySource::SFXBus: {
-	  if (cartridge.has_superfx())
+      if (cartridge.has_superfx())
         return superfxbus.read(addr & 0xffffff);
     } break;
   }
@@ -153,6 +153,7 @@ Debugger::Debugger() {
   step_sa1 = false;
   step_sfx = false;
   bus_access = false;
+  break_on_wdm = false;
   
   step_type = StepType::None;
 }
