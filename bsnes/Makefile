@@ -8,7 +8,7 @@ ifeq ($(ui),)
 endif
 
 # build version
-version := v073+1
+version := v073+2
 
 # compiler
 c       := $(compiler) -xc -std=gnu99
@@ -21,7 +21,11 @@ ifeq ($(DEBUG), 1)
   flags += -O0 -g -DDEBUG
 else
   flags += -O3 -fomit-frame-pointer -DNDEBUG -march=native
-  link += -s
+  ifeq ($(platform),osx)
+    # -s is deprecated as of clang 7.0, and using it breaks linking for some reason
+  else
+    link += -s
+  endif
 endif
 
 # comment this line to enable asserts

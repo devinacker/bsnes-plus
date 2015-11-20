@@ -27,7 +27,6 @@ Non-debugging features:
 
 - On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
 - More keyboard shortcuts for menus, etc.
-- Searching in memory editor
 - Automatic saving/loading breakpoints between sessions
 - Similar addressing improvements for cheats
 
@@ -59,11 +58,8 @@ After building, just copy the .dll, .so, or .dylib files into the same directory
 
 This fork of bsnes doesn't include the alternate UI based on byuu's `phoenix` library. The purpose of this fork is primarily to add additional UI functionality and I have no intention of implementing every new feature twice using completely different libraries just to keep both versions of the UI at parity.
 
-bsnes v073 and its derivatives are licensed under the GPL v2; see *Help > License...* for more information.
+bsnes v073 and its derivatives are licensed under the GPL v2; see *Help > License ...* for more information.
 
 ## Contributors
 
-- Devin Acker (@devinacker)
-- Alex W. Jackson (@awjackson)
-- Michał Ziąbkowski (@mziab)
-- Maximilian Rehkopf (@mrehkopf)
+See *Help > Documentation ...* for a list of authors.

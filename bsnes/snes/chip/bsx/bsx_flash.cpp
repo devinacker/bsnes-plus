@@ -10,14 +10,14 @@ void BSXFlash::power() {
 }
 
 void BSXFlash::reset() {
-  regs.command   = 0;
-  regs.write_old = 0x00;
-  regs.write_new = 0x00;
+  regs.command = 0;
 
-  regs.flash_enable = false;
-  regs.read_enable  = false;
-  regs.write_enable = false;
-  memory::bsxpack.write_protect(!regs.write_enable);
+  regs.csr = false;
+  regs.esr = false;
+  regs.vendor_info = false;
+  regs.writebyte = false;
+
+  memory::bsxpack.write_protect(!regs.writebyte);
 }
 
 unsigned BSXFlash::size() const {
@@ -25,15 +25,25 @@ unsigned BSXFlash::size() const {
 }
 
 uint8 BSXFlash::read(unsigned addr) {
-  if(addr == 0x0002) {
-    if(regs.flash_enable) return 0x80;
+  if(regs.esr) {
+    switch (addr & 0xFFFF)
+    {
+      case 0x0002:	//PSR, Page Status Register
+        return 0xC0;
+
+      case 0x0004:	//GSR, Global Status Register
+        return 0x82;
+    }
   }
 
-  if(addr == 0x5555) {
-    if(regs.flash_enable) return 0x80;
+  if(regs.csr)
+  {
+    //Read Compatible Status Register
+    regs.csr = false;
+    return 0x80;
   }
 
-  if(regs.read_enable && addr >= 0xff00 && addr <= 0xff13) {
+  if(regs.vendor_info && addr >= 0xff00 && addr <= 0xff13) {
     //read flash cartridge vendor information
     switch(addr - 0xff00) {
       case 0x00: return 0x4d;
@@ -42,7 +52,7 @@ uint8 BSXFlash::read(unsigned addr) {
       case 0x03: return 0x00;
       case 0x04: return 0x00;
       case 0x05: return 0x00;
-      case 0x06: return 0x2a;  //0x2a = 8mbit, 0x2b = 16mbit (not known to exist, though BIOS recognizes ID)
+      case 0x06: return 0x1a;  //Memory Pack Type 1, 8M
       case 0x07: return 0x00;
       default:   return 0x00;
     }
@@ -62,57 +72,70 @@ void BSXFlash::write(unsigned addr, uint8 data) {
   //below is an unfortunately necessary workaround to this problem.
   //if(cartridge.mapper() == Cartridge::BSCHiROM) return;
 
-  if((addr & 0xff0000) == 0) {
-    regs.write_old = regs.write_new;
-    regs.write_new = data;
-
-    if(regs.write_enable && regs.write_old == regs.write_new) {
-      return memory::bsxpack.write(addr, data);
-    }
-  } else {
-    if(regs.write_enable) {
-      return memory::bsxpack.write(addr, data);
-    }
+  //If Write Byte Command is issued
+  if(regs.writebyte)
+  {
+    regs.writebyte = false;
+    memory::bsxpack.write(addr, data);	//Inaccurate, it's supposed to be AND.
+    return memory::bsxpack.write_protect(!regs.writebyte);
   }
 
-  if(addr == 0x0000) {
-    regs.command <<= 8;
-    regs.command  |= data;
+  //Commands
+  regs.command <<= 8;
+  regs.command  |= data;
 
-    if((regs.command & 0xffff) == 0x38d0) {
-      regs.flash_enable = true;
-      regs.read_enable  = true;
-    }
+  //Single Byte Commands
+  switch (data)
+  {
+    case 0x00:
+    case 0xFF:
+      //Reset Array Data
+      regs.csr = false;
+      regs.esr = false;
+      regs.vendor_info = false;
+      break;
+
+    case 0x10:
+    case 0x40:
+      //Write Byte (next write will be )
+      regs.writebyte = true;
+      break;
+
+    case 0x70:
+      //Enable CSR
+      regs.csr = true;
+      break;
+
+    case 0x71:
+      //Enable ESR
+      regs.esr = true;
+      break;
+
+    case 0x75:
+      //Enable Page Buffer
+      regs.vendor_info = true;
+      break;
   }
 
-  if(addr == 0x2aaa) {
-    regs.command <<= 8;
-    regs.command  |= data;
+  //Double Byte Commands
+  switch (regs.command)
+  {
+    case 0x20D0:
+      //Page Erase
+      memory::bsxpack.write_protect(false);
+      for (int i = 0; i < 0x10000; i++)
+        memory::bsxpack.write((addr & 0xFF0000) + i, 0xFF);
+      break;
+
+    case 0xA7D0:
+      //Chip Erase
+      memory::bsxpack.write_protect(false);
+      for (int i = 0; i < memory::bsxpack.size(); i++)
+        memory::bsxpack.write(i, 0xFF);
+      break;
   }
 
-  if(addr == 0x5555) {
-    regs.command <<= 8;
-    regs.command  |= data;
-
-    if((regs.command & 0xffffff) == 0xaa5570) {
-      regs.write_enable = false;
-    }
-
-    if((regs.command & 0xffffff) == 0xaa55a0) {
-      regs.write_old = 0x00;
-      regs.write_new = 0x00;
-      regs.flash_enable = true;
-      regs.write_enable = true;
-    }
-
-    if((regs.command & 0xffffff) == 0xaa55f0) {
-      regs.flash_enable = false;
-      regs.read_enable  = false;
-      regs.write_enable = false;
-    }
-
-    memory::bsxpack.write_protect(!regs.write_enable);
-  }
+  memory::bsxpack.write_protect(!regs.writebyte);
 }
 
 #endif

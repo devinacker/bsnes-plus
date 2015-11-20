@@ -28,6 +28,15 @@ void CPUDebugger::op_step() {
     debugger.step_type = Debugger::StepType::None;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
   } else {
+      
+    if (debugger.break_on_wdm) {
+      uint8 opcode = disassembler_read(opcode_pc);
+      if (opcode == 0x42) {
+        debugger.breakpoint_hit = Debugger::SoftBreakCPU;
+        debugger.break_event = Debugger::BreakEvent::BreakpointHit;
+        scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
+      }
+    }
     debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Exec, regs.pc, 0x00);
   }
   if(step_event) step_event();

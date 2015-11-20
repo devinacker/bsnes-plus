@@ -82,22 +82,30 @@ Debugger::Debugger() {
   commandLayout = new QHBoxLayout;
   controlLayout->addLayout(commandLayout);
 
-  // TODO: icons/hotkeys instead of text
+  // TODO: icons instead of text
   runBreak = new QToolButton;
-  runBreak->setText("Brk");
+  runBreak->setDefaultAction(new QAction("Brk", this));
+  runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
+  runBreak->defaultAction()->setShortcut(Qt::Key_F5);
   commandLayout->addWidget(runBreak);
   commandLayout->addSpacing(Style::WidgetSpacing);
 
   stepInstruction = new QToolButton;
-  stepInstruction->setText("Step");
+  stepInstruction->setDefaultAction(new QAction("Step", this));
+  stepInstruction->defaultAction()->setToolTip("Step through current instruction (F6)");
+  stepInstruction->defaultAction()->setShortcut(Qt::Key_F6);
   commandLayout->addWidget(stepInstruction);
 
   stepOver = new QToolButton;
-  stepOver->setText("Over");
+  stepOver->setDefaultAction(new QAction("Over", this));
+  stepOver->defaultAction()->setToolTip("Step over current instruction (F7)");
+  stepOver->defaultAction()->setShortcut(Qt::Key_F7);
   commandLayout->addWidget(stepOver);
 
   stepOut = new QToolButton;
-  stepOut->setText("Out");
+  stepOut->setDefaultAction(new QAction("Out", this));
+  stepOut->defaultAction()->setToolTip("Step out of current routine (F8)");
+  stepOut->defaultAction()->setShortcut(Qt::Key_F8);
   commandLayout->addWidget(stepOut);
 
   controlLayout->addSpacing(Style::WidgetSpacing);
@@ -158,11 +166,11 @@ Debugger::Debugger() {
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
   connect(menu_misc_options, SIGNAL(triggered()), debuggerOptions, SLOT(show()));
 
-  connect(runBreak, SIGNAL(released()), this, SLOT(toggleRunStatus()));
+  connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
   
-  connect(stepInstruction, SIGNAL(released()), this, SLOT(stepAction()));
-  connect(stepOver, SIGNAL(released()), this, SLOT(stepOverAction()));
-  connect(stepOut, SIGNAL(released()), this, SLOT(stepOutAction()));
+  connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
+  connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
+  connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
   
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
@@ -207,9 +215,9 @@ void Debugger::modifySystemState(unsigned state) {
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
         if (offset >= 0) 
-		  SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
-		if (offset >= 0 && i < 0x600000)
-		  SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
+          SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
+        if (offset >= 0 && i < 0x600000)
+          SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
   }
@@ -226,7 +234,7 @@ void Debugger::modifySystemState(unsigned state) {
 }
 
 void Debugger::synchronize() {
-  runBreak->setText(application.debug ? "Run" : "Break");
+  runBreak->defaultAction()->setText(application.debug ? "Run" : "Break");
   bool stepEnabled = SNES::cartridge.loaded() && application.debug && 
                      (stepCPU->isChecked() || stepSMP->isChecked() || 
                       stepSA1->isChecked() || stepSFX->isChecked());
@@ -296,17 +304,37 @@ void Debugger::event() {
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
-      echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
-
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
+      
+      if (n < SNES::Debugger::Breakpoints)
+        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
+      else if (n == SNES::Debugger::SoftBreakCPU)
+        echo(string() << "Software breakpoint hit (CPU).<br>");
+      else if (n == SNES::Debugger::SoftBreakSA1)
+        echo(string() << "Software breakpoint hit (SA-1).<br>");
+      else break;
+        
+      if(n == SNES::Debugger::SoftBreakCPU
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+        break;
       }
 
+      if(n == SNES::Debugger::SoftBreakSA1
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
+        SNES::debugger.step_sa1 = true;
+        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
+        string s = t;
+        s.replace(" ", "&nbsp;");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        break;
+      }
+      
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
@@ -314,15 +342,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
-      }
-      
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
-        SNES::debugger.step_sa1 = true;
-        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
-        string s = t;
-        s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        break;
       }
       
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
@@ -332,6 +352,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+        break;
       }
     } break;
 
@@ -381,7 +402,7 @@ void Debugger::frameTick() {
     autoUpdate();
   } else {
     // update memory editor every time since once per second isn't very useful
-	// (TODO: and PPU viewers, maybe?) 
+    // (TODO: and PPU viewers, maybe?) 
     memoryEditor->autoUpdate();
   }
   

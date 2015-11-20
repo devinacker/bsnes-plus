@@ -33,7 +33,8 @@ else ifeq ($(platform),osx)
     qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/4/Headers)
     qtlib := -L/Library/Frameworks
   else
-    qtinc := $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/4/Headers)
+    qtinc := -I$(qtpath)/include
+    qtinc += $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/4/Headers)
     qtlib := -L$(qtpath)/lib -F$(qtpath)/lib
   endif
   qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/4/Headers)

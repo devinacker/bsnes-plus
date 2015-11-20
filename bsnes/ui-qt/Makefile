@@ -35,8 +35,13 @@ else
 endif
 
 # ruby
-rubyflags := $(if $(finstring .sdl,$(ruby)),`sdl-config --cflags`)
+rubyflags := $(if $(findstring .sdl,$(ruby)),`sdl-config --cflags`)
 rubyflags += $(if $(findstring .qt,$(ruby)),$(qtinc))
+
+# gross hack because at some point gcc optimization started breaking rawinput
+ifeq ($(platform),win)
+  rubyflags += -O0
+endif
 
 link += $(if $(findstring .sdl,$(ruby)),`sdl-config --libs`)
 link += $(if $(findstring video.direct3d,$(ruby)),-ld3d9)
@@ -68,7 +73,7 @@ $(foreach f,$(moc_objects), \
   $(eval $f: $(__file)) \
 )
 
-obj/ui-main.o: $(ui)/main.cpp $(headers) $(wildcard $(ui)/*.cpp) $(wildcard $(ui)/link/*.cpp) $(wildcard $(ui)/platform/*.cpp) $(wildcard $(ui)/utility/*.cpp); $(qt_compile)
+obj/ui-main.o: $(ui)/main.cpp $(headers) obj/resource.rcc $(wildcard $(ui)/*.cpp) $(wildcard $(ui)/link/*.cpp) $(wildcard $(ui)/platform/*.cpp) $(wildcard $(ui)/utility/*.cpp); $(qt_compile)
 obj/ui-base.o: $(ui)/base/base.cpp $(headers) $(wildcard $(ui)/base/*.cpp); $(qt_compile)
 obj/ui-cartridge.o: $(ui)/cartridge/cartridge.cpp $(headers) $(wildcard $(ui)/cartridge/*.cpp); $(qt_compile)
 obj/ui-debugger.o: $(ui)/debugger/debugger.cpp $(headers) $(call rwildcard,$(ui)/debugger/,%.cpp); $(qt_compile)
