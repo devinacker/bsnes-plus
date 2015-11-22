@@ -668,15 +668,15 @@ void SPC7110DCU::write(unsigned, uint8) {
 //==========
 
 unsigned SPC7110RAM::size() const {
-  return 0x2000;
+  return memory::cartram.size();
 }
 
 uint8 SPC7110RAM::read(unsigned addr) {
-  return memory::cartram.read(addr & 0x1fff);
+  return memory::cartram.read(addr);
 }
 
 void SPC7110RAM::write(unsigned addr, uint8 data) {
-  if(spc7110.r4830 & 0x80) memory::cartram.write(addr & 0x1fff, data);
+  if(spc7110.r4830 & 0x80) memory::cartram.write(addr, data);
 }
 
 }
