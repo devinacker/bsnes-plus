@@ -3,6 +3,7 @@
 void PPUcounter::serialize(serializer &s) {
   s.integer(status.hcounter);
   s.integer(status.vcounter);
+  s.integer(status.frame);
   s.integer(status.lineclocks);
   s.integer(status.prev_lineclocks);
   s.array(status.fieldlines);
