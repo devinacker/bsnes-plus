@@ -1,5 +1,7 @@
 #include <ddraw.h>
 
+typedef HRESULT(WINAPI * DIRECTDRAWCREATE)(GUID*, LPDIRECTDRAW*, IUnknown*);
+
 namespace ruby {
 
 class pVideoDD {
@@ -136,6 +138,23 @@ public:
 
   bool init() {
     term();
+
+	HINSTANCE DDHinst = 0;
+
+	DDHinst = LoadLibraryA("DDRAW.DLL");
+	if (DDHinst == 0)
+	{
+		FreeLibrary(DDHinst);
+		return false;
+	}
+
+	DIRECTDRAWCREATE DirectDrawCreate = (DIRECTDRAWCREATE)GetProcAddress(DDHinst, "DirectDrawCreate");
+
+	if (DirectDrawCreate == 0)
+	{
+		FreeLibrary(DDHinst);
+		return false;
+	}
 
     DirectDrawCreate(0, &lpdd, 0);
     lpdd->QueryInterface(IID_IDirectDraw7, (void**)&lpdd7);

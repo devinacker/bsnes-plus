@@ -309,7 +309,7 @@ public:
     //1) it consistently orders peripherals, so mapped IDs remain constant
     //2) it sorts the virtual keyboard and mouse to the bottom of the list
     //   (real devices start with \\?\HID#, virtual with \\?\Root#)
-    DevicePool pool[devices];
+    DevicePool *pool = new DevicePool[devices];
     for(unsigned i = 0; i < devices; i++) {
       pool[i].handle = list[i].hDevice;
       unsigned size = sizeof(pool[i].name) - 1;
@@ -351,6 +351,7 @@ public:
         }
       }
     }
+	delete[] pool;
 
     RAWINPUTDEVICE device[2];
     //capture all keyboard input
@@ -396,7 +397,7 @@ LRESULT CALLBACK RawInputWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 class XInput {
 public:
   HMODULE libxinput;
-  DWORD WINAPI (*pXInputGetState)(DWORD, XINPUT_STATE*);
+  DWORD (WINAPI *pXInputGetState)(DWORD, XINPUT_STATE*);
 
   struct Gamepad {
     unsigned id;
@@ -481,7 +482,7 @@ public:
     if(!libxinput) libxinput = LoadLibraryA("xinput1_2.dll");
     if(!libxinput) libxinput = LoadLibraryA("xinput1_1.dll");
     if(!libxinput) return;
-    pXInputGetState = (DWORD WINAPI (*)(DWORD, XINPUT_STATE*))GetProcAddress(libxinput, "XInputGetState");
+    pXInputGetState = (DWORD (WINAPI *)(DWORD, XINPUT_STATE*))GetProcAddress(libxinput, "XInputGetState");
   }
 
   ~XInput() {

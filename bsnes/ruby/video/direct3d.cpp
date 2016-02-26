@@ -1,8 +1,6 @@
-#undef interface
-#define interface struct
+//#include "d3d9.h"
 #include <d3d9.h>
 #include <d3dx9.h>
-#undef interface
 
 #define D3DVERTEX (D3DFVF_XYZRHW | D3DFVF_TEX1)
 
