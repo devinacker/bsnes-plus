@@ -159,7 +159,7 @@ qint64 QHexEdit::cursorPosition(QPoint pos)
 {
     // Calc cursorposition depending on a graphical position
     qint64 result = -1;
-    if ((pos.x() >= _pxPosHexX) and (pos.x() < (_pxPosHexX + (1 + HEXCHARS_IN_LINE) * _pxCharWidth)))
+    if ((pos.x() >= _pxPosHexX) && (pos.x() < (_pxPosHexX + (1 + HEXCHARS_IN_LINE) * _pxCharWidth)))
     {
         int x = (pos.x() - _pxPosHexX - _pxCharWidth / 2) / _pxCharWidth;
         x = (x / 3) * 2 + x % 3;
@@ -694,7 +694,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             int pxPosX = _pxPosHexX  - pxOfsX;
             int pxPosAsciiX2 = _pxPosAsciiX  - pxOfsX;
             qint64 bPosLine = row * BYTES_PER_LINE;
-            for (int colIdx = 0; ((bPosLine + colIdx) < _dataShown.size() and (colIdx < BYTES_PER_LINE)); colIdx++)
+            for (int colIdx = 0; ((bPosLine + colIdx) < _dataShown.size() && (colIdx < BYTES_PER_LINE)); colIdx++)
             {
                 QColor c = viewport()->palette().color(QPalette::Base);
                 painter.setPen(colStandard);
@@ -743,7 +743,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 if (_asciiArea)
                 {
                     char ch = _dataShown.at(bPosLine + colIdx);
-                    if ((ch < 0x20) or (ch > 0x7e))
+                    if ((ch < 0x20) || (ch > 0x7e))
                             ch = '.';
                     r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
@@ -905,7 +905,7 @@ QString QHexEdit::toReadable(const QByteArray &ba)
             {
                 hexStr.append(" ").append(ba.mid(i+j, 1).toHex());
                 char ch = ba[i + j];
-                if ((ch < 0x20) or (ch > 0x7e))
+                if ((ch < 0x20) || (ch > 0x7e))
                         ch = '.';
                 ascStr.append(QChar(ch));
             }

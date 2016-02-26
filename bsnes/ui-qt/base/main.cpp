@@ -586,12 +586,12 @@ void MainWindow::recordMovieFromHere() {
 
 void MainWindow::saveScreenshot() {
   //tell SNES::Interface to save a screenshot at the next video_refresh() event
-  interface.saveScreenshot = true;
+  intf.saveScreenshot = true;
 }
 
 void MainWindow::saveSPC() {
   //tell the S-SMP core to save a SPC after the next note-on
-  interface.captureSPC();
+  intf.captureSPC();
 }
 
 void MainWindow::loadState() {

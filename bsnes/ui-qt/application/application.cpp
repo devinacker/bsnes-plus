@@ -88,7 +88,7 @@ int Application::main(int &argc, char **argv) {
   config().load(configFilename);
   mapper().bind();
   init();
-  SNES::system.init(&interface);
+  SNES::system.init(&intf);
   mainWindow->system_loadSpecial_superGameBoy->setVisible(SNES::supergameboy.opened());
 
   if(argc == 2) {

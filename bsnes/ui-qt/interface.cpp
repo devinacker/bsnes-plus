@@ -1,4 +1,4 @@
-Interface interface;
+Interface intf;
 
 void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned height) {
   bool interlace = (height >= 240);

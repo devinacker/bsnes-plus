@@ -30,9 +30,9 @@ void Utility::updateSystemState() {
     text = "Power off";
   } else if(application.pause == true || application.autopause == true) {
     text = "Paused";
-  } else if(interface.framesUpdated == true) {
-    interface.framesUpdated = false;
-    text << interface.framesExecuted;
+  } else if(intf.framesUpdated == true) {
+	intf.framesUpdated = false;
+    text << intf.framesExecuted;
     text << " fps";
   } else {
     //nothing to update

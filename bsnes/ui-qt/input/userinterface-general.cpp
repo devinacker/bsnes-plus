@@ -44,7 +44,7 @@ struct ToggleCheatSystem : HotkeyInput {
 struct CaptureScreenshot : HotkeyInput {
   void pressed() {
     //tell SNES::Interface to save a screenshot at the next video_refresh() event
-    interface.saveScreenshot = true;
+    intf.saveScreenshot = true;
   }
 
   CaptureScreenshot() : HotkeyInput("Capture Screenshot", "input.userInterface.general.captureScreenshot") {
@@ -55,7 +55,7 @@ struct CaptureScreenshot : HotkeyInput {
 struct CaptureSPC : HotkeyInput {
   void pressed() {
     //tell the S-SMP core to save a SPC after the next note-on
-	interface.captureSPC();
+	intf.captureSPC();
   }
 
   CaptureSPC() : HotkeyInput("Capture SPC Dump", "input.userInterface.general.captureSPC") {
