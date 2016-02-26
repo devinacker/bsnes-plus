@@ -22,7 +22,6 @@
   #include <io.h>
   #include <direct.h>
   #include <shlobj.h>
-  #undef interface
   #define bsnesexport __declspec(dllexport)
 #else
   #include <unistd.h>
