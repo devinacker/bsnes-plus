@@ -115,7 +115,7 @@ uint8 CPUDebugger::mmio_read(unsigned addr) {
   return CPU::mmio_read(addr);
 }
 
-void CPU::mmio_write(unsigned addr, uint8 data) {
+void CPUDebugger::mmio_write(unsigned addr, uint8 data) {
   if (addr & 0xffff == 0x2180) {
     uint32 fulladdr = 0x7e0000 | status.wram_addr;
   
