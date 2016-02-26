@@ -65,8 +65,8 @@ void System::runthreadtosave() {
 }
 
 void System::init(Interface *interface_) {
-  interface = interface_;
-  assert(interface != 0);
+  intf = interface_;
+  assert(intf != 0);
 
   supergameboy.init();
   superfx.init();
@@ -98,7 +98,7 @@ void System::term() {
 void System::power() {
   region = config.region;
   expansion = config.expansion_port;
-  if(region == Region::Autodetect) {
+  if((Region)region == Region::Autodetect) {
     region = (cartridge.region() == Cartridge::Region::NTSC ? Region::NTSC : Region::PAL);
   }
 
@@ -217,7 +217,7 @@ void System::scanline() {
 void System::frame() {
 }
 
-System::System() : interface(0) {
+System::System() : intf(0) {
   region = Region::Autodetect;
   expansion = ExpansionPortDevice::None;
 }

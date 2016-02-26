@@ -66,16 +66,16 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
     memory::cartrtc.map(allocate<uint8_t>(20, 0xff), 20);
   }
 
-  if(mode == Mode::Bsx) {
+  if((Mode)mode == Mode::Bsx) {
     memory::bsxpram.map(allocate<uint8_t>(512 * 1024, 0xff), 512 * 1024);
   }
 
-  if(mode == Mode::SufamiTurbo) {
+  if((Mode)mode == Mode::SufamiTurbo) {
     if(st_A_ram_size) memory::stAram.map(allocate<uint8_t>(st_A_ram_size, 0xff), st_A_ram_size);
     if(st_B_ram_size) memory::stBram.map(allocate<uint8_t>(st_B_ram_size, 0xff), st_B_ram_size);
   }
 
-  if(mode == Mode::SuperGameBoy) {
+  if((Mode)mode == Mode::SuperGameBoy) {
     if(memory::gbrom.data()) {
       if(supergameboy_ram_size) memory::gbram.map(allocate<uint8_t>(supergameboy_ram_size, 0xff), supergameboy_ram_size);
       if(supergameboy_rtc_size) memory::gbrtc.map(allocate<uint8_t>(supergameboy_rtc_size, 0x00), supergameboy_rtc_size);
@@ -139,7 +139,7 @@ void Cartridge::unload() {
 
 Memory& Cartridge::bsxpack_access() {
   if(memory::bsxpack.size() == 0) return memory::memory_unmapped;
-  return (bsxpack_type == BSXPackType::FlashROM) ? (Memory&)bsxflash : (Memory&)memory::bsxpack;
+  return ((BSXPackType)bsxpack_type == BSXPackType::FlashROM) ? (Memory&)bsxflash : (Memory&)memory::bsxpack;
 }
 
 Cartridge::Cartridge() {

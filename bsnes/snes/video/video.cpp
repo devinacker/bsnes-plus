@@ -74,7 +74,7 @@ void Video::update() {
     height <<= 1;
   }
 
-  system.interface->video_refresh(ppu.output + 1024, width, height);
+  system.intf->video_refresh(ppu.output + 1024, width, height);
 
   frame_hires = false;
   frame_interlace = false;

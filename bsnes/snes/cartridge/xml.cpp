@@ -4,14 +4,14 @@ void Cartridge::parse_xml(const lstring &list) {
   mapping.reset();
 
   //parse any slots *before* parsing the base cartridge
-  if(mode == Mode::BsxSlotted) {
+  if((Mode)mode == Mode::BsxSlotted) {
     parse_xml_bsx(list[1]);
-  } else if(mode == Mode::Bsx) {
+  } else if((Mode)mode == Mode::Bsx) {
     parse_xml_bsx(list[1]);
-  } else if(mode == Mode::SufamiTurbo) {
+  } else if((Mode)mode == Mode::SufamiTurbo) {
     parse_xml_sufami_turbo(list[1], 0);
     parse_xml_sufami_turbo(list[2], 1);
-  } else if(mode == Mode::SuperGameBoy) {
+  } else if((Mode)mode == Mode::SuperGameBoy) {
     parse_xml_gameboy(list[1]);
   }
 
@@ -226,7 +226,7 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
       for(unsigned n = 0; n < dromsize; n++) necdsp.dataROM[n] = fp.readm(2);
 
       fp.seek(0);
-      uint8_t data[filesize];
+      uint8_t *data = new uint8_t[filesize];
       fp.read(data, filesize);
 
       sha256_ctx sha;
@@ -236,6 +236,8 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
       sha256_final(&sha);
       sha256_hash(&sha, shahash);
       foreach(n, shahash) programhash.append(hex<2>(n));
+
+	  delete[] data;
     }
     fp.close();
   }
@@ -272,9 +274,9 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
   }
 
   if(programhash == "") {
-    system.interface->message({ "Warning: NEC DSP program ", program, " is missing." });
+    system.intf->message({ "Warning: NEC DSP program ", program, " is missing." });
   } else if(sha256 != "" && sha256 != programhash) {
-    system.interface->message({
+    system.intf->message({
       "Warning: NEC DSP program ", program, " SHA256 is incorrect.\n\n"
       "Expected:\n", sha256, "\n\n"
       "Actual:\n", programhash
@@ -284,7 +286,7 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
 
 void Cartridge::xml_parse_bsx(xml_element &root) {
   has_bsx_slot = true;
-  if(mode != Mode::BsxSlotted && mode != Mode::Bsx) return;
+  if((Mode)mode != Mode::BsxSlotted && (Mode)mode != Mode::Bsx) return;
 
   foreach(node, root.element) {
     if(node.name == "slot") {
@@ -304,7 +306,7 @@ void Cartridge::xml_parse_bsx(xml_element &root) {
 }
 
 void Cartridge::xml_parse_sufamiturbo(xml_element &root) {
-  if(mode != Mode::SufamiTurbo) return;
+  if((Mode)mode != Mode::SufamiTurbo) return;
 
   foreach(node, root.element) {
     if(node.name == "slot") {
@@ -333,7 +335,7 @@ void Cartridge::xml_parse_sufamiturbo(xml_element &root) {
 }
 
 void Cartridge::xml_parse_supergameboy(xml_element &root) {
-  if(mode != Mode::SuperGameBoy) return;
+  if((Mode)mode != Mode::SuperGameBoy) return;
 
   foreach(attr, root.attribute) {
     if(attr.name == "revision") {

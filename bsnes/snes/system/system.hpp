@@ -30,7 +30,7 @@ public:
   System();
 
 private:
-  Interface *interface;
+  Interface *intf;
   void runthreadtosave();
 
   void serialize(serializer&);
