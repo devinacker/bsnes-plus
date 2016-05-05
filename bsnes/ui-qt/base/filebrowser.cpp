@@ -49,9 +49,9 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
     );
     string filename = qfilename.toUtf8().constData();
     if(filename != "") { 
-	  onAccept(filename);
+      onAccept(filename);
       config().path.current.cartridge = nall::dir(filename);
-	}
+    }
     return;
   }
 
