@@ -53,6 +53,8 @@ public slots:
   void stepOutAction();
 
 private:
+  inline void switchWindow();
+
   unsigned frameCounter;
 };
 

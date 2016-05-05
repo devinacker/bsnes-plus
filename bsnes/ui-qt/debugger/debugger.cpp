@@ -269,10 +269,21 @@ void Debugger::clear() {
   console->setHtml("");
 }
 
+void Debugger::switchWindow() {
+  // give focus to the main window if needed so that emulation can continue
+  if(config().input.focusPolicy == Configuration::Input::FocusPolicyPauseEmulation) {
+    mainWindow->activateWindow();
+  }
+}
+
 void Debugger::toggleRunStatus() {
   application.debug = !application.debug;
-  if(!application.debug) application.debugrun = false;
-  else audio.clear();
+  if(!application.debug) {
+    application.debugrun = false;
+    mainWindow->activateWindow();
+  } else {
+    audio.clear();
+  }
   synchronize();
   
   // TODO: disassemble current address when breaking (if any are selected)
@@ -281,6 +292,7 @@ void Debugger::toggleRunStatus() {
 void Debugger::stepAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepInto;
   application.debugrun = true;
+  switchWindow();
 }
 
 void Debugger::stepOverAction() {
@@ -289,6 +301,7 @@ void Debugger::stepOverAction() {
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;
+  switchWindow();
 }
 
 void Debugger::stepOutAction() {
@@ -296,6 +309,7 @@ void Debugger::stepOutAction() {
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;
+  switchWindow();
 }
 
 void Debugger::event() {
@@ -391,6 +405,7 @@ void Debugger::event() {
 
   audio.clear();
   autoUpdate();
+  activateWindow();
 }
 
 // update "auto refresh" tool windows

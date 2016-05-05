@@ -112,6 +112,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   rewindEnable = new QCheckBox("Enable Rewind Support");
   layout->addWidget(rewindEnable);
 
+  allowInvalidInput = new QCheckBox("Allow up+down / left+right combinations");
+  layout->addWidget(allowInvalidInput);
+
   useCommonDialogs = new QCheckBox("Use Native OS File Dialogs");
   layout->addWidget(useCommonDialogs);
 
@@ -129,6 +132,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   connect(focusIgnore, SIGNAL(pressed()), this, SLOT(ignoreInputWithoutFocus()));
   connect(focusAllow, SIGNAL(pressed()), this, SLOT(allowInputWithoutFocus()));
   connect(rewindEnable, SIGNAL(stateChanged(int)), this, SLOT(toggleRewindEnable()));
+  connect(allowInvalidInput, SIGNAL(stateChanged(int)), this, SLOT(toggleAllowInvalidInput()));
   connect(useCommonDialogs, SIGNAL(stateChanged(int)), this, SLOT(toggleUseCommonDialogs()));
 }
 
@@ -165,6 +169,7 @@ void AdvancedSettingsWindow::initializeUi() {
   focusAllow->setChecked (config().input.focusPolicy == Configuration::Input::FocusPolicyAllowInput);
 
   rewindEnable->setChecked(config().system.rewindEnabled);
+  allowInvalidInput->setChecked(config().input.allowInvalidInput);
   useCommonDialogs->setChecked(config().diskBrowser.useCommonDialogs);
 }
 
@@ -194,6 +199,10 @@ void AdvancedSettingsWindow::allowInputWithoutFocus()  { config().input.focusPol
 void AdvancedSettingsWindow::toggleRewindEnable() {
   config().system.rewindEnabled = rewindEnable->isChecked();
   state.resetHistory();
+}
+
+void AdvancedSettingsWindow::toggleAllowInvalidInput() {
+  config().input.allowInvalidInput = allowInvalidInput->isChecked();
 }
 
 void AdvancedSettingsWindow::toggleUseCommonDialogs() {

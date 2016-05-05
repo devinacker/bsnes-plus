@@ -36,6 +36,7 @@ public:
 
   QLabel *miscTitle;
   QCheckBox *rewindEnable;
+  QCheckBox *allowInvalidInput;
   QCheckBox *useCommonDialogs;
 
   void initializeUi();
@@ -54,6 +55,7 @@ public slots:
   void ignoreInputWithoutFocus();
   void allowInputWithoutFocus();
   void toggleRewindEnable();
+  void toggleAllowInvalidInput();
   void toggleUseCommonDialogs();
 };
 
