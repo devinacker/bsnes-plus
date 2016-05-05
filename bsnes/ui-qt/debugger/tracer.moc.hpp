@@ -18,6 +18,8 @@ public slots:
   void setTraceMaskState(int);
 
 private:
+  void setTraceState(bool);
+
   file tracefile;
   bool traceCpu;
   bool traceSmp;
