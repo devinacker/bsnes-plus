@@ -197,8 +197,8 @@ uint8 SPC7110::mmio_read(unsigned addr) {
     //==================
 
     case 0x4800: {
-	  if(Memory::debugger_access()) return 0x00;
-	
+      if(Memory::debugger_access()) return 0x00;
+    
       uint16 counter = (r4809 + (r480a << 8));
       counter--;
       r4809 = counter;
@@ -218,7 +218,7 @@ uint8 SPC7110::mmio_read(unsigned addr) {
     case 0x480b: return r480b;
     case 0x480c: {
       uint8 status = r480c;
-	  if(!Memory::debugger_access())
+      if(!Memory::debugger_access())
         r480c &= 0x7f;
       return status;
     }
@@ -302,7 +302,7 @@ uint8 SPC7110::mmio_read(unsigned addr) {
     case 0x482e: return r482e;
     case 0x482f: {
       uint8 status = r482f;
-	  if(!Memory::debugger_access())
+      if(!Memory::debugger_access())
         r482f &= 0x7f;
       return status;
     }

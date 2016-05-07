@@ -19,10 +19,10 @@ uint8 SuperFX::mmio_read(unsigned addr) {
 
     case 0x3031: {
       uint8 r = regs.sfr >> 8;
-	  if(!Memory::debugger_access()) {
+      if(!Memory::debugger_access()) {
         regs.sfr.irq = 0;
         cpu.regs.irq = 0;
-	  }
+      }
       return r;
     }
 

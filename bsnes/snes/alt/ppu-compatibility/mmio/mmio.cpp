@@ -603,7 +603,7 @@ uint8 r = 0x00;
     r |= 0x40;
   } else if(regs.counters_latched == true) {
     r |= 0x40;
-	if(!Memory::debugger_access())
+    if(!Memory::debugger_access())
       regs.counters_latched = false;
   }
   r |= (regs.ppu2_mdr & 0x20);

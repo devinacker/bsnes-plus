@@ -719,7 +719,7 @@ uint8 PPU::mmio_r213e() {
 uint8 PPU::mmio_r213f() {
   uint8 r = regs.ppu2_mdr;
 
-  if(!Memory::debugger_access() {
+  if(!Memory::debugger_access()) {
     regs.latch_hcounter = 0;
     regs.latch_vcounter = 0;
   }
@@ -730,7 +730,7 @@ uint8 PPU::mmio_r213f() {
     r |= 0x40;
   } else if(regs.counters_latched) {
     r |= 0x40;
-	if(!Memory::debugger_access())
+    if(!Memory::debugger_access())
       regs.counters_latched = false;
   }
   r |= (system.region() == System::Region::NTSC ? 0 : 1) << 4;
