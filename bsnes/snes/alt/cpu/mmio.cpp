@@ -4,19 +4,22 @@ uint8 CPU::mmio_read(unsigned addr) {
   switch(addr & 0xffff) {
     case 0x2180: {
       uint8 result = bus.read(0x7e0000 | status.wram_addr);
-      status.wram_addr = (status.wram_addr + 1) & 0x01ffff;
+	  if(!Memory::debugger_access())
+        status.wram_addr = (status.wram_addr + 1) & 0x01ffff;
       return result;
     }
 
     case 0x4016: {
       uint8 result = regs.mdr & 0xfc;
-      result |= input.port_read(0) & 3;
+      if(!Memory::debugger_access())
+        result |= input.port_read(0) & 3;
       return result;
     }
 
     case 0x4017: {
       uint8 result = (regs.mdr & 0xe0) | 0x1c;
-      result |= input.port_read(1) & 3;
+      if(!Memory::debugger_access())
+        result |= input.port_read(1) & 3;
       return result;
     }
 
@@ -24,14 +27,16 @@ uint8 CPU::mmio_read(unsigned addr) {
       uint8 result = (regs.mdr & 0x70);
       result |= status.nmi_line << 7;
       result |= 0x02;  //CPU revision
-      status.nmi_line = false;
+      if(!Memory::debugger_access())
+        status.nmi_line = false;
       return result;
     }
 
     case 0x4211: {
       uint8 result = (regs.mdr & 0x7f);
       result |= status.irq_line << 7;
-      status.irq_line = false;
+      if(!Memory::debugger_access())
+        status.irq_line = false;
       return result;
     }
 

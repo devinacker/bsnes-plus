@@ -1,7 +1,8 @@
 #ifdef SMP_CPP
 
 uint8 SMP::mmio_read(unsigned addr) {
-  cpu.synchronize_smp();
+  if(!Memory::debugger_access())
+    cpu.synchronize_smp();
   return port.smp_to_cpu[addr & 3];
 }
 
