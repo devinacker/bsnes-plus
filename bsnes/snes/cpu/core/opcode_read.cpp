@@ -201,9 +201,9 @@ L rd.h = op_readdbr(aa.w + regs.y.w + 1);
 template<void (CPUcore::*op)()> void CPUcore::op_read_ildp_b() {
   dp = op_readpc();
   op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
-  aa.b = op_readdp(dp + 2);
+  aa.l = op_readdpn(dp + 0);
+  aa.h = op_readdpn(dp + 1);
+  aa.b = op_readdpn(dp + 2);
 L rd.l = op_readlong(aa.d);
   call(op);
 }
@@ -211,9 +211,9 @@ L rd.l = op_readlong(aa.d);
 template<void (CPUcore::*op)()> void CPUcore::op_read_ildp_w() {
   dp = op_readpc();
   op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
-  aa.b = op_readdp(dp + 2);
+  aa.l = op_readdpn(dp + 0);
+  aa.h = op_readdpn(dp + 1);
+  aa.b = op_readdpn(dp + 2);
   rd.l = op_readlong(aa.d + 0);
 L rd.h = op_readlong(aa.d + 1);
   call(op);
@@ -222,9 +222,9 @@ L rd.h = op_readlong(aa.d + 1);
 template<void (CPUcore::*op)()> void CPUcore::op_read_ildpy_b() {
   dp = op_readpc();
   op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
-  aa.b = op_readdp(dp + 2);
+  aa.l = op_readdpn(dp + 0);
+  aa.h = op_readdpn(dp + 1);
+  aa.b = op_readdpn(dp + 2);
 L rd.l = op_readlong(aa.d + regs.y.w);
   call(op);
 }
@@ -232,9 +232,9 @@ L rd.l = op_readlong(aa.d + regs.y.w);
 template<void (CPUcore::*op)()> void CPUcore::op_read_ildpy_w() {
   dp = op_readpc();
   op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
-  aa.b = op_readdp(dp + 2);
+  aa.l = op_readdpn(dp + 0);
+  aa.h = op_readdpn(dp + 1);
+  aa.b = op_readdpn(dp + 2);
   rd.l = op_readlong(aa.d + regs.y.w + 0);
 L rd.h = op_readlong(aa.d + regs.y.w + 1);
   call(op);

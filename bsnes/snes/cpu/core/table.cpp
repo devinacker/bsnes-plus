@@ -1,25 +1,22 @@
 #ifdef CPUCORE_CPP
 
 void CPUcore::initialize_opcode_table() {
-  #define opA(  id, name       ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name;
-  #define opAII(id, name, x, y ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name<x, y>;
-  #define opE(  id, name       ) op_table[table_EM + id] = &CPUcore::op_##name##_e; op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_n;
-  #define opEI( id, name, x    ) op_table[table_EM + id] = &CPUcore::op_##name##_e<x>; op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_n<x>;
-  #define opEII(id, name, x, y ) op_table[table_EM + id] = &CPUcore::op_##name##_e<x, y>; op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_n<x, y>;
-  #define opM(  id, name       ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w;
-  #define opMI( id, name, x    ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<x>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x>;
-  #define opMII(id, name, x, y ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<x, y>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x, y>;
-  #define opMF( id, name, fn   ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w>;
-  #define opMFI(id, name, fn, x) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b, x>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w, x>;
-  #define opX(  id, name       ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w;
-  #define opXI( id, name, x    ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<x>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x>;
-  #define opXII(id, name, x, y ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<x, y>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x, y>;
-  #define opXF( id, name, fn   ) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w>;
-  #define opXFI(id, name, fn, x) op_table[table_EM + id] = op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b, x>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w, x>;
+  #define opA(  id, name       ) op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name;
+  #define opAII(id, name, x, y ) op_table[table_MX + id] = op_table[table_Mx + id] = op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name<x, y>;
+  #define opM(  id, name       ) op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w;
+  #define opMI( id, name, x    ) op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<x>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x>;
+  #define opMII(id, name, x, y ) op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<x, y>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x, y>;
+  #define opMF( id, name, fn   ) op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w>;
+  #define opMFI(id, name, fn, x) op_table[table_MX + id] = op_table[table_Mx + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b, x>; op_table[table_mX + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w, x>;
+  #define opX(  id, name       ) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w;
+  #define opXI( id, name, x    ) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<x>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x>;
+  #define opXII(id, name, x, y ) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<x, y>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<x, y>;
+  #define opXF( id, name, fn   ) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w>;
+  #define opXFI(id, name, fn, x) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b, x>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w, x>;
 
-  opEII(0x00, interrupt, 0xfffe, 0xffe6)
+  opAII(0x00, interrupt, 0xfffe, 0xffe6)
   opMF (0x01, read_idpx, ora)
-  opEII(0x02, interrupt, 0xfff4, 0xffe4)
+  opAII(0x02, interrupt, 0xfff4, 0xffe4)
   opMF (0x03, read_sr, ora)
   opMF (0x04, adjust_dp, tsb)
   opMF (0x05, read_dp, ora)
@@ -28,7 +25,7 @@ void CPUcore::initialize_opcode_table() {
   opA  (0x08, php)
   opMF (0x09, read_const, ora)
   opM  (0x0a, asl_imm)
-  opE  (0x0b, phd)
+  opA  (0x0b, phd)
   opMF (0x0c, adjust_addr, tsb)
   opMF (0x0d, read_addr, ora)
   opMF (0x0e, adjust_addr, asl)
@@ -41,26 +38,26 @@ void CPUcore::initialize_opcode_table() {
   opMFI(0x15, read_dpr, ora, X)
   opMF (0x16, adjust_dpx, asl)
   opMF (0x17, read_ildpy, ora)
-  opAII(0x18, flag, 0x01, 0x00)
+  opA  (0x18, clc)
   opMF (0x19, read_addry, ora)
   opMII(0x1a, adjust_imm, A, +1)
-  opE  (0x1b, tcs)
+  opA  (0x1b, tcs)
   opMF (0x1c, adjust_addr, trb)
   opMF (0x1d, read_addrx, ora)
   opMF (0x1e, adjust_addrx, asl)
   opMF (0x1f, read_longx, ora)
   opA  (0x20, jsr_addr)
   opMF (0x21, read_idpx, and)
-  opE  (0x22, jsr_long)
+  opA  (0x22, jsr_long)
   opMF (0x23, read_sr, and)
   opMF (0x24, read_dp, bit)
   opMF (0x25, read_dp, and)
   opMF (0x26, adjust_dp, rol)
   opMF (0x27, read_ildp, and)
-  opE  (0x28, plp)
+  opA  (0x28, plp)
   opMF (0x29, read_const, and)
   opM  (0x2a, rol_imm)
-  opE  (0x2b, pld)
+  opA  (0x2b, pld)
   opMF (0x2c, read_addr, bit)
   opMF (0x2d, read_addr, and)
   opMF (0x2e, adjust_addr, rol)
@@ -73,7 +70,7 @@ void CPUcore::initialize_opcode_table() {
   opMFI(0x35, read_dpr, and, X)
   opMF (0x36, adjust_dpx, rol)
   opMF (0x37, read_ildpy, and)
-  opAII(0x38, flag, 0x01, 0x01)
+  opA  (0x38, sec)
   opMF (0x39, read_addry, and)
   opMII(0x3a, adjust_imm, A, -1)
   opAII(0x3b, transfer_w, S, A)
@@ -81,7 +78,7 @@ void CPUcore::initialize_opcode_table() {
   opMF (0x3d, read_addrx, and)
   opMF (0x3e, adjust_addrx, rol)
   opMF (0x3f, read_longx, and)
-  opE  (0x40, rti)
+  opA  (0x40, rti)
   opMF (0x41, read_idpx, eor)
   opA  (0x42, wdm)
   opMF (0x43, read_sr, eor)
@@ -105,7 +102,7 @@ void CPUcore::initialize_opcode_table() {
   opMFI(0x55, read_dpr, eor, X)
   opMF (0x56, adjust_dpx, lsr)
   opMF (0x57, read_ildpy, eor)
-  opAII(0x58, flag, 0x04, 0x00)
+  opA  (0x58, cli)
   opMF (0x59, read_addry, eor)
   opXI (0x5a, push, Y)
   opAII(0x5b, transfer_w, A, D)
@@ -115,7 +112,7 @@ void CPUcore::initialize_opcode_table() {
   opMF (0x5f, read_longx, eor)
   opA  (0x60, rts)
   opMF (0x61, read_idpx, adc)
-  opE  (0x62, per)
+  opA  (0x62, per)
   opMF (0x63, read_sr, adc)
   opMI (0x64, write_dp, Z)
   opMF (0x65, read_dp, adc)
@@ -124,7 +121,7 @@ void CPUcore::initialize_opcode_table() {
   opMI (0x68, pull, A)
   opMF (0x69, read_const, adc)
   opM  (0x6a, ror_imm)
-  opE  (0x6b, rtl)
+  opA  (0x6b, rtl)
   opA  (0x6c, jmp_iaddr)
   opMF (0x6d, read_addr, adc)
   opMF (0x6e, adjust_addr, ror)
@@ -137,7 +134,7 @@ void CPUcore::initialize_opcode_table() {
   opMFI(0x75, read_dpr, adc, X)
   opMF (0x76, adjust_dpx, ror)
   opMF (0x77, read_ildpy, adc)
-  opAII(0x78, flag, 0x04, 0x04)
+  opA  (0x78, sei)
   opMF (0x79, read_addry, adc)
   opXI (0x7a, pull, Y)
   opAII(0x7b, transfer_w, D, A)
@@ -171,7 +168,7 @@ void CPUcore::initialize_opcode_table() {
   opM  (0x97, sta_ildpy)
   opMII(0x98, transfer, Y, A)
   opMII(0x99, write_addrr, A, Y)
-  opE  (0x9a, txs)
+  opA  (0x9a, txs)
   opXII(0x9b, transfer, X, Y)
   opMI (0x9c, write_addr, Z)
   opMII(0x9d, write_addrr, A, X)
@@ -201,7 +198,7 @@ void CPUcore::initialize_opcode_table() {
   opMFI(0xb5, read_dpr, lda, X)
   opXFI(0xb6, read_dpr, ldx, Y)
   opMF (0xb7, read_ildpy, lda)
-  opAII(0xb8, flag, 0x40, 0x00)
+  opA  (0xb8, clv)
   opMF (0xb9, read_addry, lda)
   opX  (0xba, tsx)
   opXII(0xbb, transfer, Y, X)
@@ -211,7 +208,7 @@ void CPUcore::initialize_opcode_table() {
   opMF (0xbf, read_longx, lda)
   opXF (0xc0, read_const, cpy)
   opMF (0xc1, read_idpx, cmp)
-  opEI (0xc2, pflag, 0)
+  opA  (0xc2, rep)
   opMF (0xc3, read_sr, cmp)
   opXF (0xc4, read_dp, cpy)
   opMF (0xc5, read_dp, cmp)
@@ -229,11 +226,11 @@ void CPUcore::initialize_opcode_table() {
   opMF (0xd1, read_idpy, cmp)
   opMF (0xd2, read_idp, cmp)
   opMF (0xd3, read_isry, cmp)
-  opE  (0xd4, pei)
+  opA  (0xd4, pei)
   opMFI(0xd5, read_dpr, cmp, X)
   opMF (0xd6, adjust_dpx, dec)
   opMF (0xd7, read_ildpy, cmp)
-  opAII(0xd8, flag, 0x08, 0x00)
+  opA  (0xd8, cld)
   opMF (0xd9, read_addry, cmp)
   opXI (0xda, push, X)
   opA  (0xdb, stp)
@@ -243,7 +240,7 @@ void CPUcore::initialize_opcode_table() {
   opMF (0xdf, read_longx, cmp)
   opXF (0xe0, read_const, cpx)
   opMF (0xe1, read_idpx, sbc)
-  opEI (0xe2, pflag, 1)
+  opA  (0xe2, sep)
   opMF (0xe3, read_sr, sbc)
   opXF (0xe4, read_dp, cpx)
   opMF (0xe5, read_dp, sbc)
@@ -261,24 +258,21 @@ void CPUcore::initialize_opcode_table() {
   opMF (0xf1, read_idpy, sbc)
   opMF (0xf2, read_idp, sbc)
   opMF (0xf3, read_isry, sbc)
-  opE  (0xf4, pea)
+  opA  (0xf4, pea)
   opMFI(0xf5, read_dpr, sbc, X)
   opMF (0xf6, adjust_dpx, inc)
   opMF (0xf7, read_ildpy, sbc)
-  opAII(0xf8, flag, 0x08, 0x08)
+  opA  (0xf8, sed)
   opMF (0xf9, read_addry, sbc)
   opXI (0xfa, pull, X)
   opA  (0xfb, xce)
-  opE  (0xfc, jsr_iaddrx)
+  opA  (0xfc, jsr_iaddrx)
   opMF (0xfd, read_addrx, sbc)
   opMF (0xfe, adjust_addrx, inc)
   opMF (0xff, read_longx, sbc)
 
   #undef opA
   #undef opAII
-  #undef opE
-  #undef opEI
-  #undef opEII
   #undef opM
   #undef opMI
   #undef opMII
@@ -292,9 +286,7 @@ void CPUcore::initialize_opcode_table() {
 }
 
 void CPUcore::update_table() {
-  if(regs.e) {
-    opcode_table = &op_table[table_EM];
-  } else if(regs.p.m) {
+  if(regs.p.m) {
     if(regs.p.x) {
       opcode_table = &op_table[table_MX];
     } else {

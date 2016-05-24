@@ -29,14 +29,18 @@ alwaysinline uint8_t op_readpbr(uint32_t addr) {
 
 alwaysinline uint8_t op_readdp(uint32_t addr) {
   if(regs.e && regs.d.l == 0x00) {
-    return op_read((regs.d & 0xff00) + ((regs.d + (addr & 0xffff)) & 0xff));
+    return op_read(regs.d + (addr & 0xff));
   } else {
-    return op_read((regs.d + (addr & 0xffff)) & 0xffff);
+    return op_read((regs.d + addr) & 0xffff);
   }
 }
 
+alwaysinline uint8_t op_readdpn(uint32_t addr) {
+  return op_read((regs.d + addr) & 0xffff);
+}
+
 alwaysinline uint8_t op_readsp(uint32_t addr) {
-  return op_read((regs.s + (addr & 0xffff)) & 0xffff);
+  return op_read((regs.s + addr) & 0xffff);
 }
 
 alwaysinline void op_writestack(uint8_t data) {
@@ -66,12 +70,12 @@ alwaysinline void op_writepbr(uint32_t addr, uint8_t data) {
 
 alwaysinline void op_writedp(uint32_t addr, uint8_t data) {
   if(regs.e && regs.d.l == 0x00) {
-    op_write((regs.d & 0xff00) + ((regs.d + (addr & 0xffff)) & 0xff), data);
+    op_write(regs.d + (addr & 0xff), data);
   } else {
-    op_write((regs.d + (addr & 0xffff)) & 0xffff, data);
+    op_write((regs.d + addr) & 0xffff, data);
   }
 }
 
 alwaysinline void op_writesp(uint32_t addr, uint8_t data) {
-  op_write((regs.s + (addr & 0xffff)) & 0xffff, data);
+  op_write((regs.s + addr) & 0xffff, data);
 }

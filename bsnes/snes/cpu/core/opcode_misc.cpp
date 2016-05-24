@@ -11,9 +11,7 @@ L op_readpc();
 void CPUcore::op_xba() {
   op_io();
 L op_io();
-  regs.a.l ^= regs.a.h;
-  regs.a.h ^= regs.a.l;
-  regs.a.l ^= regs.a.h;
+  std::swap(regs.a.l, regs.a.h);
   regs.p.n = (regs.a.l & 0x80);
   regs.p.z = (regs.a.l == 0);
 }
@@ -44,30 +42,18 @@ L op_io();
   if(regs.a.w--) regs.pc.w -= 3;
 }
 
-template<int vectorE, int vectorN> void CPUcore::op_interrupt_e() {
+template<int vectorE, int vectorN> void CPUcore::op_interrupt() {
+  int vector = regs.e ? vectorE : vectorN;
   op_readpc();
+  if(!regs.e) op_writestack(regs.pc.b);
   op_writestack(regs.pc.h);
   op_writestack(regs.pc.l);
   op_writestack(regs.p);
-  rd.l = op_readlong(vectorE + 0);
+  rd.l = op_readlong(vector + 0);
   regs.pc.b = 0;
   regs.p.i = 1;
   regs.p.d = 0;
-L rd.h = op_readlong(vectorE + 1);
-  regs.pc.w = rd.w;
-}
-
-template<int vectorE, int vectorN> void CPUcore::op_interrupt_n() {
-  op_readpc();
-  op_writestack(regs.pc.b);
-  op_writestack(regs.pc.h);
-  op_writestack(regs.pc.l);
-  op_writestack(regs.p);
-  rd.l = op_readlong(vectorN + 0);
-  regs.pc.b = 0x00;
-  regs.p.i = 1;
-  regs.p.d = 0;
-L rd.h = op_readlong(vectorN + 1);
+L rd.h = op_readlong(vector + 1);
   regs.pc.w = rd.w;
 }
 
@@ -93,35 +79,59 @@ L op_io_irq();
   if(regs.e) {
     regs.p |= 0x30;
     regs.s.h = 0x01;
-  }
-  if(regs.p.x) {
     regs.x.h = 0x00;
     regs.y.h = 0x00;
   }
   update_table();
 }
 
-template<int mask, int value> void CPUcore::op_flag() {
+void CPUcore::op_clc() {
 L op_io_irq();
-  regs.p = (regs.p & ~mask) | value;
+  regs.p.c = 0;
 }
 
-template<int mode> void CPUcore::op_pflag_e() {
-  rd.l = op_readpc();
+void CPUcore::op_sec() {
+L op_io_irq();
+  regs.p.c = 1;
+}
+
+void CPUcore::op_cli() {
+L op_io_irq();
+  regs.p.i = 0;
+}
+
+void CPUcore::op_sei() {
+L op_io_irq();
+  regs.p.i = 1;
+}
+
+void CPUcore::op_clv() {
+L op_io_irq();
+  regs.p.v = 0;
+}
+
+void CPUcore::op_cld() {
+L op_io_irq();
+  regs.p.d = 0;
+}
+
+void CPUcore::op_sed() {
+L op_io_irq();
+  regs.p.d = 1;
+}
+
+void CPUcore::op_rep() {
+  rd.l = ~op_readpc();
+  if(regs.e) rd.l |= 0x30;
 L op_io();
-  regs.p = (mode ? regs.p | rd.l : regs.p & ~rd.l);
-  regs.p |= 0x30;
-  if(regs.p.x) {
-    regs.x.h = 0x00;
-    regs.y.h = 0x00;
-  }
+  regs.p &= rd.l;
   update_table();
 }
 
-template<int mode> void CPUcore::op_pflag_n() {
+void CPUcore::op_sep() {
   rd.l = op_readpc();
 L op_io();
-  regs.p = (mode ? regs.p | rd.l : regs.p & ~rd.l);
+  regs.p |= rd.l;
   if(regs.p.x) {
     regs.x.h = 0x00;
     regs.y.h = 0x00;
@@ -143,14 +153,10 @@ L op_io_irq();
   regs.p.z = (regs.r[to].w == 0);
 }
 
-void CPUcore::op_tcs_e() {
-L op_io_irq();
-  regs.s.l = regs.a.l;
-}
-
-void CPUcore::op_tcs_n() {
+void CPUcore::op_tcs() {
 L op_io_irq();
   regs.s.w = regs.a.w;
+  if(regs.e) regs.s.h = 0x01;
 }
 
 void CPUcore::op_tsx_b() {
@@ -167,14 +173,10 @@ L op_io_irq();
   regs.p.z = (regs.x.w == 0);
 }
 
-void CPUcore::op_txs_e() {
-L op_io_irq();
-  regs.s.l = regs.x.l;
-}
-
-void CPUcore::op_txs_n() {
+void CPUcore::op_txs() {
 L op_io_irq();
   regs.s.w = regs.x.w;
+  if(regs.e) regs.s.h = 0x01;
 }
 
 template<int n> void CPUcore::op_push_b() {
@@ -188,17 +190,11 @@ template<int n> void CPUcore::op_push_w() {
 L op_writestack(regs.r[n].l);
 }
 
-void CPUcore::op_phd_e() {
+void CPUcore::op_phd() {
   op_io();
   op_writestackn(regs.d.h);
 L op_writestackn(regs.d.l);
-  regs.s.h = 0x01;
-}
-
-void CPUcore::op_phd_n() {
-  op_io();
-  op_writestackn(regs.d.h);
-L op_writestackn(regs.d.l);
+  if(regs.e) regs.s.h = 0x01;
 }
 
 void CPUcore::op_phb() {
@@ -233,23 +229,14 @@ L regs.r[n].h = op_readstack();
   regs.p.z = (regs.r[n].w == 0);
 }
 
-void CPUcore::op_pld_e() {
+void CPUcore::op_pld() {
   op_io();
   op_io();
   regs.d.l = op_readstackn();
 L regs.d.h = op_readstackn();
   regs.p.n = (regs.d.w & 0x8000);
   regs.p.z = (regs.d.w == 0);
-  regs.s.h = 0x01;
-}
-
-void CPUcore::op_pld_n() {
-  op_io();
-  op_io();
-  regs.d.l = op_readstackn();
-L regs.d.h = op_readstackn();
-  regs.p.n = (regs.d.w & 0x8000);
-  regs.p.z = (regs.d.w == 0);
+  if(regs.e) regs.s.h = 0x01;
 }
 
 void CPUcore::op_plb() {
@@ -260,10 +247,10 @@ L regs.db = op_readstack();
   regs.p.z = (regs.db == 0);
 }
 
-void CPUcore::op_plp_e() {
+void CPUcore::op_plp() {
   op_io();
   op_io();
-L regs.p = op_readstack() | 0x30;
+L regs.p = op_readstack() | (regs.e ? 0x30 : 0);
   if(regs.p.x) {
     regs.x.h = 0x00;
     regs.y.h = 0x00;
@@ -271,68 +258,32 @@ L regs.p = op_readstack() | 0x30;
   update_table();
 }
 
-void CPUcore::op_plp_n() {
-  op_io();
-  op_io();
-L regs.p = op_readstack();
-  if(regs.p.x) {
-    regs.x.h = 0x00;
-    regs.y.h = 0x00;
-  }
-  update_table();
-}
-
-void CPUcore::op_pea_e() {
+void CPUcore::op_pea() {
   aa.l = op_readpc();
   aa.h = op_readpc();
   op_writestackn(aa.h);
 L op_writestackn(aa.l);
-  regs.s.h = 0x01;
+  if(regs.e) regs.s.h = 0x01;
 }
 
-void CPUcore::op_pea_n() {
-  aa.l = op_readpc();
-  aa.h = op_readpc();
-  op_writestackn(aa.h);
-L op_writestackn(aa.l);
-}
-
-void CPUcore::op_pei_e() {
+void CPUcore::op_pei() {
   dp = op_readpc();
   op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
+  aa.l = op_readdpn(dp + 0);
+  aa.h = op_readdpn(dp + 1);
   op_writestackn(aa.h);
 L op_writestackn(aa.l);
-  regs.s.h = 0x01;
+  if(regs.e) regs.s.h = 0x01;
 }
 
-void CPUcore::op_pei_n() {
-  dp = op_readpc();
-  op_io_cond2();
-  aa.l = op_readdp(dp + 0);
-  aa.h = op_readdp(dp + 1);
-  op_writestackn(aa.h);
-L op_writestackn(aa.l);
-}
-
-void CPUcore::op_per_e() {
+void CPUcore::op_per() {
   aa.l = op_readpc();
   aa.h = op_readpc();
   op_io();
   rd.w = regs.pc.d + (int16)aa.w;
   op_writestackn(rd.h);
 L op_writestackn(rd.l);
-  regs.s.h = 0x01;
-}
-
-void CPUcore::op_per_n() {
-  aa.l = op_readpc();
-  aa.h = op_readpc();
-  op_io();
-  rd.w = regs.pc.d + (int16)aa.w;
-  op_writestackn(rd.h);
-L op_writestackn(rd.l);
+  if(regs.e) regs.s.h = 0x01;
 }
 
 #endif
