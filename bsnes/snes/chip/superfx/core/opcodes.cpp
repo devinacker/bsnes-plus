@@ -46,68 +46,23 @@ void SuperFX::op_rol() {
 }
 
 //$05 bra e
+//$06 bge e
+//$07 blt e
+//$08 bne e
+//$09 beq e
+//$0a bpl e
+//$0b bmi e
+//$0c bcc e
+//$0d bcs e
+//$0e bvc e
+//$0f bvs e
 void SuperFX::op_bra() {
   regs.r[15] += (int8)pipe();
 }
 
-//$06 bge e
-void SuperFX::op_bge() {
-  int8 e = pipe();
-  if(regs.sfr.s == regs.sfr.ov) regs.r[15] += e;
-}
-
-//$07 blt e
-void SuperFX::op_blt() {
-  int8 e = pipe();
-  if(regs.sfr.s != regs.sfr.ov) regs.r[15] += e;
-}
-
-//$08 bne e
-void SuperFX::op_bne() {
-  int8 e = pipe();
-  if(!regs.sfr.z) regs.r[15] += e;
-}
-
-//$09 beq e
-void SuperFX::op_beq() {
-  int8 e = pipe();
-  if(regs.sfr.z) regs.r[15] += e;
-}
-
-//$0a bpl e
-void SuperFX::op_bpl() {
-  int8 e = pipe();
-  if(!regs.sfr.s) regs.r[15] += e;
-}
-
-//$0b bmi e
-void SuperFX::op_bmi() {
-  int8 e = pipe();
-  if(regs.sfr.s) regs.r[15] += e;
-}
-
-//$0c bcc e
-void SuperFX::op_bcc() {
-  int8 e = pipe();
-  if(!regs.sfr.cy) regs.r[15] += e;
-}
-
-//$0d bcs e
-void SuperFX::op_bcs() {
-  int8 e = pipe();
-  if(regs.sfr.cy) regs.r[15] += e;
-}
-
-//$0e bvc e
-void SuperFX::op_bvc() {
-  int8 e = pipe();
-  if(!regs.sfr.ov) regs.r[15] += e;
-}
-
-//$0f bvs e
-void SuperFX::op_bvs() {
-  int8 e = pipe();
-  if(regs.sfr.ov) regs.r[15] += e;
+//untaken branch
+void SuperFX::op_nobranch() {
+  pipe();
 }
 
 //$10-1f(b0): to rN
