@@ -28,17 +28,21 @@ uint8 BSXBase::mmio_read(unsigned addr) {
     case 0x2190: return regs.r2190;
 
     case 0x2192: {
-      unsigned counter = regs.r2192_counter++;
-      if(regs.r2192_counter >= 18) regs.r2192_counter = 0;
+      unsigned counter = regs.r2192_counter;
+      
+      if(!Memory::debugger_access()) {
+        regs.r2192_counter++;
+        if(regs.r2192_counter >= 18) regs.r2192_counter = 0;
 
-      if(counter == 0) {
-        time_t rawtime;
-        time(&rawtime);
-        tm *t = localtime(&rawtime);
+        if(counter == 0) {
+          time_t rawtime;
+          time(&rawtime);
+          tm *t = localtime(&rawtime);
 
-        regs.r2192_hour   = t->tm_hour;
-        regs.r2192_minute = t->tm_min;
-        regs.r2192_second = t->tm_sec;
+          regs.r2192_hour   = t->tm_hour;
+          regs.r2192_minute = t->tm_min;
+          regs.r2192_second = t->tm_sec;
+        }
       }
 
       switch(counter) {

@@ -470,9 +470,11 @@ uint8 SA1::mmio_r2301() {
 //(HCR) hcounter read
 uint8 SA1::mmio_r2302() {
   //latch counters
-  mmio.hcr = status.hcounter >> 2;
-  mmio.vcr = status.vcounter;
-                            return mmio.hcr >> 0; }
+  if(!Memory::debugger_access()) {
+    mmio.hcr = status.hcounter >> 2;
+    mmio.vcr = status.vcounter;
+  }
+                          return mmio.hcr >> 0; }
 uint8 SA1::mmio_r2303() { return mmio.hcr >> 8; }
 
 //(VCR) vcounter read
@@ -505,7 +507,7 @@ uint8 SA1::mmio_r230d() {
               | (vbrbus.read(mmio.va + 2) << 16);
   data >>= mmio.vbit;
 
-  if(mmio.hl == 1) {
+  if(!Memory::debugger_access() && (mmio.hl == 1)) {
     //auto-increment mode
     mmio.vbit += mmio.vb;
     mmio.va += (mmio.vbit >> 3);
@@ -521,7 +523,8 @@ uint8 SA1::mmio_r230e() {
 }
 
 uint8 SA1::mmio_read(unsigned addr) {
-  (co_active() == cpu.thread ? cpu.synchronize_coprocessor() : synchronize_cpu());
+  if(!Memory::debugger_access())
+    (co_active() == cpu.thread ? cpu.synchronize_coprocessor() : synchronize_cpu());
   switch(addr) {
     case 0x2300: return mmio_r2300();
     case 0x2301: return mmio_r2301();

@@ -246,15 +246,14 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
   } else if(mapper == SDD1ROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
-    xml << "    <map mode='linear' address='40-7d:0000-ffff'/>\n";
     xml << "    <map mode='linear' address='80-bf:8000-ffff'/>\n";
     xml << "  </rom>\n";
 
     if(ram_size > 0) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
-      xml << "    <map mode='linear' address='70-7d:0000-7fff'/>\n";
+      xml << "    <map mode='linear' address='00-3f:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='80-bf:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='70-73:0000-ffff'/>\n";
       xml << "  </ram>\n";
     }
     xml << "  <sdd1>\n";
@@ -262,8 +261,8 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='c0-ff:0000-ffff'/>\n";
     xml << "    </mcu>\n";
     xml << "    <mmio>\n";
-    xml << "      <map address='00-3f:4800-4807'/>\n";
-    xml << "      <map address='80-bf:4800-4807'/>\n";
+    xml << "      <map address='00-3f:4800-480f'/>\n";
+    xml << "      <map address='80-bf:4800-480f'/>\n";
     xml << "    </mmio>\n";
     xml << "  </sdd1>\n";
   } else if(mapper == SPC7110ROM) {

@@ -434,29 +434,32 @@ void PPU::mmio_w2133(uint8 value) {
 uint8 PPU::mmio_r2134() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  regs.ppu1_mdr = r;
-  return regs.ppu1_mdr;
+  if(!Memory::debugger_access())
+    regs.ppu1_mdr = r;
+  return r;
 }
 
 //MPYM
 uint8 PPU::mmio_r2135() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  regs.ppu1_mdr = r >> 8;
-  return regs.ppu1_mdr;
+  if(!Memory::debugger_access())
+    regs.ppu1_mdr = r >> 8;
+  return r >> 8;
 }
 
 //MPYH
 uint8 PPU::mmio_r2136() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  regs.ppu1_mdr = r >> 16;
-  return regs.ppu1_mdr;
+  if(!Memory::debugger_access())
+    regs.ppu1_mdr = r >> 16;
+  return r >> 16;
 }
 
 //SLHV
 uint8 PPU::mmio_r2137() {
-  if(cpu.pio() & 0x80) {
+  if(!Memory::debugger_access() && (cpu.pio() & 0x80)) {
     latch_counters();
   }
   return cpu.regs.mdr;
@@ -464,6 +467,9 @@ uint8 PPU::mmio_r2137() {
 
 //OAMDATAREAD
 uint8 PPU::mmio_r2138() {
+  if(Memory::debugger_access())
+    return oam_mmio_read(regs.oam_addr);
+  
   regs.ppu1_mdr = oam_mmio_read(regs.oam_addr);
 
   regs.oam_addr++;
@@ -476,6 +482,10 @@ uint8 PPU::mmio_r2138() {
 //VMDATALREAD
 uint8 PPU::mmio_r2139() {
 uint16 addr = get_vram_address();
+
+  if(Memory::debugger_access())
+    return regs.vram_readbuffer;
+
   regs.ppu1_mdr = regs.vram_readbuffer;
   if(regs.vram_incmode == 0) {
     addr &= 0xfffe;
@@ -489,6 +499,10 @@ uint16 addr = get_vram_address();
 //VMDATAHREAD
 uint8 PPU::mmio_r213a() {
 uint16 addr = get_vram_address() + 1;
+  
+  if(Memory::debugger_access())
+    return regs.vram_readbuffer >> 8;
+
   regs.ppu1_mdr = regs.vram_readbuffer >> 8;
   if(regs.vram_incmode == 1) {
     addr &= 0xfffe;
@@ -504,12 +518,19 @@ uint16 addr = get_vram_address() + 1;
 //therefore, the high byte read from each color does not
 //update bit 7 of the PPU2 MDR.
 uint8 PPU::mmio_r213b() {
+  uint8 r = regs.ppu2_mdr;
+
   if(!(regs.cgram_addr & 1)) {
-    regs.ppu2_mdr  = cgram_mmio_read(regs.cgram_addr) & 0xff;
+    r  = cgram_mmio_read(regs.cgram_addr) & 0xff;
   } else {
-    regs.ppu2_mdr &= 0x80;
-    regs.ppu2_mdr |= cgram_mmio_read(regs.cgram_addr) & 0x7f;
+    r &= 0x80;
+    r |= cgram_mmio_read(regs.cgram_addr) & 0x7f;
   }
+  
+  if(Memory::debugger_access())
+    return r;
+  
+  regs.ppu2_mdr = r;
   regs.cgram_addr++;
   regs.cgram_addr &= 0x01ff;
   return regs.ppu2_mdr;
@@ -517,24 +538,38 @@ uint8 PPU::mmio_r213b() {
 
 //OPHCT
 uint8 PPU::mmio_r213c() {
+  uint8 r = regs.ppu2_mdr;
+
   if(!regs.latch_hcounter) {
-    regs.ppu2_mdr  = regs.hcounter & 0xff;
+    r  = regs.hcounter & 0xff;
   } else {
-    regs.ppu2_mdr &= 0xfe;
-    regs.ppu2_mdr |= (regs.hcounter >> 8) & 1;
+    r &= 0xfe;
+    r |= (regs.hcounter >> 8) & 1;
   }
+  
+  if(Memory::debugger_access())
+    return r;
+  
+  regs.ppu2_mdr = r;
   regs.latch_hcounter ^= 1;
   return regs.ppu2_mdr;
 }
 
 //OPVCT
 uint8 PPU::mmio_r213d() {
+  uint8 r = regs.ppu2_mdr;
+
   if(!regs.latch_vcounter) {
-    regs.ppu2_mdr  = regs.vcounter & 0xff;
+    r  = regs.vcounter & 0xff;
   } else {
-    regs.ppu2_mdr &= 0xfe;
-    regs.ppu2_mdr |= (regs.vcounter >> 8) & 1;
+    r &= 0xfe;
+    r |= (regs.vcounter >> 8) & 1;
   }
+  
+  if(Memory::debugger_access())
+    return r;
+  
+  regs.ppu2_mdr = r;
   regs.latch_vcounter ^= 1;
   return regs.ppu2_mdr;
 }
@@ -546,6 +581,10 @@ uint8 r = 0x00;
   r |= (regs.range_over) ? 0x40 : 0x00;
   r |= (regs.ppu1_mdr & 0x10);
   r |= (ppu1_version & 0x0f);
+  
+  if(Memory::debugger_access())
+    return r;
+
   regs.ppu1_mdr = r;
   return regs.ppu1_mdr;
 }
@@ -553,25 +592,34 @@ uint8 r = 0x00;
 //STAT78
 uint8 PPU::mmio_r213f() {
 uint8 r = 0x00;
-  regs.latch_hcounter = 0;
-  regs.latch_vcounter = 0;
+
+  if(!Memory::debugger_access) {
+    regs.latch_hcounter = 0;
+    regs.latch_vcounter = 0;
+  }
 
   r |= cpu.field() << 7;
   if(!(cpu.pio() & 0x80)) {
     r |= 0x40;
   } else if(regs.counters_latched == true) {
     r |= 0x40;
-    regs.counters_latched = false;
+    if(!Memory::debugger_access())
+      regs.counters_latched = false;
   }
   r |= (regs.ppu2_mdr & 0x20);
   r |= (region << 4); //0 = NTSC, 1 = PAL
   r |= (ppu2_version & 0x0f);
+  
+  if(Memory::debugger_access())
+    return r;
+  
   regs.ppu2_mdr = r;
   return regs.ppu2_mdr;
 }
 
 uint8 PPU::mmio_read(unsigned addr) {
-  cpu.synchronize_ppu();
+  if(!Memory::debugger_access())
+    cpu.synchronize_ppu();
 
   switch(addr & 0x3f) {
     case 0x04:

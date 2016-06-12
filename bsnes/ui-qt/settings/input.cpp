@@ -20,6 +20,10 @@ InputSettingsWindow::InputSettingsWindow() {
   list->header()->setResizeMode(QHeaderView::ResizeToContents);
   layout->addWidget(list);
 
+  modifierEnable = new QCheckBox("Allow modifier keys to be assigned standalone");
+  modifierEnable->setToolTip("When enabled, modifier keys like Shift and Ctrl can be used as inputs by themselves");
+  layout->addWidget(modifierEnable);
+
   controlLayout = new QHBoxLayout;
   layout->addLayout(controlLayout);
 
@@ -57,6 +61,7 @@ InputSettingsWindow::InputSettingsWindow() {
   connect(xAxisButton, SIGNAL(released()), this, SLOT(xAxisAssign()));
   connect(yAxisButton, SIGNAL(released()), this, SLOT(yAxisAssign()));
   connect(stopButton, SIGNAL(released()), this, SLOT(stop()));
+  connect(modifierEnable, SIGNAL(stateChanged(int)), this, SLOT(toggleModifierEnable()));
 
   //initialize list
 
@@ -91,6 +96,8 @@ InputSettingsWindow::InputSettingsWindow() {
       inputTable.append(group[i]);
     }
   }
+
+  modifierEnable->setChecked(!config().input.modifierEnable);
 
   updateList();
   synchronize();
@@ -351,4 +358,8 @@ void InputSettingsWindow::yAxisAssign() {
 void InputSettingsWindow::stop() {
   setActiveInput(0);
   activeGroup = 0;
+}
+
+void InputSettingsWindow::toggleModifierEnable() {
+  config().input.modifierEnable = !modifierEnable->isChecked();
 }

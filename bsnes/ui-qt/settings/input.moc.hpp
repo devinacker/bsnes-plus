@@ -13,6 +13,7 @@ public:
   QPushButton *xAxisButton;
   QPushButton *yAxisButton;
   QPushButton *stopButton;
+  QCheckBox *modifierEnable;
 
   void inputEvent(uint16_t scancode);
   InputSettingsWindow();
@@ -27,6 +28,7 @@ private slots:
   void xAxisAssign();
   void yAxisAssign();
   void stop();
+  void toggleModifierEnable();
 
 private:
   QTreeWidgetItem *port1, *port2, *userInterface;
