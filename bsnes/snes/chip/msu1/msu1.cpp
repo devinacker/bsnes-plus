@@ -94,7 +94,7 @@ uint8 MSU1::mmio_read(unsigned addr) {
   }
 
   if(addr == 0x2001) {
-    if(mmio.data_busy) return 0x00;
+    if(Memory::debugger_access() || mmio.data_busy) return 0x00;
     mmio.data_offset++;
     if(datafile.open()) return datafile.read();
     return 0x00;

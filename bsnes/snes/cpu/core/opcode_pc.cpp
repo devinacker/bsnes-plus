@@ -76,7 +76,7 @@ L op_writestack(regs.pc.l);
   regs.pc.w = aa.w;
 }
 
-void CPUcore::op_jsr_long_e() {
+void CPUcore::op_jsr_long() {
   aa.l = op_readpc();
   aa.h = op_readpc();
   op_writestackn(regs.pc.b);
@@ -86,22 +86,10 @@ void CPUcore::op_jsr_long_e() {
   op_writestackn(regs.pc.h);
 L op_writestackn(regs.pc.l);
   regs.pc.d = aa.d & 0xffffff;
-  regs.s.h = 0x01;
+  if(regs.e) regs.s.h = 0x01;
 }
 
-void CPUcore::op_jsr_long_n() {
-  aa.l = op_readpc();
-  aa.h = op_readpc();
-  op_writestackn(regs.pc.b);
-  op_io();
-  aa.b = op_readpc();
-  regs.pc.w--;
-  op_writestackn(regs.pc.h);
-L op_writestackn(regs.pc.l);
-  regs.pc.d = aa.d & 0xffffff;
-}
-
-void CPUcore::op_jsr_iaddrx_e() {
+void CPUcore::op_jsr_iaddrx() {
   aa.l = op_readpc();
   op_writestackn(regs.pc.h);
   op_writestackn(regs.pc.l);
@@ -110,41 +98,24 @@ void CPUcore::op_jsr_iaddrx_e() {
   rd.l = op_readpbr(aa.w + regs.x.w + 0);
 L rd.h = op_readpbr(aa.w + regs.x.w + 1);
   regs.pc.w = rd.w;
-  regs.s.h = 0x01;
+  if(regs.e) regs.s.h = 0x01;
 }
 
-void CPUcore::op_jsr_iaddrx_n() {
-  aa.l = op_readpc();
-  op_writestackn(regs.pc.h);
-  op_writestackn(regs.pc.l);
-  aa.h = op_readpc();
-  op_io();
-  rd.l = op_readpbr(aa.w + regs.x.w + 0);
-L rd.h = op_readpbr(aa.w + regs.x.w + 1);
-  regs.pc.w = rd.w;
-}
-
-void CPUcore::op_rti_e() {
+void CPUcore::op_rti() {
   op_io();
   op_io();
-  regs.p = op_readstack() | 0x30;
-  rd.l = op_readstack();
-L rd.h = op_readstack();
-  regs.pc.w = rd.w;
-}
-
-void CPUcore::op_rti_n() {
-  op_io();
-  op_io();
-  regs.p = op_readstack();
+  regs.p = op_readstack() | (regs.e ? 0x30 : 0);
   if(regs.p.x) {
     regs.x.h = 0x00;
     regs.y.h = 0x00;
   }
-  rd.l = op_readstack();
-  rd.h = op_readstack();
-L rd.b = op_readstack();
-  regs.pc.d = rd.d & 0xffffff;
+  regs.pc.l = op_readstack();
+  if(regs.e) {
+L   regs.pc.h = op_readstack();
+  } else {
+    regs.pc.h = op_readstack();
+L   regs.pc.b = op_readstack();
+  }
   update_table();
 }
 
@@ -157,7 +128,7 @@ L op_io();
   regs.pc.w = ++rd.w;
 }
 
-void CPUcore::op_rtl_e() {
+void CPUcore::op_rtl() {
   op_io();
   op_io();
   rd.l = op_readstackn();
@@ -165,17 +136,7 @@ void CPUcore::op_rtl_e() {
 L rd.b = op_readstackn();
   regs.pc.b = rd.b;
   regs.pc.w = ++rd.w;
-  regs.s.h = 0x01;
-}
-
-void CPUcore::op_rtl_n() {
-  op_io();
-  op_io();
-  rd.l = op_readstackn();
-  rd.h = op_readstackn();
-L rd.b = op_readstackn();
-  regs.pc.b = rd.b;
-  regs.pc.w = ++rd.w;
+  if(regs.e) regs.s.h = 0x01;
 }
 
 #endif

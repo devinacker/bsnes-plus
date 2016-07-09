@@ -157,7 +157,7 @@ unsigned SRTC::weekday(unsigned year, unsigned month, unsigned day) {
 
 uint8 SRTC::mmio_read(unsigned addr) {
   if(addr == 0x2800) {
-    if(rtc_mode != RtcRead) return 0x00;
+    if(Memory::debugger_access() || (rtc_mode != RtcRead)) return 0x00;
 
     if(rtc_index < 0) {
       update_time();

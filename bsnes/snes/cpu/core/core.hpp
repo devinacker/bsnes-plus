@@ -149,69 +149,61 @@ public:
   void op_jmp_iaddrx();
   void op_jmp_iladdr();
   void op_jsr_addr();
-  void op_jsr_long_e();
-  void op_jsr_long_n();
-  void op_jsr_iaddrx_e();
-  void op_jsr_iaddrx_n();
-  void op_rti_e();
-  void op_rti_n();
+  void op_jsr_long();
+  void op_jsr_iaddrx();
+  void op_rti();
   void op_rts();
-  void op_rtl_e();
-  void op_rtl_n();
+  void op_rtl();
 
   void op_nop();
   void op_wdm();
   void op_xba();
   template<int> void op_move_b();
   template<int> void op_move_w();
-  template<int, int> void op_interrupt_e();
-  template<int, int> void op_interrupt_n();
+  template<int, int> void op_interrupt();
   void op_stp();
   void op_wai();
   void op_xce();
-  template<int, int> void op_flag();
-  template<int> void op_pflag_e();
-  template<int> void op_pflag_n();
+  void op_clc();
+  void op_sec();
+  void op_cli();
+  void op_sei();
+  void op_clv();
+  void op_cld();
+  void op_sed();
+  void op_rep();
+  void op_sep();
   template<int, int> void op_transfer_b();
   template<int, int> void op_transfer_w();
-  void op_tcs_e();
-  void op_tcs_n();
+  void op_tcs();
   void op_tsx_b();
   void op_tsx_w();
-  void op_txs_e();
-  void op_txs_n();
+  void op_txs();
   template<int> void op_push_b();
   template<int> void op_push_w();
-  void op_phd_e();
-  void op_phd_n();
+  void op_phd();
   void op_phb();
   void op_phk();
   void op_php();
   template<int> void op_pull_b();
   template<int> void op_pull_w();
-  void op_pld_e();
-  void op_pld_n();
+  void op_pld();
   void op_plb();
-  void op_plp_e();
-  void op_plp_n();
-  void op_pea_e();
-  void op_pea_n();
-  void op_pei_e();
-  void op_pei_n();
-  void op_per_e();
-  void op_per_n();
+  void op_plp();
+  void op_pea();
+  void op_pei();
+  void op_per();
 
   void (CPUcore::**opcode_table)();
-  void (CPUcore::*op_table[256 * 5])();
+  void (CPUcore::*op_table[256 * 4])();
   void initialize_opcode_table();
   void update_table();
 
   enum {
-    table_EM =    0,  // 8-bit accumulator,  8-bit index (emulation mode)
-    table_MX =  256,  // 8-bit accumulator,  8-bit index
-    table_Mx =  512,  // 8-bit accumulator, 16-bit index
-    table_mX =  768,  //16-bit accumulator,  8-bit index
-    table_mx = 1024,  //16-bit accumulator, 16-bit index
+    table_MX =    0,  // 8-bit accumulator,  8-bit index
+    table_Mx =  256,  // 8-bit accumulator, 16-bit index
+    table_mX =  512,  //16-bit accumulator,  8-bit index
+    table_mx =  768,  //16-bit accumulator, 16-bit index
   };
 
   void core_serialize(serializer&);

@@ -59,6 +59,8 @@ void Serial::write(uint8 data) {
 }
 
 uint8 Serial::mmio_read(unsigned addr) {
+  if(Memory::debugger_access()) return 0;
+  
   cpu.synchronize_coprocessor();
   switch(addr & 1) { default:
     case 0: return r4016->mmio_read(addr);
