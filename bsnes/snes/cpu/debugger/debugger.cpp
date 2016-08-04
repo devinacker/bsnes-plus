@@ -265,4 +265,62 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   return false;
 }
 
+unsigned CPUDebugger::getRegister(unsigned id) {
+  switch ((Register)id) {
+  case RegisterPC: return regs.pc;
+  case RegisterA:  return regs.a;
+  case RegisterX:  return regs.x;
+  case RegisterY:  return regs.y;
+  case RegisterS:  return regs.s;
+  case RegisterD:  return regs.d;
+  case RegisterDB: return regs.db;
+  case RegisterP:  return regs.p;
+  }
+  
+  return 0;
+}
+
+void CPUDebugger::setRegister(unsigned id, unsigned value) {
+  switch (id) {
+  case RegisterPC: regs.pc = value; return;
+  case RegisterA:  regs.a  = value; return;
+  case RegisterX:  regs.x  = value; return;
+  case RegisterY:  regs.y  = value; return;
+  case RegisterS:  regs.s  = value; return;
+  case RegisterD:  regs.d  = value; return;
+  case RegisterDB: regs.db = value; return;
+  case RegisterP:  regs.p  = value; return;
+  }
+}
+
+bool CPUDebugger::getFlag(unsigned id) {
+  switch (id) {
+  case FlagE: return regs.e;
+  case FlagN: return regs.p.n;
+  case FlagV: return regs.p.v;
+  case FlagM: return regs.p.m;
+  case FlagX: return regs.p.x;
+  case FlagD: return regs.p.d;
+  case FlagI: return regs.p.i;
+  case FlagZ: return regs.p.z;
+  case FlagC: return regs.p.c;
+  }
+  
+  return false;
+}
+
+void CPUDebugger::setFlag(unsigned id, bool value) {
+  switch (id) {
+  case FlagE: regs.e   = value; return;
+  case FlagN: regs.p.n = value; return;
+  case FlagV: regs.p.v = value; return;
+  case FlagM: regs.p.m = value; return;
+  case FlagX: regs.p.x = value; return;
+  case FlagD: regs.p.d = value; return;
+  case FlagI: regs.p.i = value; return;
+  case FlagZ: regs.p.z = value; return;
+  case FlagC: regs.p.c = value; return;
+  }
+}
+
 #endif

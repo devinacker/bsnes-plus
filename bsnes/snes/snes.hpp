@@ -106,6 +106,11 @@ namespace SNES {
 
   struct ChipDebugger {
     virtual bool property(unsigned id, string &name, string &value) = 0;
+    
+    virtual unsigned getRegister(unsigned id) {return 0;}
+    virtual void     setRegister(unsigned id, unsigned value) {}
+    virtual bool     getFlag(unsigned id) {return false;}
+    virtual void     setFlag(unsigned id, bool value) {}
   };
 
   #include <memory/memory.hpp>
