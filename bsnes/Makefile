@@ -43,8 +43,8 @@ ifeq ($(platform),x)
   link += -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
-  flags += -march=native
-  link += -F/usr/local/lib
+  flags += -march=native -mmacosx-version-min=10.9
+  link += -F/usr/local/lib -mmacosx-version-min=10.9
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
