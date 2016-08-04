@@ -1,7 +1,32 @@
 class SFXDebugger : public SuperFX, public ChipDebugger {
 public:
   bool property(unsigned id, string &name, string &value);
+  
+  enum Register {
+    // 0-15 == R0-R15
+    RegisterSFR = 16,
+	// TODO: some other registers here (ROMBR, etc)
+  };
+  unsigned getRegister(unsigned id);
+  void     setRegister(unsigned id, unsigned value);
 
+  enum {
+    FlagI,
+    FlagB,
+    FlagIH,
+    FlagIL,
+    FlagA2,
+    FlagA1,
+    FlagR,
+    FlagG,
+    FlagV,
+    FlagN,
+    FlagC,
+    FlagZ,
+  };
+  bool     getFlag(unsigned id);
+  void     setFlag(unsigned id, bool value);
+  
   function<void ()> step_event;
 
   enum Usage {

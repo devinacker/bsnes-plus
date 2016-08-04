@@ -154,4 +154,58 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   return false;
 }
 
+unsigned SFXDebugger::getRegister(unsigned id) {
+  if (id < 16) {
+    return regs.r[id];
+  } else switch ((Register)id) {
+  case RegisterSFR:  return regs.sfr;
+  }
+  
+  return 0;
+}
+
+void SFXDebugger::setRegister(unsigned id, unsigned value) {
+  if (id < 16) {
+    regs.r[id] = value; return;
+  } else switch ((Register)id) {
+  case RegisterSFR:  regs.sfr = value; return;
+  }
+}
+
+bool SFXDebugger::getFlag(unsigned id) {
+  switch (id) {
+  case FlagI:  return regs.sfr.irq;
+  case FlagB:  return regs.sfr.b;
+  case FlagIH: return regs.sfr.ih;
+  case FlagIL: return regs.sfr.il;
+  case FlagA2: return regs.sfr.alt2;
+  case FlagA1: return regs.sfr.alt1;
+  case FlagR:  return regs.sfr.r;
+  case FlagG:  return regs.sfr.g;
+  case FlagV:  return regs.sfr.ov;
+  case FlagN:  return regs.sfr.s;
+  case FlagC:  return regs.sfr.cy;
+  case FlagZ:  return regs.sfr.z;
+  }
+  
+  return false;
+}
+
+void SFXDebugger::setFlag(unsigned id, bool value) {
+  switch (id) {
+  case FlagI:  regs.sfr.irq  = value; return;
+  case FlagB:  regs.sfr.b    = value; return;
+  case FlagIH: regs.sfr.ih   = value; return;
+  case FlagIL: regs.sfr.il   = value; return;
+  case FlagA2: regs.sfr.alt2 = value; return;
+  case FlagA1: regs.sfr.alt1 = value; return;
+  case FlagR:  regs.sfr.r    = value; return;
+  case FlagG:  regs.sfr.g    = value; return;
+  case FlagV:  regs.sfr.ov   = value; return;
+  case FlagN:  regs.sfr.s    = value; return;
+  case FlagC:  regs.sfr.cy   = value; return;
+  case FlagZ:  regs.sfr.z    = value; return;
+  }
+}
+
 #endif

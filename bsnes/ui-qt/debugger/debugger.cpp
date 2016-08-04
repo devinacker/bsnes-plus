@@ -64,11 +64,11 @@ Debugger::Debugger() {
 
   QTabWidget *editTabs = new QTabWidget;
   editTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  registerEditCPU = new RegisterEditCPU(SNES::cpu.regs);
+  registerEditCPU = new RegisterEditCPU(SNES::cpu);
   editTabs->addTab(registerEditCPU, "CPU Registers");
   registerEditSMP = new RegisterEditSMP;
   editTabs->addTab(registerEditSMP, "SMP Registers");
-  registerEditSA1 = new RegisterEditCPU(SNES::sa1.regs);
+  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
   editTabs->addTab(registerEditSA1, "SA-1 Registers");
   registerEditSFX = new RegisterEditSFX;
   editTabs->addTab(registerEditSFX, "SuperFX Registers");

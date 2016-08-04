@@ -165,4 +165,62 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
   return false;
 }
 
+unsigned SA1Debugger::getRegister(unsigned id) {
+  switch (id) {
+  case RegisterPC: return regs.pc;
+  case RegisterA:  return regs.a;
+  case RegisterX:  return regs.x;
+  case RegisterY:  return regs.y;
+  case RegisterS:  return regs.s;
+  case RegisterD:  return regs.d;
+  case RegisterDB: return regs.db;
+  case RegisterP:  return regs.p;
+  }
+  
+  return 0;
+}
+
+void SA1Debugger::setRegister(unsigned id, unsigned value) {
+  switch (id) {
+  case RegisterPC: regs.pc = value; return;
+  case RegisterA:  regs.a  = value; return;
+  case RegisterX:  regs.x  = value; return;
+  case RegisterY:  regs.y  = value; return;
+  case RegisterS:  regs.s  = value; return;
+  case RegisterD:  regs.d  = value; return;
+  case RegisterDB: regs.db = value; return;
+  case RegisterP:  regs.p  = value; return;
+  }
+}
+
+bool SA1Debugger::getFlag(unsigned id) {
+  switch (id) {
+  case FlagE: return regs.e;
+  case FlagN: return regs.p.n;
+  case FlagV: return regs.p.v;
+  case FlagM: return regs.p.m;
+  case FlagX: return regs.p.x;
+  case FlagD: return regs.p.d;
+  case FlagI: return regs.p.i;
+  case FlagZ: return regs.p.z;
+  case FlagC: return regs.p.c;
+  }
+  
+  return false;
+}
+
+void SA1Debugger::setFlag(unsigned id, bool value) {
+  switch (id) {
+  case FlagE: regs.e   = value;
+  case FlagN: regs.p.n = value;
+  case FlagV: regs.p.v = value;
+  case FlagM: regs.p.m = value;
+  case FlagX: regs.p.x = value;
+  case FlagD: regs.p.d = value;
+  case FlagI: regs.p.i = value;
+  case FlagZ: regs.p.z = value;
+  case FlagC: regs.p.c = value;
+  }
+}
+
 #endif
