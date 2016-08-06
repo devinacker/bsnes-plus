@@ -219,12 +219,10 @@ MainWindow::MainWindow() {
       canvas->setAcceptDrops(true);
       canvas->setFocusPolicy(Qt::StrongFocus);
       canvas->setAttribute(Qt::WA_PaintOnScreen, true);  //disable Qt painting on focus / resize
-
-      QPalette palette;
-      palette.setColor(QPalette::Window, QColor(0, 0, 0));
-
-      canvas->setPalette(palette);
-      canvas->setAutoFillBackground(true);
+      canvas->setAttribute(Qt::WA_NoSystemBackground, true);
+      // don't let widget updates temporarily draw a parent widget over an external rendering context
+      // (this is overridden by the Qt-based video drivers)
+      canvas->setUpdatesEnabled(false);
     }
     canvasLayout->addWidget(canvas);
   }
