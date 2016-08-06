@@ -161,6 +161,7 @@ public:
     widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(widget);
     parent->setLayout(layout);
+    parent->setUpdatesEnabled(true);
 
     return true;
   }
