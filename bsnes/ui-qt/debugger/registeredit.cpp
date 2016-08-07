@@ -4,26 +4,27 @@ RegisterEditCPU *registerEditCPU, *registerEditSA1;
 RegisterEditSMP *registerEditSMP;
 RegisterEditSFX *registerEditSFX;
 
-#define reg_editor(reg, digits) \
-	layout->addWidget(new QLabel(QString(#reg).toUpper())); \
-	edit_##reg = new QLineEdit(this); \
-	edit_##reg->setFont(QFont(Style::Monospace)); \
-	edit_##reg->setFixedWidth((digits + 1) * edit_##reg->fontMetrics().width(' ')); \
-	edit_##reg->setInputMask(QString("H").repeated(digits)); \
-	edit_##reg->setMaxLength(digits); \
-	connect(edit_##reg, SIGNAL(textEdited(QString)), this, SLOT(commit())); \
-	layout->addWidget(edit_##reg);
+#define reg_editor(name, digits) \
+	layout->addWidget(new QLabel(QString(#name).toUpper())); \
+	edit_##name = new QLineEdit(this); \
+	edit_##name->setFont(QFont(Style::Monospace)); \
+	edit_##name->setFixedWidth((digits + 1) * edit_##name->fontMetrics().width(' ')); \
+	edit_##name->setInputMask(QString("H").repeated(digits)); \
+	edit_##name->setMaxLength(digits); \
+	connect(edit_##name, SIGNAL(textEdited(QString)), this, SLOT(commit())); \
+	layout->addWidget(edit_##name);
 
-#define reg_sync(reg) \
-	edit_##reg->setText(QString::number((unsigned) reg, 16).rightJustified(edit_##reg->maxLength(), '0').toUpper());
-#define reg_commit(reg) \
-	if (sender() == edit_##reg) { \
+#define reg_sync(name, reg) \
+	edit_##name->setText(QString::number(_debugger.getRegister(reg), 16) \
+		.rightJustified(edit_##name->maxLength(), '0').toUpper());
+#define reg_commit(name, reg) \
+	if (sender() == edit_##name) { \
 		bool ok; \
-		int val = edit_##reg->text().toInt(&ok, 16); \
-		int pos = edit_##reg->cursorPosition(); \
-		if (ok) reg = val; \
+		int val = edit_##name->text().toInt(&ok, 16); \
+		int pos = edit_##name->cursorPosition(); \
+		if (ok) _debugger.setRegister(reg, val); \
 		synchronize(); \
-		edit_##reg->setCursorPosition(pos); \
+		edit_##name->setCursorPosition(pos); \
 		return; \
 	}
 
@@ -33,10 +34,10 @@ RegisterEditSFX *registerEditSFX;
 	connect(flag_btn[num], SIGNAL(toggled(bool)), this, SLOT(commit())); \
 	layout->addWidget(flag_btn[num]);
 
-#define flag_sync(flag, num) flag_btn[num]->setChecked(flag);
+#define flag_sync(flag, num) flag_btn[num]->setChecked(_debugger.getFlag(flag));
 #define flag_commit(flag, num) \
 	if (sender() == flag_btn[num]) { \
-		flag = flag_btn[num]->isChecked(); \
+		_debugger.setFlag(flag, flag_btn[num]->isChecked()); \
 		synchronize(); \
 		return; \
 	}
@@ -68,45 +69,45 @@ void RegisterEditCPU::setupUI() {
 }
 
 void RegisterEditCPU::commit() {
-	reg_commit(pc);
-	reg_commit(a);
-	reg_commit(x);
-	reg_commit(y);
-	reg_commit(s);
-	reg_commit(d);
-	reg_commit(db);
-	reg_commit(p);
+	reg_commit(pc, SNES::CPUDebugger::RegisterPC);
+	reg_commit(a,  SNES::CPUDebugger::RegisterA);
+	reg_commit(x,  SNES::CPUDebugger::RegisterX);
+	reg_commit(y,  SNES::CPUDebugger::RegisterY);
+	reg_commit(s,  SNES::CPUDebugger::RegisterS);
+	reg_commit(d,  SNES::CPUDebugger::RegisterD);
+	reg_commit(db, SNES::CPUDebugger::RegisterDB);
+	reg_commit(p,  SNES::CPUDebugger::RegisterP);
 	
-	flag_commit(e, 0);
-	flag_commit(p.n, 1);
-	flag_commit(p.v, 2);
-	flag_commit(p.m, 3);
-	flag_commit(p.x, 4);
-	flag_commit(p.d, 5);
-	flag_commit(p.i, 6);
-	flag_commit(p.z, 7);
-	flag_commit(p.c, 8);
+	flag_commit(SNES::CPUDebugger::FlagE, 0);
+	flag_commit(SNES::CPUDebugger::FlagN, 1);
+	flag_commit(SNES::CPUDebugger::FlagV, 2);
+	flag_commit(SNES::CPUDebugger::FlagM, 3);
+	flag_commit(SNES::CPUDebugger::FlagX, 4);
+	flag_commit(SNES::CPUDebugger::FlagD, 5);
+	flag_commit(SNES::CPUDebugger::FlagI, 6);
+	flag_commit(SNES::CPUDebugger::FlagZ, 7);
+	flag_commit(SNES::CPUDebugger::FlagC, 8);
 }
 
 void RegisterEditCPU::synchronize() {
-	reg_sync(pc);
-	reg_sync(a);
-	reg_sync(x);
-	reg_sync(y);
-	reg_sync(s);
-	reg_sync(d);
-	reg_sync(db);
-	reg_sync(p);
+	reg_sync(pc, SNES::CPUDebugger::RegisterPC);
+	reg_sync(a,  SNES::CPUDebugger::RegisterA);
+	reg_sync(x,  SNES::CPUDebugger::RegisterX);
+	reg_sync(y,  SNES::CPUDebugger::RegisterY);
+	reg_sync(s,  SNES::CPUDebugger::RegisterS);
+	reg_sync(d,  SNES::CPUDebugger::RegisterD);
+	reg_sync(db, SNES::CPUDebugger::RegisterDB);
+	reg_sync(p,  SNES::CPUDebugger::RegisterP);
 	
-	flag_sync(e, 0);
-	flag_sync(p.n, 1);
-	flag_sync(p.v, 2);
-	flag_sync(p.m, 3);
-	flag_sync(p.x, 4);
-	flag_sync(p.d, 5);
-	flag_sync(p.i, 6);
-	flag_sync(p.z, 7);
-	flag_sync(p.c, 8);
+	flag_sync(SNES::CPUDebugger::FlagE, 0);
+	flag_sync(SNES::CPUDebugger::FlagN, 1);
+	flag_sync(SNES::CPUDebugger::FlagV, 2);
+	flag_sync(SNES::CPUDebugger::FlagM, 3);
+	flag_sync(SNES::CPUDebugger::FlagX, 4);
+	flag_sync(SNES::CPUDebugger::FlagD, 5);
+	flag_sync(SNES::CPUDebugger::FlagI, 6);
+	flag_sync(SNES::CPUDebugger::FlagZ, 7);
+	flag_sync(SNES::CPUDebugger::FlagC, 8);
 }
 
 void RegisterEditSMP::setupUI() {
@@ -135,41 +136,41 @@ void RegisterEditSMP::setupUI() {
 }
 
 void RegisterEditSMP::commit() {
-	reg_commit(pc);
-	reg_commit(a);
-	reg_commit(x);
-	reg_commit(y);
-	reg_commit(s);
-	reg_commit(ya);
-	reg_commit(p);
+	reg_commit(pc, SNES::SMPDebugger::RegisterPC);
+	reg_commit(a,  SNES::SMPDebugger::RegisterA);
+	reg_commit(x,  SNES::SMPDebugger::RegisterX);
+	reg_commit(y,  SNES::SMPDebugger::RegisterY);
+	reg_commit(s,  SNES::SMPDebugger::RegisterS);
+	reg_commit(ya, SNES::SMPDebugger::RegisterYA);
+	reg_commit(p,  SNES::SMPDebugger::RegisterP);
 	
-	flag_commit(p.n, 0);
-	flag_commit(p.v, 1);
-	flag_commit(p.p, 2);
-	flag_commit(p.b, 3);
-	flag_commit(p.h, 4);
-	flag_commit(p.i, 5);
-	flag_commit(p.z, 6);
-	flag_commit(p.c, 7);
+	flag_commit(SNES::SMPDebugger::FlagN, 0);
+	flag_commit(SNES::SMPDebugger::FlagV, 1);
+	flag_commit(SNES::SMPDebugger::FlagP, 2);
+	flag_commit(SNES::SMPDebugger::FlagB, 3);
+	flag_commit(SNES::SMPDebugger::FlagH, 4);
+	flag_commit(SNES::SMPDebugger::FlagI, 5);
+	flag_commit(SNES::SMPDebugger::FlagZ, 6);
+	flag_commit(SNES::SMPDebugger::FlagC, 7);
 }
 
 void RegisterEditSMP::synchronize() {
-	reg_sync(pc);
-	reg_sync(a);
-	reg_sync(x);
-	reg_sync(y);
-	reg_sync(s);
-	reg_sync(ya);
-	reg_sync(p);
-	
-	flag_sync(p.n, 0);
-	flag_sync(p.v, 1);
-	flag_sync(p.p, 2);
-	flag_sync(p.b, 3);
-	flag_sync(p.h, 4);
-	flag_sync(p.i, 5);
-	flag_sync(p.z, 6);
-	flag_sync(p.c, 7);
+	reg_sync(pc, SNES::SMPDebugger::RegisterPC);
+	reg_sync(a,  SNES::SMPDebugger::RegisterA);
+	reg_sync(x,  SNES::SMPDebugger::RegisterX);
+	reg_sync(y,  SNES::SMPDebugger::RegisterY);
+	reg_sync(s,  SNES::SMPDebugger::RegisterS);
+	reg_sync(ya, SNES::SMPDebugger::RegisterYA);
+	reg_sync(p,  SNES::SMPDebugger::RegisterP);
+
+	flag_sync(SNES::SMPDebugger::FlagN, 0);
+	flag_sync(SNES::SMPDebugger::FlagV, 1);
+	flag_sync(SNES::SMPDebugger::FlagP, 2);
+	flag_sync(SNES::SMPDebugger::FlagB, 3);
+	flag_sync(SNES::SMPDebugger::FlagH, 4);
+	flag_sync(SNES::SMPDebugger::FlagI, 5);
+	flag_sync(SNES::SMPDebugger::FlagZ, 6);
+	flag_sync(SNES::SMPDebugger::FlagC, 7);
 }
 
 void RegisterEditSFX::setupUI() {
@@ -212,42 +213,42 @@ void RegisterEditSFX::setupUI() {
 
 void RegisterEditSFX::commit() {
 	for (int i = 0; i < 16; i++) {
-		reg_commit(r[i]);
+		reg_commit(r[i], i);
 	}
-	reg_commit(sfr);
+	reg_commit(sfr, SNES::SFXDebugger::RegisterSFR);
 	
-	flag_commit(sfr.irq, 0);
-	flag_commit(sfr.b, 1);
-	flag_commit(sfr.ih, 2);
-	flag_commit(sfr.il, 3);
-	flag_commit(sfr.alt2, 4);
-	flag_commit(sfr.alt1, 5);
-	flag_commit(sfr.r, 6);
-	flag_commit(sfr.g, 7);
-	flag_commit(sfr.ov, 8);
-	flag_commit(sfr.s, 9);
-	flag_commit(sfr.cy, 10);
-	flag_commit(sfr.z, 11);
+	flag_commit(SNES::SFXDebugger::FlagI, 0);
+	flag_commit(SNES::SFXDebugger::FlagB, 1);
+	flag_commit(SNES::SFXDebugger::FlagIH, 2);
+	flag_commit(SNES::SFXDebugger::FlagIL, 3);
+	flag_commit(SNES::SFXDebugger::FlagA2, 4);
+	flag_commit(SNES::SFXDebugger::FlagA1, 5);
+	flag_commit(SNES::SFXDebugger::FlagR, 6);
+	flag_commit(SNES::SFXDebugger::FlagG, 7);
+	flag_commit(SNES::SFXDebugger::FlagV, 8);
+	flag_commit(SNES::SFXDebugger::FlagN, 9);
+	flag_commit(SNES::SFXDebugger::FlagC, 10);
+	flag_commit(SNES::SFXDebugger::FlagZ, 11);
 }
 
 void RegisterEditSFX::synchronize() {
 	for (int i = 0; i < 16; i++) {
-		reg_sync(r[i]);
+		reg_sync(r[i], i);
 	}
-	reg_sync(sfr);
+	reg_sync(sfr, SNES::SFXDebugger::RegisterSFR);
 	
-	flag_sync(sfr.irq, 0);
-	flag_sync(sfr.b, 1);
-	flag_sync(sfr.ih, 2);
-	flag_sync(sfr.il, 3);
-	flag_sync(sfr.alt2, 4);
-	flag_sync(sfr.alt1, 5);
-	flag_sync(sfr.r, 6);
-	flag_sync(sfr.g, 7);
-	flag_sync(sfr.ov, 8);
-	flag_sync(sfr.s, 9);
-	flag_sync(sfr.cy, 10);
-	flag_sync(sfr.z, 11);
+	flag_sync(SNES::SFXDebugger::FlagI, 0);
+	flag_sync(SNES::SFXDebugger::FlagB, 1);
+	flag_sync(SNES::SFXDebugger::FlagIH, 2);
+	flag_sync(SNES::SFXDebugger::FlagIL, 3);
+	flag_sync(SNES::SFXDebugger::FlagA2, 4);
+	flag_sync(SNES::SFXDebugger::FlagA1, 5);
+	flag_sync(SNES::SFXDebugger::FlagR, 6);
+	flag_sync(SNES::SFXDebugger::FlagG, 7);
+	flag_sync(SNES::SFXDebugger::FlagV, 8);
+	flag_sync(SNES::SFXDebugger::FlagN, 9);
+	flag_sync(SNES::SFXDebugger::FlagC, 10);
+	flag_sync(SNES::SFXDebugger::FlagZ, 11);
 }
 
 #undef reg_editor

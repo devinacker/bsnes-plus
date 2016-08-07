@@ -1,7 +1,34 @@
 class SA1Debugger : public SA1, public ChipDebugger {
 public:
   bool property(unsigned id, string &name, string &value);
-
+  
+  enum {
+    RegisterPC,
+    RegisterA,
+    RegisterX,
+    RegisterY,
+    RegisterS,
+    RegisterD,
+    RegisterDB,
+    RegisterP,
+  };
+  unsigned getRegister(unsigned id);
+  void     setRegister(unsigned id, unsigned value);
+  
+  enum {
+    FlagE,
+    FlagN,
+    FlagV,
+    FlagM,
+    FlagX,
+    FlagD,
+    FlagI,
+    FlagZ,
+    FlagC,
+  };
+  bool     getFlag(unsigned id);
+  void     setFlag(unsigned id, bool value);
+  
   function<void ()> step_event;
 
   enum Usage {

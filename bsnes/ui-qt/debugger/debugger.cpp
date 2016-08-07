@@ -64,11 +64,11 @@ Debugger::Debugger() {
 
   QTabWidget *editTabs = new QTabWidget;
   editTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  registerEditCPU = new RegisterEditCPU(SNES::cpu.regs);
+  registerEditCPU = new RegisterEditCPU(SNES::cpu);
   editTabs->addTab(registerEditCPU, "CPU Registers");
   registerEditSMP = new RegisterEditSMP;
   editTabs->addTab(registerEditSMP, "SMP Registers");
-  registerEditSA1 = new RegisterEditCPU(SNES::sa1.regs);
+  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
   editTabs->addTab(registerEditSA1, "SA-1 Registers");
   registerEditSFX = new RegisterEditSFX;
   editTabs->addTab(registerEditSFX, "SuperFX Registers");
@@ -234,8 +234,10 @@ void Debugger::modifySystemState(unsigned state) {
 }
 
 void Debugger::synchronize() {
-  runBreak->defaultAction()->setText(application.debug ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && application.debug && 
+  bool active = application.debug && !application.debugrun;
+
+  runBreak->defaultAction()->setText(active ? "Run" : "Break");
+  bool stepEnabled = SNES::cartridge.loaded() && active && 
                      (stepCPU->isChecked() || stepSMP->isChecked() || 
                       stepSA1->isChecked() || stepSFX->isChecked());
   bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + 
@@ -252,11 +254,12 @@ void Debugger::synchronize() {
   SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
   SNES::debugger.step_sfx = application.debug && stepSFX->isChecked();
 
-  registerEditCPU->setEnabled(SNES::debugger.step_cpu);
-  registerEditSMP->setEnabled(SNES::debugger.step_smp);
-  registerEditSA1->setEnabled(SNES::debugger.step_sa1);
-  registerEditSFX->setEnabled(SNES::debugger.step_sfx);
-
+  if(!active) {
+    registerEditCPU->setEnabled(false);
+    registerEditSMP->setEnabled(false);
+    registerEditSA1->setEnabled(false);
+    registerEditSFX->setEnabled(false);
+  }
   memoryEditor->synchronize();
 }
 
@@ -277,9 +280,9 @@ void Debugger::switchWindow() {
 }
 
 void Debugger::toggleRunStatus() {
-  application.debug = !application.debug;
+  application.debug = !application.debug || application.debugrun;
+  application.debugrun = false;
   if(!application.debug) {
-    application.debugrun = false;
     mainWindow->activateWindow();
   } else {
     audio.clear();
@@ -292,6 +295,7 @@ void Debugger::toggleRunStatus() {
 void Debugger::stepAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepInto;
   application.debugrun = true;
+  synchronize();
   switchWindow();
 }
 
@@ -301,6 +305,7 @@ void Debugger::stepOverAction() {
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;
+  synchronize();
   switchWindow();
 }
 
@@ -309,11 +314,17 @@ void Debugger::stepOutAction() {
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;
+  synchronize();
   switchWindow();
 }
 
 void Debugger::event() {
   char t[256];
+
+  registerEditCPU->setEnabled(false);
+  registerEditSMP->setEnabled(false);
+  registerEditSA1->setEnabled(false);
+  registerEditSFX->setEnabled(false);
 
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
@@ -335,6 +346,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+        registerEditCPU->setEnabled(true);
         break;
       }
 
@@ -346,6 +358,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        registerEditSA1->setEnabled(true);
         break;
       }
       
@@ -356,6 +369,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+        registerEditSMP->setEnabled(true);
         break;
       }
       
@@ -366,6 +380,7 @@ void Debugger::event() {
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+        registerEditSFX->setEnabled(true);
         break;
       }
     } break;
@@ -376,6 +391,7 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+      registerEditCPU->setEnabled(true);
     } break;
 
     case SNES::Debugger::BreakEvent::SMPStep: {
@@ -384,6 +400,7 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+      registerEditSMP->setEnabled(true);
     } break;
     
     case SNES::Debugger::BreakEvent::SA1Step: {
@@ -392,6 +409,7 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+      registerEditSA1->setEnabled(true);
     } break;
     
     case SNES::Debugger::BreakEvent::SFXStep: {
@@ -400,6 +418,7 @@ void Debugger::event() {
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
       disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+      registerEditSFX->setEnabled(true);
     } break;
   }
 

@@ -98,4 +98,58 @@ bool SMPDebugger::property(unsigned id, string &name, string &value) {
   return false;
 }
 
+unsigned SMPDebugger::getRegister(unsigned id) {
+  switch ((Register)id) {
+  case RegisterPC: return regs.pc;
+  case RegisterA:  return regs.a;
+  case RegisterX:  return regs.x;
+  case RegisterY:  return regs.y;
+  case RegisterS:  return regs.sp;
+  case RegisterYA: return regs.ya;
+  case RegisterP:  return regs.p;
+  }
+  
+  return 0;
+}
+
+void SMPDebugger::setRegister(unsigned id, unsigned value) {
+  switch (id) {
+  case RegisterPC: regs.pc = value; return;
+  case RegisterA:  regs.a  = value; return;
+  case RegisterX:  regs.x  = value; return;
+  case RegisterY:  regs.y  = value; return;
+  case RegisterS:  regs.sp = value; return;
+  case RegisterYA: regs.ya = value; return;
+  case RegisterP:  regs.p  = value; return;
+  }
+}
+
+bool SMPDebugger::getFlag(unsigned id) {
+  switch (id) {
+  case FlagN: return regs.p.n;
+  case FlagV: return regs.p.v;
+  case FlagP: return regs.p.p;
+  case FlagB: return regs.p.b;
+  case FlagH: return regs.p.h;
+  case FlagI: return regs.p.i;
+  case FlagZ: return regs.p.z;
+  case FlagC: return regs.p.c;
+  }
+  
+  return false;
+}
+
+void SMPDebugger::setFlag(unsigned id, bool value) {
+  switch (id) {
+  case FlagN: regs.p.n = value; return;
+  case FlagV: regs.p.v = value; return;
+  case FlagP: regs.p.p = value; return;
+  case FlagB: regs.p.b = value; return;
+  case FlagH: regs.p.h = value; return;
+  case FlagI: regs.p.i = value; return;
+  case FlagZ: regs.p.z = value; return;
+  case FlagC: regs.p.c = value; return;
+  }
+}
+
 #endif
