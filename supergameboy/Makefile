@@ -8,8 +8,8 @@ link  :=
 ifeq ($(platform),osx)
   flags := -fPIC $(flags)
 else ifeq ($(platform),x)
-  flags := -fPIC $(flags)
-  link += -s
+  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
 
 objects := supergameboy
