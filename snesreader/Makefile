@@ -21,8 +21,8 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags += -fPIC $(flags) -march=native
-	link += -F/usr/local/lib
+  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
 
 objects := snesreader
@@ -42,12 +42,12 @@ objects += jma jcrc32 lzmadecode 7zlzma iiostrm inbyte lzma winout
 
 compile = \
   $(strip \
-    $(if $(filter %.c,$<), \
-      $(c) $(flags) $1 -c $< -o $@, \
-      $(if $(filter %.cpp,$<), \
-        $(cpp) $(flags) $1 -c $< -o $@ \
-      ) \
-    ) \
+	$(if $(filter %.c,$<), \
+	  $(c) $(flags) $1 -c $< -o $@, \
+	  $(if $(filter %.cpp,$<), \
+		$(cpp) $(flags) $1 -c $< -o $@ \
+	  ) \
+	) \
   )
 
 %.o: $<; $(call compile)
