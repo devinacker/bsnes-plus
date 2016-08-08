@@ -134,7 +134,7 @@ else
 	@echo Distribution building not available for current platform
 endif
 
-clean: ui_clean
+clean: ui_clean plugins_clean
 	-@$(call delete,obj/*.o)
 	-@$(call delete,obj/*.a)
 	-@$(call delete,obj/*.so)
@@ -149,6 +149,11 @@ clean: ui_clean
 ifeq ($(platform),osx)
 	@rm -rf $(osxbundle)
 endif
+
+plugins_clean:
+	@$(MAKE) clean -C ../snesreader
+	@$(MAKE) clean -C ../snesfilter
+	@$(MAKE) clean -C ../supergameboy
 
 archive-all:
 	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh
