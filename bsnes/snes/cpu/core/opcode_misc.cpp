@@ -17,11 +17,10 @@ L op_io();
 }
 
 template<int adjust> void CPUcore::op_move_b() {
-  dp = op_readpc();
+  regs.db = op_readpc();
   sp = op_readpc();
-  regs.db = dp;
   rd.l = op_readlong((sp << 16) | regs.x.w);
-  op_writelong((dp << 16) | regs.y.w, rd.l);
+  op_writedbr(regs.y.w, rd.l);
   op_io();
   regs.x.l += adjust;
   regs.y.l += adjust;
@@ -30,11 +29,10 @@ L op_io();
 }
 
 template<int adjust> void CPUcore::op_move_w() {
-  dp = op_readpc();
+  regs.db = op_readpc();
   sp = op_readpc();
-  regs.db = dp;
   rd.l = op_readlong((sp << 16) | regs.x.w);
-  op_writelong((dp << 16) | regs.y.w, rd.l);
+  op_writedbr(regs.y.w, rd.l);
   op_io();
   regs.x.w += adjust;
   regs.y.w += adjust;

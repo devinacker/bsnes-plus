@@ -49,22 +49,35 @@ void SuperFX::op_exec(uint8 opcode) {
   return (!regs.sfr.alt2) ? ((!regs.sfr.alt1) ? op_##name()  : op_##name1()) : \
                             ((!regs.sfr.alt1) ? op_##name2() : op_##name3());
 
+#define opb(id, cond) case id: return (cond) ? op_bra() : op_nobranch();
+
+#define bge (regs.sfr.s == regs.sfr.ov)
+#define blt (regs.sfr.s != regs.sfr.ov)
+#define bne !regs.sfr.z
+#define beq regs.sfr.z
+#define bpl !regs.sfr.s
+#define bmi regs.sfr.s
+#define bcc !regs.sfr.cy
+#define bcs regs.sfr.cy
+#define bvc !regs.sfr.ov
+#define bvs regs.sfr.ov
+
 op     (0x00, stop)
 op     (0x01, nop)
 op     (0x02, cache)
 op     (0x03, lsr)
 op     (0x04, rol)
 op     (0x05, bra)
-op     (0x06, bge)
-op     (0x07, blt)
-op     (0x08, bne)
-op     (0x09, beq)
-op     (0x0a, bpl)
-op     (0x0b, bmi)
-op     (0x0c, bcc)
-op     (0x0d, bcs)
-op     (0x0e, bvc)
-op     (0x0f, bvs)
+opb    (0x06, bge)
+opb    (0x07, blt)
+opb    (0x08, bne)
+opb    (0x09, beq)
+opb    (0x0a, bpl)
+opb    (0x0b, bmi)
+opb    (0x0c, bcc)
+opb    (0x0d, bcs)
+opb    (0x0e, bvc)
+opb    (0x0f, bvs)
 op16   (0x10, to_move)
 op16   (0x20, with)
 op12   (0x30, stw_stb)
@@ -113,6 +126,18 @@ op16a12(0xf0, iwt, lm, sm)
 #undef op16a12
 #undef opalt23
 #undef opa123
+#undef opb
+#undef bge
+#undef blt
+#undef bne
+#undef beq
+#undef bpl
+#undef bmi
+#undef bcc
+#undef bcs
+#undef bvc
+#undef bvs
+
   }
 }
 #endif
