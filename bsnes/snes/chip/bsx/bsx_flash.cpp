@@ -18,50 +18,6 @@ void BSXFlash::reset() {
   regs.writebyte = false;
 
   memory::bsxpack.write_protect(!regs.writebyte);
-
-  //Check if Memory Pack is Type 7 (ROM) for accuracy
-  type7 = false;
-
-  for (int check = 0; check <= 1; check++)
-  {
-    int i = 0;
-    for (i = 0; i < 20; i++)
-    {
-        uint8 checkbyte;
-        switch(i)
-        {
-            case 0x00: checkbyte = 0x4D; break;
-            case 0x02: checkbyte = 0x50; break;
-            case 0x06: checkbyte = 0x70; break;
-            default:   checkbyte = 0x00;
-        }
-
-        //Check both 0x7F00+i and 0xFF00+i
-        if (i != 0x06)
-        {
-            if (memory::bsxpack.read((0x7F00 | (check << 16)) + i) != checkbyte)
-            {
-                break;
-            }
-        }
-        else
-        {
-            //Only check 0xF0 for i = 6, only Memory Pack type matters
-            if (memory::bsxpack.read(((0x7F00 | (check << 16)) + i) & 0xF0) != checkbyte)
-            {
-                break;
-            }
-        }
-    }
-
-    if (i == 20)
-    {
-        //if i reaches 20, that means all the checks are successful
-        type7 = true;
-        break;
-    }
-  }
-
 }
 
 unsigned BSXFlash::size() const {
@@ -69,12 +25,6 @@ unsigned BSXFlash::size() const {
 }
 
 uint8 BSXFlash::read(unsigned addr) {
-  if (type7)
-  {
-    //Don't do anything else than reading data, it's not Flash
-    return memory::bsxpack.read(addr);
-  }
-
   if(regs.esr) {
     switch (addr & 0xFFFF)
     {
@@ -121,13 +71,6 @@ void BSXFlash::write(unsigned addr, uint8 data) {
   //read-only flashcarts.
   //below is an unfortunately necessary workaround to this problem.
   //if(cartridge.mapper() == Cartridge::BSCHiROM) return;
-
-  //If Type7
-  if (type7)
-  {
-    //Don't do anything, it's not Flash
-    return;
-  }
 
   //If Write Byte Command is issued
   if(regs.writebyte)
