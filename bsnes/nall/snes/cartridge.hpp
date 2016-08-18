@@ -314,7 +314,8 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     }
     xml << "  <bsx>\n";
     xml << "    <slot>\n";
-    xml << "      <map mode='linear' address='c0-ef:0000-ffff'/>\n";
+    xml << "      <map mode='linear' address='c0-ef:0000-7fff'/>\n";
+    xml << "      <map mode='linear' address='c0-ef:8000-ffff'/>\n";
     xml << "    </slot>\n";
     xml << "  </bsx>\n";
   } else if(mapper == BSCHiROM) {
