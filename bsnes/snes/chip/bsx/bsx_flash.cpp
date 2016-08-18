@@ -43,9 +43,9 @@ uint8 BSXFlash::read(unsigned addr) {
     return 0x80;
   }
 
-  if(regs.vendor_info && addr >= 0xff00 && addr <= 0xff13) {
+  if(regs.vendor_info && ((addr & 0x7FFF) >= 0x7F00) && ((addr & 0x7FFF) <= 0x7F13)) {
     //read flash cartridge vendor information
-    switch(addr - 0xff00) {
+    switch(addr & 0xFF) {
       case 0x00: return 0x4d;
       case 0x01: return 0x00;
       case 0x02: return 0x50;
