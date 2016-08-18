@@ -314,7 +314,8 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     }
     xml << "  <bsx>\n";
     xml << "    <slot>\n";
-    xml << "      <map mode='linear' address='c0-ef:0000-ffff'/>\n";
+    xml << "      <map mode='linear' address='c0-ef:0000-7fff'/>\n";
+    xml << "      <map mode='linear' address='c0-ef:8000-ffff'/>\n";
     xml << "    </slot>\n";
     xml << "  </bsx>\n";
   } else if(mapper == BSCHiROM) {
@@ -545,7 +546,45 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
       if(n15 == 0x00 || n15 == 0x80 || n15 == 0x84 || n15 == 0x9c || n15 == 0xbc || n15 == 0xfc) {
         if(data[index + 0x1a] == 0x33 || data[index + 0x1a] == 0xff) {
           type = TypeBsx;
-          bsxpack_type = (data[index + 0x10] == 0x00) ? MaskROM : FlashROM;
+          //Check if FlashROM or MaskROM
+          uint8_t i = 0;
+    	  for (i = 0; i < 20; i++)
+    	  {
+        	uint8_t checkbyte;
+        	switch(i)
+        	{
+            	case 0x00: checkbyte = 0x4D; break;
+            	case 0x02: checkbyte = 0x50; break;
+            	case 0x06: checkbyte = 0x70; break;
+            	default:   checkbyte = 0x00;
+        	}
+
+        	if (i != 0x06)
+        	{
+	            if (data[index - 0xC0 + i] != checkbyte)
+            	{
+	                break;
+            	}
+        	}
+        	else
+        	{
+	            //Only check 0xF0 for i = 6, only Memory Pack type matters
+            	if ((data[index - 0xC0 + i] & 0xF0) != checkbyte)
+            	{
+	                break;
+            	}
+        	}
+    	  }
+
+    	  if (i == 20)
+    	  {
+	        //if i reaches 20, that means all the checks are successful
+        	bsxpack_type = MaskROM;
+    	  }
+    	  else
+    	  {
+    		bsxpack_type = FlashROM;
+    	  }
           region = NTSC;  //BS-X only released in Japan
           return;
         }
