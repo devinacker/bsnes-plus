@@ -7,22 +7,7 @@ void SuperFX::serialize(serializer &s) {
   s.integer(regs.pipeline);
   s.integer(regs.ramaddr);
 
-  s.integer(regs.r[ 0].data);
-  s.integer(regs.r[ 1].data);
-  s.integer(regs.r[ 2].data);
-  s.integer(regs.r[ 3].data);
-  s.integer(regs.r[ 4].data);
-  s.integer(regs.r[ 5].data);
-  s.integer(regs.r[ 6].data);
-  s.integer(regs.r[ 7].data);
-  s.integer(regs.r[ 8].data);
-  s.integer(regs.r[ 9].data);
-  s.integer(regs.r[10].data);
-  s.integer(regs.r[11].data);
-  s.integer(regs.r[12].data);
-  s.integer(regs.r[13].data);
-  s.integer(regs.r[14].data);
-  s.integer(regs.r[15].data);
+  s.array(regs.r);
 
   s.integer(regs.sfr.irq);
   s.integer(regs.sfr.b);
@@ -74,6 +59,7 @@ void SuperFX::serialize(serializer &s) {
   s.integer(regs.sreg);
   s.integer(regs.dreg);
 
+  s.integer(cache.partial);
   s.array(cache.buffer);
   s.array(cache.valid);
 
@@ -82,9 +68,6 @@ void SuperFX::serialize(serializer &s) {
     s.integer(pixelcache[i].bitpend);
     s.array(pixelcache[i].data);
   }
-
-  //timing/timing.hpp
-  s.integer(r15_modified);
 }
 
 #endif

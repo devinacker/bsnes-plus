@@ -1,8 +1,7 @@
 #ifdef SUPERFX_CPP
 
 uint8 SuperFX::mmio_read(unsigned addr) {
-  if(!Memory::debugger_access())
-    cpu.synchronize_coprocessor();
+  cpu.synchronize_coprocessor();
 
   if(addr >= 0x3100 && addr <= 0x32ff) {
     return cache_mmio_read(addr - 0x3100);
@@ -19,10 +18,8 @@ uint8 SuperFX::mmio_read(unsigned addr) {
 
     case 0x3031: {
       uint8 r = regs.sfr >> 8;
-      if(!Memory::debugger_access()) {
-        regs.sfr.irq = 0;
-        cpu.regs.irq = 0;
-      }
+      regs.sfr.irq = 0;
+      cpu.regs.irq = 0;
       return r;
     }
 
@@ -68,6 +65,7 @@ void SuperFX::mmio_write(unsigned addr, uint8 data) {
     } else {
       regs.r[n] = (data << 8) | (regs.r[n] & 0xff);
     }
+    if(n == 14) rombuffer_update();
 
     if(addr == 0x301f) regs.sfr.g = 1;
     return;
@@ -75,9 +73,8 @@ void SuperFX::mmio_write(unsigned addr, uint8 data) {
 
   switch(addr) {
     case 0x3030: {
-      bool g = regs.sfr.g;
       regs.sfr = (regs.sfr & 0xff00) | (data << 0);
-      if(g == 1 && regs.sfr.g == 0) {
+      if(regs.sfr.g == 0) {
         regs.cbr = 0x0000;
         cache_flush();
       }

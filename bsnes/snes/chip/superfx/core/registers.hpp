@@ -1,37 +1,3 @@
-//accepts a callback binding so r14 writes can trigger ROM buffering transparently
-struct reg16_t {
-  uint16 data;
-  function<void (uint16)> on_modify;
-
-  inline operator unsigned() const { return data; }
-  inline uint16 assign(uint16 i) {
-    if(on_modify) on_modify(i);
-    else data = i;
-    return data;
-  }
-
-  inline unsigned operator++() { return assign(data + 1); }
-  inline unsigned operator--() { return assign(data - 1); }
-  inline unsigned operator++(int) { unsigned r = data; assign(data + 1); return r; }
-  inline unsigned operator--(int) { unsigned r = data; assign(data - 1); return r; }
-  inline unsigned operator   = (unsigned i) { return assign(i); }
-  inline unsigned operator  |= (unsigned i) { return assign(data | i); }
-  inline unsigned operator  ^= (unsigned i) { return assign(data ^ i); }
-  inline unsigned operator  &= (unsigned i) { return assign(data & i); }
-  inline unsigned operator <<= (unsigned i) { return assign(data << i); }
-  inline unsigned operator >>= (unsigned i) { return assign(data >> i); }
-  inline unsigned operator  += (unsigned i) { return assign(data + i); }
-  inline unsigned operator  -= (unsigned i) { return assign(data - i); }
-  inline unsigned operator  *= (unsigned i) { return assign(data * i); }
-  inline unsigned operator  /= (unsigned i) { return assign(data / i); }
-  inline unsigned operator  %= (unsigned i) { return assign(data % i); }
-
-  inline unsigned operator   = (const reg16_t& i) { return assign(i); }
-
-  reg16_t() : data(0) {}
-  reg16_t(const reg16_t&) = delete;
-};
-
 struct sfr_t {
   bool irq;   //interrupt flag
   bool b;     //WITH flag
@@ -69,10 +35,10 @@ struct sfr_t {
 };
 
 struct scmr_t {
-  unsigned ht;
   bool ron;
   bool ran;
-  unsigned md;
+  uint8 ht;
+  uint8 md;
 
   operator unsigned() const {
     return ((ht >> 1) << 5) | (ron << 4) | (ran << 3) | ((ht & 1) << 2) | (md);
@@ -137,7 +103,7 @@ struct regs_t {
   uint8 pipeline;
   uint16 ramaddr;
 
-  reg16_t r[16];    //general purpose registers
+  uint16 r[16];     //general purpose registers
   sfr_t sfr;        //status flag register
   uint8 pbr;        //program bank register
   uint8 rombr;      //game pack ROM bank register
@@ -160,20 +126,24 @@ struct regs_t {
   uint8 ramdr;      //RAM buffer data register
 
   uint8 sreg, dreg;
-  reg16_t& sr() { return r[sreg]; }  //source register (from)
-  reg16_t& dr() { return r[dreg]; }  //destination register (to)
+  uint16& sr() { return r[sreg]; }  //source register (from)
+  uint16& dr() { return r[dreg]; }  //destination register (to)
 
-  void reset() {
+  uint8 reset() {
+    uint8 ret = dreg;
     sfr.b    = 0;
     sfr.alt1 = 0;
     sfr.alt2 = 0;
 
     sreg = 0;
     dreg = 0;
+    return ret;
   }
 } regs;
 
 struct cache_t {
+  enum { Flushed = 0xfff0 };
+  uint16 partial;
   uint8 buffer[512];
   bool valid[32];
 } cache;

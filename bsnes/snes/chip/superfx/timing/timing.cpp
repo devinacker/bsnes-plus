@@ -59,19 +59,7 @@ void SuperFX::rambuffer_write(uint16 addr, uint8 data) {
   regs.ramdr = data;
 }
 
-void SuperFX::r14_modify(uint16 data) {
-  regs.r[14].data = data;
-  rombuffer_update();
-}
-
-void SuperFX::r15_modify(uint16 data) {
-  regs.r[15].data = data;
-  r15_modified = true;
-}
-
 void SuperFX::timing_reset() {
-  r15_modified = false;
-
   regs.romcl = 0;
   regs.romdr = 0;
 
