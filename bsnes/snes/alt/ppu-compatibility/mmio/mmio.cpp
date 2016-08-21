@@ -593,7 +593,7 @@ uint8 r = 0x00;
 uint8 PPU::mmio_r213f() {
 uint8 r = 0x00;
 
-  if(!Memory::debugger_access) {
+  if(!Memory::debugger_access()) {
     regs.latch_hcounter = 0;
     regs.latch_vcounter = 0;
   }

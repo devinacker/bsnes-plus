@@ -14,6 +14,13 @@ void CPUcore::initialize_opcode_table() {
   #define opXF( id, name, fn   ) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w>;
   #define opXFI(id, name, fn, x) op_table[table_MX + id] = op_table[table_mX + id] = &CPUcore::op_##name##_b<&CPUcore::op_##fn##_b, x>; op_table[table_Mx + id] = op_table[table_mx + id] = &CPUcore::op_##name##_w<&CPUcore::op_##fn##_w, x>;
 
+  #define A 0
+  #define X 1
+  #define Y 2
+  #define Z 3
+  #define S 4
+  #define D 5
+
   opAII(0x00, interrupt, 0xfffe, 0xffe6)
   opMF (0x01, read_idpx, ora)
   opAII(0x02, interrupt, 0xfff4, 0xffe4)
@@ -283,6 +290,13 @@ void CPUcore::initialize_opcode_table() {
   #undef opXII
   #undef opXF
   #undef opXFI
+
+  #undef A
+  #undef X
+  #undef Y
+  #undef Z
+  #undef S
+  #undef D
 }
 
 void CPUcore::update_table() {

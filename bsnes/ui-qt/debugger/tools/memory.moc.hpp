@@ -4,7 +4,7 @@ class MemoryEditor : public Window {
   Q_OBJECT
 
 public:
-  QHBoxLayout *layout;
+  QGridLayout *layout;
   QHexEdit *editor;
   QVBoxLayout *controlLayout;
   QComboBox *source;
@@ -28,6 +28,8 @@ public:
   QPushButton *exportButton;
   QPushButton *importButton;
 
+  QLabel *statusBar;
+
   void autoUpdate();
   void synchronize();
 
@@ -47,6 +49,7 @@ public slots:
   void sourceChanged(int);
   void refresh();
   void updateOffset();
+  void showAddress(qint64);
   
   void prevCode();
   void nextCode();

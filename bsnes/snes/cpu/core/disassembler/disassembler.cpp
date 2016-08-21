@@ -109,11 +109,6 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
   char t[256];
   char *s = output;
 
-  if(false /* in_opcode() == true */) {
-    strcpy(s, "?????? <CPU within opcode>");
-    return;
-  }
-
   pc.d = addr;
   sprintf(s, "%.6x ", (uint32)pc.d);
 
@@ -230,7 +225,7 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
     case 0x5f: sprintf(t, "eor $%.6x,x [%.6x]", op24, decode(OPTYPE_LONGX, op24, addr)); break;
     case 0x60: sprintf(t, "rts                   "); break;
     case 0x61: sprintf(t, "adc ($%.2x,x)   [%.6x]", op8, decode(OPTYPE_IDPX, op8, addr)); break;
-    case 0x62: sprintf(t, "per $%.4x     [%.6x]", op16, decode(OPTYPE_ADDR, op16, addr)); break;
+    case 0x62: sprintf(t, "per $%.4x             ", uint16(decode(OPTYPE_RELW, op16, addr))); break;
     case 0x63: sprintf(t, "adc $%.2x,s     [%.6x]", op8, decode(OPTYPE_SR, op8, addr)); break;
     case 0x64: sprintf(t, "stz $%.2x       [%.6x]", op8, decode(OPTYPE_DP, op8, addr)); break;
     case 0x65: sprintf(t, "adc $%.2x       [%.6x]", op8, decode(OPTYPE_DP, op8, addr)); break;
@@ -351,7 +346,7 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
     case 0xd1: sprintf(t, "cmp ($%.2x),y   [%.6x]", op8, decode(OPTYPE_IDPY, op8, addr)); break;
     case 0xd2: sprintf(t, "cmp ($%.2x)     [%.6x]", op8, decode(OPTYPE_IDP, op8, addr)); break;
     case 0xd3: sprintf(t, "cmp ($%.2x,s),y [%.6x]", op8, decode(OPTYPE_ISRY, op8, addr)); break;
-    case 0xd4: sprintf(t, "pei ($%.2x)     [%.6x]", op8, decode(OPTYPE_IDP, op8, addr)); break;
+    case 0xd4: sprintf(t, "pei ($%.2x)     [%.6x]", op8, decode(OPTYPE_DP, op8, addr)); break;
     case 0xd5: sprintf(t, "cmp $%.2x,x     [%.6x]", op8, decode(OPTYPE_DPX, op8, addr)); break;
     case 0xd6: sprintf(t, "dec $%.2x,x     [%.6x]", op8, decode(OPTYPE_DPX, op8, addr)); break;
     case 0xd7: sprintf(t, "cmp [$%.2x],y   [%.6x]", op8, decode(OPTYPE_ILDPY, op8, addr)); break;
@@ -385,7 +380,7 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
     case 0xf1: sprintf(t, "sbc ($%.2x),y   [%.6x]", op8, decode(OPTYPE_IDPY, op8, addr)); break;
     case 0xf2: sprintf(t, "sbc ($%.2x)     [%.6x]", op8, decode(OPTYPE_IDP, op8, addr)); break;
     case 0xf3: sprintf(t, "sbc ($%.2x,s),y [%.6x]", op8, decode(OPTYPE_ISRY, op8, addr)); break;
-    case 0xf4: sprintf(t, "pea $%.4x     [%.6x]", op16, decode(OPTYPE_ADDR, op16, addr)); break;
+    case 0xf4: sprintf(t, "pea $%.4x             ", op16); break;
     case 0xf5: sprintf(t, "sbc $%.2x,x     [%.6x]", op8, decode(OPTYPE_DPX, op8, addr)); break;
     case 0xf6: sprintf(t, "inc $%.2x,x     [%.6x]", op8, decode(OPTYPE_DPX, op8, addr)); break;
     case 0xf7: sprintf(t, "sbc [$%.2x],y   [%.6x]", op8, decode(OPTYPE_ILDPY, op8, addr)); break;

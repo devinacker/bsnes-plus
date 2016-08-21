@@ -367,7 +367,7 @@ void Debugger::event() {
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << t << "</font><br>");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
         registerEditSMP->setEnabled(true);
         break;

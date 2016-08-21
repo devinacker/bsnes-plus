@@ -13,7 +13,7 @@ MemoryEditor::MemoryEditor() {
   setGeometryString(&config().geometry.memoryEditor);
   application.windowList.append(this);
 
-  layout = new QHBoxLayout;
+  layout = new QGridLayout;
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
@@ -23,11 +23,12 @@ MemoryEditor::MemoryEditor() {
   editor->writer = { &MemoryEditor::writer, this };
   editor->usage  = { &MemoryEditor::usage, this };
   memorySource = SNES::Debugger::MemorySource::CPUBus;
-  layout->addWidget(editor, 1);
+  layout->addWidget(editor, 0, 0);
 
   controlLayout = new QVBoxLayout;
   controlLayout->setSpacing(0);
-  layout->addLayout(controlLayout);
+  layout->addLayout(controlLayout, 0, 1);
+  layout->setColumnStretch(0, 1);
 
   source = new QComboBox;
   source->addItem("S-CPU bus");
@@ -89,6 +90,10 @@ MemoryEditor::MemoryEditor() {
   importButton = new QPushButton("Import");
   controlLayout->addWidget(importButton);
 
+  statusBar = new QLabel;
+  layout->addWidget(statusBar, 1, 0, 1, 2);
+
+  connect(editor, SIGNAL(currentAddressChanged(qint64)), this, SLOT(showAddress(qint64)));
   connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceChanged(int)));
   connect(addr, SIGNAL(textEdited(const QString&)), this, SLOT(updateOffset()));
   connect(addr, SIGNAL(returnPressed()), this, SLOT(updateOffset()));
@@ -156,6 +161,15 @@ void MemoryEditor::updateOffset() {
   refresh();
 }
 
+void MemoryEditor::showAddress(qint64 address) {
+  if (address < 0) {
+    statusBar->setText("");
+  } else {
+    QString msg;
+    msg.sprintf("Address: 0x%06X", address);
+    statusBar->setText(msg);
+  }
+}
 
 void MemoryEditor::prevCode() {
   gotoPrevious(QHexEdit::UsageExec);
@@ -306,14 +320,14 @@ void MemoryEditor::search() {
   
   if (dlg.exec()) {
     QString searchText = edit->text().trimmed();
-	
-	// try quoted text
-	if (searchText.startsWith("\"") && searchText.endsWith("\"")) {
-	  searchStr = searchText.mid(1, searchText.size() - 2).toUtf8();
+    
+    // try quoted text
+    if (searchText.startsWith("\"") && searchText.endsWith("\"")) {
+      searchStr = searchText.mid(1, searchText.size() - 2).toUtf8();
     } else {
-	  searchStr = QByteArray::fromHex(edit->text().toUtf8());
-	}
-	
+      searchStr = QByteArray::fromHex(edit->text().toUtf8());
+    }
+    
     int offset = (int)editor->cursorPosition() / 2;
     
     if (searchDown->isChecked()) {

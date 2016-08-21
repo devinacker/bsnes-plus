@@ -8,12 +8,6 @@ namespace SNES {
 #include "disassembler/disassembler.cpp"
 
 #define L last_cycle();
-#define A 0
-#define X 1
-#define Y 2
-#define Z 3
-#define S 4
-#define D 5
 #define call(op) (this->*op)()
 
 #include "opcode_read.cpp"
@@ -24,12 +18,6 @@ namespace SNES {
 #include "table.cpp"
 
 #undef L
-#undef A
-#undef X
-#undef Y
-#undef Z
-#undef S
-#undef D
 #undef call
 
 //immediate, 2-cycle opcodes with I/O cycle will become bus read
