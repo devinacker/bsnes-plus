@@ -34,7 +34,10 @@ RegisterEditSFX *registerEditSFX;
 	connect(flag_btn[num], SIGNAL(toggled(bool)), this, SLOT(commit())); \
 	layout->addWidget(flag_btn[num]);
 
-#define flag_sync(flag, num) flag_btn[num]->setChecked(_debugger.getFlag(flag));
+#define flag_sync(flag, num) \
+	flag_btn[num]->blockSignals(true); \
+	flag_btn[num]->setChecked(_debugger.getFlag(flag)); \
+	flag_btn[num]->blockSignals(false);
 #define flag_commit(flag, num) \
 	if (sender() == flag_btn[num]) { \
 		_debugger.setFlag(flag, flag_btn[num]->isChecked()); \

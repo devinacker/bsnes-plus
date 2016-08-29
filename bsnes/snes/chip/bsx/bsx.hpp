@@ -61,8 +61,6 @@ private:
     bool vendor_info;
     bool writebyte;
   } regs;
-
-  bool type7;
 };
 
 extern BSXBase  bsxbase;
