@@ -170,8 +170,8 @@ void SMP::save_spc_dump() {
   // 00F0 - 00FF
   out.write(memory::apuram[0xF0]);
   out.write(memory::apuram[0xF1]);
-  out.write(memory::apuram[0xF2]);
-  out.write(memory::apuram[0xF3]);
+  out.write(status.dsp_addr);
+  out.write(dsp.read(status.dsp_addr & 0x7f));
   
   out.write(port.cpu_to_smp[0]);
   out.write(port.cpu_to_smp[1]);
