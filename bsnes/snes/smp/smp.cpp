@@ -164,9 +164,33 @@ void SMP::save_spc_dump() {
   // just write completely blank ID666 tag
   for (unsigned i = 0x2e; i < 0x100; i++) out.write(0);
   
-  for (unsigned i = 0; i < memory::apuram.size(); i++) {
-    out.write(memory::apuram.read(i));
-  }
+  // 0000 - 00EF
+  out.write(memory::apuram.data(), 0xF0);
+  
+  // 00F0 - 00FF
+  out.write(memory::apuram[0xF0]);
+  out.write(memory::apuram[0xF1]);
+  out.write(status.dsp_addr);
+  out.write(dsp.read(status.dsp_addr & 0x7f));
+  
+  out.write(port.cpu_to_smp[0]);
+  out.write(port.cpu_to_smp[1]);
+  out.write(port.cpu_to_smp[2]);
+  out.write(port.cpu_to_smp[3]);
+  
+  out.write(port.aux[0]);
+  out.write(port.aux[1]);
+  
+  out.write(memory::apuram[0xFA]);
+  out.write(memory::apuram[0xFB]);
+  out.write(memory::apuram[0xFC]);
+  
+  out.write(t0.stage3_ticks & 15);
+  out.write(t1.stage3_ticks & 15);
+  out.write(t2.stage3_ticks & 15);
+  
+  // 0100 - FFFF
+  out.write(memory::apuram.data() + 0x100, 0xFF00);
   
   for (unsigned i = 0; i < 128; i++) {
     out.write(dsp.read(i));
