@@ -211,15 +211,15 @@ bool SA1Debugger::getFlag(unsigned id) {
 
 void SA1Debugger::setFlag(unsigned id, bool value) {
   switch (id) {
-  case FlagE: regs.e   = value;
-  case FlagN: regs.p.n = value;
-  case FlagV: regs.p.v = value;
-  case FlagM: regs.p.m = value;
-  case FlagX: regs.p.x = value;
-  case FlagD: regs.p.d = value;
-  case FlagI: regs.p.i = value;
-  case FlagZ: regs.p.z = value;
-  case FlagC: regs.p.c = value;
+  case FlagE: regs.e   = value; return;
+  case FlagN: regs.p.n = value; return;
+  case FlagV: regs.p.v = value; return;
+  case FlagM: regs.p.m = value; return;
+  case FlagX: regs.p.x = value; return;
+  case FlagD: regs.p.d = value; return;
+  case FlagI: regs.p.i = value; return;
+  case FlagZ: regs.p.z = value; return;
+  case FlagC: regs.p.c = value; return;
   }
 }
 

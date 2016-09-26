@@ -51,7 +51,9 @@ void Tracer::stepSfx() {
 
 void Tracer::setTraceState(bool state) {
   if(state && !tracefile.open()) {
-    tracefile.open(filepath(nall::basename(cartridge.fileName), config().path.data) << "-trace.log", file::mode::write);
+    string name = filepath(nall::basename(cartridge.fileName), config().path.data);
+    name << "-trace.log";
+    tracefile.open(name, file::mode::write);
   } else if(!traceCpu && !traceSmp && !traceSa1 && !traceSfx && tracefile.open()) {
     tracefile.close();
   }
