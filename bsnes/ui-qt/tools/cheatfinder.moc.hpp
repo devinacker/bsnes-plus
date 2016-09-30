@@ -23,11 +23,18 @@ public:
   QPushButton *searchButton;
   QPushButton *resetButton;
 
+  QButtonGroup *compareToGroup;
+  QLabel *compareToLabel;
+  QRadioButton *compareToPrev;
+  QRadioButton *compareToAddress;
+  QRadioButton *compareToValue;
+
   void synchronize();
   void refreshList();
   CheatFinderWindow();
 
 public slots:
+  void toggle_editline(bool);
   void searchMemory();
   void resetSearch();
 
