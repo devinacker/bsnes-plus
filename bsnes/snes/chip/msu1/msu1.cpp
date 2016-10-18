@@ -72,7 +72,8 @@ void MSU1::reset() {
   create(MSU1::Enter, 44100);
   boot = true;
 
-  mmio.data_offset  = 0;
+  mmio.data_offset       = 0;
+  mmio.data_seek_offset  = 0;
   mmio.audio_offset = 0;
   mmio.audio_track  = 0;
   mmio.audio_volume = 255;
@@ -112,19 +113,20 @@ uint8 MSU1::mmio_read(unsigned addr) {
 
 void MSU1::mmio_write(unsigned addr, uint8 data) {
   if(addr == 0x2000) {
-    mmio.data_offset = (mmio.data_offset & 0xffffff00) | (data <<  0);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xffffff00) | (data <<  0);
   }
 
   if(addr == 0x2001) {
-    mmio.data_offset = (mmio.data_offset & 0xffff00ff) | (data <<  8);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xffff00ff) | (data <<  8);
   }
 
   if(addr == 0x2002) {
-    mmio.data_offset = (mmio.data_offset & 0xff00ffff) | (data << 16);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xff00ffff) | (data << 16);
   }
 
   if(addr == 0x2003) {
-    mmio.data_offset = (mmio.data_offset & 0x00ffffff) | (data << 24);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0x00ffffff) | (data << 24);
+	mmio.data_offset = mmio.data_seek_offset;
     if(datafile.open()) datafile.seek(mmio.data_offset);
     mmio.data_busy = false;
   }
