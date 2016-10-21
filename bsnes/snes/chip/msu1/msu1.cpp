@@ -156,8 +156,6 @@ void MSU1::mmio_write(unsigned addr, uint8 data) {
       }
     }
     mmio.audio_busy   = false;
-    mmio.audio_repeat = false;
-    mmio.audio_play   = false;
     mmio.audio_error  = !audiofile.open();
   }
 
