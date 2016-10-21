@@ -84,7 +84,8 @@ Debugger::Debugger() {
 
   // TODO: icons instead of text
   runBreak = new QToolButton;
-  runBreak->setDefaultAction(new QAction("Brk", this));
+  runBreak->setDefaultAction(new QAction("Break", this));
+  runBreak->setFixedWidth(runBreak->minimumSizeHint().width());
   runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
   runBreak->defaultAction()->setShortcut(Qt::Key_F5);
   commandLayout->addWidget(runBreak);
