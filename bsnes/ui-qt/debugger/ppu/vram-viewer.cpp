@@ -126,7 +126,14 @@ void VramViewer::zoomChanged(int index) {
   if(z == 0) z = 1;
 
   canvas->setZoom(z);
-  scrollArea->setMinimumWidth(canvas->width() + scrollArea->verticalScrollBar()->width() * 2);
+
+  int scrollWidth = canvas->width() + scrollArea->verticalScrollBar()->width() * 2;
+  scrollArea->setMinimumWidth(scrollWidth);
+
+  int mainWidth = scrollWidth + sidebarLayout->minimumSize().width();
+  int controlWidth = controlLayout->minimumSize().width();
+
+  setFixedWidth(max(mainWidth, controlWidth) + Style::WidgetSpacing * 3);
 }
 
 void VramViewer::gotoAddress(unsigned vram_addr) {
