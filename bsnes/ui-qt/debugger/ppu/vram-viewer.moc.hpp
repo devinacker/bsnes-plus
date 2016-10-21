@@ -12,12 +12,15 @@ public slots:
   void setDepth4bpp();
   void setDepth8bpp();
   void setDepthMode7();
+  void setZoom(unsigned);
+  void updateWidgetSize();
 
 signals:
-	void infoChanged(unsigned vram_addr);
+  void infoChanged(unsigned vram_addr);
 
 private:
   unsigned bpp;
+  unsigned zoom;
   void refresh2bpp(const uint8_t*);
   void refresh4bpp(const uint8_t*);
   void refresh8bpp(const uint8_t*);
@@ -34,6 +37,7 @@ public:
   QRadioButton *depth4bpp;
   QRadioButton *depth8bpp;
   QRadioButton *depthMode7;
+  QComboBox *zoom;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
   QLabel *vramInfo;
@@ -46,6 +50,7 @@ public:
 public slots:
   void show();
   void refresh();
+  void zoomChanged(int);
   void displayInfo(unsigned vram_addr);
 };
 
