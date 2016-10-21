@@ -139,20 +139,25 @@ void MSU1::mmio_write(unsigned addr, uint8 data) {
 
   if(addr == 0x2005) {
     mmio.audio_track = (mmio.audio_track & 0x00ff) | (data << 8);
+    mmio.audio_offset = 8;
+    
+    if(mmio.audio_resume_track == mmio.audio_track) {
+      mmio.audio_offset = mmio.audio_resume_offset;
+      mmio.audio_resume_track = ~0;
+      mmio.audio_resume_offset = 0;
+    }
+    
     if(audiofile.open()) audiofile.close();
     if(audiofile.open(string(cartridge.basename(), "-", mmio.audio_track, ".pcm"), file::mode::read)) {
       uint32 header = audiofile.readm(4);
       if(header != 0x4d535531) {  //verify 'MSU1' header
         audiofile.close();
       } else {
-        mmio.audio_offset = 8;
         mmio.audio_loop_offset = 8 + audiofile.readl(4) * 4;
-        
-        if(mmio.audio_resume_track == mmio.audio_track) {
-          mmio.audio_offset = mmio.audio_resume_offset;
-          mmio.audio_resume_track = ~0;
-          mmio.audio_resume_offset = 0;
-        }
+        if(mmio.audio_loop_offset > audiofile.size())
+          mmio.audio_loop_offset = 8;
+
+        audiofile.seek(mmio.audio_offset);
       }
     }
     mmio.audio_busy   = false;
