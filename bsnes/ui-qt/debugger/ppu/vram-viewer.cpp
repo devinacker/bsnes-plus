@@ -37,21 +37,25 @@ VramViewer::VramViewer() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
+  scrollArea = new QScrollArea;
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  layout->addWidget(scrollArea);
+
   canvas = new VramCanvas;
-  canvas->setFixedSize(512, 512);
-  layout->addWidget(canvas);
+  scrollArea->setWidget(canvas);
 
   vramInfo = new QLabel;
   layout->addWidget(vramInfo);
 
-  bpp = 2;
+  canvas->setDepth2bpp();
   depth2bpp->setChecked(true);
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
-  connect(depth2bpp,  SIGNAL(pressed()), this, SLOT(setDepth2bpp()));
-  connect(depth4bpp,  SIGNAL(pressed()), this, SLOT(setDepth4bpp()));
-  connect(depth8bpp,  SIGNAL(pressed()), this, SLOT(setDepth8bpp()));
-  connect(depthMode7, SIGNAL(pressed()), this, SLOT(setDepthMode7()));
+  connect(depth2bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth2bpp()));
+  connect(depth4bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth4bpp()));
+  connect(depth8bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth8bpp()));
+  connect(depthMode7, SIGNAL(pressed()), canvas, SLOT(setDepthMode7()));
   connect(canvas, SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
 }
 
@@ -65,21 +69,34 @@ void VramViewer::show() {
 }
 
 void VramViewer::refresh() {
-  canvas->image->fill(0x800000);
-  if(SNES::cartridge.loaded()) {
-    const uint8_t *source = SNES::memory::vram.data();
-    uint32_t *dest = (uint32_t*)canvas->image->bits();
-    if(bpp == 2) refresh2bpp (source, dest);
-    if(bpp == 4) refresh4bpp (source, dest);
-    if(bpp == 8) refresh8bpp (source, dest);
-    if(bpp == 7) refreshMode7(source, dest);
-  }
-  canvas->update();
+  canvas->refresh();
 }
 
-void VramViewer::refresh2bpp(const uint8_t *source, uint32_t *dest) {
-  for(unsigned ty = 0; ty < 64; ty++) {
-    for(unsigned tx = 0; tx < 64; tx++) {
+VramCanvas::VramCanvas() {
+  image = new QImage(128, 2048, QImage::Format_RGB32);
+  image->fill(0x800000);
+
+  setDepth2bpp();
+}
+
+void VramCanvas::refresh() {
+  image->fill(0x800000);
+  if(SNES::cartridge.loaded()) {
+    const uint8_t *source = SNES::memory::vram.data();
+
+    if(bpp == 2) refresh2bpp (source);
+    if(bpp == 4) refresh4bpp (source);
+    if(bpp == 8) refresh8bpp (source);
+    if(bpp == 7) refreshMode7(source);
+  }
+  update();
+}
+
+void VramCanvas::refresh2bpp(const uint8_t *source) {
+  uint32_t *dest = (uint32_t*)image->bits();
+
+  for(unsigned ty = 0; ty < 256; ty++) {
+    for(unsigned tx = 0; tx < 16; tx++) {
       for(unsigned py = 0; py < 8; py++) {
         uint8_t d0 = source[0];
         uint8_t d1 = source[1];
@@ -88,7 +105,7 @@ void VramViewer::refresh2bpp(const uint8_t *source, uint32_t *dest) {
           pixel |= (d0 & (0x80 >> px)) ? 1 : 0;
           pixel |= (d1 & (0x80 >> px)) ? 2 : 0;
           pixel *= 0x55;
-          dest[(ty * 8 + py) * 512 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
         }
         source += 2;
       }
@@ -96,9 +113,11 @@ void VramViewer::refresh2bpp(const uint8_t *source, uint32_t *dest) {
   }
 }
 
-void VramViewer::refresh4bpp(const uint8_t *source, uint32_t *dest) {
-  for(unsigned ty = 0; ty < 32; ty++) {
-    for(unsigned tx = 0; tx < 64; tx++) {
+void VramCanvas::refresh4bpp(const uint8_t *source) {
+  uint32_t *dest = (uint32_t*)image->bits();
+
+  for(unsigned ty = 0; ty < 128; ty++) {
+    for(unsigned tx = 0; tx < 16; tx++) {
       for(unsigned py = 0; py < 8; py++) {
         uint8_t d0 = source[ 0];
         uint8_t d1 = source[ 1];
@@ -111,7 +130,7 @@ void VramViewer::refresh4bpp(const uint8_t *source, uint32_t *dest) {
           pixel |= (d2 & (0x80 >> px)) ? 4 : 0;
           pixel |= (d3 & (0x80 >> px)) ? 8 : 0;
           pixel *= 0x11;
-          dest[(ty * 8 + py) * 512 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
         }
         source += 2;
       }
@@ -120,9 +139,11 @@ void VramViewer::refresh4bpp(const uint8_t *source, uint32_t *dest) {
   }
 }
 
-void VramViewer::refresh8bpp(const uint8_t *source, uint32_t *dest) {
-  for(unsigned ty = 0; ty < 16; ty++) {
-    for(unsigned tx = 0; tx < 64; tx++) {
+void VramCanvas::refresh8bpp(const uint8_t *source) {
+  uint32_t *dest = (uint32_t*)image->bits();
+
+  for(unsigned ty = 0; ty < 64; ty++) {
+    for(unsigned tx = 0; tx < 16; tx++) {
       for(unsigned py = 0; py < 8; py++) {
         uint8_t d0 = source[ 0];
         uint8_t d1 = source[ 1];
@@ -142,7 +163,7 @@ void VramViewer::refresh8bpp(const uint8_t *source, uint32_t *dest) {
           pixel |= (d5 & (0x80 >> px)) ? 0x20 : 0;
           pixel |= (d6 & (0x80 >> px)) ? 0x40 : 0;
           pixel |= (d7 & (0x80 >> px)) ? 0x80 : 0;
-          dest[(ty * 8 + py) * 512 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
         }
         source += 2;
       }
@@ -151,13 +172,15 @@ void VramViewer::refresh8bpp(const uint8_t *source, uint32_t *dest) {
   }
 }
 
-void VramViewer::refreshMode7(const uint8_t *source, uint32_t *dest) {
+void VramCanvas::refreshMode7(const uint8_t *source) {
+  uint32_t *dest = (uint32_t*)image->bits();
+
   for(unsigned ty = 0; ty < 16; ty++) {
     for(unsigned tx = 0; tx < 16; tx++) {
       for(unsigned py = 0; py < 8; py++) {
         for(unsigned px = 0; px < 8; px++) {
           uint8_t pixel = source[1];
-          dest[(ty * 8 + py) * 512 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
           source += 2;
         }
       }
@@ -165,18 +188,17 @@ void VramViewer::refreshMode7(const uint8_t *source, uint32_t *dest) {
   }
 }
 
-void VramViewer::setDepth2bpp()  { bpp = 2; refresh(); }
-void VramViewer::setDepth4bpp()  { bpp = 4; refresh(); }
-void VramViewer::setDepth8bpp()  { bpp = 8; refresh(); }
-void VramViewer::setDepthMode7() { bpp = 7; refresh(); }
+void VramCanvas::setDepth2bpp()  { bpp = 2; setFixedSize(128, 2048); refresh(); }
+void VramCanvas::setDepth4bpp()  { bpp = 4; setFixedSize(128, 1024); refresh(); }
+void VramCanvas::setDepth8bpp()  { bpp = 8; setFixedSize(128, 512);  refresh(); }
+void VramCanvas::setDepthMode7() { bpp = 7; setFixedSize(128, 128);  refresh(); }
 
 void VramCanvas::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.drawImage(0, 0, *image);
 }
 
-void VramViewer::displayInfo(unsigned tile_num) {
-	unsigned vram_addr = (tile_num * bpp * 8);
+void VramViewer::displayInfo(unsigned vram_addr) {
 	if (vram_addr <= 0xFFFF) {
 		char tmp[256] = "";
 		sprintf(tmp, "VRAM address: %04X", vram_addr);
@@ -190,12 +212,8 @@ void VramCanvas::mousePressEvent(QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
 	  unsigned column = event->x() / 8;
 	  unsigned row = event->y() / 8;
-	  unsigned tile_num = (row * 64) + column;
-	  emit infoChanged(tile_num);
+	  unsigned tile_num = (row * 16) + column;
+	  unsigned vram_addr = (tile_num * bpp * 8);
+	  emit infoChanged(vram_addr);
   }
-}
-
-VramCanvas::VramCanvas() {
-  image = new QImage(512, 512, QImage::Format_RGB32);
-  image->fill(0x800000);
 }
