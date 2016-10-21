@@ -19,6 +19,16 @@ VramViewer::VramViewer() {
   controlLayout->setAlignment(Qt::AlignRight);
   layout->addLayout(controlLayout);
 
+  mainLayout = new QHBoxLayout;
+  mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
+  mainLayout->setAlignment(Qt::AlignTop);
+  layout->addLayout(mainLayout);
+
+  sidebarLayout = new QVBoxLayout;
+  sidebarLayout->setAlignment(Qt::AlignTop);
+  sidebarLayout->setSizeConstraint(QLayout::SetFixedSize);
+  mainLayout->addLayout(sidebarLayout);
+
   depth2bpp = new QRadioButton("2 BPP");
   controlLayout->addWidget(depth2bpp);
 
@@ -45,11 +55,29 @@ VramViewer::VramViewer() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
+  baseAddrLabel = new QLabel("Base Tile Addresses:");
+  sidebarLayout->addWidget(baseAddrLabel);
+
+  //TODO: Properly expose these values to the debugger
+  //TODO: Add second sprite table address
+
+  vramAddrItems[0] = new VramAddrItem("BG1:", "BG1 Name Base Address");
+  vramAddrItems[1] = new VramAddrItem("BG2:", "BG2 Name Base Address");
+  vramAddrItems[2] = new VramAddrItem("BG3:", "BG3 Name Base Address");
+  vramAddrItems[3] = new VramAddrItem("BG4:", "BG4 Name Base Address");
+  vramAddrItems[4] = new VramAddrItem("OAM:", "OAM Name Base Address");
+
+  for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
+    sidebarLayout->addWidget(vramAddrItems[i]);
+  }
+
+  mainLayout->addStretch();
+
   scrollArea = new QScrollArea;
   scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scrollArea->setMinimumHeight(300);
-  layout->addWidget(scrollArea);
+  mainLayout->addWidget(scrollArea);
 
   canvas = new VramCanvas;
   scrollArea->setWidget(canvas);
@@ -70,6 +98,10 @@ VramViewer::VramViewer() {
   connect(depth8bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth8bpp()));
   connect(depthMode7, SIGNAL(pressed()), canvas, SLOT(setDepthMode7()));
   connect(canvas,     SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
+
+  for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
+    connect(vramAddrItems[i], SIGNAL(gotoPressed(unsigned)), this, SLOT(gotoAddress(unsigned)));
+  }
 }
 
 void VramViewer::autoUpdate() {
@@ -83,6 +115,10 @@ void VramViewer::show() {
 
 void VramViewer::refresh() {
   canvas->refresh();
+
+  for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
+    vramAddrItems[i]->refresh();
+  }
 }
 
 void VramViewer::zoomChanged(int index) {
@@ -91,6 +127,12 @@ void VramViewer::zoomChanged(int index) {
 
   canvas->setZoom(z);
   scrollArea->setMinimumWidth(canvas->width() + scrollArea->verticalScrollBar()->width() * 2);
+}
+
+void VramViewer::gotoAddress(unsigned vram_addr) {
+  int y = canvas->tileYPos(vram_addr);
+
+  scrollArea->verticalScrollBar()->setValue(y);
 }
 
 VramCanvas::VramCanvas() {
@@ -255,4 +297,56 @@ void VramCanvas::mousePressEvent(QMouseEvent* event) {
 	  unsigned vram_addr = (tile_num * bpp * 8);
 	  emit infoChanged(vram_addr);
   }
+}
+
+int VramCanvas::tileYPos(unsigned vram_addr) {
+  if (bpp == 7 || vram_addr > 0xffff) return 0;
+
+  unsigned tile = vram_addr / 8 / bpp;
+  unsigned row = tile / 16;
+  unsigned ypos = row * 8;
+  return ypos * zoom;
+}
+
+VramAddrItem::VramAddrItem(const QString& text, const string& propertyName) {
+  layout = new QHBoxLayout;
+  layout->setAlignment(Qt::AlignLeft);
+  layout->setSizeConstraint(QLayout::SetMinimumSize);
+  layout->setContentsMargins(-1, 0, -1, 0);
+  setLayout(layout);
+
+  label = new QLabel(text);
+  layout->addWidget(label);
+
+  address = new QLineEdit();
+  address->setFixedWidth(9 * address->fontMetrics().width('0'));
+  address->setReadOnly(true);
+  layout->addWidget(address);
+
+  gotoButton = new QToolButton;
+  gotoButton->setDefaultAction(new QAction("goto", this));
+  layout->addWidget(gotoButton);
+
+  propertyId = 0;
+  while(true) {
+    string name, value;
+
+    propertyId++;
+    bool s = SNES::ppu.property(propertyId, name, value);
+
+    if(s == false || name == propertyName) break;
+  }
+
+  connect(gotoButton, SIGNAL(released()), this, SLOT(onGotoPressed()));
+}
+
+void VramAddrItem::refresh() {
+  string label, value;
+  SNES::ppu.property(propertyId, label, value);
+
+  address->setText(value);
+}
+
+void VramAddrItem::onGotoPressed() {
+  gotoPressed(hex(address->text().toUtf8().data()));
 }
