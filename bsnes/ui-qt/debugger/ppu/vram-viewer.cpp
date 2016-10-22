@@ -58,14 +58,12 @@ VramViewer::VramViewer() {
   baseAddrLabel = new QLabel("Base Tile Addresses:");
   sidebarLayout->addWidget(baseAddrLabel);
 
-  //TODO: Properly expose these values to the debugger
-  //TODO: Add second sprite table address
-
   vramAddrItems[0] = new VramAddrItem("BG1:", "BG1 Name Base Address");
   vramAddrItems[1] = new VramAddrItem("BG2:", "BG2 Name Base Address");
   vramAddrItems[2] = new VramAddrItem("BG3:", "BG3 Name Base Address");
   vramAddrItems[3] = new VramAddrItem("BG4:", "BG4 Name Base Address");
-  vramAddrItems[4] = new VramAddrItem("OAM:", "OAM Name Base Address");
+  vramAddrItems[4] = new VramAddrItem("OAM1:", "OAM Name Base Address");
+  vramAddrItems[5] = new VramAddrItem("OAM2:", "OAM Second Name Table Address");
 
   for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
     sidebarLayout->addWidget(vramAddrItems[i]);

@@ -57,7 +57,7 @@ private:
 class VramViewer : public Window {
   Q_OBJECT
 
-  const static unsigned N_MAP_ITEMS = 5;
+  const static unsigned N_MAP_ITEMS = 6;
 
 public:
   QVBoxLayout *layout;
