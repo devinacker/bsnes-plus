@@ -13,7 +13,6 @@ public:
   void serialize(serializer&);
 
 private:
-  bool boot;
   file datafile;
   file audiofile;
 
