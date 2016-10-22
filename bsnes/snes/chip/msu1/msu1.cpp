@@ -70,7 +70,7 @@ void MSU1::reset() {
   mmio.data_seek_offset  = 0;
   mmio.audio_offset = 0;
   mmio.audio_track  = 0;
-  mmio.audio_volume = 255;
+  mmio.audio_volume = 0;
   mmio.audio_resume_track = ~0;
   mmio.audio_resume_offset = 0;
   mmio.data_busy    = true;
