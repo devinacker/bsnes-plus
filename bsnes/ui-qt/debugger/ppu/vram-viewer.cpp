@@ -69,6 +69,16 @@ VramViewer::VramViewer() {
     sidebarLayout->addWidget(vramAddrItems[i]);
   }
 
+  sidebarLayout->addSpacing(Style::WidgetSpacing);
+
+  useCgram = new QCheckBox("Use CGRAM");
+  sidebarLayout->addWidget(useCgram);
+
+  selectedColor = new QSpinBox;
+  selectedColor->setMinimum(0);
+  selectedColor->setMaximum(255);
+  sidebarLayout->addWidget(selectedColor);
+
   mainLayout->addStretch();
 
   scrollArea = new QScrollArea;
@@ -83,8 +93,12 @@ VramViewer::VramViewer() {
   vramInfo = new QLabel;
   layout->addWidget(vramInfo);
 
+
   canvas->setDepth2bpp();
   depth2bpp->setChecked(true);
+
+  canvas->setSelectedColor(0);
+  selectedColor->setValue(0);
 
   zoom->setCurrentIndex(1);
   zoomChanged(1);
@@ -96,6 +110,9 @@ VramViewer::VramViewer() {
   connect(depth8bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth8bpp()));
   connect(depthMode7, SIGNAL(pressed()), canvas, SLOT(setDepthMode7()));
   connect(canvas,     SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
+
+  connect(useCgram,      SIGNAL(toggled(bool)), canvas, SLOT(setUseCgram(bool)));
+  connect(selectedColor, SIGNAL(valueChanged(int)), canvas, SLOT(setSelectedColor(int)));
 
   for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
     connect(vramAddrItems[i], SIGNAL(gotoPressed(unsigned)), this, SLOT(gotoAddress(unsigned)));
@@ -145,12 +162,72 @@ VramCanvas::VramCanvas() {
   image->fill(0x800000);
 
   zoom = 1;
+  selectedColor = 0;
+  useCgram = false;
   setDepth2bpp();
+}
+
+void VramCanvas::setDepth2bpp()  { bpp = 2; buildDefaultPalette(); updateWidgetSize(); }
+void VramCanvas::setDepth4bpp()  { bpp = 4; buildDefaultPalette(); updateWidgetSize(); }
+void VramCanvas::setDepth8bpp()  { bpp = 8; buildDefaultPalette(); updateWidgetSize(); }
+void VramCanvas::setDepthMode7() { bpp = 7; buildDefaultPalette(); updateWidgetSize(); }
+
+void VramCanvas::setUseCgram(bool b) {
+  useCgram = b;
+  if (!useCgram) buildDefaultPalette();
+  refresh();
+}
+
+void VramCanvas::setSelectedColor(int c) {
+  if (c < 0 || c > 255) c = 0;
+  selectedColor = c;
+  if (useCgram) refresh();
+}
+
+void VramCanvas::buildDefaultPalette() {
+  unsigned nColors = 1 << bpp;
+  if(bpp == 7) nColors = 256;
+
+  uint8_t delta = 1;
+  if(bpp == 2) delta = 0x55;
+  if(bpp == 4) delta = 0x11;
+
+  uint8_t pixel = 0;
+
+  for(unsigned i = 0; i < nColors; i++) {
+    palette[i] = (pixel << 16) + (pixel << 8) + pixel;
+    pixel += delta;
+  }
+}
+
+void VramCanvas::buildCgramPalette() {
+  unsigned nColors = 1 << bpp;
+  if(bpp == 7) nColors = 256;
+
+  unsigned start = selectedColor & (0xff - nColors + 1);
+  assert(start + nColors < 256);
+
+  for(unsigned i = 0; i < nColors; i++) {
+    uint16_t color = SNES::memory::cgram[(start + i) * 2 + 0];
+    color |= SNES::memory::cgram[(start + i) * 2 + 1] << 8;
+
+    uint8_t r = (color >>  0) & 31;
+    uint8_t g = (color >>  5) & 31;
+    uint8_t b = (color >> 10) & 31;
+
+    r = (r << 3) | (r >> 2);
+    g = (g << 3) | (g >> 2);
+    b = (b << 3) | (b >> 2);
+
+    palette[i] = (r << 16) | (g << 8) | (b << 0);
+  }
 }
 
 void VramCanvas::refresh() {
   image->fill(0x800000);
   if(SNES::cartridge.loaded()) {
+    if(useCgram) buildCgramPalette();
+
     const uint8_t *source = SNES::memory::vram.data();
 
     if(bpp == 2) refresh2bpp (source);
@@ -173,8 +250,7 @@ void VramCanvas::refresh2bpp(const uint8_t *source) {
           uint8_t pixel = 0;
           pixel |= (d0 & (0x80 >> px)) ? 1 : 0;
           pixel |= (d1 & (0x80 >> px)) ? 2 : 0;
-          pixel *= 0x55;
-          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = palette[pixel];
         }
         source += 2;
       }
@@ -198,8 +274,7 @@ void VramCanvas::refresh4bpp(const uint8_t *source) {
           pixel |= (d1 & (0x80 >> px)) ? 2 : 0;
           pixel |= (d2 & (0x80 >> px)) ? 4 : 0;
           pixel |= (d3 & (0x80 >> px)) ? 8 : 0;
-          pixel *= 0x11;
-          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = palette[pixel];
         }
         source += 2;
       }
@@ -232,7 +307,7 @@ void VramCanvas::refresh8bpp(const uint8_t *source) {
           pixel |= (d5 & (0x80 >> px)) ? 0x20 : 0;
           pixel |= (d6 & (0x80 >> px)) ? 0x40 : 0;
           pixel |= (d7 & (0x80 >> px)) ? 0x80 : 0;
-          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = palette[pixel];
         }
         source += 2;
       }
@@ -249,18 +324,13 @@ void VramCanvas::refreshMode7(const uint8_t *source) {
       for(unsigned py = 0; py < 8; py++) {
         for(unsigned px = 0; px < 8; px++) {
           uint8_t pixel = source[1];
-          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = (pixel << 16) + (pixel << 8) + pixel;
+          dest[(ty * 8 + py) * 128 + (tx * 8 + px)] = palette[pixel];
           source += 2;
         }
       }
     }
   }
 }
-
-void VramCanvas::setDepth2bpp()  { bpp = 2; updateWidgetSize(); }
-void VramCanvas::setDepth4bpp()  { bpp = 4; updateWidgetSize(); }
-void VramCanvas::setDepth8bpp()  { bpp = 8; updateWidgetSize(); }
-void VramCanvas::setDepthMode7() { bpp = 7; updateWidgetSize(); }
 
 void VramCanvas::setZoom(unsigned newZoom) {
     zoom = newZoom;

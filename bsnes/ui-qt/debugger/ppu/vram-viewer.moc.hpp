@@ -1,10 +1,10 @@
 struct VramCanvas : public QWidget {
 	Q_OBJECT
+
 public:
-  QImage *image;
+  VramCanvas();
   void paintEvent(QPaintEvent*);
   void mousePressEvent(QMouseEvent*);
-  VramCanvas();
 
   int tileYPos(unsigned vram_addr);
 
@@ -14,6 +14,8 @@ public slots:
   void setDepth4bpp();
   void setDepth8bpp();
   void setDepthMode7();
+  void setUseCgram(bool);
+  void setSelectedColor(int);
   void setZoom(unsigned);
   void updateWidgetSize();
 
@@ -21,12 +23,22 @@ signals:
   void infoChanged(unsigned vram_addr);
 
 private:
-  unsigned bpp;
-  unsigned zoom;
+  void buildDefaultPalette();
+  void buildCgramPalette();
+
   void refresh2bpp(const uint8_t*);
   void refresh4bpp(const uint8_t*);
   void refresh8bpp(const uint8_t*);
   void refreshMode7(const uint8_t*);
+
+private:
+  QImage *image;
+  unsigned bpp;
+  unsigned zoom;
+  unsigned selectedColor;
+  bool useCgram;
+
+  uint32_t palette[256];
 };
 
 class VramAddrItem : public QWidget {
@@ -76,6 +88,9 @@ public:
 
   QLabel *baseAddrLabel;
   VramAddrItem *vramAddrItems[N_MAP_ITEMS];
+
+  QCheckBox *useCgram;
+  QSpinBox *selectedColor;
 
   VramCanvas *canvas;
   QScrollArea *scrollArea;
