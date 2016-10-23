@@ -15,7 +15,7 @@ public slots:
   void setDepth8bpp();
   void setDepthMode7();
   void setUseCgram(bool);
-  void setSelectedColor(int);
+  void setSelectedColor(unsigned);
   void setZoom(unsigned);
   void updateWidgetSize();
 
@@ -90,9 +90,9 @@ public:
   VramAddrItem *vramAddrItems[N_MAP_ITEMS];
 
   QCheckBox *useCgram;
-  QSpinBox *selectedColor;
+  CgramWidget *cgramWidget;
 
-  VramCanvas *canvas;
+  VramCanvas *vramCanvas;
   QScrollArea *scrollArea;
 
   void autoUpdate();
@@ -104,6 +104,10 @@ public slots:
   void zoomChanged(int);
   void gotoAddress(unsigned vram_addr);
   void displayInfo(unsigned vram_addr);
+
+  void onDepthChanged();
+  void onUseCgramPressed();
+  void onCgramSelectedChanged();
 };
 
 extern VramViewer *vramViewer;

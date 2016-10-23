@@ -74,10 +74,9 @@ VramViewer::VramViewer() {
   useCgram = new QCheckBox("Use CGRAM");
   sidebarLayout->addWidget(useCgram);
 
-  selectedColor = new QSpinBox;
-  selectedColor->setMinimum(0);
-  selectedColor->setMaximum(255);
-  sidebarLayout->addWidget(selectedColor);
+  cgramWidget = new CgramWidget;
+  cgramWidget->setScale(12);
+  sidebarLayout->addWidget(cgramWidget);
 
   mainLayout->addStretch();
 
@@ -87,32 +86,32 @@ VramViewer::VramViewer() {
   scrollArea->setMinimumHeight(300);
   mainLayout->addWidget(scrollArea);
 
-  canvas = new VramCanvas;
-  scrollArea->setWidget(canvas);
+  vramCanvas = new VramCanvas;
+  scrollArea->setWidget(vramCanvas);
 
   vramInfo = new QLabel;
   layout->addWidget(vramInfo);
 
-
-  canvas->setDepth2bpp();
   depth2bpp->setChecked(true);
+  onDepthChanged();
 
-  canvas->setSelectedColor(0);
-  selectedColor->setValue(0);
+  cgramWidget->setSelected(-1);
+  vramCanvas->setSelectedColor(0);
 
   zoom->setCurrentIndex(1);
   zoomChanged(1);
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
-  connect(zoom,       SIGNAL(currentIndexChanged(int)), this, SLOT(zoomChanged(int)));
-  connect(depth2bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth2bpp()));
-  connect(depth4bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth4bpp()));
-  connect(depth8bpp,  SIGNAL(pressed()), canvas, SLOT(setDepth8bpp()));
-  connect(depthMode7, SIGNAL(pressed()), canvas, SLOT(setDepthMode7()));
-  connect(canvas,     SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
+  connect(vramCanvas, SIGNAL(infoChanged(unsigned)), this, SLOT(displayInfo(unsigned)));
 
-  connect(useCgram,      SIGNAL(toggled(bool)), canvas, SLOT(setUseCgram(bool)));
-  connect(selectedColor, SIGNAL(valueChanged(int)), canvas, SLOT(setSelectedColor(int)));
+  connect(zoom,       SIGNAL(currentIndexChanged(int)), this, SLOT(zoomChanged(int)));
+  connect(depth2bpp,  SIGNAL(clicked()), this, SLOT(onDepthChanged()));
+  connect(depth4bpp,  SIGNAL(clicked()), this, SLOT(onDepthChanged()));
+  connect(depth8bpp,  SIGNAL(clicked()), this, SLOT(onDepthChanged()));
+  connect(depthMode7, SIGNAL(clicked()), this, SLOT(onDepthChanged()));
+
+  connect(useCgram,    SIGNAL(clicked()), this, SLOT(onUseCgramPressed()));
+  connect(cgramWidget, SIGNAL(selectedChanged()), this, SLOT(onCgramSelectedChanged()));
 
   for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
     connect(vramAddrItems[i], SIGNAL(gotoPressed(unsigned)), this, SLOT(gotoAddress(unsigned)));
@@ -129,9 +128,10 @@ void VramViewer::show() {
 }
 
 void VramViewer::refresh() {
-  canvas->refresh();
+  vramCanvas->refresh();
+  cgramWidget->refresh();
 
-  for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
+  for(unsigned i = 0; i < N_MAP_ITEMS; i++) {
     vramAddrItems[i]->refresh();
   }
 }
@@ -140,9 +140,9 @@ void VramViewer::zoomChanged(int index) {
   unsigned z = zoom->itemData(index).toUInt();
   if(z == 0) z = 1;
 
-  canvas->setZoom(z);
+  vramCanvas->setZoom(z);
 
-  int scrollWidth = canvas->width() + scrollArea->verticalScrollBar()->width() * 2;
+  int scrollWidth = vramCanvas->width() + scrollArea->verticalScrollBar()->width() * 2;
   scrollArea->setMinimumWidth(scrollWidth);
 
   int mainWidth = scrollWidth + sidebarLayout->minimumSize().width();
@@ -152,9 +152,37 @@ void VramViewer::zoomChanged(int index) {
 }
 
 void VramViewer::gotoAddress(unsigned vram_addr) {
-  int y = canvas->tileYPos(vram_addr);
+  int y = vramCanvas->tileYPos(vram_addr);
 
   scrollArea->verticalScrollBar()->setValue(y);
+}
+
+void VramViewer::onDepthChanged() {
+  if(depth2bpp->isChecked())  { vramCanvas->setDepth2bpp();  cgramWidget->setPaletteBpp(2); }
+  if(depth4bpp->isChecked())  { vramCanvas->setDepth4bpp();  cgramWidget->setPaletteBpp(4); }
+  if(depth8bpp->isChecked())  { vramCanvas->setDepth8bpp();  cgramWidget->setPaletteBpp(8); }
+  if(depthMode7->isChecked()) { vramCanvas->setDepthMode7(); cgramWidget->setPaletteBpp(8); }
+}
+
+void VramViewer::onUseCgramPressed() {
+  if(useCgram->isChecked()) {
+    if(!cgramWidget->hasSelected()) cgramWidget->setSelected(0);
+  } else {
+    cgramWidget->selectNone();
+  }
+}
+
+void VramViewer::onCgramSelectedChanged() {
+  if(cgramWidget->hasSelected()) {
+    vramCanvas->setUseCgram(true);
+    useCgram->setChecked(true);
+    vramCanvas->setSelectedColor(cgramWidget->selectedPalette());
+  } else {
+    useCgram->setChecked(false);
+    vramCanvas->setUseCgram(false);
+  }
+
+  refresh();
 }
 
 VramCanvas::VramCanvas() {
@@ -175,13 +203,11 @@ void VramCanvas::setDepthMode7() { bpp = 7; buildDefaultPalette(); updateWidgetS
 void VramCanvas::setUseCgram(bool b) {
   useCgram = b;
   if (!useCgram) buildDefaultPalette();
-  refresh();
 }
 
-void VramCanvas::setSelectedColor(int c) {
-  if (c < 0 || c > 255) c = 0;
+void VramCanvas::setSelectedColor(unsigned c) {
+  if (c > 255) c = 0;
   selectedColor = c;
-  if (useCgram) refresh();
 }
 
 void VramCanvas::buildDefaultPalette() {
@@ -208,18 +234,7 @@ void VramCanvas::buildCgramPalette() {
   assert(start + nColors < 256);
 
   for(unsigned i = 0; i < nColors; i++) {
-    uint16_t color = SNES::memory::cgram[(start + i) * 2 + 0];
-    color |= SNES::memory::cgram[(start + i) * 2 + 1] << 8;
-
-    uint8_t r = (color >>  0) & 31;
-    uint8_t g = (color >>  5) & 31;
-    uint8_t b = (color >> 10) & 31;
-
-    r = (r << 3) | (r >> 2);
-    g = (g << 3) | (g >> 2);
-    b = (b << 3) | (b >> 2);
-
-    palette[i] = (r << 16) | (g << 8) | (b << 0);
+    palette[i] = rgbFromCgram(start + i);
   }
 }
 

@@ -14,6 +14,7 @@ Debugger *debugger;
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
 
+#include "ppu/cgram-widget.cpp"
 #include "ppu/vram-viewer.cpp"
 #include "ppu/oam-viewer.cpp"
 #include "ppu/cgram-viewer.cpp"

@@ -2,28 +2,22 @@ class CgramViewer : public Window {
   Q_OBJECT
 
 public:
-  QHBoxLayout *layout;
-  struct Canvas : public QWidget {
-    QImage *image;
-    void mousePressEvent(QMouseEvent*);
-    void paintEvent(QPaintEvent*);
-    Canvas();
-  } *canvas;
-  QVBoxLayout *controlLayout;
-  QCheckBox *autoUpdateBox;
-  QPushButton *refreshButton;
-  QLabel *colorInfo;
-
-  void setSelection(unsigned);
-  void autoUpdate();
   CgramViewer();
+
+  void autoUpdate();
 
 public slots:
   void show();
   void refresh();
 
 private:
-  unsigned currentSelection;
+  QHBoxLayout *layout;
+  QVBoxLayout *controlLayout;
+  QCheckBox *autoUpdateBox;
+  QPushButton *refreshButton;
+
+  CgramWidget *cgramWidget;
+  QLabel *colorInfo;
 };
 
 extern CgramViewer *cgramViewer;
