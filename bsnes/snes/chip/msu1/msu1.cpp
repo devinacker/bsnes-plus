@@ -10,11 +10,6 @@ MSU1 msu1;
 void MSU1::Enter() { msu1.enter(); }
 
 void MSU1::enter() {
-  if(boot == true) {
-    boot = false;
-    for(unsigned addr = 0x2000; addr <= 0x2007; addr++) mmio_write(addr, 0x00);
-  }
-
   while(true) {
     if(scheduler.sync == Scheduler::SynchronizeMode::All) {
       scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
@@ -70,12 +65,14 @@ void MSU1::power() {
 
 void MSU1::reset() {
   create(MSU1::Enter, 44100);
-  boot = true;
 
-  mmio.data_offset  = 0;
+  mmio.data_offset       = 0;
+  mmio.data_seek_offset  = 0;
   mmio.audio_offset = 0;
   mmio.audio_track  = 0;
-  mmio.audio_volume = 255;
+  mmio.audio_volume = 0;
+  mmio.audio_resume_track = ~0;
+  mmio.audio_resume_offset = 0;
   mmio.data_busy    = true;
   mmio.audio_busy   = true;
   mmio.audio_repeat = false;
@@ -105,26 +102,27 @@ uint8 MSU1::mmio_read(unsigned addr) {
   if(addr == 0x2004) return 'M';
   if(addr == 0x2005) return 'S';
   if(addr == 0x2006) return 'U';
-  if(addr == 0x2007) return '0' + Revision;
+  if(addr == 0x2007) return '1';
 
   return 0x00;
 }
 
 void MSU1::mmio_write(unsigned addr, uint8 data) {
   if(addr == 0x2000) {
-    mmio.data_offset = (mmio.data_offset & 0xffffff00) | (data <<  0);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xffffff00) | (data <<  0);
   }
 
   if(addr == 0x2001) {
-    mmio.data_offset = (mmio.data_offset & 0xffff00ff) | (data <<  8);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xffff00ff) | (data <<  8);
   }
 
   if(addr == 0x2002) {
-    mmio.data_offset = (mmio.data_offset & 0xff00ffff) | (data << 16);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0xff00ffff) | (data << 16);
   }
 
   if(addr == 0x2003) {
-    mmio.data_offset = (mmio.data_offset & 0x00ffffff) | (data << 24);
+    mmio.data_seek_offset = (mmio.data_seek_offset & 0x00ffffff) | (data << 24);
+    mmio.data_offset = mmio.data_seek_offset;
     if(datafile.open()) datafile.seek(mmio.data_offset);
     mmio.data_busy = false;
   }
@@ -135,19 +133,28 @@ void MSU1::mmio_write(unsigned addr, uint8 data) {
 
   if(addr == 0x2005) {
     mmio.audio_track = (mmio.audio_track & 0x00ff) | (data << 8);
+    mmio.audio_offset = 8;
+    
+    if(mmio.audio_resume_track == mmio.audio_track) {
+      mmio.audio_offset = mmio.audio_resume_offset;
+      mmio.audio_resume_track = ~0;
+      mmio.audio_resume_offset = 0;
+    }
+    
     if(audiofile.open()) audiofile.close();
     if(audiofile.open(string(cartridge.basename(), "-", mmio.audio_track, ".pcm"), file::mode::read)) {
       uint32 header = audiofile.readm(4);
       if(header != 0x4d535531) {  //verify 'MSU1' header
         audiofile.close();
       } else {
-        mmio.audio_offset = 8;
         mmio.audio_loop_offset = 8 + audiofile.readl(4) * 4;
+        if(mmio.audio_loop_offset > audiofile.size())
+          mmio.audio_loop_offset = 8;
+
+        audiofile.seek(mmio.audio_offset);
       }
     }
     mmio.audio_busy   = false;
-    mmio.audio_repeat = false;
-    mmio.audio_play   = false;
     mmio.audio_error  = !audiofile.open();
   }
 
@@ -156,8 +163,14 @@ void MSU1::mmio_write(unsigned addr, uint8 data) {
   }
 
   if(addr == 0x2007) {
+    bool audio_resume = data & 4;
     mmio.audio_repeat = data & 2;
     mmio.audio_play   = data & 1;
+    
+    if(!mmio.audio_play && audio_resume) {
+      mmio.audio_resume_track = mmio.audio_track;
+      mmio.audio_resume_offset = mmio.audio_offset;
+    }
   }
 }
 
