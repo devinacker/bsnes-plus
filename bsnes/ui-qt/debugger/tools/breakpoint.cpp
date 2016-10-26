@@ -92,6 +92,32 @@ void BreakpointItem::toggle() {
   }
 }
 
+void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr) {
+  if (addrStr == "" || mode == "") return;
+
+  sourceStr.lower();
+  if(sourceStr == "cpu")        { source->setCurrentIndex(0); }
+  else if(sourceStr == "smp")   { source->setCurrentIndex(1); }
+  else if(sourceStr == "vram")  { source->setCurrentIndex(2); }
+  else if(sourceStr == "oam")   { source->setCurrentIndex(3); }
+  else if(sourceStr == "cgram") { source->setCurrentIndex(4); }
+  else if(sourceStr == "sa1")   { source->setCurrentIndex(5); }
+  else if(sourceStr == "sfx")   { source->setCurrentIndex(6); }
+  else { return; }
+
+  mode.lower();
+  if(mode.position("r")) { mode_r->setChecked(true); }
+  if(mode.position("w")) { mode_w->setChecked(true); }
+  if(mode.position("x")) { mode_x->setChecked(true); }
+
+  lstring addresses;
+  addresses.split<2>("-", addrStr);
+  addr->setText(addresses[0]);
+  if (addresses.size() >= 2) { addr_end->setText(addresses[1]); }
+
+  toggle();
+}
+
 BreakpointEditor::BreakpointEditor() {
   setObjectName("breakpoint-editor");
   setWindowTitle("Breakpoint Editor");
@@ -116,4 +142,13 @@ BreakpointEditor::BreakpointEditor() {
 
 void BreakpointEditor::toggle() {
   SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
+}
+
+void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, const string& source) {
+  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
+    if(breakpoint[n]->addr->text().isEmpty()) {
+      breakpoint[n]->setBreakpoint(addr, mode, source);
+      return;
+    }
+  }
 }

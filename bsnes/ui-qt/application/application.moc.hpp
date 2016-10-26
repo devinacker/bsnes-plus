@@ -47,6 +47,10 @@ public:
   void initPaths(const char *basename);
   void init();
 
+  void printArguments();
+  void parseArguments();
+  bool parseArgumentSwitch(const string& arg, const string& param);
+
   Application();
   ~Application();
 
