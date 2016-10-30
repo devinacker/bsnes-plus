@@ -14,6 +14,7 @@ Debugger *debugger;
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
 
+#include "ppu/cgram-widget.cpp"
 #include "ppu/vram-viewer.cpp"
 #include "ppu/oam-viewer.cpp"
 #include "ppu/cgram-viewer.cpp"
@@ -84,7 +85,8 @@ Debugger::Debugger() {
 
   // TODO: icons instead of text
   runBreak = new QToolButton;
-  runBreak->setDefaultAction(new QAction("Brk", this));
+  runBreak->setDefaultAction(new QAction("Break", this));
+  runBreak->setFixedWidth(runBreak->minimumSizeHint().width());
   runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
   runBreak->defaultAction()->setShortcut(Qt::Key_F5);
   commandLayout->addWidget(runBreak);

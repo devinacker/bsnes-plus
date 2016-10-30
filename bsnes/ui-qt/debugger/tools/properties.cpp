@@ -33,11 +33,15 @@ PropertiesWidget::PropertiesWidget(SNES::ChipDebugger &object) : object(object) 
   list->setSortingEnabled(false);
   layout->addWidget(list);
 
+  bool indent = false;
   unsigned counter = 0;
   while(true) {
     string name, value;
     bool result = object.property(counter, name, value);
     if(result == false) break;
+
+    if(value == "") indent = true;
+    if(value != "" && indent) name = string("     ", name);
 
     QTreeWidgetItem *item = new QTreeWidgetItem(list);
     item->setData(0, Qt::UserRole, QVariant(counter++));
