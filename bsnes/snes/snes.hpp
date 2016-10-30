@@ -25,6 +25,7 @@ namespace SNES {
 #include <nall/platform.hpp>
 #include <nall/priorityqueue.hpp>
 #include <nall/property.hpp>
+#include <nall/random.hpp>
 #include <nall/serializer.hpp>
 #include <nall/stdint.hpp>
 #include <nall/string.hpp>

@@ -52,6 +52,7 @@ void System::serialize_all(serializer &s) {
   bus.serialize(s);
   cartridge.serialize(s);
   system.serialize(s);
+  random.serialize(s);
   cpu.serialize(s);
   smp.serialize(s);
   ppu.serialize(s);

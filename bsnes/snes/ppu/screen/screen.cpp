@@ -151,17 +151,17 @@ uint16 PPU::Screen::get_direct_color(unsigned palette, unsigned tile) {
 }
 
 void PPU::Screen::reset() {
-  regs.addsub_mode = 0;
-  regs.direct_color = 0;
-  regs.color_mode = 0;
-  regs.color_halve = 0;
-  regs.bg1_color_enable = 0;
-  regs.bg2_color_enable = 0;
-  regs.bg3_color_enable = 0;
-  regs.bg4_color_enable = 0;
-  regs.oam_color_enable = 0;
-  regs.back_color_enable = 0;
-  regs.color = 0;
+  regs.addsub_mode = random(0);
+  regs.direct_color = random(0);
+  regs.color_mode = random(0);
+  regs.color_halve = random(0);
+  regs.bg1_color_enable = random(0);
+  regs.bg2_color_enable = random(0);
+  regs.bg3_color_enable = random(0);
+  regs.bg4_color_enable = random(0);
+  regs.oam_color_enable = random(0);
+  regs.back_color_enable = random(0);
+  regs.color = random(0);
 
   math.main.color = 0;
   math.sub.color = 0;

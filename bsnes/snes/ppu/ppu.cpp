@@ -83,9 +83,13 @@ void PPU::power() {
   ppu1_version = config.ppu1.version;
   ppu2_version = config.ppu2.version;
 
-  memset(memory::vram.data(), 0x00, memory::vram.size());
+  for(unsigned i = 0; i < memory::vram.size(); i++) {
+    memory::vram.write(i, random(0));
+  }
+  for(unsigned i = 0; i < memory::cgram.size(); i++) {
+    memory::cgram.write(i, random(0));
+  }
   memset(memory::oam.data(), 0x00, memory::oam.size());
-  memset(memory::cgram.data(), 0x00, memory::cgram.size());
 
   reset();
 }
