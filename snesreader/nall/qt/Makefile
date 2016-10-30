@@ -11,7 +11,7 @@
 
 ifeq ($(moc),)
   ifeq ($(qtpath),)
-    moc := moc
+    moc := moc-qt4
   else
     moc := $(qtpath)/bin/moc
   endif
@@ -19,7 +19,7 @@ endif
 
 ifeq ($(rcc),)
   ifeq ($(qtpath),)
-    rcc := rcc
+    rcc := rcc-qt4
   else
     rcc := $(qtpath)/bin/rcc
   endif
