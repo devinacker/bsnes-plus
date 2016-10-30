@@ -5,9 +5,10 @@ cpp   := $(compiler) -std=gnu++0x
 flags := -O3 -fomit-frame-pointer -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
 link  :=
 
-ifeq ($(platform),osx)
+ifeq ($(platform),x)
   flags := -fPIC $(flags)
-else ifeq ($(platform),x)
+  link += -s
+else ifeq ($(platform),osx)
   flags += -fPIC -march=native -mmacosx-version-min=10.10
   link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
