@@ -68,18 +68,18 @@ CheatFinderWindow::CheatFinderWindow() {
   
   compareToGroup = new QButtonGroup(this);
   
+  compareToValue = new QRadioButton("Value");
+  compareToGroup->addButton(compareToValue);
+  controlLayout->addWidget(compareToValue, 2, 1);
+  compareToValue->setChecked(true);
+  
   compareToPrev = new QRadioButton("Previous value");
-  compareToPrev->setChecked(true);
   compareToGroup->addButton(compareToPrev);
-  controlLayout->addWidget(compareToPrev, 2, 1);
+  controlLayout->addWidget(compareToPrev, 2, 2);
   
   compareToAddress = new QRadioButton("Address");
   compareToGroup->addButton(compareToAddress);
-  controlLayout->addWidget(compareToAddress, 2, 2);
-  
-  compareToValue = new QRadioButton("Value");
-  compareToGroup->addButton(compareToValue);
-  controlLayout->addWidget(compareToValue, 2, 3);
+  controlLayout->addWidget(compareToAddress, 2, 3);
 
   valueLabel = new QLabel("Search value:");
   controlLayout->addWidget(valueLabel, 3, 0);
@@ -89,7 +89,6 @@ CheatFinderWindow::CheatFinderWindow() {
   controlLayout->addLayout(actionLayout, 3, 1, 1, 4);
 
   valueEdit = new QLineEdit;
-  valueEdit->setEnabled(false);
   actionLayout->addWidget(valueEdit);
 
   searchButton = new QPushButton("Search");
@@ -117,12 +116,9 @@ void CheatFinderWindow::synchronize() {
   if(SNES::cartridge.loaded() == false || application.power == false) {
     list->clear();
     for(unsigned n = 0; n < 3; n++) list->resizeColumnToContents(n);
-    valueEdit->setEnabled(false);
-    valueEdit->setText("");
     searchButton->setEnabled(false);
     resetButton->setEnabled(false);
   } else {
-    if(!compareToPrev->isChecked()) valueEdit->setEnabled(true);
     searchButton->setEnabled(true);
     resetButton->setEnabled(true);
   }
@@ -173,6 +169,7 @@ void CheatFinderWindow::searchMemory() {
 
     //auto-detect input data type
     if(strbegin(text, "0x")) data = hex((const char*)text + 2);
+    else if(compareToAddress->isChecked()) data = hex(text);
     else if(strbegin(text, "-")) data = integer(text);
     else data = decimal(text);
 
