@@ -23,6 +23,8 @@ public:
   QComboBox *source;
   BreakpointItem(unsigned id);
 
+  void setBreakpoint(string addr, string mode, string source);
+
 public slots:
   void init();
   void toggle();
@@ -40,7 +42,9 @@ public:
   QCheckBox *breakOnWDM;
 
   BreakpointEditor();
-  
+
+  void addBreakpoint(const string& addr, const string& mode, const string& source);
+
 public slots:
   void toggle();
 };
