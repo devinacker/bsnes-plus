@@ -43,6 +43,15 @@ private:
   friend class Input;
 };
 
+struct Random {
+  void seed(unsigned seed);
+  unsigned operator()(unsigned result);
+  void serialize(serializer&);
+  
+private:
+  nall::random_cyclic _random;
+};
+
 #include <video/video.hpp>
 #include <audio/audio.hpp>
 #include <input/input.hpp>
@@ -53,3 +62,4 @@ private:
 #include <scheduler/scheduler.hpp>
 
 extern System system;
+extern Random random;

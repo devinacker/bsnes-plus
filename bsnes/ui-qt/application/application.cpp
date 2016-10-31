@@ -3,6 +3,7 @@ VideoDisplay display;
 Application application;
 
 #include "init.cpp"
+#include "arguments.cpp"
 
 VideoDisplay::VideoDisplay() {
   outputWidth = 0;
@@ -91,10 +92,7 @@ int Application::main(int &argc, char **argv) {
   SNES::system.init(&interface);
   mainWindow->system_loadSpecial_superGameBoy->setVisible(SNES::supergameboy.opened());
 
-  if(argc == 2) {
-    //if valid file was specified on the command-line, attempt to load it now
-    cartridge.loadNormal(argv[1]);
-  }
+  parseArguments();
 
   timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(run()));

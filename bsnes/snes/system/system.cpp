@@ -13,6 +13,7 @@ System system;
 #include <audio/audio.cpp>
 #include <input/input.cpp>
 
+#include "random.cpp"
 #include "serialization.cpp"
 
 void System::run() {
@@ -96,6 +97,8 @@ void System::term() {
 }
 
 void System::power() {
+  random.seed((unsigned)time(0));
+
   region = config.region;
   expansion = config.expansion_port;
   if(region == Region::Autodetect) {

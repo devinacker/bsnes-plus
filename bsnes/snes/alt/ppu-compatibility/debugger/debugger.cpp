@@ -60,6 +60,7 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("OAM Base Size", (unsigned)regs.oam_basesize);
   item("OAM Name Select", (unsigned)regs.oam_nameselect);
   item("OAM Name Base Address", string("0x", hex<4>(regs.oam_tdaddr)));
+  item("OAM Second Name Table Address", string("0x", hex<4>((regs.oam_tdaddr + (256 * 32) + (regs.oam_nameselect << 13)) & 0xffff)));
 
   //$2102-$2103
   item("$2102-$2103", "");

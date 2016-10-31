@@ -193,13 +193,13 @@ void PPU::Sprite::reset() {
     }
   }
 
-  regs.main_enable = 0;
-  regs.sub_enable = 0;
-  regs.interlace = 0;
+  regs.main_enable = random(0);
+  regs.sub_enable = random(0);
+  regs.interlace = random(0);
 
-  regs.base_size = 0;
-  regs.nameselect = 0;
-  regs.tiledata_addr = 0;
+  regs.base_size = random(0);
+  regs.nameselect = random(0);
+  regs.tiledata_addr = (random(0) & 0x7) << 13;
   regs.first_sprite = 0;
 
   regs.priority0 = 0;

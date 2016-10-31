@@ -16,6 +16,8 @@ Configuration::Configuration() {
   attach((unsigned&)(SNES::config.expansion_port   = SNES::System::ExpansionPortDevice::BSX), "snes.expansionPort");
   attach((unsigned&)(SNES::config.region           = SNES::System::Region::Autodetect), "snes.region");
 
+  attach(SNES::config.random = true, "snes.random", "Randomize some system state on powerup");
+
   attach(SNES::config.cpu.version         =        2, "cpu.version", "Valid version(s) are: 1, 2");
   attach(SNES::config.cpu.ntsc_frequency = 21477272, "cpu.ntscFrequency");
   attach(SNES::config.cpu.pal_frequency  = 21281370, "cpu.palFrequency");
