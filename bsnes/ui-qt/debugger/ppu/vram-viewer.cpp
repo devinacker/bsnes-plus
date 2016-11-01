@@ -365,8 +365,7 @@ void VramCanvas::updateWidgetSize() {
 void VramCanvas::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.setRenderHints(0);
-  painter.scale(zoom, zoom);
-  painter.drawImage(0, 0, *image);
+  painter.drawImage(0, 0, image->scaled(image->width() * zoom, image->height() * zoom, Qt::IgnoreAspectRatio, Qt::FastTransformation));
 }
 
 void VramViewer::displayInfo(unsigned vram_addr) {
