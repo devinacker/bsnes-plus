@@ -16,7 +16,7 @@ void CgramWidget::setScale(unsigned s) {
 }
 
 void CgramWidget::setPaletteBpp(unsigned bpp) {
-  if(bpp > 8) bpp == 0;
+  if(bpp > 8) bpp = 0;
 
   unsigned nColors = 1 << bpp;
 
@@ -57,8 +57,7 @@ void CgramWidget::setSelected(int s) {
 void CgramWidget::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.setRenderHints(0);
-  painter.scale(scale, scale);
-  painter.drawImage(0, 0, *image);
+  painter.drawImage(0, 0, image->scaled(image->width() * scale, image->height() * scale, Qt::IgnoreAspectRatio, Qt::FastTransformation));
 
   if(selected >= 0 && selected < 256) {
     const static QPen white(Qt::white, 1, Qt::SolidLine);
