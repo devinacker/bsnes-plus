@@ -42,4 +42,5 @@ class Screen {
 
   PPU &self;
   friend class PPU;
+  friend class PPUDebugger;
 };

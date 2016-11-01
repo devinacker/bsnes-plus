@@ -293,7 +293,7 @@ uint8 PPU::mmio_read(unsigned addr) {
     }
 
     case 0x3e: {  //STAT77
-      uint r = regs.ppu1_mdr;
+      uint8 r = regs.ppu1_mdr;
     
       r &= 0x10;
       r |= oam.regs.time_over << 7;
@@ -308,12 +308,12 @@ uint8 PPU::mmio_read(unsigned addr) {
     }
 
     case 0x3f: {  //STAT78
-      if(!Memory::debugger_access() {
+      if(!Memory::debugger_access()) {
         regs.latch_hcounter = 0;
         regs.latch_vcounter = 0;
       }
       
-      uint r = regs.ppu2_mdr;
+      uint8 r = regs.ppu2_mdr;
 
       r &= 0x20;
       r |= cpu.field() << 7;

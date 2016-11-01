@@ -68,6 +68,11 @@ SMPDebugger::~SMPDebugger() {
   delete[] usage;
 }
 
+static string clockdivide(double base, unsigned divide) {
+  if (!divide) divide = 256;
+  return string(fp(base / divide), " Hz");
+}
+
 bool SMPDebugger::property(unsigned id, string &name, string &value) {
   unsigned n = 0;
 
@@ -91,8 +96,50 @@ bool SMPDebugger::property(unsigned id, string &name, string &value) {
   item("IPLROM Enable", status.iplrom_enabled);
 
   //$00f2
-  item("$00f2", "");
+  item("$00f2-$00f3", "");
   item("DSP Address", string("0x", hex<2>(status.dsp_addr)));
+  item("DSP Data", string("0x", hex<2>(dsp.read(status.dsp_addr & 0x7f))))
+
+  //$00f4
+  item("$00f4", "");
+  item("Port 0 CPU->SMP", string("0x", hex<2>(port.cpu_to_smp[0])));
+  item("Port 0 SMP->CPU", string("0x", hex<2>(port.smp_to_cpu[0])));
+
+  //$00f5
+  item("$00f5", "");
+  item("Port 1 CPU->SMP", string("0x", hex<2>(port.cpu_to_smp[1])));
+  item("Port 1 SMP->CPU", string("0x", hex<2>(port.smp_to_cpu[1])));
+
+  //$00f6
+  item("$00f6", "");
+  item("Port 2 CPU->SMP", string("0x", hex<2>(port.cpu_to_smp[2])));
+  item("Port 2 SMP->CPU", string("0x", hex<2>(port.smp_to_cpu[2])));
+
+  //$00f7
+  item("$00f7", "");
+  item("Port 3 CPU->SMP", string("0x", hex<2>(port.cpu_to_smp[3])));
+  item("Port 3 SMP->CPU", string("0x", hex<2>(port.smp_to_cpu[3])));
+  
+  //$00fa
+  item("$00fa", "");
+  item("Timer 0 Divider", (unsigned)t0.target);
+  item("Timer 0 Frequency", clockdivide(8000.0, (unsigned)t0.target));
+  
+  //$00fb
+  item("$00fb", "");
+  item("Timer 1 Divider", (unsigned)t1.target);
+  item("Timer 1 Frequency", clockdivide(8000.0, (unsigned)t1.target));
+  
+  //$00fc
+  item("$00fc", "");
+  item("Timer 2 Divider", (unsigned)t2.target);
+  item("Timer 2 Frequency", clockdivide(64000.0, (unsigned)t2.target));
+  
+  //$00fd-$00ff
+  item("$00fd-$00ff", "");
+  item("Timer 0 Count", (unsigned)t0.stage3_ticks);
+  item("Timer 1 Count", (unsigned)t1.stage3_ticks);
+  item("Timer 2 Count", (unsigned)t2.stage3_ticks);
 
   #undef item
   return false;
