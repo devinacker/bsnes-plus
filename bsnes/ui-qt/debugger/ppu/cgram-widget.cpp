@@ -16,7 +16,7 @@ void CgramWidget::setScale(unsigned s) {
 }
 
 void CgramWidget::setPaletteBpp(unsigned bpp) {
-  if(bpp > 8) bpp == 0;
+  if(bpp > 8) bpp = 0;
 
   unsigned nColors = 1 << bpp;
 
