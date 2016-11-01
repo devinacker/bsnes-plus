@@ -325,11 +325,11 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
 
   //$213c
   item("$213c", "");
-  item("H-counter", (unsigned)hcounter());
+  item("H-counter", (unsigned)regs.hcounter);
 
   //$213d
   item("$213d", "");
-  item("V-counter", (unsigned)vcounter());
+  item("V-counter", (unsigned)regs.vcounter);
 
   //$213e
   item("$213e", "");
@@ -340,6 +340,7 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   //$213f
   item("$213f", "");
   item("Field", cpu.field());
+  item("Counters Latched", regs.counters_latched);
   item("Region", !region ? "NTSC" : "PAL");
   item("S-PPU2 Version", (unsigned)ppu2_version);
 

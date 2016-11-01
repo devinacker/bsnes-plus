@@ -68,4 +68,5 @@ class Sprite {
 
   PPU &self;
   friend class PPU;
+  friend class PPUDebugger;
 };
