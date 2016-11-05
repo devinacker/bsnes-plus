@@ -10,3 +10,5 @@
 /bsnes+.app
 *.patch
 *.rar
+*/out
+*/bin

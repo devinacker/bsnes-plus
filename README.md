@@ -42,13 +42,23 @@ Building with the original MinGW used to be the preferred way to do it, but made
 
 - Install a C++ toolchain ([Xcode](https://developer.apple.com) is probably the easiest route)  
 - Install Qt 4.8 (get [Brew](http://brew.sh) and run `brew install qt`)  
-- Run `make`from the bsnes directory.  
+- Make sure the `qtpath` environment variable points to your Qt installation, ie. add `export qtpath=/usr/local/Cellar/qt/4.8.7_2` to .bash_profile.
+- Run `make`from the bsnes directory.
+
+If you're running macOS 10.12 Sierra you will (probably not) be able to install Qt4 using brew. If so, try installing this unofficial branch:
+
+```
+brew install cartr/qt4/qt
+brew linkapps qt
+```
 
 ## Building on Linux / other *nix
 
 As there is no ``configure`` step, make sure necessary Qt4/X11 packages are installed. On a Debian/Ubuntu system, it would require a command like:
+
 ```
-apt-get install libqt4-dev libqt4-dev-bin libxv-dev libsdl1.2-dev libao-dev libopenal-dev g++
+apt-get install libqt4-dev libqt4-dev-bin libxv-dev libsdl1.2-dev libao-dev
+libopenal-dev g++
 ```
 
 Afterwards, run ``make`` and if everything works out correctly you will find the output binary in the ``out/`` directory.

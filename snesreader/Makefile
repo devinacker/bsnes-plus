@@ -21,8 +21,8 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags := -fPIC $(flags)
-  link += -F/usr/local/lib
+  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
 
 objects := snesreader

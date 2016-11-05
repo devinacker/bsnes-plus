@@ -63,12 +63,30 @@ CheatFinderWindow::CheatFinderWindow() {
   compareGroup->addButton(compareGreaterThan);
   controlLayout->addWidget(compareGreaterThan, 1, 4);
 
+  compareToLabel = new QLabel("Compare to:");
+  controlLayout->addWidget(compareToLabel, 2, 0);
+  
+  compareToGroup = new QButtonGroup(this);
+  
+  compareToValue = new QRadioButton("Value");
+  compareToGroup->addButton(compareToValue);
+  controlLayout->addWidget(compareToValue, 2, 1);
+  compareToValue->setChecked(true);
+  
+  compareToPrev = new QRadioButton("Previous value");
+  compareToGroup->addButton(compareToPrev);
+  controlLayout->addWidget(compareToPrev, 2, 2);
+  
+  compareToAddress = new QRadioButton("Address");
+  compareToGroup->addButton(compareToAddress);
+  controlLayout->addWidget(compareToAddress, 2, 3);
+
   valueLabel = new QLabel("Search value:");
-  controlLayout->addWidget(valueLabel, 2, 0);
+  controlLayout->addWidget(valueLabel, 3, 0);
 
   actionLayout = new QHBoxLayout;
   actionLayout->setSpacing(Style::WidgetSpacing);
-  controlLayout->addLayout(actionLayout, 2, 1, 1, 4);
+  controlLayout->addLayout(actionLayout, 3, 1, 1, 4);
 
   valueEdit = new QLineEdit;
   actionLayout->addWidget(valueEdit);
@@ -79,22 +97,28 @@ CheatFinderWindow::CheatFinderWindow() {
   resetButton = new QPushButton("Reset");
   actionLayout->addWidget(resetButton);
 
+  connect(compareToPrev, SIGNAL(toggled(bool)), this, SLOT(toggle_editline(bool)));
+  connect(compareToAddress, SIGNAL(toggled(bool)), this, SLOT(toggle_editline(bool)));
+  connect(compareToValue, SIGNAL(toggled(bool)), this, SLOT(toggle_editline(bool)));
+
   connect(valueEdit, SIGNAL(returnPressed()), this, SLOT(searchMemory()));
   connect(searchButton, SIGNAL(released()), this, SLOT(searchMemory()));
   connect(resetButton, SIGNAL(released()), this, SLOT(resetSearch()));
   synchronize();
 }
 
+void CheatFinderWindow::toggle_editline(bool) {
+  if(compareToPrev->isChecked()) valueEdit->setEnabled(false);
+  else valueEdit->setEnabled(true);
+}
+
 void CheatFinderWindow::synchronize() {
   if(SNES::cartridge.loaded() == false || application.power == false) {
     list->clear();
     for(unsigned n = 0; n < 3; n++) list->resizeColumnToContents(n);
-    valueEdit->setEnabled(false);
-    valueEdit->setText("");
     searchButton->setEnabled(false);
     resetButton->setEnabled(false);
   } else {
-    valueEdit->setEnabled(true);
     searchButton->setEnabled(true);
     resetButton->setEnabled(true);
   }
@@ -140,12 +164,21 @@ void CheatFinderWindow::searchMemory() {
   if(size32bit->isChecked()) size = 3;
 
   unsigned data;
-  string text = valueEdit->text().toUtf8().constData();
+  if(!compareToPrev->isChecked()){
+    string text = valueEdit->text().toUtf8().constData();
 
-  //auto-detect input data type
-  if(strbegin(text, "0x")) data = hex((const char*)text + 2);
-  else if(strbegin(text, "-")) data = integer(text);
-  else data = decimal(text);
+    //auto-detect input data type
+    if(strbegin(text, "0x")) data = hex((const char*)text + 2);
+    else if(compareToAddress->isChecked()) data = hex(text);
+    else if(strbegin(text, "-")) data = integer(text);
+    else data = decimal(text);
+
+    if(compareToAddress->isChecked()){
+      //How should incorrect addresses be handled? For now we wrap around.
+      data %= SNES::memory::wram.size();
+      data = read(data, size);
+    }
+  }
 
   if(addrList.size() == 0) {
     //search for the first time: enqueue all possible values so they are all searched
@@ -160,6 +193,8 @@ void CheatFinderWindow::searchMemory() {
   for(unsigned i = 0; i < addrList.size(); i++) {
     unsigned thisAddr = addrList[i];
     unsigned thisData = read(thisAddr, size);
+
+    if(compareToPrev->isChecked()) data = dataList[i];
 
     if((compareEqual->isChecked()       && thisData == data)
     || (compareNotEqual->isChecked()    && thisData != data)

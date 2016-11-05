@@ -5,11 +5,12 @@ cpp   := $(compiler) -std=gnu++0x
 flags := -O3 -DNDEBUG -fomit-frame-pointer -march=native -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
 link  :=
 
-ifeq ($(platform),osx)
-  flags := -fPIC $(flags)
-else ifeq ($(platform),x)
+ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
+else ifeq ($(platform),osx)
+  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
 
 objects := supergameboy

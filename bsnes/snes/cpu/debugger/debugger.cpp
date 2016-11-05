@@ -229,18 +229,57 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   item("$420d", "");
   item("FastROM Enable", status.rom_speed == 6);
 
+  //$4210
+  item("$4210", "");
+  item("NMI Flag", status.nmi_line);
+#if defined(ALT_CPU_CPP)
+  item("S-CPU Version", 2u);
+#else
+  item("S-CPU Version", (unsigned)cpu_version);
+#endif
+
+  //$4211
+  item("$4211", "");
+  item("IRQ Flag", status.irq_line);
+  
+  //$4212
+  {
+#if defined(ALT_CPU_CPP)
+  uint8 r = mmio_read(0x4212);
+#else
+  uint8 r = mmio_r4212();
+#endif
+  item("$4212", "");
+  item("V-Blank Flag", (r & 0x80) != 0);
+  item("H-Blank Flag", (r & 0x40) != 0);
+  item("Auto Joypad Read", (r & 0x01) != 0);
+  }
+  
+  //$4214-$4215
+  item("$4214-$4215", "");
+  item("Quotient", (unsigned)status.rddiv);
+  
+  item("$4216-$4217", "");
+  item("Product / Remainder", (unsigned)status.rdmpy);
+  
+  item("$4218-$421f", "");
+  item("Controller 1 Data", string("0x", hex<4>((status.joy1h << 8) | status.joy1l)));
+  item("Controller 2 Data", string("0x", hex<4>((status.joy2h << 8) | status.joy2l)));
+  item("Controller 3 Data", string("0x", hex<4>((status.joy3h << 8) | status.joy3l)));
+  item("Controller 4 Data", string("0x", hex<4>((status.joy4h << 8) | status.joy4l)));
+  
   for(unsigned i = 0; i < 8; i++) {
     item(string("DMA Channel ", i), "");
 
     //$43x0
-    item("Direction", channel[i].direction);
+    item("Direction", channel[i].direction ? "B->A" : "A->B");
     item("Indirect", channel[i].indirect);
     item("Reverse Transfer", channel[i].reverse_transfer);
     item("Fixed Transfer", channel[i].fixed_transfer);
     item("Transfer Mode", (unsigned)channel[i].transfer_mode);
 
     //$43x1
-    item("B-Bus Address", string("0x", hex<4>(channel[i].dest_addr)));
+    item("B-Bus Address", string("0x21", hex<2>(channel[i].dest_addr)));
 
     //$43x2-$43x3
     item("A-Bus Address", string("0x", hex<4>(channel[i].source_addr)));

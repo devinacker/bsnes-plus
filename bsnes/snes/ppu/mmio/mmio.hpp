@@ -83,8 +83,14 @@ struct {
 } regs;
 
 uint16 get_vram_address();
-uint8 vram_read(unsigned addr);
-void vram_write(unsigned addr, uint8 data);
+debugvirtual uint8 vram_read(unsigned addr);
+debugvirtual void vram_write(unsigned addr, uint8 data);
+
+debugvirtual uint8 oam_read(unsigned addr);
+debugvirtual void oam_write(unsigned addr, uint8 data);
+
+debugvirtual uint8 cgram_read(unsigned addr);
+debugvirtual void cgram_write(unsigned addr, uint8 data);
 
 void mmio_update_video_mode();
 

@@ -73,7 +73,7 @@ void SMP::reset() {
   regs.p = 0x02;
 
   for(unsigned i = 0; i < memory::apuram.size(); i++) {
-    memory::apuram.write(i, 0x00);
+    memory::apuram.write(i, random(0));
   }
 
   status.clock_counter = 0;
