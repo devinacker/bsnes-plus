@@ -1,5 +1,38 @@
 #ifdef PPU_CPP
 
+uint8 PPUDebugger::vram_read(unsigned addr) {
+  uint8 data = PPU::vram_read(addr);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::VRAM, Debugger::Breakpoint::Mode::Read, addr, data);
+  return data;
+}
+
+void PPUDebugger::vram_write(unsigned addr, uint8 data) {
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::VRAM, Debugger::Breakpoint::Mode::Write, addr, data);
+  PPU::vram_write(addr, data);
+}
+
+uint8 PPUDebugger::oam_read(unsigned addr) {
+  uint8 data = PPU::oam_read(addr);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::OAM, Debugger::Breakpoint::Mode::Read, addr, data);
+  return data;
+}
+
+void PPUDebugger::oam_write(unsigned addr, uint8 data) {
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::OAM, Debugger::Breakpoint::Mode::Write, addr, data);
+  PPU::oam_write(addr, data);
+}
+
+uint8 PPUDebugger::cgram_read(unsigned addr) {
+  uint8 data = PPU::cgram_read(addr);
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::CGRAM, Debugger::Breakpoint::Mode::Read, addr, data);
+  return data;
+}
+
+void PPUDebugger::cgram_write(unsigned addr, uint8 data) {
+  debugger.breakpoint_test(Debugger::Breakpoint::Source::CGRAM, Debugger::Breakpoint::Mode::Write, addr, data);
+  PPU::cgram_write(addr, data);
+}
+
 bool PPUDebugger::property(unsigned id, string &name, string &value) {
   unsigned n = 0;
 
