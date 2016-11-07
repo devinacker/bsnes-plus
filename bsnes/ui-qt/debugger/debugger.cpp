@@ -222,6 +222,8 @@ void Debugger::modifySystemState(unsigned state) {
           SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
+    
+    tracer->resetTraceState();
   }
 
   if(state == Utility::UnloadCartridge) {

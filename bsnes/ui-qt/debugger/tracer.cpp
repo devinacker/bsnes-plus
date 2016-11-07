@@ -49,8 +49,16 @@ void Tracer::stepSfx() {
   }
 }
 
+void Tracer::resetTraceState() {
+  tracefile.close();
+  setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx);
+  
+  // reset trace masks
+  setTraceMaskState(Qt::Checked);
+}
+
 void Tracer::setTraceState(bool state) {
-  if(state && !tracefile.open()) {
+  if(state && !tracefile.open() && SNES::cartridge.loaded()) {
     string name = filepath(nall::basename(cartridge.fileName), config().path.data);
     name << "-trace.log";
     tracefile.open(name, file::mode::write);
