@@ -22,7 +22,7 @@ enum {
   OPTYPE_RELW,      //relw
 };
 
-void   disassemble_opcode(char *output, uint32 addr);
+void   disassemble_opcode(char *output, uint32 addr, bool hclocks = false);
 uint8  dreadb(uint32 addr);
 uint16 dreadw(uint32 addr);
 uint32 dreadl(uint32 addr);

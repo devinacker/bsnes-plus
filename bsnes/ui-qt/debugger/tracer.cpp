@@ -6,7 +6,7 @@ void Tracer::stepCpu() {
     unsigned addr = SNES::cpu.regs.pc;
     if(!traceMask || !(traceMaskCPU[addr >> 3] & (0x80 >> (addr & 7)))) {
       char text[256];
-      SNES::cpu.disassemble_opcode(text, addr);
+      SNES::cpu.disassemble_opcode(text, addr, config().debugger.showHClocks);
       tracefile.print(string() << text << "\n");
     }
     traceMaskCPU[addr >> 3] |= 0x80 >> (addr & 7);
@@ -30,7 +30,7 @@ void Tracer::stepSa1() {
     unsigned addr = SNES::sa1.regs.pc;
     if(!traceMask || !(traceMaskSA1[addr >> 3] & (0x80 >> (addr & 7)))) {
       char text[256];
-      SNES::sa1.disassemble_opcode(text, addr);
+      SNES::sa1.disassemble_opcode(text, addr, config().debugger.showHClocks);
       tracefile.print(string() << text << "\n");
     }
     traceMaskSA1[addr >> 3] |= 0x80 >> (addr & 7);

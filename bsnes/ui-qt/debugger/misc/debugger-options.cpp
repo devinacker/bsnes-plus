@@ -15,15 +15,23 @@ DebuggerOptions::DebuggerOptions() {
 
   cacheUsageBox = new QCheckBox("Cache memory usage table to disk");
   layout->addWidget(cacheUsageBox);
+  showHClocksBox = new QCheckBox("Show H-position in clocks instead of dots");
+  layout->addWidget(showHClocksBox);
 
   synchronize();
-  connect(cacheUsageBox, SIGNAL(stateChanged(int)), this, SLOT(toggleCacheUsage()));
+  connect(cacheUsageBox, SIGNAL(toggled(bool)), this, SLOT(toggleCacheUsage(bool)));
+  connect(showHClocksBox, SIGNAL(toggled(bool)), this, SLOT(toggleHClocks(bool)));
 }
 
 void DebuggerOptions::synchronize() {
   cacheUsageBox->setChecked(config().debugger.cacheUsageToDisk);
+  showHClocksBox->setChecked(config().debugger.showHClocks);
 }
 
-void DebuggerOptions::toggleCacheUsage() {
-  config().debugger.cacheUsageToDisk = cacheUsageBox->isChecked();
+void DebuggerOptions::toggleCacheUsage(bool on) {
+  config().debugger.cacheUsageToDisk = on;
+}
+
+void DebuggerOptions::toggleHClocks(bool on) {
+  config().debugger.showHClocks = on;
 }
