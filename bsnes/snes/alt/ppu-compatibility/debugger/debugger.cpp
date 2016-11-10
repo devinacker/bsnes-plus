@@ -84,27 +84,28 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("BG3 Mosaic Enable", regs.mosaic_enabled[BG3]);
   item("BG4 Mosaic Enable", regs.mosaic_enabled[BG4]);
 
-  static char screen_size[4][8] = { "32x32", "32x64", "64x32", "64x64" };
+  // Width x Height
+  static char screen_size[4][8] = { "32x32", "64x32", "32x64", "64x64" };
 
   //$2107
   item("$2107", "");
   item("BG1 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG1])));
-  item("BG1 Screen Size", screen_size[regs.bg_scsize[BG1]]);
+  item("BG1 Screen Size", screen_size[regs.bg_scsize[BG1] & 3]);
 
   //$2108
   item("$2108", "");
   item("BG2 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG2])));
-  item("BG2 Screen Size", screen_size[regs.bg_scsize[BG2]]);
+  item("BG2 Screen Size", screen_size[regs.bg_scsize[BG2] & 3]);
 
   //$2109
   item("$2109", "");
   item("BG3 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG3])));
-  item("BG3 Screen Size", screen_size[regs.bg_scsize[BG3]]);
+  item("BG3 Screen Size", screen_size[regs.bg_scsize[BG3] & 3]);
 
   //$210a
   item("$210a", "");
   item("BG4 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG4])));
-  item("BG4 Screen Size", screen_size[regs.bg_scsize[BG4]]);
+  item("BG4 Screen Size", screen_size[regs.bg_scsize[BG4] & 3]);
 
   //$210b
   item("$210b", "");
