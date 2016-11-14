@@ -55,8 +55,19 @@ OamViewer::OamViewer() {
   list->setAllColumnsShowFocus(true);
   list->setAlternatingRowColors(true);
   list->setRootIsDecorated(false);
+  list->setUniformRowHeights(true);
   list->setSortingEnabled(false);
   layout->addWidget(list);
+
+  unsigned dw = list->fontMetrics().width('0');
+  list->setColumnWidth(0, dw * 4);
+  list->setColumnWidth(1, dw * 8);
+  list->setColumnWidth(2, dw * 6);
+  list->setColumnWidth(3, dw * 6);
+  list->setColumnWidth(4, dw * 6);
+  list->setColumnWidth(5, dw * 6);
+  list->setColumnWidth(6, dw * 6);
+  list->setColumnWidth(7, dw * 6);
 
   for(unsigned i = 0; i < 128; i++) {
     QTreeWidgetItem *item = new QTreeWidgetItem(list);
@@ -121,8 +132,6 @@ void OamViewer::refresh() {
     item->setText(6, string() << obj.palette);
     item->setText(7, flags);
   }
-
-  for(unsigned i = 0; i <= 7; i++) list->resizeColumnToContents(i);
 
   canvas->refresh();
 }
