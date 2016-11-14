@@ -55,6 +55,8 @@ private:
   OamCanvas *canvas;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
+
+  bool inRefreshCall;
 };
 
 extern OamViewer *oamViewer;

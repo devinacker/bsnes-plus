@@ -43,6 +43,8 @@ OamViewer::OamViewer() {
   setGeometryString(&config().geometry.oamViewer);
   application.windowList.append(this);
 
+  inRefreshCall = false;
+
   layout = new QHBoxLayout;
   layout->setAlignment(Qt::AlignLeft);
   layout->setMargin(Style::WindowMargin);
@@ -71,8 +73,9 @@ OamViewer::OamViewer() {
 
   for(unsigned i = 0; i < 128; i++) {
     QTreeWidgetItem *item = new QTreeWidgetItem(list);
+    item->setData(0, Qt::DisplayRole, i);
     item->setData(0, Qt::UserRole, QVariant(i));
-    item->setTextAlignment(0, Qt::AlignHCenter);
+    item->setTextAlignment(0, Qt::AlignRight);
     item->setTextAlignment(1, Qt::AlignHCenter);
     item->setTextAlignment(2, Qt::AlignRight);
     item->setTextAlignment(3, Qt::AlignRight);
@@ -80,8 +83,12 @@ OamViewer::OamViewer() {
     item->setTextAlignment(5, Qt::AlignRight);
     item->setTextAlignment(6, Qt::AlignRight);
     item->setTextAlignment(7, Qt::AlignLeft);
-    item->setText(0, string() << i);
   }
+  list->setCurrentItem(NULL);
+
+  list->sortItems(0, Qt::AscendingOrder);
+  list->setSortingEnabled(true);
+
 
   controlLayout = new QVBoxLayout;
   controlLayout->setAlignment(Qt::AlignTop);
@@ -98,6 +105,7 @@ OamViewer::OamViewer() {
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
+
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(onSelectedChanged()));
 }
@@ -112,9 +120,17 @@ void OamViewer::autoUpdate() {
 }
 
 void OamViewer::refresh() {
-  QList<QTreeWidgetItem*> items = list->findItems("", Qt::MatchContains);
-  for(unsigned v = 0; v < items.count(); v++) {
-    QTreeWidgetItem *item = items[v];
+  // Required to prevent the occasional infinite signal call loop.
+  if(inRefreshCall) return;
+  inRefreshCall = true;
+
+  int selectedRow = -1;
+  if (list->currentItem()) selectedRow = list->currentIndex().row();
+
+  list->setSortingEnabled(false);
+
+  for(unsigned r = 0; r < list->topLevelItemCount(); r++) {
+    QTreeWidgetItem *item = list->topLevelItem(r);
     unsigned i = item->data(0, Qt::UserRole).toUInt();
 
     OamObject obj = OamObject::getObject(i);
@@ -122,27 +138,32 @@ void OamViewer::refresh() {
     string flags;
     if(obj.hFlip) flags << "V";
     if(obj.vFlip) flags << "H";
-    if(obj.table) flags << "N";
 
     item->setText(1, string() << obj.width << "x" << obj.height);
-    item->setText(2, string() << obj.xpos);
-    item->setText(3, string() << obj.ypos);
-    item->setText(4, string() << obj.character);
-    item->setText(5, string() << obj.priority);
-    item->setText(6, string() << obj.palette);
+    item->setData(2, Qt::DisplayRole, obj.xpos);
+    item->setData(3, Qt::DisplayRole, obj.ypos);
+    item->setData(4, Qt::DisplayRole, obj.character + (obj.table << 8));
+    item->setData(5, Qt::DisplayRole, obj.priority);
+    item->setData(6, Qt::DisplayRole, obj.palette);
     item->setText(7, flags);
   }
 
-  canvas->refresh();
+  list->setSortingEnabled(true);
+
+  if(selectedRow >= 0 && selectedRow < list->topLevelItemCount()) {
+    list->setCurrentItem(list->topLevelItem(selectedRow));
+  }
+
+  inRefreshCall = false;
 }
 
 void OamViewer::onSelectedChanged() {
-  QList<QTreeWidgetItem *> sel = list->selectedItems();
+  QTreeWidgetItem *item = list->currentItem();
 
-  int i = -1;
-  if(!sel.empty()) i = sel.at(0)->data(0, Qt::UserRole).toUInt();
+  int s = -1;
+  if (item) s = item->data(0, Qt::UserRole).toUInt();
 
-  canvas->setSelected(i);
+  canvas->setSelected(s);
   refresh();
 }
 
