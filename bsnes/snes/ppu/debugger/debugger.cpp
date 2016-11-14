@@ -33,6 +33,38 @@ void PPUDebugger::cgram_write(unsigned addr, uint8 data) {
   PPU::cgram_write(addr, data);
 }
 
+uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
+  switch (index) {
+  case 0: return bg1.regs.screen_addr;
+  case 1: return bg2.regs.screen_addr;
+  case 2: return bg3.regs.screen_addr;
+  case 3: return bg4.regs.screen_addr;
+  }
+  
+  return 0;
+}
+
+uint16 PPUDebugger::bg_tile_addr(unsigned index) const {
+  switch (index) {
+  case 0: return bg1.regs.tiledata_addr;
+  case 1: return bg2.regs.tiledata_addr;
+  case 2: return bg3.regs.tiledata_addr;
+  case 3: return bg4.regs.tiledata_addr;
+  }
+  
+  return 0;
+}
+
+uint16 PPUDebugger::oam_tile_addr(unsigned index) const {
+  return index
+    ? (oam.regs.tiledata_addr + (256 * 32) + (oam.regs.nameselect << 13)) & 0xffff
+    : oam.regs.tiledata_addr;
+}
+
+uint8 PPUDebugger::oam_base_size() const { 
+  return oam.regs.base_size; 
+}
+
 bool PPUDebugger::property(unsigned id, string &name, string &value) {
   unsigned n = 0;
 
@@ -57,7 +89,7 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("OAM Base Size", (unsigned)oam.regs.base_size);
   item("OAM Name Select", (unsigned)oam.regs.nameselect);
   item("OAM Name Base Address", string("0x", hex<4>(oam.regs.tiledata_addr)));
-  item("OAM Second Name Table Address", string("0x", hex<4>((oam.regs.tiledata_addr + (256 * 32) + (oam.regs.nameselect << 13)) & 0xffff)));
+  item("OAM Second Name Table Address", string("0x", hex<4>(oam_tile_addr(1))));
 
   //$2102-$2103
   item("$2102-$2103", "");

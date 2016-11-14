@@ -45,7 +45,7 @@ class VramAddrItem : public QWidget {
   Q_OBJECT
 
 public:
-  VramAddrItem(const QString& text, const string& property);
+  VramAddrItem(const QString& text, unsigned num);
 
 public slots:
   void refresh();
@@ -57,7 +57,7 @@ private slots:
   void onGotoPressed();
 
 private:
-  unsigned propertyId;
+  unsigned index;
 
   QHBoxLayout *layout;
 
