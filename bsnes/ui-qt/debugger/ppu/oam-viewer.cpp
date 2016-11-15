@@ -153,6 +153,7 @@ void OamViewer::refresh() {
   if(selectedRow >= 0 && selectedRow < list->topLevelItemCount()) {
     list->setCurrentItem(list->topLevelItem(selectedRow));
   }
+  canvas->refresh();
 
   inRefreshCall = false;
 }
@@ -196,7 +197,6 @@ void OamCanvas::setScale(unsigned z) {
 
 void OamCanvas::setSelected(int s) {
   selected = s;
-  refresh();
 }
 
 void OamCanvas::refresh() {
