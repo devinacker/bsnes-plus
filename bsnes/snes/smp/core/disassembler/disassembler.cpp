@@ -1,10 +1,5 @@
 #ifdef SMPCORE_CPP
 
-uint8 SMPcore::disassemble_read(uint16 addr) {
-  if(addr >= 0xffc0) return smp.iplrom[addr & 0x3f];
-  return memory::apuram[addr];
-}
-
 uint16 SMPcore::relb(int8 offset, int op_len, uint16 pc) {
   return pc + op_len + offset;
 }
@@ -16,10 +11,13 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
   s = output;
 
   sprintf(s, "..%.4x ", addr);
-
-  op  = disassemble_read(addr + 0);
-  op0 = disassemble_read(addr + 1);
-  op1 = disassemble_read(addr + 2);
+  
+  SNES::debugger.bus_access = true;
+  op  = smp.op_debugread(addr + 0);
+  op0 = smp.op_debugread(addr + 1);
+  op1 = smp.op_debugread(addr + 2);
+  SNES::debugger.bus_access = false;
+  
   opw = (op0) | (op1 << 8);
   opdp0 = ((unsigned)regs.p.p << 8) + op0;
   opdp1 = ((unsigned)regs.p.p << 8) + op1;
