@@ -104,7 +104,7 @@ uint32 CPUcore::decode(uint8 offset_type, uint32 addr, uint32 pc) {
   return(r & 0xffffff);
 }
 
-void CPUcore::disassemble_opcode(char *output, uint32 addr) {
+void CPUcore::disassemble_opcode(char *output, uint32 addr, bool hclocks) {
   static reg24_t pc;
   char t[256];
   char *s = output;
@@ -424,7 +424,10 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr) {
   strcat(s, t);
   strcat(s, " ");
 
-  sprintf(t, "V:%3d H:%3d F:%2d", cpu.vcounter(), cpu.hdot(), cpu.framecounter());
+  if (hclocks)
+    sprintf(t, "V:%3d H:%4d F:%2d", cpu.vcounter(), cpu.hcounter(), cpu.framecounter());
+  else
+    sprintf(t, "V:%3d H:%3d F:%2d", cpu.vcounter(), cpu.hdot(), cpu.framecounter());
   strcat(s, t);
 }
 

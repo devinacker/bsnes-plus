@@ -33,7 +33,36 @@ void PPUDebugger::cgram_mmio_write(uint16 addr, uint8 data) {
   PPU::cgram_mmio_write(addr, data);
 }
 
-PPUDebugger::PPUDebugger() {
+uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
+  switch (index) {
+  case 0: return regs.bg_scaddr[BG1];
+  case 1: return regs.bg_scaddr[BG2];
+  case 2: return regs.bg_scaddr[BG3];
+  case 3: return regs.bg_scaddr[BG4];
+  }
+  
+  return 0;
+}
+
+uint16 PPUDebugger::bg_tile_addr(unsigned index) const {
+  switch (index) {
+  case 0: return regs.bg_tdaddr[BG1];
+  case 1: return regs.bg_tdaddr[BG2];
+  case 2: return regs.bg_tdaddr[BG3];
+  case 3: return regs.bg_tdaddr[BG4];
+  }
+  
+  return 0;
+}
+
+uint16 PPUDebugger::oam_tile_addr(unsigned index) const {
+  return index
+    ? (regs.oam_tdaddr + (256 * 32) + (regs.oam_nameselect << 13)) & 0xffff
+    : regs.oam_tdaddr;
+}
+
+uint8 PPUDebugger::oam_base_size() const { 
+  return regs.oam_basesize; 
 }
 
 bool PPUDebugger::property(unsigned id, string &name, string &value) {
@@ -60,7 +89,7 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("OAM Base Size", (unsigned)regs.oam_basesize);
   item("OAM Name Select", (unsigned)regs.oam_nameselect);
   item("OAM Name Base Address", string("0x", hex<4>(regs.oam_tdaddr)));
-  item("OAM Second Name Table Address", string("0x", hex<4>((regs.oam_tdaddr + (256 * 32) + (regs.oam_nameselect << 13)) & 0xffff)));
+  item("OAM Second Name Table Address", string("0x", hex<4>(oam_tile_addr(1))));
 
   //$2102-$2103
   item("$2102-$2103", "");
@@ -84,27 +113,28 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("BG3 Mosaic Enable", regs.mosaic_enabled[BG3]);
   item("BG4 Mosaic Enable", regs.mosaic_enabled[BG4]);
 
-  static char screen_size[4][8] = { "32x32", "32x64", "64x32", "64x64" };
+  // Width x Height
+  static char screen_size[4][8] = { "32x32", "64x32", "32x64", "64x64" };
 
   //$2107
   item("$2107", "");
   item("BG1 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG1])));
-  item("BG1 Screen Size", screen_size[regs.bg_scsize[BG1]]);
+  item("BG1 Screen Size", screen_size[regs.bg_scsize[BG1] & 3]);
 
   //$2108
   item("$2108", "");
   item("BG2 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG2])));
-  item("BG2 Screen Size", screen_size[regs.bg_scsize[BG2]]);
+  item("BG2 Screen Size", screen_size[regs.bg_scsize[BG2] & 3]);
 
   //$2109
   item("$2109", "");
   item("BG3 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG3])));
-  item("BG3 Screen Size", screen_size[regs.bg_scsize[BG3]]);
+  item("BG3 Screen Size", screen_size[regs.bg_scsize[BG3] & 3]);
 
   //$210a
   item("$210a", "");
   item("BG4 Screen Address", string("0x", hex<4>(regs.bg_scaddr[BG4])));
-  item("BG4 Screen Size", screen_size[regs.bg_scsize[BG4]]);
+  item("BG4 Screen Size", screen_size[regs.bg_scsize[BG4] & 3]);
 
   //$210b
   item("$210b", "");

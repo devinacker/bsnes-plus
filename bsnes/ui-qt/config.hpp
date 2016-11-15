@@ -76,6 +76,7 @@ public:
 
   struct Debugger {
     bool cacheUsageToDisk;
+    bool showHClocks;
   } debugger;
 
   struct Geometry {

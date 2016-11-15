@@ -6,7 +6,7 @@ void Tracer::stepCpu() {
     unsigned addr = SNES::cpu.regs.pc;
     if(!traceMask || !(traceMaskCPU[addr >> 3] & (0x80 >> (addr & 7)))) {
       char text[256];
-      SNES::cpu.disassemble_opcode(text, addr);
+      SNES::cpu.disassemble_opcode(text, addr, config().debugger.showHClocks);
       tracefile.print(string() << text << "\n");
     }
     traceMaskCPU[addr >> 3] |= 0x80 >> (addr & 7);
@@ -30,7 +30,7 @@ void Tracer::stepSa1() {
     unsigned addr = SNES::sa1.regs.pc;
     if(!traceMask || !(traceMaskSA1[addr >> 3] & (0x80 >> (addr & 7)))) {
       char text[256];
-      SNES::sa1.disassemble_opcode(text, addr);
+      SNES::sa1.disassemble_opcode(text, addr, config().debugger.showHClocks);
       tracefile.print(string() << text << "\n");
     }
     traceMaskSA1[addr >> 3] |= 0x80 >> (addr & 7);
@@ -49,8 +49,16 @@ void Tracer::stepSfx() {
   }
 }
 
+void Tracer::resetTraceState() {
+  tracefile.close();
+  setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx);
+  
+  // reset trace masks
+  setTraceMaskState(Qt::Checked);
+}
+
 void Tracer::setTraceState(bool state) {
-  if(state && !tracefile.open()) {
+  if(state && !tracefile.open() && SNES::cartridge.loaded()) {
     string name = filepath(nall::basename(cartridge.fileName), config().path.data);
     name << "-trace.log";
     tracefile.open(name, file::mode::write);
