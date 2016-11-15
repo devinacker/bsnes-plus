@@ -60,6 +60,8 @@ private:
   friend class PPU::Window;
   friend class PPU::Screen;
   friend class Video;
+
+  friend class PPUDebugger;
 };
 
 #if defined(DEBUGGER)

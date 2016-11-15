@@ -222,6 +222,8 @@ void Debugger::modifySystemState(unsigned state) {
           SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
+    
+    tracer->resetTraceState();
   }
 
   if(state == Utility::UnloadCartridge) {
@@ -343,7 +345,7 @@ void Debugger::event() {
       if(n == SNES::Debugger::SoftBreakCPU
            || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
         SNES::debugger.step_cpu = true;
-        SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
+        SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
@@ -355,7 +357,7 @@ void Debugger::event() {
       if(n == SNES::Debugger::SoftBreakSA1
            || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
         SNES::debugger.step_sa1 = true;
-        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
+        SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
@@ -388,7 +390,7 @@ void Debugger::event() {
     } break;
 
     case SNES::Debugger::BreakEvent::CPUStep: {
-      SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc);
+      SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
@@ -406,7 +408,7 @@ void Debugger::event() {
     } break;
     
     case SNES::Debugger::BreakEvent::SA1Step: {
-      SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc);
+      SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");

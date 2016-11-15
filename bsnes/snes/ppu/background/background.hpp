@@ -70,4 +70,5 @@ class Background {
 
   PPU &self;
   friend class PPU;
+  friend class PPUDebugger;
 };

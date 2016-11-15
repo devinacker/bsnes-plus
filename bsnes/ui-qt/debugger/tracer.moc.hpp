@@ -16,6 +16,8 @@ public slots:
   void setSa1TraceState(int);
   void setSfxTraceState(int);
   void setTraceMaskState(int);
+  
+  void resetTraceState();
 
 private:
   void setTraceState(bool);

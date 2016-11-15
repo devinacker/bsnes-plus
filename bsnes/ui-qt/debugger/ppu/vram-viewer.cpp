@@ -58,12 +58,12 @@ VramViewer::VramViewer() {
   baseAddrLabel = new QLabel("Base Tile Addresses:");
   sidebarLayout->addWidget(baseAddrLabel);
 
-  vramAddrItems[0] = new VramAddrItem("BG1:", "BG1 Name Base Address");
-  vramAddrItems[1] = new VramAddrItem("BG2:", "BG2 Name Base Address");
-  vramAddrItems[2] = new VramAddrItem("BG3:", "BG3 Name Base Address");
-  vramAddrItems[3] = new VramAddrItem("BG4:", "BG4 Name Base Address");
-  vramAddrItems[4] = new VramAddrItem("OAM1:", "OAM Name Base Address");
-  vramAddrItems[5] = new VramAddrItem("OAM2:", "OAM Second Name Table Address");
+  vramAddrItems[0] = new VramAddrItem("BG1:", 0);
+  vramAddrItems[1] = new VramAddrItem("BG2:", 1);
+  vramAddrItems[2] = new VramAddrItem("BG3:", 2);
+  vramAddrItems[3] = new VramAddrItem("BG4:", 3);
+  vramAddrItems[4] = new VramAddrItem("OAM1:", 4);
+  vramAddrItems[5] = new VramAddrItem("OAM2:", 5);
 
   for (unsigned i = 0; i < N_MAP_ITEMS; i++) {
     sidebarLayout->addWidget(vramAddrItems[i]);
@@ -186,13 +186,14 @@ void VramViewer::onCgramSelectedChanged() {
 }
 
 VramCanvas::VramCanvas() {
-  image = new QImage(128, 2048, QImage::Format_RGB32);
-  image->fill(0x800000);
+  image = QImage(128, 2048, QImage::Format_RGB32);
+  image.fill(0x800000);
 
   zoom = 1;
   selectedColor = 0;
   useCgram = false;
   setDepth2bpp();
+  refreshScaledImage();
 }
 
 void VramCanvas::setDepth2bpp()  { bpp = 2; buildDefaultPalette(); updateWidgetSize(); }
@@ -239,7 +240,6 @@ void VramCanvas::buildCgramPalette() {
 }
 
 void VramCanvas::refresh() {
-  image->fill(0x800000);
   if(SNES::cartridge.loaded()) {
     if(useCgram) buildCgramPalette();
 
@@ -250,11 +250,13 @@ void VramCanvas::refresh() {
     if(bpp == 8) refresh8bpp (source);
     if(bpp == 7) refreshMode7(source);
   }
+
+  refreshScaledImage();
   update();
 }
 
 void VramCanvas::refresh2bpp(const uint8_t *source) {
-  uint32_t *dest = (uint32_t*)image->bits();
+  uint32_t *dest = (uint32_t*)image.bits();
 
   for(unsigned ty = 0; ty < 256; ty++) {
     for(unsigned tx = 0; tx < 16; tx++) {
@@ -274,7 +276,7 @@ void VramCanvas::refresh2bpp(const uint8_t *source) {
 }
 
 void VramCanvas::refresh4bpp(const uint8_t *source) {
-  uint32_t *dest = (uint32_t*)image->bits();
+  uint32_t *dest = (uint32_t*)image.bits();
 
   for(unsigned ty = 0; ty < 128; ty++) {
     for(unsigned tx = 0; tx < 16; tx++) {
@@ -299,7 +301,7 @@ void VramCanvas::refresh4bpp(const uint8_t *source) {
 }
 
 void VramCanvas::refresh8bpp(const uint8_t *source) {
-  uint32_t *dest = (uint32_t*)image->bits();
+  uint32_t *dest = (uint32_t*)image.bits();
 
   for(unsigned ty = 0; ty < 64; ty++) {
     for(unsigned tx = 0; tx < 16; tx++) {
@@ -332,7 +334,7 @@ void VramCanvas::refresh8bpp(const uint8_t *source) {
 }
 
 void VramCanvas::refreshMode7(const uint8_t *source) {
-  uint32_t *dest = (uint32_t*)image->bits();
+  uint32_t *dest = (uint32_t*)image.bits();
 
   for(unsigned ty = 0; ty < 16; ty++) {
     for(unsigned tx = 0; tx < 16; tx++) {
@@ -347,8 +349,13 @@ void VramCanvas::refreshMode7(const uint8_t *source) {
   }
 }
 
+void VramCanvas::refreshScaledImage() {
+  scaledImage = image.scaled(image.width() * zoom, image.height() * zoom, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+}
+
 void VramCanvas::setZoom(unsigned newZoom) {
     zoom = newZoom;
+    refreshScaledImage();
 
     updateWidgetSize();
 }
@@ -365,8 +372,7 @@ void VramCanvas::updateWidgetSize() {
 void VramCanvas::paintEvent(QPaintEvent*) {
   QPainter painter(this);
   painter.setRenderHints(0);
-  painter.scale(zoom, zoom);
-  painter.drawImage(0, 0, *image);
+  painter.drawImage(0, 0, scaledImage);
 }
 
 void VramViewer::displayInfo(unsigned vram_addr) {
@@ -398,7 +404,7 @@ int VramCanvas::tileYPos(unsigned vram_addr) {
   return ypos * zoom;
 }
 
-VramAddrItem::VramAddrItem(const QString& text, const string& propertyName) {
+VramAddrItem::VramAddrItem(const QString& text, unsigned num) {
   layout = new QHBoxLayout;
   layout->setAlignment(Qt::AlignLeft);
   layout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -417,24 +423,23 @@ VramAddrItem::VramAddrItem(const QString& text, const string& propertyName) {
   gotoButton->setDefaultAction(new QAction("goto", this));
   layout->addWidget(gotoButton);
 
-  propertyId = 0;
-  while(true) {
-    string name, value;
-
-    propertyId++;
-    bool s = SNES::ppu.property(propertyId, name, value);
-
-    if(s == false || name == propertyName) break;
-  }
+  index = num;
 
   connect(gotoButton, SIGNAL(released()), this, SLOT(onGotoPressed()));
 }
 
 void VramAddrItem::refresh() {
-  string label, value;
-  SNES::ppu.property(propertyId, label, value);
+  unsigned value = 0;
+  switch (index) {
+  case 0: value = SNES::ppu.bg_tile_addr(0); break;
+  case 1: value = SNES::ppu.bg_tile_addr(1); break;
+  case 2: value = SNES::ppu.bg_tile_addr(2); break;
+  case 3: value = SNES::ppu.bg_tile_addr(3); break;
+  case 4: value = SNES::ppu.oam_tile_addr(0); break;
+  case 5: value = SNES::ppu.oam_tile_addr(1); break;
+  }
 
-  address->setText(value);
+  address->setText(string("0x", hex<4>(value)));
 }
 
 void VramAddrItem::onGotoPressed() {

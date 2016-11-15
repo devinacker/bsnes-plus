@@ -4,12 +4,14 @@ class DebuggerOptions : public Window {
 public:
   QVBoxLayout *layout;
   QCheckBox *cacheUsageBox;
+  QCheckBox *showHClocksBox;
 
   void synchronize();
   DebuggerOptions();
 
 public slots:
-  void toggleCacheUsage();
+  void toggleCacheUsage(bool);
+  void toggleHClocks(bool);
 };
 
 extern DebuggerOptions *debuggerOptions;

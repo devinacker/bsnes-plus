@@ -85,4 +85,5 @@ class Window {
 
   PPU &self;
   friend class PPU;
+  friend class PPUDebugger;
 };
