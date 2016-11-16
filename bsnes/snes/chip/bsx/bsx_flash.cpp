@@ -76,7 +76,7 @@ void BSXFlash::write(unsigned addr, uint8 data) {
   if(regs.writebyte)
   {
     regs.writebyte = false;
-    memory::bsxpack.write(addr, data);	//Inaccurate, it's supposed to be AND.
+    memory::bsxpack.write(addr, memory::bsxpack.read(addr) & data);	//AND byte
     return memory::bsxpack.write_protect(!regs.writebyte);
   }
 
