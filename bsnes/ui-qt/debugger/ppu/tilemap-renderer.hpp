@@ -20,6 +20,6 @@ public:
 
 private:
   void drawMap(QImage& image, unsigned mapAddr, unsigned startX, unsigned startY);
-  void drawMapScanline(uint32_t* scanline, const unsigned py, const uint8_t* map);
-  void drawSliver(uint32_t* imgBits, unsigned c, unsigned fpy, const uint8_t pal, bool hFlip);
+  void drawMapTile(uint32_t* imgBits, const unsigned wordsPerScanline, const uint8_t* map);
+  void draw8pxTile(uint32_t* imgBits, const unsigned wordsPerScanline, unsigned c, uint8_t pal, bool hFlip, bool vFlip);
 };
