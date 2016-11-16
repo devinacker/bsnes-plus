@@ -137,6 +137,7 @@ Configuration::Configuration() {
   attach(geometry.propertiesViewer = "", "geometry.propertiesViewer");
   attach(geometry.layerToggle      = "", "geometry.layerToggle");
   attach(geometry.vramViewer       = "", "geometry.vramViewer");
+  attach(geometry.tilemapViewer    = "", "geometry.tilemapViewer");
   attach(geometry.oamViewer        = "", "geometry.oamViewer");
   attach(geometry.cgramViewer      = "", "geometry.cgramViewer");
   attach(geometry.debuggerOptions  = "", "geometry.debuggerOptions");

@@ -98,6 +98,7 @@ public:
     string propertiesViewer;
     string layerToggle;
     string vramViewer;
+    string tilemapViewer;
     string oamViewer;
     string cgramViewer;
     string debuggerOptions;
