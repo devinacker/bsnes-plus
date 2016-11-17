@@ -77,8 +77,8 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
     unsigned c2 = (c & 0x3f0) | ((c + 1) & 0x00f);
     if (hFlip) { swap(c1, c2); }
 
-    unsigned c3 = (c1 + 0x010) & 0x3f0;
-    unsigned c4 = (c2 + 0x010) & 0x3f0;
+    unsigned c3 = c1 + 0x010;
+    unsigned c4 = c2 + 0x010;
     if (vFlip) { swap(c1, c3); swap(c2, c4); }
 
     uint32_t* row2Bits = imgBits + wordsPerScanline * 8;
