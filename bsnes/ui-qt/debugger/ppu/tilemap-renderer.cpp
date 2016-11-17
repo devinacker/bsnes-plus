@@ -120,7 +120,7 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
   switch(bitDepth) {
     case BitDepth::BPP8: pal = 0;        break;
     case BitDepth::BPP4: pal = pal * 16; break;
-    case BitDepth::BPP2: pal = pal *  4; break;
+    case BitDepth::BPP2: pal = pal *  4 + ((screenMode == 0) ? layer * 32 : 0); break;
   }
 
   if(tileSize == false) {
