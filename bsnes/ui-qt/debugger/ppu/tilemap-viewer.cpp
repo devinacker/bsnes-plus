@@ -48,6 +48,7 @@ TilemapViewer::TilemapViewer() {
   bitDepth->addItem("2bpp", QVariant(TilemapRenderer::BPP2));
   bitDepth->addItem("4bpp", QVariant(TilemapRenderer::BPP4));
   bitDepth->addItem("8bpp", QVariant(TilemapRenderer::BPP8));
+  bitDepth->addItem("Mode 7", QVariant(TilemapRenderer::MODE7));
   sidebarLayout->addRow("Bit Depth:", bitDepth);
 
   screenSize = new QComboBox;

@@ -18,6 +18,8 @@ void TilemapRenderer::buildPalette() {
 }
 
 QImage TilemapRenderer::drawTilemap() {
+  if(bitDepth == BitDepth::MODE7) return drawMode7Tilemap();
+
   unsigned mapSize = tileSize ? 512 : 256;
   unsigned width = mapSize * (screenSizeX + 1);
   unsigned height = mapSize * (screenSizeY + 1);
@@ -148,6 +150,42 @@ void TilemapRenderer::draw8pxTile(uint32_t* imgBits, const unsigned wordsPerScan
       }
     }
 
+    imgBits += wordsPerScanline;
+  }
+}
+
+QImage TilemapRenderer::drawMode7Tilemap() {
+  QImage image(1024, 1024, QImage::Format_RGB32);
+
+  uint32_t* scanline = (uint32_t*)image.scanLine(0);
+  unsigned wordsPerScanline = image.bytesPerLine() / 4;
+
+  const uint8_t *map = SNES::memory::vram.data();
+
+  for(unsigned ty = 0; ty < 128; ty++) {
+    uint32_t* imgBits = scanline;
+    scanline += wordsPerScanline * 8;
+
+    for(unsigned tx = 0; tx < 128; tx++) {
+      unsigned c = *map;
+      map += 2;
+
+      drawMode7Tile(imgBits, wordsPerScanline, c);
+      imgBits += 8;
+    }
+  }
+
+  return image;
+}
+
+void TilemapRenderer::drawMode7Tile(uint32_t* imgBits, const unsigned wordsPerScanline, unsigned c) {
+  const uint8_t *tile = SNES::memory::vram.data() + c * 128 + 1;
+
+  for(unsigned py = 0; py < 8; py++) {
+    for(unsigned px = 0; px < 8; px++) {
+      imgBits[px] = palette[*tile];
+      tile +=2;
+    }
     imgBits += wordsPerScanline;
   }
 }
