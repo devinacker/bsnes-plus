@@ -33,6 +33,10 @@ void PPUDebugger::cgram_mmio_write(uint16 addr, uint8 data) {
   PPU::cgram_mmio_write(addr, data);
 }
 
+uint8 PPUDebugger::bg_mode() const {
+  return (uint8)regs.bg_mode;
+}
+
 uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
   switch (index) {
   case 0: return regs.bg_scaddr[BG1];
@@ -44,12 +48,34 @@ uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
   return 0;
 }
 
+uint8 PPUDebugger::bg_screen_size(unsigned index) const {
+  switch (index) {
+  case 0: return regs.bg_scsize[BG1] & 3;
+  case 1: return regs.bg_scsize[BG2] & 3;
+  case 2: return regs.bg_scsize[BG3] & 3;
+  case 3: return regs.bg_scsize[BG4] & 3;
+  }
+  
+  return 0;
+}
+
 uint16 PPUDebugger::bg_tile_addr(unsigned index) const {
   switch (index) {
   case 0: return regs.bg_tdaddr[BG1];
   case 1: return regs.bg_tdaddr[BG2];
   case 2: return regs.bg_tdaddr[BG3];
   case 3: return regs.bg_tdaddr[BG4];
+  }
+  
+  return 0;
+}
+
+uint8 PPUDebugger::bg_tile_size(unsigned index) const {
+  switch (index) {
+  case 0: return regs.bg_tilesize[BG1];
+  case 1: return regs.bg_tilesize[BG2];
+  case 2: return regs.bg_tilesize[BG3];
+  case 3: return regs.bg_tilesize[BG4];
   }
   
   return 0;

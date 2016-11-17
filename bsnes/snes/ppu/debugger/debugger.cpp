@@ -33,6 +33,10 @@ void PPUDebugger::cgram_write(unsigned addr, uint8 data) {
   PPU::cgram_write(addr, data);
 }
 
+uint8 PPUDebugger::bg_mode() const {
+  return (uint8)regs.bgmode;
+}
+
 uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
   switch (index) {
   case 0: return bg1.regs.screen_addr;
@@ -44,12 +48,34 @@ uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
   return 0;
 }
 
+uint8 PPUDebugger::bg_screen_size(unsigned index) const {
+  switch (index) {
+  case 0: return bg1.regs.screen_size & 3;
+  case 1: return bg2.regs.screen_size & 3;
+  case 2: return bg3.regs.screen_size & 3;
+  case 3: return bg4.regs.screen_size & 3;
+  }
+  
+  return 0;
+}
+
 uint16 PPUDebugger::bg_tile_addr(unsigned index) const {
   switch (index) {
   case 0: return bg1.regs.tiledata_addr;
   case 1: return bg2.regs.tiledata_addr;
   case 2: return bg3.regs.tiledata_addr;
   case 3: return bg4.regs.tiledata_addr;
+  }
+  
+  return 0;
+}
+
+uint8 PPUDebugger::bg_tile_size(unsigned index) const {
+  switch (index) {
+  case 0: return bg1.regs.tile_size;
+  case 1: return bg2.regs.tile_size;
+  case 2: return bg3.regs.tile_size;
+  case 3: return bg4.regs.tile_size;
   }
   
   return 0;
