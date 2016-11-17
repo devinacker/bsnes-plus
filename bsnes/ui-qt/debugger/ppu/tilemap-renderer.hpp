@@ -1,5 +1,5 @@
 struct TilemapRenderer {
-  enum BitDepth { BPP8, BPP4, BPP2 };
+  enum BitDepth { None, BPP2, BPP4, BPP8 };
 
   uint32_t palette[256];
 
