@@ -1,18 +1,27 @@
 struct TilemapRenderer {
-  enum BitDepth { BPP8, BPP4, BPP2, MODE7 };
+  enum BitDepth { BPP8, BPP4, BPP2, MODE7, NONE };
 
   uint32_t palette[256];
 
+  unsigned screenMode;
+  unsigned layer;
+
+  BitDepth bitDepth;
   unsigned tileAddr;
   unsigned screenAddr;
 
-  BitDepth bitDepth;
   bool screenSizeX;
   bool screenSizeY;
   bool tileSize;
 
 public:
   TilemapRenderer();
+
+  void updateBitDepth();
+  void loadScreenMode();
+  void loadTilemapSettings();
+
+  unsigned nLayersInMode() const;
 
   void buildPalette();
 

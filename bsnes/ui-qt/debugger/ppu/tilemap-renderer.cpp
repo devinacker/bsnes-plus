@@ -1,12 +1,64 @@
 
 TilemapRenderer::TilemapRenderer()
 {
+  screenMode = 0;
+  layer = 0;
   tileAddr = 0;
   screenAddr = 0;
-  bitDepth = BitDepth::BPP2;
+  bitDepth = BitDepth::NONE;
   screenSizeX = false;
   screenSizeY = false;
   tileSize = false;
+}
+
+void TilemapRenderer::updateBitDepth() {
+  static const BitDepth map[8][4] = {
+    { BPP2, BPP2, BPP2, BPP2},
+    { BPP4, BPP4, BPP2, NONE},
+    { BPP4, BPP4, NONE, NONE},
+    { BPP8, BPP4, NONE, NONE},
+    { BPP8, BPP2, NONE, NONE},
+    { BPP4, BPP2, NONE, NONE},
+    { BPP4, NONE, NONE, NONE},
+    { MODE7, MODE7, MODE7, MODE7}
+  };
+
+  layer = layer & 3;
+  screenMode = screenMode & 7;
+  bitDepth = map[screenMode][layer];
+}
+
+unsigned TilemapRenderer::nLayersInMode() const {
+  const static unsigned layers[8] = { 4, 3, 2, 2, 2, 2, 1, 1 };
+
+  return layers[screenMode & 7];
+}
+
+void TilemapRenderer::loadScreenMode() {
+  screenMode = SNES::ppu.bg_mode() & 7;
+}
+
+void TilemapRenderer::loadTilemapSettings() {
+  layer = layer & 3;
+
+  updateBitDepth();
+
+  if(screenMode < 7) {
+    unsigned ss = SNES::ppu.bg_screen_size(layer);
+
+    screenAddr = SNES::ppu.bg_screen_addr(layer);
+    tileAddr = SNES::ppu.bg_tile_addr(layer);
+    screenSizeX = ss & 1;
+    screenSizeY = ss & 2;
+    tileSize = SNES::ppu.bg_tile_size(layer);
+  }
+  else {
+    screenAddr = 0;
+    tileAddr = 0;
+    screenSizeX = false;
+    screenSizeY = false;
+    tileSize = false;
+  }
 }
 
 void TilemapRenderer::buildPalette() {
@@ -19,6 +71,7 @@ void TilemapRenderer::buildPalette() {
 
 QImage TilemapRenderer::drawTilemap() {
   if(bitDepth == BitDepth::MODE7) return drawMode7Tilemap();
+  if(bitDepth == BitDepth::NONE) return QImage();
 
   unsigned mapSize = tileSize ? 512 : 256;
   unsigned width = mapSize * (screenSizeX + 1);
@@ -70,7 +123,7 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
     case BitDepth::BPP2: pal = pal *  4; break;
   }
 
-  if (tileSize == false) {
+  if(tileSize == false) {
     draw8pxTile(imgBits, wordsPerScanline, c, pal, hFlip, vFlip);
 
   } else {
