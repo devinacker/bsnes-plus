@@ -49,7 +49,10 @@ using namespace ruby;
   #include "debugger/tools/properties.moc.hpp"
 
   #include "debugger/ppu/cgram-widget.moc.hpp"
+  #include "debugger/ppu/tilemap-renderer.hpp"
+
   #include "debugger/ppu/vram-viewer.moc.hpp"
+  #include "debugger/ppu/tilemap-viewer.moc.hpp"
   #include "debugger/ppu/oam-viewer.moc.hpp"
   #include "debugger/ppu/cgram-viewer.moc.hpp"
 

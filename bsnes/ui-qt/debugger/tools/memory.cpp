@@ -136,7 +136,7 @@ void MemoryEditor::show() {
 void MemoryEditor::sourceChanged(int index) {
   switch(index) { default:
     case 0: memorySource = SNES::Debugger::MemorySource::CPUBus; editor->setEditorSize(16 * 1024 * 1024); break;
-    case 1: memorySource = SNES::Debugger::MemorySource::APURAM; editor->setEditorSize(64 * 1024);        break;
+    case 1: memorySource = SNES::Debugger::MemorySource::APUBus; editor->setEditorSize(64 * 1024);        break;
     case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(64 * 1024);        break;
     case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setEditorSize(544);              break;
     case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setEditorSize(512);              break;
@@ -203,7 +203,7 @@ void MemoryEditor::gotoPrevious(int type) {
   if (memorySource == SNES::Debugger::MemorySource::CPUBus) {
     usage = SNES::cpu.usage;
   }
-  else if (memorySource == SNES::Debugger::MemorySource::APURAM) {
+  else if (memorySource == SNES::Debugger::MemorySource::APUBus) {
     usage = SNES::smp.usage;
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
@@ -245,7 +245,7 @@ void MemoryEditor::gotoNext(int type) {
   if (memorySource == SNES::Debugger::MemorySource::CPUBus) {
     usage = SNES::cpu.usage;
   }
-  else if (memorySource == SNES::Debugger::MemorySource::APURAM) {
+  else if (memorySource == SNES::Debugger::MemorySource::APUBus) {
     usage = SNES::smp.usage;
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM) {
@@ -436,7 +436,7 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   if (memorySource == SNES::Debugger::MemorySource::CPUBus && addr < 1 << 24) {
     return SNES::cpu.usage[addr];
   }
-  else if (memorySource == SNES::Debugger::MemorySource::APURAM && addr < 1 << 16) {
+  else if (memorySource == SNES::Debugger::MemorySource::APUBus && addr < 1 << 16) {
     return SNES::smp.usage[addr];
   }
   else if (memorySource == SNES::Debugger::MemorySource::CartROM && addr < 1 << 24) {
