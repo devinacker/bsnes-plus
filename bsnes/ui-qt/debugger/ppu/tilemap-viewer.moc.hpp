@@ -11,30 +11,23 @@ public slots:
   void refresh();
 
   void onZoomChanged(int);
+  void onFormChanged();
 
 private:
-  void updateInfo();
-
   TilemapRenderer renderer;
 
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
 
-  QHBoxLayout *bgLayout;
-  QRadioButton *bgButton[4];
-
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
   QComboBox *zoomCombo;
 
-  unsigned layer;
-
-  QLabel *screenMode;
-  QLabel *bitDepth;
-  QLabel *screenSize;
-  QLabel *tileSize;
-  QLabel *tileAddr;
-  QLabel *screenAddr;
+  QComboBox *bitDepth;
+  QComboBox *screenSize;
+  QComboBox *tileSize;
+  QLineEdit *tileAddr;
+  QLineEdit *screenAddr;
 
   QGraphicsScene *scene;
   QGraphicsPixmapItem *scenePixmap;

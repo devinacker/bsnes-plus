@@ -66,7 +66,6 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
     case BitDepth::BPP8: pal = 0;        break;
     case BitDepth::BPP4: pal = pal * 16; break;
     case BitDepth::BPP2: pal = pal *  4; break;
-    default: return;
   }
 
   if (tileSize == false) {
@@ -98,7 +97,6 @@ void TilemapRenderer::draw8pxTile(uint32_t* imgBits, const unsigned wordsPerScan
     case BitDepth::BPP8: addr += (tileAddr + c * 64) & 0xffc0; break;
     case BitDepth::BPP4: addr += (tileAddr + c * 32) & 0xffe0; break;
     case BitDepth::BPP2: addr += (tileAddr + c * 16) & 0xfff0; break;
-    default: return;
   }
 
   const uint8_t *tile = SNES::memory::vram.data() + addr;
