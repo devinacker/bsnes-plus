@@ -59,6 +59,11 @@ void MSU1::enable() {
   datafile.open(string(cartridge.basename(), ".msu"), file::mode::read);
 }
 
+void MSU1::unload() {
+  if(datafile.open()) datafile.close();
+  if(audiofile.open()) audiofile.close();
+}
+
 void MSU1::power() {
   reset();
 }
