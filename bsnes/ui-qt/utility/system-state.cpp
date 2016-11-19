@@ -84,11 +84,11 @@ void Utility::modifySystemState(system_state_t systemState) {
       showMessage("System power was cycled.");
     } break;
 
-	case ReloadCartridge: {
-		 if(application.currentRom != "")
-			 cartridge.loadNormal(application.currentRom);
-		 showMessage(string() << "Reloaded " << cartridge.name << ".");
-	 } break;
+    case ReloadCartridge: {
+      if(application.currentRom != "")
+        cartridge.loadNormal(application.currentRom);
+      showMessage(string() << "Reloaded " << cartridge.name << ".");
+    } break;
 
     case Reset: {
       if(SNES::cartridge.loaded() == false || application.power == false) break;

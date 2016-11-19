@@ -55,7 +55,7 @@ struct CaptureScreenshot : HotkeyInput {
 struct CaptureSPC : HotkeyInput {
   void pressed() {
     //tell the S-SMP core to save a SPC after the next note-on
-	interface.captureSPC();
+    interface.captureSPC();
   }
 
   CaptureSPC() : HotkeyInput("Capture SPC Dump", "input.userInterface.general.captureSPC") {

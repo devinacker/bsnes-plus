@@ -52,14 +52,14 @@ BreakpointItem::BreakpointItem(unsigned id_) : id(id_) {
   if (id_ == 0) {
     layout->addWidget(new QLabel("Address Range"), 0, BreakAddrStart, 1, BreakAddrEnd - BreakAddrStart + 1);
     layout->addWidget(new QLabel("Data"), 0, BreakData);
-	QLabel *label = new QLabel("R");
-	label->setAlignment(Qt::AlignHCenter);
+    QLabel *label = new QLabel("R");
+    label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(label, 0, BreakRead);
     label = new QLabel("W");
-	label->setAlignment(Qt::AlignHCenter);
+    label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(label, 0, BreakWrite);
     label = new QLabel("X");
-	label->setAlignment(Qt::AlignHCenter);
+    label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(label, 0, BreakExecute);
     layout->addWidget(new QLabel("Source"), 0, BreakSource);
   }
@@ -75,7 +75,7 @@ void BreakpointItem::init() {
 void BreakpointItem::toggle() {
   bool state = mode_r->isChecked() | mode_w->isChecked() | mode_x->isChecked();
   SNES::debugger.breakpoint[id].enabled = state;
-	
+    
   if(state) {
     SNES::debugger.breakpoint[id].addr = hex(addr->text().toUtf8().data()) & 0xffffff;
     SNES::debugger.breakpoint[id].addr_end = hex(addr_end->text().toUtf8().data()) & 0xffffff;
