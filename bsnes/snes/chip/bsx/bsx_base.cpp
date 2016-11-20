@@ -96,7 +96,7 @@ uint8 BSXBase::get_time(bool reset)
     case  1: return 0x00;  //Data Group Link / Continuity
     case  2: return 0x00;  //Data Group Size (24-bit)
     case  3: return 0x00;
-    case  4: return 0x11;
+    case  4: return 0x10;
     case  5: return 0x01;  //Must be 0x01
     case  6: return 0x01;  //Amount of packets (1)
     case  7: return 0x00;  //Offset (24-bit)
@@ -207,8 +207,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             //Return Time
             regs.r218c = get_time(false);
           }
-        
-          if (regs.stream1_loaded)
+          else if (regs.stream1_loaded)
           {
             //Get packet data
             regs.r218c = SAT1.read();
@@ -323,8 +322,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             //Return Time
             regs.r2192 = get_time(false);
           }
-        
-          if (regs.stream1_loaded)
+          else if (regs.stream1_loaded)
           {
             //Get packet data
             regs.r2192 = SAT1.read();
