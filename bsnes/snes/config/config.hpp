@@ -25,6 +25,10 @@ struct Configuration {
     unsigned version;
   } ppu2;
 
+  struct Satellaview {
+    string path;
+  } sat;
+
   Configuration();
 };
 

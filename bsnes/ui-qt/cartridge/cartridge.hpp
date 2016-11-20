@@ -27,6 +27,7 @@ public:
   bool loadSufamiTurbo(const char*, const char *, const char*);
   bool loadSuperGameBoy(const char*, const char*);
   void saveMemory();
+  void saveMemoryPack();
   void unload();
 
   void loadCheats();
@@ -36,6 +37,7 @@ private:
   bool loadCartridge(string&, string&, SNES::MappedRAM&);
   bool loadMemory(const char*, const char*, SNES::MappedRAM&);
   bool saveMemory(const char*, const char*, SNES::MappedRAM&);
+  bool loadEmptyMemoryPack(SNES::MappedRAM&);
   bool applyBPS(string&, uint8_t *&data, unsigned &size);
   bool applyUPS(string&, uint8_t *&data, unsigned &size);
   bool applyIPS(string&, uint8_t *&data, unsigned &size);

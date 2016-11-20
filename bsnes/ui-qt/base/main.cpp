@@ -29,6 +29,9 @@ MainWindow::MainWindow() {
 
   system_loadSpecial_superGameBoy = system_loadSpecial->addAction("Load Super &Game Boy Cartridge ...");
 
+  system_saveMemoryPack = system->addAction("Save Memory Pack");
+  system_saveMemoryPack->setVisible(false);
+
   system_reload = system->addAction("Re&load");
 
   system->addSeparator();
@@ -250,6 +253,7 @@ MainWindow::MainWindow() {
   connect(system_loadSpecial_bsx, SIGNAL(triggered()), this, SLOT(loadBsxCartridge()));
   connect(system_loadSpecial_sufamiTurbo, SIGNAL(triggered()), this, SLOT(loadSufamiTurboCartridge()));
   connect(system_loadSpecial_superGameBoy, SIGNAL(triggered()), this, SLOT(loadSuperGameBoyCartridge()));
+  connect(system_saveMemoryPack, SIGNAL(triggered()), this, SLOT(saveMemoryPack()));
   connect(system_power, SIGNAL(triggered()), this, SLOT(power()));
   connect(system_reset, SIGNAL(triggered()), this, SLOT(reset()));
   connect(system_port1_none, SIGNAL(triggered()), this, SLOT(setPort1None()));
@@ -408,6 +412,10 @@ void MainWindow::loadSufamiTurboCartridge() {
 
 void MainWindow::loadSuperGameBoyCartridge() {
   loaderWindow->loadSuperGameBoyCartridge(config().path.sgb, "");
+}
+
+void MainWindow::saveMemoryPack() {
+  cartridge.saveMemoryPack();
 }
 
 void MainWindow::power() {

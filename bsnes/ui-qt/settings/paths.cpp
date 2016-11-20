@@ -1,9 +1,10 @@
 #include "paths.moc"
 PathSettingsWindow *pathSettingsWindow;
 
-PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, const char *pathDefaultLabel_, const char *pathBrowseLabel_) : pathValue(pathValue_) {
+PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, const char *pathDefaultLabel_, const char *pathBrowseLabel_, const char *pathDefaultValue_) : pathValue(pathValue_) {
   pathDefaultLabel = pathDefaultLabel_;
   pathBrowseLabel = pathBrowseLabel_;
+  pathDefaultValue = pathDefaultValue_;
 
   layout = new QVBoxLayout;
   layout->setMargin(0);
@@ -40,7 +41,7 @@ void PathSettingWidget::acceptPath(const string &newPath) {
 }
 
 void PathSettingWidget::updatePath() {
-  if(pathValue == "") {
+  if(pathValue == pathDefaultValue) {
     path->setStyleSheet("color: #808080");
     path->setText(pathDefaultLabel);
   } else {
@@ -59,7 +60,7 @@ void PathSettingWidget::selectPath() {
 }
 
 void PathSettingWidget::defaultPath() {
-  pathValue = "";
+  pathValue = pathDefaultValue;
   updatePath();
 }
 
@@ -70,12 +71,13 @@ PathSettingsWindow::PathSettingsWindow() {
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
 
-  gamePath  = new PathSettingWidget(config().path.rom,   "Games:",         "Remember last path",  "Default Game Path");
-  savePath  = new PathSettingWidget(config().path.save,  "Save RAM:",      "Same as loaded game", "Default Save RAM Path");
-  statePath = new PathSettingWidget(config().path.state, "Save states:",   "Same as loaded game", "Default Save State Path");
-  patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path");
-  cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path");
-  dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path");
+  gamePath  = new PathSettingWidget(config().path.rom,   "Games:",         "Remember last path",  "Default Game Path", "");
+  savePath  = new PathSettingWidget(config().path.save,  "Save RAM:",      "Same as loaded game", "Default Save RAM Path", "");
+  statePath = new PathSettingWidget(config().path.state, "Save states:",   "Same as loaded game", "Default Save State Path", "");
+  patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path", "");
+  cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path", "");
+  dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path", "");
+  satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
 
   layout->addWidget(gamePath);
   layout->addWidget(savePath);
@@ -83,4 +85,5 @@ PathSettingsWindow::PathSettingsWindow() {
   layout->addWidget(patchPath);
   layout->addWidget(cheatPath);
   layout->addWidget(dataPath);
+  layout->addWidget(satdataPath);
 }

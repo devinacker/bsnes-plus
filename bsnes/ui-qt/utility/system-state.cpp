@@ -104,6 +104,9 @@ void Utility::modifySystemState(system_state_t systemState) {
   // (only applies when the system is powered on)
   mainWindow->canvas->setUpdatesEnabled(!application.power || video.cap("QWidget"));
 
+  mainWindow->system_saveMemoryPack->setVisible(SNES::cartridge.loaded() 
+    && SNES::cartridge.has_bsx_slot() && (SNES::memory::bsxpack.size() > 0));
+
   mainWindow->syncUi();
   #if defined(DEBUGGER)
   debugger->modifySystemState(systemState);
