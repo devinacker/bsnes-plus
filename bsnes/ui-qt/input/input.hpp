@@ -43,6 +43,8 @@ struct HotkeyInput : DigitalInput {
   virtual void released() {}
 
   HotkeyInput(const char*, const char*);
+  
+  static void releaseSpeedKeys();
 };
 
 struct InputGroup : public array<MappedInput*> {

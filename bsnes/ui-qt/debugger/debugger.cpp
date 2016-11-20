@@ -435,6 +435,10 @@ void Debugger::event() {
     } break;
   }
 
+  // disable speedup/slowdown since the main window isn't going to register
+  // the user probably releasing the key while the debug window is active
+  HotkeyInput::releaseSpeedKeys();
+  
   audio.clear();
   autoUpdate();
   activateWindow();
