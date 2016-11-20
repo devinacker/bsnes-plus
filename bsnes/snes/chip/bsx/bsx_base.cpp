@@ -322,7 +322,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             //Return Time
             regs.r2192 = get_time(false);
           }
-          else if (regs.stream1_loaded)
+          else if (regs.stream2_loaded)
           {
             //Get packet data
             regs.r2192 = SAT1.read();
