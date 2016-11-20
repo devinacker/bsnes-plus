@@ -232,6 +232,35 @@ void Cartridge::saveMemory() {
   }
 }
 
+void Cartridge::saveMemoryPack() {
+  if(SNES::cartridge.loaded() == false) return;
+  if(SNES::cartridge.has_bsx_slot() == false) return;
+
+  string filename = nall::basename(cartridge.fileName);
+  string fullpath = config().path.save;
+  
+  time_t systemTime = time(0);
+  tm *currentTime = localtime(&systemTime);
+  char t[512];
+  sprintf(t, "%.4u%.2u%.2u-%.2u%.2u%.2u",
+    1900 + currentTime->tm_year, 1 + currentTime->tm_mon, currentTime->tm_mday,
+    currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec
+  );
+  filename << "-" << t << ".bs";
+  fullpath << filename;
+
+  file fp;
+  if(fp.open(fullpath, file::mode::write) == false)
+  {
+    utility.showMessage(string("Memory Pack save failed."));
+    return;
+  }
+
+  fp.write(SNES::memory::bsxpack.data(), SNES::memory::bsxpack.size());
+  fp.close();
+  utility.showMessage(string(filename, " saved."));
+}
+
 void Cartridge::unload() {
   if(SNES::cartridge.loaded() == false) return;
   utility.modifySystemState(Utility::UnloadCartridge);

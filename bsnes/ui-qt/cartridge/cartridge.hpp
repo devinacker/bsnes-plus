@@ -27,6 +27,7 @@ public:
   bool loadSufamiTurbo(const char*, const char *, const char*);
   bool loadSuperGameBoy(const char*, const char*);
   void saveMemory();
+  void saveMemoryPack();
   void unload();
 
   void loadCheats();

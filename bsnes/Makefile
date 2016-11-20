@@ -13,8 +13,8 @@ version := v073+2
 # compiler
 c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
-flags   := -I. -I$(snes)
-link    :=
+flags   := -m32 -I. -I$(snes)
+link    := -m32
 objects :=
 
 ifeq ($(DEBUG), 1)
