@@ -438,6 +438,7 @@ bool Cartridge::loadEmptyMemoryPack(SNES::MappedRAM &memory) {
   uint8_t *emptydata = new uint8_t[0x100000];
   memset(emptydata, 0xFF, 0x100000);
   memory.copy(emptydata, 0x100000);
+  delete[] emptydata;
   return true;
 }
 
