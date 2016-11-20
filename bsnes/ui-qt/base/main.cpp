@@ -385,7 +385,7 @@ void MainWindow::syncUi() {
 }
 
 bool MainWindow::isActive() {
-  return isActiveWindow() && !isMinimized();
+  return isActiveWindow() && !isMinimized() && !fileBrowser->popupOpen();
 }
 
 void MainWindow::loadCartridge() {

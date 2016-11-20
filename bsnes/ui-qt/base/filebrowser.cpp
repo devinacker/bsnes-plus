@@ -3,12 +3,14 @@ FileBrowser *fileBrowser;
 
 void FileBrowser::chooseFile() {
   if(config().diskBrowser.useCommonDialogs == true) {
+    nativeOpen = true;
     audio.clear();
     QString qfilename = QFileDialog::getOpenFileName(0,
       windowTitle(), fileSystemModel->rootPath(), "All Files (*)"
     );
     string filename = qfilename.toUtf8().constData();
     if(filename != "") onAccept(filename);
+    nativeOpen = false;
     return;
   }
 
@@ -17,6 +19,7 @@ void FileBrowser::chooseFile() {
 
 void FileBrowser::chooseFolder() {
   if(config().diskBrowser.useCommonDialogs == true) {
+    nativeOpen = true;
     audio.clear();
     QString qfilename = QFileDialog::getExistingDirectory(0,
       windowTitle(), config().path.current.folder,
@@ -24,6 +27,7 @@ void FileBrowser::chooseFolder() {
     );
     string filename = qfilename.toUtf8().constData();
     if(filename != "") onAccept(filename);
+    nativeOpen = false;
     return;
   }
 
@@ -40,6 +44,7 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
   string defaultPath = config().path.rom == "" ? config().path.current.cartridge : config().path.rom;
 
   if(config().diskBrowser.useCommonDialogs == true) {
+    nativeOpen = true;
     audio.clear();
     QString qfilename = QFileDialog::getOpenFileName(0,
       windowTitle(), defaultPath, string(
@@ -52,6 +57,7 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
       onAccept(filename);
       config().path.current.cartridge = nall::dir(filename);
     }
+    nativeOpen = false;
     return;
   }
 
@@ -114,6 +120,8 @@ FileBrowser::FileBrowser() {
   connect(this, SIGNAL(activated(const string&)), this, SLOT(activate(const string&)));
   connect(this, SIGNAL(accepted(const string&)), this, SLOT(accept(const string&)));
   connect(previewApplyPatch, SIGNAL(stateChanged(int)), this, SLOT(toggleApplyPatch()));
+  
+  nativeOpen = false;
 }
 
 //
