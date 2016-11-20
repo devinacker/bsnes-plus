@@ -152,7 +152,11 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
   loadMemory(baseName, ".srm", SNES::memory::cartram);
   loadMemory(baseName, ".psr", SNES::memory::bsxpram);
 
-  fileName = slotAName;
+  if (slotAName != "")
+    fileName = slotAName;
+  else
+    fileName = baseName;
+  
   name = *slot
   ? notdir(nall::basename(slotAName))
   : notdir(nall::basename(baseName));
