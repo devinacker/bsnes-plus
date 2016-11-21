@@ -100,6 +100,7 @@ void Utility::modifySystemState(system_state_t systemState) {
     } break;
   }
 
+  mainWindow->system_saveMemoryPack->setVisible(SNES::cartridge.loaded() && SNES::cartridge.has_bsx_slot() && (SNES::memory::bsxpack.size() > 0));
   mainWindow->syncUi();
   #if defined(DEBUGGER)
   debugger->modifySystemState(systemState);
