@@ -19,6 +19,8 @@ Configuration::Configuration() {
 
   ppu1.version = 1;
   ppu2.version = 3;
+
+  sat.path = "./bsxdat/";
 }
 
 #endif

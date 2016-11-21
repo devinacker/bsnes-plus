@@ -29,6 +29,8 @@ Configuration::Configuration() {
   attach(SNES::config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
   attach(SNES::config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
 
+  attach(SNES::config.sat.path = "./bsxdat/", "path.satdata");
+
   //TODO: add superfx frequency
 
   //internal

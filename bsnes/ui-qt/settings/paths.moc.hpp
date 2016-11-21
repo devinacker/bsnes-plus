@@ -12,10 +12,11 @@ public:
   string &pathValue;
   string pathDefaultLabel;
   string pathBrowseLabel;
+  string pathDefaultValue;
   void acceptPath(const string&);
   void updatePath();
 
-  PathSettingWidget(string&, const char*, const char*, const char*);
+  PathSettingWidget(string&, const char*, const char*, const char*, const char*);
 
 public slots:
   void selectPath();
@@ -33,6 +34,7 @@ public:
   PathSettingWidget *patchPath;
   PathSettingWidget *cheatPath;
   PathSettingWidget *dataPath;
+  PathSettingWidget *satdataPath;
 
   PathSettingsWindow();
 };

@@ -22,11 +22,12 @@ void BSXBase::stream1_fileload(uint8 count)
   //Make sure to close the file first
   SAT1.close();
   char filename[256];
-  sprintf(filename, "./bsxdat/BSX%04X-%d.bin", (regs.r2188 | (regs.r2189 * 256)), count);
+  string filepath;
+  sprintf(filename, "BSX%04X-%d.bin", (regs.r2188 | (regs.r2189 * 256)), count);
+  filepath << config.sat.path << filename;
   
   //Open Satellaview file
-  //if (SAT1.open(filepath(filename, config().path.satdata), file::mode::read))
-  if (SAT1.open(filename, file::mode::read))
+  if (SAT1.open(filepath, file::mode::read))
   {
     regs.stream1_loaded = true;
     regs.stream1_first = true;
@@ -45,11 +46,12 @@ void BSXBase::stream2_fileload(uint8 count)
   //Make sure to close the file first
   SAT2.close();
   char filename[256];
-  sprintf(filename, "./bsxdat/BSX%04X-%d.bin", (regs.r2188 | (regs.r2189*256)), count);
+  string filepath;
+  sprintf(filename, "BSX%04X-%d.bin", (regs.r218e | (regs.r218f * 256)), count);
+  filepath << config.sat.path << filename;
 
   //Open Satellaview file
-  //if (SAT2.open(filepath(filename, config().path.satdata), file::mode::read))
-  if (SAT2.open(filename, file::mode::read))
+  if (SAT2.open(filepath, file::mode::read))
   {
     regs.stream2_loaded = true;
     regs.stream2_first = true;
