@@ -92,13 +92,9 @@ ifeq ($(platform),x)
 	install -D -m 644 data/bsnes.png $(DESTDIR)$(prefix)/share/pixmaps/bsnes.png
 	install -D -m 644 data/bsnes.desktop $(DESTDIR)$(prefix)/share/applications/bsnes.desktop
 	test -d ~/.bsnes || mkdir ~/.bsnes
-	cp data/cheats.xml ~/.bsnes/cheats.xml
-	chmod 777 ~/.bsnes ~/.bsnes/cheats.xml
 else ifeq ($(platform),osx)
 	mv -f $(osxbundle) /Applications/bsnes+.app
 	test -d ~/.bsnes || mkdir ~/.bsnes
-	cp data/cheats.xml ~/.bsnes/cheats.xml
-	chmod 777 ~/.bsnes ~/.bsnes/cheats.xml
 else
 	@echo Install not available for current platform
 endif

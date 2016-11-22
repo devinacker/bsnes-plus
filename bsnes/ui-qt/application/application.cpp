@@ -46,11 +46,18 @@ void Application::initPaths(const char *basename) {
   config().path.startup = getcwd(cwd);
 }
 
-void Application::locateFile(string &filename, bool createDataDirectory) {
-  //first, check if file exists in executable directory (single-user mode)
-  string temp = string() << config().path.base << filename;
+bool Application::singleUserMode() {
+  //check if config file exists in executable directory (single-user mode)
+  string temp = string() << config().path.base << "bsnes-qt.cfg";
+  return file::exists(temp);
+}
 
-  if(file::exists(temp) == false) {
+void Application::locateFile(string &filename, bool createDataDirectory) {
+  string temp;
+
+  if(singleUserMode()) {
+    temp = string() << config().path.base << filename;
+  } else {
     //if not, use user data path (multi-user mode)
     temp = config().path.user;
     temp << ".bsnes";
