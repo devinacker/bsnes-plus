@@ -84,13 +84,18 @@ int Application::main(int &argc, char **argv) {
 
   initPaths(argv[0]);
   locateFile(configFilename = "bsnes-qt.cfg", true);
-  locateFile(styleSheetFilename = "style.qss", false);
+  locateFile(styleSheetFilename = "style.qss");
+  locateFile(cheatsFilename = "cheats.xml");
 
   string customStylesheet;
   if(customStylesheet.readfile(styleSheetFilename) == true) {
     app->setStyleSheet((const char*)customStylesheet);
   } else {
     app->setStyleSheet(defaultStylesheet);
+  }
+
+  if(!QFile::exists(cheatsFilename)) {
+    QFile::copy(":/cheats.xml", cheatsFilename);
   }
 
   config().load(configFilename);

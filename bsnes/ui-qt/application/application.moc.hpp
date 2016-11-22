@@ -38,6 +38,7 @@ public:
 
   string configFilename;
   string styleSheetFilename;
+  string cheatsFilename;
   string currentRom;
 
   array<QWidget*> windowList;
