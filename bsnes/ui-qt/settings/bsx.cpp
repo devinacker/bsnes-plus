@@ -40,7 +40,7 @@ BSXSettingsWindow::BSXSettingsWindow() {
 void BSXSettingsWindow::initializeUi() {
   if (SNES::config.sat.local_time) {
     useLocalTime->setChecked(true);
-	dateTime->setEnabled(false);
+    dateTime->setEnabled(false);
   } else {
     useCustomTime->setChecked(true);
   }

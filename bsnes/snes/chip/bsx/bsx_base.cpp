@@ -98,7 +98,7 @@ uint8 BSXBase::get_time(bool reset)
     regs.time_minute = t->tm_min;
     regs.time_second = t->tm_sec;
     regs.time_weekday = (t->tm_wday) + 1;
-    regs.time_day = (t->tm_mday) + 1;
+    regs.time_day = t->tm_mday;
     regs.time_month = (t->tm_mon) + 1;
     uint16 time_year = (t->tm_year) + 1900;
     regs.time_yearL = time_year & 0xFF;
