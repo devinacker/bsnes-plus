@@ -9,6 +9,7 @@
 #include "input.cpp"
 #include "paths.cpp"
 #include "advanced.cpp"
+#include "bsx.cpp"
 
 #include "settings.moc"
 SettingsWindow *settingsWindow;
@@ -33,6 +34,7 @@ SettingsWindow::SettingsWindow() {
   inputSettingsWindow    = new InputSettingsWindow;
   pathSettingsWindow     = new PathSettingsWindow;
   advancedSettingsWindow = new AdvancedSettingsWindow;
+  bsxSettingsWindow      = new BSXSettingsWindow;
 
 #if defined(LAUNCHER)
   profileArea = new QScrollArea;
@@ -66,6 +68,11 @@ SettingsWindow::SettingsWindow() {
   advancedArea->setFrameStyle(0);
   advancedArea->setWidgetResizable(true);
 
+  bsxArea = new QScrollArea;
+  bsxArea->setWidget(bsxSettingsWindow);
+  bsxArea->setFrameStyle(0);
+  bsxArea->setWidgetResizable(true);
+
   tab = new QTabWidget;
 #if defined(LAUNCHER)
   tab->addTab(profileArea, "Profile");
@@ -75,5 +82,6 @@ SettingsWindow::SettingsWindow() {
   tab->addTab(inputArea, "Input");
   tab->addTab(pathArea, "Paths");
   tab->addTab(advancedArea, "Advanced");
+  tab->addTab(bsxArea, "BS-X");
   layout->addWidget(tab);
 }

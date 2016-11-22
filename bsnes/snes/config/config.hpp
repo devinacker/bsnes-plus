@@ -27,6 +27,8 @@ struct Configuration {
 
   struct Satellaview {
     string path;
+    bool local_time;
+    time_t custom_time;
   } sat;
 
   Configuration();

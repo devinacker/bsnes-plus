@@ -21,6 +21,8 @@ Configuration::Configuration() {
   ppu2.version = 3;
 
   sat.path = "./bsxdat/";
+  sat.local_time = true;
+  sat.custom_time = 798653040; // 1995-04-23 16:04
 }
 
 #endif

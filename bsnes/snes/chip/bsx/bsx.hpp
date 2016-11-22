@@ -18,6 +18,9 @@ private:
   void stream2_fileload(uint8 count);
   uint8 get_time(bool reset);
 
+  bool local_time;
+  time_t custom_time, start_time;
+
   struct {
     uint8 r2188, r2189, r218a, r218b;
     uint8 r218c, r218d, r218e, r218f;

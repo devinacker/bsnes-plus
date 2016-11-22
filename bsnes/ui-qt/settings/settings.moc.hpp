@@ -10,6 +10,7 @@ public:
   QScrollArea *inputArea;
   QScrollArea *pathArea;
   QScrollArea *advancedArea;
+  QScrollArea *bsxArea;
 
   SettingsWindow();
 
