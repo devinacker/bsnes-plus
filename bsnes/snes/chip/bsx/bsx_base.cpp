@@ -136,6 +136,11 @@ uint8 BSXBase::mmio_read(unsigned addr) {
 
     case 0x218a: {
       //Prefix Data Count
+      if (!regs.pf_latch1_enable || !regs.dt_latch1_enable)
+      {
+        return 0;
+      }
+
       if (regs.r2188 == 0 && regs.r2189 == 0)
       {
         //Time Channel, one packet
@@ -250,6 +255,11 @@ uint8 BSXBase::mmio_read(unsigned addr) {
 
     case 0x2190: {
       //Prefix Data Count
+      if (!regs.pf_latch2_enable || !regs.dt_latch2_enable)
+      {
+        return 0;
+      }
+
       if (regs.r218e == 0 && regs.r218f == 0)
       {
         //Time Channel, one packet
@@ -392,7 +402,7 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
 
     case 0x218b: {
       //Prefix Data Latch
-      regs.pf_latch1_enable = (data & 1 == 1);
+      regs.pf_latch1_enable = (data != 0);
     } break;
 
     case 0x218c: {
@@ -402,7 +412,7 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
         //Hardcoded Time Channel
         get_time(true);
       }
-      regs.dt_latch1_enable = (data & 1 == 1);
+      regs.dt_latch1_enable = (data != 0);
     } break;
 
 
@@ -423,7 +433,7 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
 
     case 0x2191: {
       //Prefix Data Latch
-      regs.pf_latch2_enable = (data & 1 == 1);
+      regs.pf_latch2_enable = (data != 0);
     } break;
 
     case 0x2192: {
@@ -433,7 +443,7 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
         //Hardcoded Time Channel
         get_time(true);
       }
-      regs.dt_latch2_enable = (data & 1 == 1);
+      regs.dt_latch2_enable = (data != 0);
     } break;
 
 
