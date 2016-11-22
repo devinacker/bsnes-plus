@@ -112,7 +112,9 @@ endif
 
 plugins: build
 	@$(MAKE) -C ../snesreader
-#	@$(MAKE) -C ../snesfilter
+ifneq ($(platform), osx)
+	@$(MAKE) -C ../snesfilter
+endif
 	@$(MAKE) -C ../supergameboy
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
