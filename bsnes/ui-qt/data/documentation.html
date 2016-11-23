@@ -3,27 +3,40 @@
 <head></head>
 <body>
 
-<h2>bsnes Usage Documentation</h2><br>
+<h2>bsnes-plus Usage Documentation</h2><br>
 
-bsnes is a Super Nintendo / Super Famicom emulator that strives to provide the
-most faithful hardware emulation possible. It focuses on accuracy and clean
-code, rather than speed and special features. It is meant as a reference
-emulator to document how the underlying hardware works. It is thus very useful
-for development and research. And while it can be used for general purpose
-gaming, it will require significantly more powerful hardware than a typical
-emulator.
+bsnes-plus is a Super Nintendo / Super Famicom emulator which aims to provide powerful, easy-to-use
+tools for debugging SNES software, in addition to the highly accurate hardware emulation provided
+by the original bsnes/higan project.
+<p>
+
+bsnes-plus is forked from version 073 of bsnes, but features numerous emulation updates and other
+enhancements backported from later versions of bsnes and higan. There are a couple of rare corner cases
+where even the bsnes-plus "accuracy" builds exhibit slightly less hardware-accuracy than current
+versions of higan, but nearly all licensed games, homebrew, and hacks that run correctly on a real console
+will also run identically under bsnes-plus.
+<p>
+
+The "compatibility" (default) profile features slightly decreased emulation accuracy, but with lower system
+requirements. This profile is recommended for most users and is capable of emulating nearly all of the same
+software as the accuracy profile, with little to no issues. The "performance" profile (not currently included
+in official releases) features an even greater speed/accuracy tradeoff, as the name implies.
+<p>
+
+The debugging tools included with bsnes-plus are fully compatible with all three profiles. See below for more
+information about using bsnes-plus for debugging.
 <br>
 
 <h3>Modes of Operation</h3><br>
 
 bsnes is capable of running both in its default multi-user mode, as well as in
 single-user mode.
-<br><br>
+<p>
 
 In multi-user mode, configuration data is stored inside the user's home
 directory. On Windows, this is located at "%APPDATA%/.bsnes". On other operating
 systems, this is located at "~/.bsnes".
-<br><br>
+<p>
 
 To enable single-user mode, create a blank "bsnes-qt.cfg" file inside the same
 folder as the bsnes executable. bsnes will then use this file to store
@@ -39,22 +52,184 @@ configuration data.
 <b>RTC:</b> real-time clock non-volatile memory.<br>
 <b>UPS, BPS, IPS:</b> patch data, used to dynamically modify cartridge of same base filename upon load.<br>
 <b>CHT:</b> plain-text list of "Game Genie" / "Pro Action Replay" codes.
+<p>
+
+The "snesreader" plugin adds additional support for compressed archives and less-common ROM file extensions, 
+and the "supergameboy" plugin adds support for Game Boy and Super Game Boy ROMs (a copy of the actual Super 
+Game Boy BIOS is required).
 <br>
 
-<h3>Known Limitations</h3><br>
+<h3>Using the Debugger</h3><br>
 
-<b>Satellaview BS-X emulation:</b> this hardware is only partially supported.
-This is mostly because the satellite network it used (St. GIGA) has been shut
-down. Access to this network would be required to properly reverse engineer much
-of the hardware. Working around this would require game-specific hacks, which
-are contrary to the design goals of this emulator. As a result, most BS-X
-software will not function correctly.
-<br><br>
+The primary goal of bsnes-plus is to provide easy-to-use tools for homebrew developers and ROM hackers. These tools
+can be accessed by selecting "Debugger ..." from the Tools menu.
+<p>
+
+The main debug window allows you to pause/resume emulation, single-step the SNES CPU and/or any active coprocessors,
+and optionally keep a trace log of executed code saved to disk for long-term debugging.
+<p>
+
+When emulation is stopped, either by pressing the Break/Run button or after a breakpoint is triggered (see below),
+you can press the Step button to execute a single instruction, the Step Over button to execute a single instruction or
+entire subroutine, or the Step Out button to exit the current subroutine. The checkboxes underneath allow you to select
+which combination of processors to single-step; each processor's code appears with a different color in the
+disassembly window.
+<p>
+
+(Note: the Step Over and Step Out buttons are unavailable when stepping multiple processors, and when stepping the
+SuperFX due to its lack of traditional call/return instructions and processor stack).
+<p>
+
+The trace options allow you to log disassembled instructions to disk in real-time while the emulator is running.
+The log output will be located in the directory specified for "exported data" in the emulator options (by default,
+this is the same directory as the currently loaded ROM). When the trace mask is enabled, each instruction will only
+be logged the first time it is executed; disabling this provides more thorough and detailed logging, but with greatly
+increased file size and CPU usage.
+<p>
+
+At the bottom of the main debug window, you can view the current register values for all steppable processors, and edit
+register values for the processor currently being stepped.
+<p>
+
+<h3>Debugger Menu: Tools</h3>
+<h4>Disassembler Window</h4><br>
+
+When single-stepping code, the disassembler window allows you to see other code in the vicinity of the current instruction.
+Only memory within a certain range that is known to actually be code is shown here.
+<p>
+
+<h4>Breakpoint Editor</h4><br>
+
+Breakpoints allow you to automatically pause execution when code at a given location is executed, or when specific data is
+read or modified. Each breakpoint contains these fields:<p>
+
+<b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end 
+of an address range, and is optional. Note that address mirroring will be ignored if a range of multiple addresses is specified.<br>
+<b>Data:</b> (optional) If this is specified, read and write breakpoints will only trigger if the byte being read from or written to
+the given address equals this value.<br>
+<b>R/W/X:</b> Specify any combination of read (R), write (W), and execute (X) operations that will trigger this breakpoint.<br>
+<b>Source:</b> Select which address space this breakpoint applies to; the default is the SNES CPU. Change this when debugging
+a coprocessor or monitoring reads/writes involving VRAM or other PPU memory.
+<p>
+
+<h4>Memory Editor</h4><br>
+
+The memory editor allows you to view and edit the current contents of CPU memory, APU memory, VRAM, and all other address spaces
+which are available via the breakpoint editor. The values can be updated automatically in near-real-time or manually at any time.
+<p>
+
+A useful feature of this memory editor is that memory is highlighted to indicate known code and data regions. Memory highlighted
+in red is code, memory in blue is data, and memory in purple has been both read or written and executed (for example, code which
+is being executed from RAM).
+<p>
+
+The seek and search buttons can be used to jump to nearby regions of code, data, or unmarked memory, and to search for strings
+of byte values or ASCII text. Memory can also be dumped to disk and reloaded at a later time.
+<p>
+
+<h4>Properties Viewer</h4><br>
+
+This window displays a detailed list of hardware register values and other properties for the SNES CPU, PPU, SMP, DSP, and other
+coprocessors, when available. Use this window to verify that the system has been initialized correctly, and whenever you want
+to be sure that a particular hardware register has the value that you expect.
+<p>
+
+<h3>Debugger Menu: S-PPU</h3>
+<h4>Video RAM viewer</h4><br>
+
+This window displays a graphical view of the current contents of VRAM.
+<p>
+
+The view can be switched between all available bit depths/formats as appropriate. The current tile addresses for all four background
+layers are also shown, and allow you to quickly jump to the graphics used by a specific layer.
+<p>
+
+When enabled, the graphic display can also be colored based on the current contents of CGRAM. Clicking within the CGRAM display allows
+you to select the palette to use.
+<p>
+
+<h4>Tilemap Viewer</h4><br>
+
+This view displays the current contents and properties of each background layer's tilemap.
+<p>
+
+The properties of each layer can also optionally be overridden with custom values, for instances when the screen mode or other
+background properties are changed mid-frame. At any time, the relevant values being used by a given background layer can be viewed
+via the S-PPU tab on the Properties Viewer window, under registers $2105 and $2107 through $210c.
+<p>
+
+<h4>Sprite Viewer</h4><br>
+
+This view displays the current properties of all sprites, based on the contents of OAM. Clicking on any sprite listed will display 
+its graphics in the upper right corner of the window. The sprites can also be sorted by any of their properties by clicking the
+respective column header in the table.
+<p>
+
+<h4>Palette Viewer</h4><br>
+
+This window displays the current contents of CGRAM. The same information is also presented on the Video RAM Viewer window, but this
+window is useful if you aren't currently interested in the contents of VRAM.
+<p>
+
+<h3>Debugger Menu: Misc</h3>
+<h4>Debugger Options</h4><br>
+
+This window allows you to configure a couple of options related to the debug windows:
+<p>
+
+<b>Cache memory usage table to disk:</b> Causes logged information about SNES memory usage (code/data regions) to be saved to disk
+and restored the next time the ROM is loaded. This is useful for long-term debugging/exploring across multiple sessions, but is
+disabled by default to avoid excessive disk space usage.<br>
+<b>Show H-position in clocks instead of dots:</b> Normally, when single-stepping the CPU, the output log shows the CPU's vertical
+counter value (in scanlines) and horizontal counter value (in dots/pixels). Enabling this option shows a more precise horizontal
+counter value based on the number of master clock cycles per scanline.
+<p>
+
+<h3>Satellaview and BS-X Support</h3><br>
+
+As of version 073+3, bsnes-plus features extensive Satellaview and BS-X support.
+<p>
+
+Before using the Satellaview, first make sure it is enabled as the expansion port device on the "Advanced" tab of the emulator 
+config window.
+<p>
+
+To use the BS-X interactive menu and play games on BS-X Memory Packs, select "Load BS-X Cartridge" from the "Load Special" menu.
+The "base cartridge" is the BS-X ROM itself, and the "slot cartridge" is an optional Memory Pack containing one or more BS-X games.
+<p>
+
+The next option, "Load BS-X Slotted Cartridge", allows you to play one of several other standalone cartridges which use the
+Satellaview hardware and have their own Memory Pack slots. A complete list of these cartridges is as follows:
+<ul>
+<li>Derby Stallion 96</li>
+<li>Itoi Shigesato no Bass Tsuri No. 1</li>
+<li>Joushou Mahjong Tenpai</li>
+<li>Ongaku Tsukuru Kanadeeru</li>
+<li>RPG Tsukuru 2</li>
+<li>Same Game Tsume Game</li>
+<li>SD Gundam G-NEXT</li>
+<li>Sound Novel Tsukuru</li>
+</ul>
+<p>
+
+Some sample broadcast data is located in the <tt>bsxdat</tt> directory. If you have downloaded some additional data, you can
+point to it using the "Paths" tab of the config window.
+<p>
+
+For more BS-X information and downloads, visit the <a href="https://bsxproj.superfamicom.org" target="_blank">BS-X Project</a> site.
+
+<h3>Known Limitations</h3><br>
 
 <b>Netplay:</b> internet multiplay is not currently supported nor planned.
 <br>
 
+
 <h3>Contributors</h3><br>
+
+<a href="https://byuu.org" target="_blank">byuu</a> is the original author of bsnes and higan.
+<p>
+
+This is a list of others who have contributed to bsnes-plus, either directly or indirectly:<br>
 &bull; Alex W. Jackson<br>
 &bull; Andreas Naive<br>
 &bull; anomie<br>
@@ -65,10 +240,13 @@ software will not function correctly.
 &bull; DMV27<br>
 &bull; FirebrandX<br>
 &bull; FitzRoy<br>
+&bull; Grieverheart<br>
 &bull; GIGO<br>
 &bull; Jonas Quinn<br>
 &bull; kode54<br>
 &bull; krom<br>
+&bull; LuigiBlood<br>
+&bull; Marcus Rowe<br>
 &bull; Matthew Callis<br>
 &bull; Maximilian Rehkopf<br>
 &bull; Michal Ziabkowski<br>

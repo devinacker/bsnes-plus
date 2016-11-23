@@ -11,6 +11,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 - Improved handling of address mirroring for breakpoints (extends to the entire address space, not just RAM)
 - Real-time code and data highlighting in memory editor, with fast searching for known code/data locations and unexplored regions
 - Cartridge ROM and RAM views in memory editor for mapper-agnostic analysis
+- Enhanced VRAM, sprite, and tilemap viewing
 - SA-1 disassembly and debugging
 - SA-1 bus and BW-RAM viewing and (partial) usage logging
 - Super FX disassembly and debugging
@@ -18,6 +19,7 @@ introduce some new features and improvements, mostly aimed at debugging.
 
 Non-debugging features:
 
+- Satellaview / BS-X support
 - SPC file dumping
 - SPC output visualizer (keyboards & peak meters)
 - IPS and BPS soft patching
