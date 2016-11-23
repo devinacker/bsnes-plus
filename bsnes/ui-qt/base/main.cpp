@@ -21,9 +21,9 @@ MainWindow::MainWindow() {
 
   system_loadSpecial = system->addMenu("Load &Special");
 
-  system_loadSpecial_bsxSlotted = system_loadSpecial->addAction("Load BS-X &Slotted Cartridge ...");
-
   system_loadSpecial_bsx = system_loadSpecial->addAction("Load &BS-X Cartridge ...");
+  
+  system_loadSpecial_bsxSlotted = system_loadSpecial->addAction("Load BS-X &Slotted Cartridge ...");
 
   system_loadSpecial_sufamiTurbo = system_loadSpecial->addAction("Load Sufami &Turbo Cartridge ...");
 
