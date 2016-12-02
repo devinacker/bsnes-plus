@@ -13,6 +13,7 @@ HtmlViewerWindow::HtmlViewerWindow() {
   setLayout(layout);
 
   document = new QTextBrowser;
+  document->setOpenExternalLinks(true);
   layout->addWidget(document);
 }
 

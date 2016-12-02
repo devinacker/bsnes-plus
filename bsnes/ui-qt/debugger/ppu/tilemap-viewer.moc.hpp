@@ -11,35 +11,40 @@ public slots:
   void refresh();
 
   void onZoomChanged(int);
+  void onFormChanged();
+  void updateForm();
+
+  void setCustomScreenMode(bool);
+  void setCustomTilemap(bool);
 
 private:
-  void updateInfo();
-
   TilemapRenderer renderer;
 
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
-
   QHBoxLayout *bgLayout;
-  QRadioButton *bgButton[4];
 
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
   QComboBox *zoomCombo;
 
-  unsigned layer;
+  QCheckBox *customScreenMode;
+  QCheckBox *customTilemap;
 
-  QLabel *screenMode;
-  QLabel *bitDepth;
-  QLabel *screenSize;
-  QLabel *tileSize;
-  QLabel *tileAddr;
-  QLabel *screenAddr;
+  QSpinBox  *screenMode;
+  QToolButton *bgButtons[4];
+  QComboBox *bitDepth;
+  QComboBox *screenSize;
+  QComboBox *tileSize;
+  QLineEdit *tileAddr;
+  QLineEdit *screenAddr;
 
   QGraphicsScene *scene;
   QGraphicsPixmapItem *scenePixmap;
 
   QGraphicsView* view;
+
+  bool inUpdateFormCall;
 };
 
 extern TilemapViewer *tilemapViewer;

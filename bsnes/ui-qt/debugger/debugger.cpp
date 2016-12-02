@@ -349,7 +349,10 @@ void Debugger::event() {
       else break;
         
       if(n == SNES::Debugger::SoftBreakCPU
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus) {
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::VRAM
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::OAM
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CGRAM) {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
         string s = t;
@@ -432,6 +435,10 @@ void Debugger::event() {
     } break;
   }
 
+  // disable speedup/slowdown since the main window isn't going to register
+  // the user probably releasing the key while the debug window is active
+  HotkeyInput::releaseSpeedKeys();
+  
   audio.clear();
   autoUpdate();
   activateWindow();

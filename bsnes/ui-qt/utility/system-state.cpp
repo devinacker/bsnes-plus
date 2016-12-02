@@ -84,11 +84,11 @@ void Utility::modifySystemState(system_state_t systemState) {
       showMessage("System power was cycled.");
     } break;
 
-	case ReloadCartridge: {
-		 if(application.currentRom != "")
-			 cartridge.loadNormal(application.currentRom);
-		 showMessage(string() << "Reloaded " << cartridge.name << ".");
-	 } break;
+    case ReloadCartridge: {
+      if(application.currentRom != "")
+        cartridge.loadNormal(application.currentRom);
+      showMessage(string() << "Reloaded " << cartridge.name << ".");
+    } break;
 
     case Reset: {
       if(SNES::cartridge.loaded() == false || application.power == false) break;
@@ -99,6 +99,13 @@ void Utility::modifySystemState(system_state_t systemState) {
       showMessage("System was reset.");
     } break;
   }
+
+  // don't let widget updates temporarily draw a parent widget over an external rendering contex
+  // (only applies when the system is powered on)
+  mainWindow->canvas->setUpdatesEnabled(!application.power || video.cap("QWidget"));
+
+  mainWindow->system_saveMemoryPack->setVisible(SNES::cartridge.loaded() 
+    && SNES::cartridge.has_bsx_slot() && (SNES::memory::bsxpack.size() > 0));
 
   mainWindow->syncUi();
   #if defined(DEBUGGER)

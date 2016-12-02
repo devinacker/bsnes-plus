@@ -17,6 +17,7 @@ public:
   void reset();
 
   void layer_enable(unsigned, unsigned, bool) {}
+  unsigned get_frameskip() const { return 0; }
   void set_frameskip(unsigned) {}
 
   void serialize(serializer&);

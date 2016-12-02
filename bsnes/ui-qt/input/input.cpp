@@ -122,6 +122,17 @@ void HotkeyInput::poll() {
 HotkeyInput::HotkeyInput(const char *label, const char *configName) : DigitalInput(label, configName) {
 }
 
+void HotkeyInput::releaseSpeedKeys() {
+  if (UserInterfaceEmulationSpeed::slowdown.isPressed()) {
+    UserInterfaceEmulationSpeed::slowdown.state = 0;
+    UserInterfaceEmulationSpeed::slowdown.released();
+  }
+  if (UserInterfaceEmulationSpeed::speedup.isPressed()) {
+    UserInterfaceEmulationSpeed::speedup.state = 0;
+    UserInterfaceEmulationSpeed::speedup.released();
+  }
+}
+
 //
 
 void InputGroup::attach(MappedInput *input) {

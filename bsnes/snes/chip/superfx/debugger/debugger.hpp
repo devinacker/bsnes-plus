@@ -5,7 +5,7 @@ public:
   enum Register {
     // 0-15 == R0-R15
     RegisterSFR = 16,
-	// TODO: some other registers here (ROMBR, etc)
+    // TODO: some other registers here (ROMBR, etc)
   };
   unsigned getRegister(unsigned id);
   void     setRegister(unsigned id, unsigned value);

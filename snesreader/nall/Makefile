@@ -16,7 +16,7 @@
 
 ifeq ($(platform),)
   uname := $(shell uname -a)
-  ifdef SystemRoot
+  ifeq ($(OS),Windows_NT)
     platform := win
     delete = del $(subst /,\,$1)
   else ifneq ($(findstring Darwin,$(uname)),)

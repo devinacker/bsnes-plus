@@ -6,7 +6,7 @@ bool CPU::joylatch() { return status.joypad_strobe_latch; }
 //WMDATA
 uint8 CPU::mmio_r2180() {
   uint8 r = bus.read(0x7e0000 | status.wram_addr);
-  if(!Memory::Memory::debugger_access())
+  if(!Memory::debugger_access())
     status.wram_addr++;
   
   return r;
@@ -48,7 +48,7 @@ void CPU::mmio_w4016(uint8 data) {
 //1-0 = Joypad serial data
 uint8 CPU::mmio_r4016() {
   uint8 r = regs.mdr & 0xfc;
-  if(!Memory::Memory::debugger_access())
+  if(!Memory::debugger_access())
     r |= input.port_read(0) & 3;
   return r;
 }
@@ -59,7 +59,7 @@ uint8 CPU::mmio_r4016() {
 //1-0 = Joypad serial data
 uint8 CPU::mmio_r4017() {
   uint8 r = (regs.mdr & 0xe0) | 0x1c;
-  if(!Memory::Memory::debugger_access())
+  if(!Memory::debugger_access())
     r |= input.port_read(1) & 3;
   return r;
 }
@@ -160,7 +160,7 @@ void CPU::mmio_w420d(uint8 data) {
 //3-0 = CPU (5a22) version
 uint8 CPU::mmio_r4210() {
   uint8 r = (regs.mdr & 0x70);
-  r |= (uint8)(Memory::Memory::debugger_access() ? status.nmi_line : rdnmi()) << 7;
+  r |= (uint8)(Memory::debugger_access() ? status.nmi_line : rdnmi()) << 7;
   r |= (cpu_version & 0x0f);
   return r;
 }
@@ -170,7 +170,7 @@ uint8 CPU::mmio_r4210() {
 //6-0 = MDR
 uint8 CPU::mmio_r4211() {
   uint8 r = (regs.mdr & 0x7f);
-  r |= (uint8)(Memory::Memory::debugger_access() ? status.irq_line : timeup()) << 7;
+  r |= (uint8)(Memory::debugger_access() ? status.irq_line : timeup()) << 7;
   return r;
 }
 

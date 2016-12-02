@@ -17,10 +17,10 @@ public:
     unsigned addr;
     unsigned addr_end; //0 = unused
     signed data;  //-1 = unused
-	
+    
     enum class Mode : unsigned { Exec = 1, Read = 2, Write = 4 };
     unsigned mode;
-	
+    
     enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus, SFXBus } source;
     unsigned counter;  //number of times breakpoint has been hit since being set
   } breakpoint[Breakpoints];

@@ -21,13 +21,16 @@ MainWindow::MainWindow() {
 
   system_loadSpecial = system->addMenu("Load &Special");
 
-  system_loadSpecial_bsxSlotted = system_loadSpecial->addAction("Load BS-X &Slotted Cartridge ...");
-
   system_loadSpecial_bsx = system_loadSpecial->addAction("Load &BS-X Cartridge ...");
+  
+  system_loadSpecial_bsxSlotted = system_loadSpecial->addAction("Load BS-X &Slotted Cartridge ...");
 
   system_loadSpecial_sufamiTurbo = system_loadSpecial->addAction("Load Sufami &Turbo Cartridge ...");
 
   system_loadSpecial_superGameBoy = system_loadSpecial->addAction("Load Super &Game Boy Cartridge ...");
+
+  system_saveMemoryPack = system->addAction("Save Memory Pack");
+  system_saveMemoryPack->setVisible(false);
 
   system_reload = system->addAction("Re&load");
 
@@ -220,9 +223,6 @@ MainWindow::MainWindow() {
       canvas->setFocusPolicy(Qt::StrongFocus);
       canvas->setAttribute(Qt::WA_PaintOnScreen, true);  //disable Qt painting on focus / resize
       canvas->setAttribute(Qt::WA_NoSystemBackground, true);
-      // don't let widget updates temporarily draw a parent widget over an external rendering context
-      // (this is overridden by the Qt-based video drivers)
-      canvas->setUpdatesEnabled(false);
     }
     canvasLayout->addWidget(canvas);
   }
@@ -253,6 +253,7 @@ MainWindow::MainWindow() {
   connect(system_loadSpecial_bsx, SIGNAL(triggered()), this, SLOT(loadBsxCartridge()));
   connect(system_loadSpecial_sufamiTurbo, SIGNAL(triggered()), this, SLOT(loadSufamiTurboCartridge()));
   connect(system_loadSpecial_superGameBoy, SIGNAL(triggered()), this, SLOT(loadSuperGameBoyCartridge()));
+  connect(system_saveMemoryPack, SIGNAL(triggered()), this, SLOT(saveMemoryPack()));
   connect(system_power, SIGNAL(triggered()), this, SLOT(power()));
   connect(system_reset, SIGNAL(triggered()), this, SLOT(reset()));
   connect(system_port1_none, SIGNAL(triggered()), this, SLOT(setPort1None()));
@@ -385,7 +386,7 @@ void MainWindow::syncUi() {
 }
 
 bool MainWindow::isActive() {
-  return isActiveWindow() && !isMinimized();
+  return isActiveWindow() && !isMinimized() && !fileBrowser->popupOpen();
 }
 
 void MainWindow::loadCartridge() {
@@ -411,6 +412,10 @@ void MainWindow::loadSufamiTurboCartridge() {
 
 void MainWindow::loadSuperGameBoyCartridge() {
   loaderWindow->loadSuperGameBoyCartridge(config().path.sgb, "");
+}
+
+void MainWindow::saveMemoryPack() {
+  cartridge.saveMemoryPack();
 }
 
 void MainWindow::power() {

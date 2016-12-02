@@ -9,8 +9,10 @@ namespace UserInterfaceEmulationSpeed {
 struct Slowdown : HotkeyInput {
   bool syncVideo;
   bool syncAudio;
+  unsigned speed;
 
   void pressed() {
+    speed = config().system.speed;
     config().system.speed = 0;
     utility.updateEmulationSpeed();
     syncVideo = config().video.synchronize;
@@ -27,7 +29,7 @@ struct Slowdown : HotkeyInput {
   }
 
   void released() {
-    config().system.speed = 2;
+    config().system.speed = speed;
     utility.updateEmulationSpeed();
     if(syncVideo) {
       config().video.synchronize = true;
@@ -49,11 +51,16 @@ struct Slowdown : HotkeyInput {
 struct Speedup : HotkeyInput {
   bool syncVideo;
   bool syncAudio;
+  unsigned speed;
+  unsigned frameskip;
 
   void pressed() {
-    if(SNES::PPU::SupportsFrameSkip)
+    if(SNES::PPU::SupportsFrameSkip) {
+	  frameskip = SNES::ppu.get_frameskip();
       SNES::ppu.set_frameskip(9);
-
+    }
+    
+    speed = config().system.speed;
     config().system.speed = 4;
     utility.updateEmulationSpeed();
     syncVideo = config().video.synchronize;
@@ -70,10 +77,11 @@ struct Speedup : HotkeyInput {
   }
 
   void released() {
-    if(SNES::PPU::SupportsFrameSkip)
-      SNES::ppu.set_frameskip(0);
-
-    config().system.speed = 2;
+    if(SNES::PPU::SupportsFrameSkip) {
+      SNES::ppu.set_frameskip(frameskip);
+    }
+    
+    config().system.speed = speed;
     utility.updateEmulationSpeed();
     if(syncVideo) {
       config().video.synchronize = true;

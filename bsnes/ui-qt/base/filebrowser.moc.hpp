@@ -11,6 +11,8 @@ public:
   enum CartridgeMode { LoadDirect, LoadBase, LoadSlot1, LoadSlot2 } cartridgeMode;
   void loadCartridge(CartridgeMode, signed = -1);
 
+  bool popupOpen() const { return nativeOpen; }
+
   FileBrowser();
 
 private slots:
@@ -25,6 +27,8 @@ private:
   QWidget *previewImage;
   QWidget *previewSpacer;
   QCheckBox *previewApplyPatch;
+
+  bool nativeOpen;
 
   string resolveFilename(const string&);
   void onChangeCartridge(const string&);

@@ -19,6 +19,7 @@ public:
   void frame();
 
   void layer_enable(unsigned layer, unsigned priority, bool enable);
+  unsigned get_frameskip() const { return display.frameskip; }
   void set_frameskip(unsigned frameskip);
 
   void serialize(serializer&);

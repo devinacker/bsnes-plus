@@ -8,7 +8,7 @@ ifeq ($(ui),)
 endif
 
 # build version
-version := v073+2
+version := v073+3
 
 # compiler
 c       := $(compiler) -xc -std=gnu99
@@ -43,8 +43,8 @@ ifeq ($(platform),x)
   link += -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
-  flags += -march=native
-  link += -F/usr/local/lib
+  flags += -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -mmacosx-version-min=10.10
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
@@ -92,13 +92,9 @@ ifeq ($(platform),x)
 	install -D -m 644 data/bsnes.png $(DESTDIR)$(prefix)/share/pixmaps/bsnes.png
 	install -D -m 644 data/bsnes.desktop $(DESTDIR)$(prefix)/share/applications/bsnes.desktop
 	test -d ~/.bsnes || mkdir ~/.bsnes
-	cp data/cheats.xml ~/.bsnes/cheats.xml
-	chmod 777 ~/.bsnes ~/.bsnes/cheats.xml
 else ifeq ($(platform),osx)
 	mv -f $(osxbundle) /Applications/bsnes+.app
 	test -d ~/.bsnes || mkdir ~/.bsnes
-	cp data/cheats.xml ~/.bsnes/cheats.xml
-	chmod 777 ~/.bsnes ~/.bsnes/cheats.xml
 else
 	@echo Install not available for current platform
 endif
@@ -114,14 +110,16 @@ else
 	@echo Install not available for current platform
 endif
 
-plugins:
+plugins: build
 	@$(MAKE) -C ../snesreader
+ifneq ($(platform), osx)
 	@$(MAKE) -C ../snesfilter
+endif
 	@$(MAKE) -C ../supergameboy
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
-	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+#	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
@@ -134,7 +132,7 @@ else
 	@echo Distribution building not available for current platform
 endif
 
-clean: ui_clean plugins_clean
+clean: ui_clean
 	-@$(call delete,obj/*.o)
 	-@$(call delete,obj/*.a)
 	-@$(call delete,obj/*.so)
@@ -149,11 +147,6 @@ clean: ui_clean plugins_clean
 ifeq ($(platform),osx)
 	@rm -rf $(osxbundle)
 endif
-
-plugins_clean:
-	@$(MAKE) clean -C ../snesreader
-	@$(MAKE) clean -C ../snesfilter
-	@$(MAKE) clean -C ../supergameboy
 
 archive-all:
 	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh

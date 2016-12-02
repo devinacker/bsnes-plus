@@ -145,7 +145,7 @@ void SMP::save_spc_dump(string path) {
 
 void SMP::save_spc_dump() {
   dump_spc = false;
-	
+    
   file out;
   if (!out.open(spc_path(), file::mode::write)) {
     return;

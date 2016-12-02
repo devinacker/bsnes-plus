@@ -14,7 +14,7 @@ public:
     int id() const { return 1234; }
 
 private:
-	QHexEdit *_edit;
+    QHexEdit *_edit;
     qint64 _charPos;
     bool _wasChanged;
     char _newChar;
@@ -35,23 +35,23 @@ bool CharCommand::mergeWith(const QUndoCommand *command)
     bool result = false;
 
     if (nextCommand->_charPos == _charPos)
-	{
-		_newChar = nextCommand->_newChar;
-		result = true;
-	}
+    {
+        _newChar = nextCommand->_newChar;
+        result = true;
+    }
     return result;
 }
 
 void CharCommand::undo()
 {
-	if (_edit->writer) _edit->writer(_charPos, _oldChar);
-	_edit->setCursorPosition(_charPos * 2);
+    if (_edit->writer) _edit->writer(_charPos, _oldChar);
+    _edit->setCursorPosition(_charPos * 2);
 }
 
 void CharCommand::redo()
 {
-	_oldChar = _edit->reader ? _edit->reader(_charPos) : 0;
-	if (_edit->writer) _edit->writer(_charPos, _newChar);
+    _oldChar = _edit->reader ? _edit->reader(_charPos) : 0;
+    if (_edit->writer) _edit->writer(_charPos, _newChar);
 }
 
 UndoStack::UndoStack(QHexEdit * parent)

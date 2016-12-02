@@ -28,6 +28,7 @@ public:
       QAction *system_loadSpecial_bsx;
       QAction *system_loadSpecial_sufamiTurbo;
       QAction *system_loadSpecial_superGameBoy;
+    QAction *system_saveMemoryPack;
     CheckAction *system_power;
     QAction *system_reset;
     QMenu *system_port1;
@@ -88,7 +89,7 @@ public:
     QAction *tools_cheatFinder;
     QAction *tools_stateManager;
     QAction *tools_effectToggle;
-	QAction *tools_soundViewer;
+    QAction *tools_soundViewer;
     QAction *tools_debugger;
   QMenu *help;
     QAction *help_documentation;
@@ -112,6 +113,7 @@ public slots:
   void loadBsxCartridge();
   void loadSufamiTurboCartridge();
   void loadSuperGameBoyCartridge();
+  void saveMemoryPack();
   void power();
   void reset();
   void reloadCartridge();

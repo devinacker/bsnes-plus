@@ -8,6 +8,7 @@ TilemapViewer::TilemapViewer() {
   setGeometryString(&config().geometry.tilemapViewer);
   application.windowList.append(this);
 
+  inUpdateFormCall = false;
 
   layout = new QHBoxLayout;
   layout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -17,7 +18,7 @@ TilemapViewer::TilemapViewer() {
   setLayout(layout);
 
   sidebarLayout = new QFormLayout;
-  sidebarLayout->setSizeConstraint(QLayout::SetFixedSize);
+  sidebarLayout->setSizeConstraint(QLayout::SetMinimumSize);
   sidebarLayout->setRowWrapPolicy(QFormLayout::DontWrapRows);
   sidebarLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
   sidebarLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
@@ -42,35 +43,61 @@ TilemapViewer::TilemapViewer() {
   refreshButton = new QPushButton("Refresh");
   sidebarLayout->addRow(refreshButton);
 
-  screenMode = new QLabel;
-  sidebarLayout->addRow("Screen Mode:", screenMode);
+  sidebarLayout->addRow(new QWidget);
+
+
+  customScreenMode = new QCheckBox("Custom Screen Mode");
+  sidebarLayout->addRow(customScreenMode);
+
+  screenMode = new QSpinBox;
+  screenMode->setMinimum(0);
+  screenMode->setMaximum(7);
+  sidebarLayout->addRow("Mode:", screenMode);
 
   bgLayout = new QHBoxLayout;
-  for (int i = 0; i < 4; i++) {
-    bgButton[i] = new QRadioButton;
-    bgButton[i]->setText(QString::number(i + 1));
-    connect(bgButton[i], SIGNAL(clicked()), this, SLOT(refresh()));
-    bgLayout->addWidget(bgButton[i]);
+  bgLayout->setSizeConstraint(QLayout::SetMinimumSize);
+  for(unsigned i = 0; i < 4; i++) {
+    bgButtons[i] = new QToolButton;
+    bgButtons[i]->setText(QString::number(i + 1));
+    bgButtons[i]->setCheckable(true);
+    bgButtons[i]->setAutoExclusive(true);
+    bgLayout->addWidget(bgButtons[i]);
   }
-  bgButton[0]->setChecked(true);
-  sidebarLayout->addRow("BG Layer:", bgLayout);
+  sidebarLayout->addRow("BG:", bgLayout);
 
-  bitDepth = new QLabel;
+  sidebarLayout->addRow(new QWidget);
+
+
+  customTilemap = new QCheckBox("Override Tilemap");
+  sidebarLayout->addRow(customTilemap);
+
+  bitDepth = new QComboBox;
+  bitDepth->addItem("2bpp", QVariant(TilemapRenderer::BPP2));
+  bitDepth->addItem("4bpp", QVariant(TilemapRenderer::BPP4));
+  bitDepth->addItem("8bpp", QVariant(TilemapRenderer::BPP8));
+  bitDepth->addItem("Mode 7", QVariant(TilemapRenderer::MODE7));
   sidebarLayout->addRow("Bit Depth:", bitDepth);
 
-  screenSize = new QLabel;
+  screenSize = new QComboBox;
+  screenSize->addItem("32x32", QVariant(0));
+  screenSize->addItem("64x32", QVariant(1));
+  screenSize->addItem("32x64", QVariant(2));
+  screenSize->addItem("64x64", QVariant(3));
   sidebarLayout->addRow("Map Size:", screenSize);
 
-  screenAddr = new QLabel;
+  screenAddr = new QLineEdit;
   sidebarLayout->addRow("Map Addr:", screenAddr);
 
-  tileSize = new QLabel;
+  tileSize = new QComboBox;
+  tileSize->addItem("8x8", QVariant(false));
+  tileSize->addItem("16x16", QVariant(true));
   sidebarLayout->addRow("Tile Size:", tileSize);
 
-  tileAddr = new QLabel;
+  tileAddr = new QLineEdit;
   sidebarLayout->addRow("Tile Addr:", tileAddr);
 
-  layer = 0;
+  setCustomScreenMode(false);
+  setCustomTilemap(false);
 
   scene = new QGraphicsScene;
 
@@ -83,11 +110,24 @@ TilemapViewer::TilemapViewer() {
   layout->addWidget(view, 10);
 
 
-  updateInfo();
+  onFormChanged();
 
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
-  connect(zoomCombo,     SIGNAL(currentIndexChanged(int)),    this, SLOT(onZoomChanged(int)));
+  connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
+
+  connect(customScreenMode, SIGNAL(clicked(bool)), this, SLOT(setCustomScreenMode(bool)));
+  connect(customTilemap,    SIGNAL(clicked(bool)), this, SLOT(setCustomTilemap(bool)));
+
+  for(int i = 0; i < 4; i++) {
+    connect(bgButtons[i],SIGNAL(clicked(bool)),               this, SLOT(onFormChanged()));
+  }
+  connect(screenMode,    SIGNAL(valueChanged(int)),           this, SLOT(onFormChanged()));
+  connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
+  connect(screenSize,    SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
+  connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
+  connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(onFormChanged()));
+  connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(onFormChanged()));
 }
 
 void TilemapViewer::autoUpdate() {
@@ -99,70 +139,19 @@ void TilemapViewer::show() {
   refresh();
 }
 
-void TilemapViewer::updateInfo() {
-  typedef TilemapRenderer::BitDepth Depth;
-  static const Depth bitDepth[8][4] = {
-    // mode 0, 2/2/2/2bpp
-    {Depth::BPP2, Depth::BPP2, Depth::BPP2, Depth::BPP2},
-    // mode 1, 4/4/2bpp
-    {Depth::BPP4, Depth::BPP4, Depth::BPP2, Depth::None},
-    // mode 2, 4/4bpp + OPT
-    {Depth::BPP4, Depth::BPP4, Depth::None, Depth::None},
-    // mode 3, 8/4bpp
-    {Depth::BPP8, Depth::BPP4, Depth::None, Depth::None},
-    // mode 4, 8/2bpp + OPT
-    {Depth::BPP8, Depth::BPP2, Depth::None, Depth::None},
-    // mode 5, 4/2bpp + hires
-    {Depth::BPP4, Depth::BPP2, Depth::None, Depth::None},
-    // mode 6, 4bpp + hires + OPT
-    {Depth::BPP4, Depth::None, Depth::None, Depth::None},
-    // no proper mode 7 support yet
-    {Depth::None, Depth::None, Depth::None, Depth::None}
-  };
-  
-  static const char* strDepth[] = { "n/a", "2 BPP", "4 BPP", "8 BPP" };
-  static const char* strScreenSize[] = { "32x32", "64x32", "32x64", "64x64" };
-
-  unsigned mode = SNES::ppu.bg_mode() & 7;
-  this->screenMode->setText(QString::number(mode));
-  for (int i = 0; i < 4; i++) {
-    this->bgButton[i]->setEnabled(bitDepth[mode][i] != Depth::None);
-    if (this->bgButton[i]->isChecked()) {
-      this->layer = i;
-    }
-  }
-  
-  unsigned screenSize = SNES::ppu.bg_screen_size(this->layer);
-  
-  renderer.tileAddr = SNES::ppu.bg_tile_addr(this->layer);
-  this->tileAddr->setText(string("0x", hex<4>(renderer.tileAddr)));
-  
-  renderer.screenAddr = SNES::ppu.bg_screen_addr(this->layer);
-  this->screenAddr->setText(string("0x", hex<4>(renderer.screenAddr)));
-  
-  renderer.bitDepth = bitDepth[mode][this->layer];
-  this->bitDepth->setText(strDepth[(int)renderer.bitDepth]);
-  
-  renderer.screenSizeX = screenSize & 1;
-  renderer.screenSizeY = screenSize & 2;
-  this->screenSize->setText(strScreenSize[screenSize]);
-  
-  renderer.tileSize = SNES::ppu.bg_tile_size(this->layer);
-  this->tileSize->setText(renderer.tileSize ? "16x16" : "8x8");
-}
-
 void TilemapViewer::refresh() {
   if(SNES::cartridge.loaded()) {
+    bool loadMode = customScreenMode->isChecked() == false;
+    bool loadTilemap = customTilemap->isChecked() == false;
+
+    if(loadMode) renderer.loadScreenMode();
+    if(loadTilemap) renderer.loadTilemapSettings();
+    if(loadMode || loadTilemap) updateForm();
+
     renderer.buildPalette();
 
-    updateInfo();
-
-    if (renderer.bitDepth != TilemapRenderer::BitDepth::None) {
-      QImage image = renderer.drawTilemap();
-      scenePixmap->setPixmap(QPixmap::fromImage(image));
-    } else {
-      scenePixmap->setPixmap(QPixmap());
-    }
+    QImage image = renderer.drawTilemap();
+    scenePixmap->setPixmap(QPixmap::fromImage(image));
 
     scene->setSceneRect(scenePixmap->boundingRect());
   }
@@ -176,4 +165,83 @@ void TilemapViewer::onZoomChanged(int index) {
   view->scale(z, z);
 
   scene->setSceneRect(scenePixmap->boundingRect());
+}
+
+void TilemapViewer::onFormChanged() {
+  if(inUpdateFormCall) return;
+
+  unsigned layer = 0;
+  for(int i = 0; i < 4; i++) {
+    if(bgButtons[i]->isChecked()) layer = i;
+  }
+
+  renderer.layer = layer;
+
+  if(customScreenMode->isChecked()) {
+    renderer.screenMode = screenMode->value();
+  }
+
+  if(customTilemap->isChecked()) {
+    typedef TilemapRenderer::BitDepth Depth;
+    int i = bitDepth->currentIndex();
+    Depth bd = i >= 0 ? Depth(bitDepth->itemData(i).toInt()) : Depth::NONE;
+
+    renderer.bitDepth = bd;
+    renderer.tileAddr = hex(tileAddr->text().toUtf8().data()) & 0xe000;
+    renderer.screenAddr = hex(screenAddr->text().toUtf8().data()) & 0xff80;
+    renderer.screenSizeX = screenSize->currentIndex() & 1;
+    renderer.screenSizeY = screenSize->currentIndex() & 2;
+    renderer.tileSize = tileSize->currentIndex();
+  }
+
+  refresh();
+}
+
+void TilemapViewer::updateForm() {
+  inUpdateFormCall = true;
+
+  unsigned nLayers = renderer.nLayersInMode();
+  if(renderer.screenMode == 7) nLayers = 0;
+  for(unsigned i = 0; i < 4; i++) {
+    bgButtons[i]->setChecked(i == renderer.layer);
+    bgButtons[i]->setEnabled(i < nLayers);
+  }
+
+  if(customScreenMode->isChecked() == false) {
+    screenMode->setValue(renderer.screenMode);
+  }
+
+  if(customTilemap->isChecked() == false) {
+    renderer.updateBitDepth();
+    bitDepth->setCurrentIndex(bitDepth->findData(renderer.bitDepth));
+
+    unsigned ss = (renderer.screenSizeY << 1) | int(renderer.screenSizeX);
+
+    screenAddr->setText(string("0x", hex<4>(renderer.screenAddr)));
+    tileAddr->setText(string("0x", hex<4>(renderer.tileAddr)));
+    screenSize->setCurrentIndex(ss);
+    tileSize->setCurrentIndex(renderer.tileSize);
+  }
+
+  inUpdateFormCall = false;
+}
+
+void TilemapViewer::setCustomScreenMode(bool v) {
+  customScreenMode->setChecked(v);
+
+  screenMode->setEnabled(v);
+
+  refresh();
+}
+
+void TilemapViewer::setCustomTilemap(bool v) {
+  customTilemap->setChecked(v);
+
+  bitDepth->setEnabled(v);
+  screenAddr->setEnabled(v);
+  tileAddr->setEnabled(v);
+  screenSize->setEnabled(v);
+  tileSize->setEnabled(v);
+
+  refresh();
 }

@@ -123,7 +123,7 @@ bool Cartridge::loadNormal(const char *base) {
 bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted,
@@ -143,7 +143,7 @@ bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
 bool Cartridge::loadBsx(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,
@@ -152,7 +152,11 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
   loadMemory(baseName, ".srm", SNES::memory::cartram);
   loadMemory(baseName, ".psr", SNES::memory::bsxpram);
 
-  fileName = slotAName;
+  if (slotAName != "")
+    fileName = slotAName;
+  else
+    fileName = baseName;
+  
   name = *slot
   ? notdir(nall::basename(slotAName))
   : notdir(nall::basename(baseName));
@@ -230,6 +234,35 @@ void Cartridge::saveMemory() {
       saveMemory(slotAName, ".rtc", SNES::memory::gbrtc);
     } break;
   }
+}
+
+void Cartridge::saveMemoryPack() {
+  if(SNES::cartridge.loaded() == false) return;
+  if(SNES::cartridge.has_bsx_slot() == false) return;
+
+  string filename = nall::basename(cartridge.fileName);
+  string fullpath = config().path.save;
+  
+  time_t systemTime = time(0);
+  tm *currentTime = localtime(&systemTime);
+  char t[512];
+  sprintf(t, "%.4u%.2u%.2u-%.2u%.2u%.2u",
+    1900 + currentTime->tm_year, 1 + currentTime->tm_mon, currentTime->tm_mday,
+    currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec
+  );
+  filename << "-" << t << ".bs";
+  fullpath << filename;
+
+  file fp;
+  if(fp.open(fullpath, file::mode::write) == false)
+  {
+    utility.showMessage(string("Memory Pack save failed."));
+    return;
+  }
+
+  fp.write(SNES::memory::bsxpack.data(), SNES::memory::bsxpack.size());
+  fp.close();
+  utility.showMessage(string(filename, " saved."));
 }
 
 void Cartridge::unload() {
@@ -431,6 +464,14 @@ bool Cartridge::saveMemory(const char *filename, const char *extension, SNES::Ma
 
   fp.write(memory.data(), memory.size());
   fp.close();
+  return true;
+}
+
+bool Cartridge::loadEmptyMemoryPack(SNES::MappedRAM &memory) {
+  uint8_t *emptydata = new uint8_t[0x100000];
+  memset(emptydata, 0xFF, 0x100000);
+  memory.copy(emptydata, 0x100000);
+  delete[] emptydata;
   return true;
 }
 

@@ -343,6 +343,8 @@ void MemoryEditor::search() {
 void MemoryEditor::searchNext() {
   if (searchStr.size() == 0) return;
 
+  if (searchPos >= editor->editorSize())
+    searchPos = (int)editor->cursorPosition() / 2;
   searchPos = editor->indexOf(searchStr, searchPos + 1);
 
   if (searchPos >= 0) {
@@ -357,6 +359,8 @@ void MemoryEditor::searchNext() {
 void MemoryEditor::searchPrev() {
   if (searchStr.size() == 0) return;
 
+  if (searchPos < 0)
+    searchPos = (int)editor->cursorPosition() / 2;
   searchPos = editor->lastIndexOf(searchStr, searchPos - 1);
 
   if (searchPos >= 0) {

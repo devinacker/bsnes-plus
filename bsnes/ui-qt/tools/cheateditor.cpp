@@ -239,7 +239,8 @@ void CheatEditorWindow::toggleCheatEnable() {
 
 void CheatEditorWindow::findCheatCodes() {
   string data;
-  QFile file(":/cheats.xml");
+  
+  QFile file(application.cheatsFilename);
   if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     data = file.readAll().constData();
     file.close();

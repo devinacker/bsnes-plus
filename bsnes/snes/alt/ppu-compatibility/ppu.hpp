@@ -66,6 +66,7 @@ public:
   void layer_enable(unsigned layer, unsigned priority, bool enable);
   unsigned frameskip;
   unsigned framecounter;
+  unsigned get_frameskip() const { return frameskip; }
   void set_frameskip(unsigned frameskip);
 
   void serialize(serializer&);

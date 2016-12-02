@@ -38,11 +38,13 @@ public:
 
   string configFilename;
   string styleSheetFilename;
+  string cheatsFilename;
   string currentRom;
 
   array<QWidget*> windowList;
 
   int main(int &argc, char **argv);
+  bool singleUserMode();
   void locateFile(string &filename, bool createDataDirectory = false);
   void initPaths(const char *basename);
   void init();
