@@ -22,7 +22,7 @@ ifeq ($(DEBUG), 1)
 else
   flags += -O3 -fomit-frame-pointer
   ifeq ($(platform),osx)
-    # -s is deprecated as of clang 7.0, and using it breaks linking for some reason
+    # -s is deprecated as of Apple LLVM 7.0, and using it breaks linking with some versions
   else
     link += -s
   endif
