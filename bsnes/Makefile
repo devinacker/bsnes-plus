@@ -1,7 +1,7 @@
 include nall/Makefile
 snes := snes
 ifeq ($(profile),)
-  profile := compatibility
+  profile := accuracy
 endif
 ifeq ($(ui),)
   ui := ui-qt
@@ -81,7 +81,7 @@ ifeq ($(platform),osx)
 	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/bsnes $(objects) $(link))
 	mkdir -p $(osxbundle)/Contents/Resources
 	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
-	cp -f data/Info.plist $(osxbundle)/Contents/Info.plist
+	sed 's/@VERSION/$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
 else
 	$(strip $(cpp) -o out/bsnes $(objects) $(link))
 endif
@@ -112,14 +112,12 @@ endif
 
 plugins: build
 	@$(MAKE) -C ../snesreader
-ifneq ($(platform), osx)
 	@$(MAKE) -C ../snesfilter
-endif
 	@$(MAKE) -C ../supergameboy
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
-#	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
@@ -129,10 +127,10 @@ ifeq ($(platform),osx)
 	@zip -9 -r ../bsnes_$(version)_osx.zip $(osxbundle)
 	@rm -rf $(osxbundle)
 else
-	@echo Distribution building not available for current platform
+	@echo Distribution target not available for current platform
 endif
 
-clean: ui_clean
+clean: ui_clean plugins_clean
 	-@$(call delete,obj/*.o)
 	-@$(call delete,obj/*.a)
 	-@$(call delete,obj/*.so)
@@ -147,6 +145,11 @@ clean: ui_clean
 ifeq ($(platform),osx)
 	@rm -rf $(osxbundle)
 endif
+
+plugins_clean:
+	@$(MAKE) clean -C ../snesreader
+	@$(MAKE) clean -C ../snesfilter
+	@$(MAKE) clean -C ../supergameboy
 
 archive-all:
 	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh
