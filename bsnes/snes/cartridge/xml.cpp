@@ -136,7 +136,9 @@ void Cartridge::xml_parse_ram(xml_element &root) {
   foreach(attr, root.attribute) {
     if(attr.name == "size") ram_size = hex(attr.content);
   }
-  xml_parse_memory(root, memory::cartram);
+  if(ram_size > 0) {
+    xml_parse_memory(root, memory::cartram);
+  }
 }
 
 void Cartridge::xml_parse_superfx(xml_element &root) {
@@ -149,7 +151,9 @@ void Cartridge::xml_parse_superfx(xml_element &root) {
       foreach(attr, node.attribute) {
         if(attr.name == "size") ram_size = hex(attr.content);
       }
-      xml_parse_memory(node, memory::fxram);
+      if(ram_size > 0) {
+        xml_parse_memory(node, memory::fxram);
+      }
     } else if(node.name == "mmio") {
       foreach(leaf, node.element) {
         if(leaf.name == "map") {
@@ -176,7 +180,9 @@ void Cartridge::xml_parse_sa1(xml_element &root) {
       foreach(attr, node.attribute) {
         if(attr.name == "size") ram_size = hex(attr.content);
       }
-      xml_parse_memory(node, memory::cc1bwram);
+	  if (ram_size) {
+        xml_parse_memory(node, memory::cc1bwram);
+	  }
     } else if(node.name == "mmio") {
       foreach(leaf, node.element) {
         if(leaf.name == "map") {
@@ -434,7 +440,9 @@ void Cartridge::xml_parse_spc7110(xml_element &root) {
       foreach(attr, node.attribute) {
         if(attr.name == "size") ram_size = hex(attr.content);
       }
-      xml_parse_memory(node, spc7110ram);
+      if(ram_size > 0) {
+        xml_parse_memory(node, spc7110ram);
+      }
     } else if(node.name == "rtc") {
       has_spc7110rtc = true;
 
@@ -474,6 +482,7 @@ void Cartridge::xml_parse_obc1(xml_element &root) {
       foreach(attr, node.attribute) {
         if(attr.name == "address") xml_parse_address(m, attr.content);
       }
+      m.min_ram_size = 0x2000;
       mapping.append(m);
     }
   }
@@ -561,21 +570,21 @@ Cartridge::Mapping::Mapping() {
   memory = 0;
   mmio = 0;
   mode = Bus::MapMode::Direct;
-  banklo = bankhi = addrlo = addrhi = offset = size = 0;
+  banklo = bankhi = addrlo = addrhi = offset = size = min_ram_size = 0;
 }
 
 Cartridge::Mapping::Mapping(Memory &memory_) {
   memory = &memory_;
   mmio = 0;
   mode = Bus::MapMode::Direct;
-  banklo = bankhi = addrlo = addrhi = offset = size = 0;
+  banklo = bankhi = addrlo = addrhi = offset = size = min_ram_size = 0;
 }
 
 Cartridge::Mapping::Mapping(MMIO &mmio_) {
   memory = 0;
   mmio = &mmio_;
   mode = Bus::MapMode::Direct;
-  banklo = bankhi = addrlo = addrhi = offset = size = 0;
+  banklo = bankhi = addrlo = addrhi = offset = size = min_ram_size = 0;
 }
 
 #endif
