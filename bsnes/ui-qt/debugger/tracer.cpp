@@ -94,8 +94,8 @@ void Tracer::setTraceMaskState(int state) {
     //flush all bitmasks once enabled
     memset(traceMaskCPU, 0x00, (1 << 24) >> 3);
     memset(traceMaskSMP, 0x00, (1 << 16) >> 3);
-    memset(traceMaskSA1, 0x00, (1 << 16) >> 3);
-    memset(traceMaskSFX, 0x00, (1 << 16) >> 3);
+    memset(traceMaskSA1, 0x00, (1 << 24) >> 3);
+    memset(traceMaskSFX, 0x00, (1 << 23) >> 3);
   }
 }
 
@@ -108,8 +108,8 @@ Tracer::Tracer() {
 
   traceMaskCPU = new uint8_t[(1 << 24) >> 3]();
   traceMaskSMP = new uint8_t[(1 << 16) >> 3]();
-  traceMaskSA1 = new uint8_t[(1 << 16) >> 3]();
-  traceMaskSFX = new uint8_t[(1 << 16) >> 3]();
+  traceMaskSA1 = new uint8_t[(1 << 24) >> 3]();
+  traceMaskSFX = new uint8_t[(1 << 23) >> 3]();
 
   SNES::cpu.step_event = { &Tracer::stepCpu, this };
   SNES::smp.step_event = { &Tracer::stepSmp, this };
