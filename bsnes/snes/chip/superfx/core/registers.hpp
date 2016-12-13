@@ -139,8 +139,8 @@ struct regs_t {
 
   reg16_t r[16];    //general purpose registers
   sfr_t sfr;        //status flag register
-  uint8 pbr;        //program bank register
-  uint8 rombr;      //game pack ROM bank register
+  uint7 pbr;        //program bank register
+  uint7 rombr;      //game pack ROM bank register
   bool rambr;       //game pack RAM bank register
   uint16 cbr;       //cache base register
   uint8 scbr;       //screen base register

@@ -314,7 +314,7 @@ void SuperFX::op_jmp(unsigned n) {
 
 //$98-9d(alt1): ljmp rN
 void SuperFX::op_ljmp(unsigned n) {
-  regs.pbr = regs.r[n] & 0x7f;
+  regs.pbr = regs.r[n];
   regs.r[15] = regs.sr();
   regs.cbr = regs.r[15] & 0xfff0;
   cache_flush();
@@ -431,7 +431,7 @@ void SuperFX::op_ramb() {
 //$df(alt3): romb
 void SuperFX::op_romb() {
   rombuffer_sync();
-  regs.rombr = regs.sr() & 0x7f;
+  regs.rombr = regs.sr();
   regs.reset();
 }
 
