@@ -63,7 +63,7 @@ MappedInput::MappedInput(const char *label_, const char *configName) : parent(0)
 
 void DigitalInput::poll() {
   previousState = state;
-  if(modifier == mapper().modifier || !config().input.modifierEnable) {
+  if(modifier == mapper().modifier || !modifier && Keyboard::isAnyModifier(scancode)) {
     if(specifier == InputSpecifier::None) {
       state = mapper().state(scancode);
     } else if(specifier == InputSpecifier::Up) {
