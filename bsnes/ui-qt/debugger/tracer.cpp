@@ -54,7 +54,8 @@ void Tracer::resetTraceState() {
   setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx);
   
   // reset trace masks
-  setTraceMaskState(Qt::Checked);
+  if (traceMask)
+    setTraceMaskState(Qt::Checked);
 }
 
 void Tracer::setTraceState(bool state) {
