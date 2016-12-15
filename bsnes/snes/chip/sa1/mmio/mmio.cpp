@@ -231,8 +231,10 @@ void SA1::mmio_w2223(uint8 data) {
 void SA1::mmio_w2224(uint8 data) {
   mmio.sbm = (data & 0x1f);
 
-  bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::cc1bwram, mmio.sbm * 0x2000, 0x2000);
-  bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::cc1bwram, mmio.sbm * 0x2000, 0x2000);
+  if(memory::cartram.size() > 0) {
+    bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::cc1bwram, mmio.sbm * 0x2000, 0x2000);
+    bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::cc1bwram, mmio.sbm * 0x2000, 0x2000);
+  }
 }
 
 //(BMAP) SA-1 BW-RAM address mapping
@@ -240,14 +242,16 @@ void SA1::mmio_w2225(uint8 data) {
   mmio.sw46 = (data & 0x80);
   mmio.cbm  = (data & 0x7f);
 
-  if(mmio.sw46 == 0) {
-    //$[40-43]:[0000-ffff] x  32 projection
-    sa1bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::sa1bwram, (mmio.cbm & 0x1f) * 0x2000, 0x2000);
-    sa1bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::sa1bwram, (mmio.cbm & 0x1f) * 0x2000, 0x2000);
-  } else {
-    //$[60-6f]:[0000-ffff] x 128 projection
-    sa1bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::bitmapram, mmio.cbm * 0x2000, 0x2000);
-    sa1bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::bitmapram, mmio.cbm * 0x2000, 0x2000);
+  if(memory::cartram.size() > 0) {
+    if(mmio.sw46 == 0) {
+      //$[40-43]:[0000-ffff] x  32 projection
+      sa1bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::sa1bwram, (mmio.cbm & 0x1f) * 0x2000, 0x2000);
+      sa1bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::sa1bwram, (mmio.cbm & 0x1f) * 0x2000, 0x2000);
+    } else {
+      //$[60-6f]:[0000-ffff] x 128 projection
+      sa1bus.map(Bus::MapMode::Linear, 0x00, 0x3f, 0x6000, 0x7fff, memory::bitmapram, mmio.cbm * 0x2000, 0x2000);
+      sa1bus.map(Bus::MapMode::Linear, 0x80, 0xbf, 0x6000, 0x7fff, memory::bitmapram, mmio.cbm * 0x2000, 0x2000);
+    }
   }
 }
 

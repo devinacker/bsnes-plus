@@ -153,7 +153,7 @@ void Bus::map_reset() {
 
 void Bus::map_xml() {
   foreach(m, cartridge.mapping) {
-    if(m.memory) {
+    if(m.memory && (memory::cartram.size() >= m.min_ram_size)) {
       map(m.mode, m.banklo, m.bankhi, m.addrlo, m.addrhi, *m.memory, m.offset, m.size);
     } else if(m.mmio) {
       memory::mmio.map(m.addrlo, m.addrhi, *m.mmio);

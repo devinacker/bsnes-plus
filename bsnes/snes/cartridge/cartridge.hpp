@@ -66,6 +66,7 @@ public:
     unsigned addrhi;
     unsigned offset;
     unsigned size;
+    unsigned min_ram_size;
 
     Mapping();
     Mapping(Memory&);

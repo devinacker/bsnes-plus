@@ -15,7 +15,10 @@ void SuperFXBus::init() {
   map(MapMode::Linear, 0x00, 0x3f, 0x0000, 0x7fff, memory::gsurom);
   map(MapMode::Linear, 0x00, 0x3f, 0x8000, 0xffff, memory::gsurom);
   map(MapMode::Linear, 0x40, 0x5f, 0x0000, 0xffff, memory::gsurom);
-  map(MapMode::Linear, 0x60, 0x7f, 0x0000, 0xffff, memory::gsuram);
+  
+  if(memory::cartram.size() > 0) {
+    map(MapMode::Linear, 0x60, 0x7f, 0x0000, 0xffff, memory::gsuram);
+  }
 }
 
 //ROM / RAM access from the SuperFX CPU
