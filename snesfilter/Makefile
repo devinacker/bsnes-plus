@@ -21,8 +21,8 @@ ifeq ($(platform),x)
   flags := -fPIC -fopenmp $(flags)
   link += -s -fopenmp -lpthread -lgomp
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native
-  link += -F/usr/local/lib -lpthread
+  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  link += -F/usr/local/lib -lpthread -mmacosx-version-min=10.10
 #TODO: openmp not currently supported in Apple clang
 #  flags += -fopenmp
 #  link += -fopenmp -lgomp
