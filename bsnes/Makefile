@@ -123,7 +123,7 @@ endif
 
 distribution: clean build plugins
 ifeq ($(platform),osx)
-	@macdeployqt $(osxbundle) -executable=$(osxbundle)/Contents/MacOS/bsnes -verbose=2
+	@macdeployqt $(osxbundle) -executable=$(osxbundle)/Contents/MacOS/bsnes
 else
 	@echo Distribution target not available for current platform
 endif
