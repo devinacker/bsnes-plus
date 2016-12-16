@@ -1,0 +1,21 @@
+#!/bin/bash
+
+mkdir -pv distribution
+version=`grep -m 1 'version := ' bsnes/Makefile | awk '{ print $3 }'`;
+
+#compatibility
+cd bsnes
+make distribution profile=compatibility
+cd ..
+rm -f ./distribution/bsnes_${version}_compatibility_osx.zip
+zip -9 -r ./distribution/bsnes_${version}_compatibility_osx.zip ./bsnes+.app
+rm -frd ./bsnes+.app
+
+#accuracy
+cd bsnes
+make distribution profile=accuracy
+cd ..
+mv ./bsnes+.app ./bsnes+\ \(accuracy\).app
+rm -f ./distribution/bsnes_${version}_accuracy_osx.zip
+zip -9 -r ./distribution/bsnes_${version}_accuracy_osx.zip ./bsnes+\ \(accuracy\).app
+rm -frd ./bsnes+\ \(accuracy\).app
