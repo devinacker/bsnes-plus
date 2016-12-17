@@ -20,7 +20,12 @@ Configuration::Configuration() {
   ppu1.version = 1;
   ppu2.version = 3;
 
+#if defined(PLATFORM_OSX)
+  sat.path = nall::launchpath() << "bsxdat/";
+#else
   sat.path = "./bsxdat/";
+#endif
+
   sat.local_time = true;
   sat.custom_time = 798653040; // 1995-04-23 16:04
 }

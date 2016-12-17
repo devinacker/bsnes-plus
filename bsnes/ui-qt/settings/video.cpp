@@ -3,8 +3,8 @@ VideoSettingsWindow *videoSettingsWindow;
 
 VideoSettingsWindow::VideoSettingsWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
 

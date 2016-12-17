@@ -6,7 +6,7 @@
   const char Style::Monospace[64] = "Liberation Mono";
 #elif defined(PLATFORM_OSX)
   #include "platform/platform_osx.cpp"
-  const char Style::Monospace[64] = "Courier New";
+  const char UIStyle::Monospace[64] = "Courier New";
 #elif defined(PLATFORM_WIN)
   #include "platform/platform_win.cpp"
   const char Style::Monospace[64] = "Lucida Console";

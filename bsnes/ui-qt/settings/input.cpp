@@ -8,8 +8,8 @@ InputSettingsWindow::InputSettingsWindow() {
   activeMouse = 0;
 
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   list = new QTreeWidget;

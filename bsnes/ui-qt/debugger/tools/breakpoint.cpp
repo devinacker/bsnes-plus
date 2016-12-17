@@ -4,7 +4,7 @@ BreakpointEditor *breakpointEditor;
 BreakpointItem::BreakpointItem(unsigned id_) : id(id_) {
   layout = new QGridLayout;
   layout->setMargin(0);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   addr = new QLineEdit;
@@ -126,8 +126,8 @@ BreakpointEditor::BreakpointEditor() {
 
   layout = new QVBoxLayout;
   layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {

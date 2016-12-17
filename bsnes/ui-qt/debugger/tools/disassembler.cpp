@@ -7,13 +7,13 @@ Disassembler *disassembler;
 
 DisasmWidget::DisasmWidget() {
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   view = new QTextEdit;
   view->setReadOnly(true);
-  view->setFont(QFont(Style::Monospace));
+  view->setFont(QFont(UIStyle::Monospace));
   view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   view->setMinimumHeight((25 + 1) * view->fontMetrics().height());
   layout->addWidget(view);
@@ -26,8 +26,8 @@ Disassembler::Disassembler() {
   application.windowList.append(this);
 
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   cpuDisassembler = new DisasmWidget;

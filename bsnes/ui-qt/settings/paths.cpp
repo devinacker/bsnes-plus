@@ -15,7 +15,7 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   layout->addWidget(label);
 
   controlLayout = new QHBoxLayout;
-  controlLayout->setSpacing(Style::WidgetSpacing);
+  controlLayout->setSpacing(UIStyle::WidgetSpacing);
   layout->addLayout(controlLayout);
 
   path = new QLineEdit;
@@ -66,8 +66,8 @@ void PathSettingWidget::defaultPath() {
 
 PathSettingsWindow::PathSettingsWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
 
@@ -77,7 +77,11 @@ PathSettingsWindow::PathSettingsWindow() {
   patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path", "");
   cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path", "");
   dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path", "");
+#if defined(PLATFORM_OSX)
+  satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", nall::launchpath() << "bsxdat/", "Default Satellaview Signal Data Path", nall::launchpath() << "bsxdat/");
+#else
   satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
+#endif
 
   layout->addWidget(gamePath);
   layout->addWidget(savePath);
