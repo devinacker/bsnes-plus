@@ -42,12 +42,12 @@ objects += jma jcrc32 lzmadecode 7zlzma iiostrm inbyte lzma winout
 
 compile = \
   $(strip \
-	$(if $(filter %.c,$<), \
-	  $(c) $(flags) $1 -c $< -o $@, \
-	  $(if $(filter %.cpp,$<), \
-		$(cpp) $(flags) $1 -c $< -o $@ \
-	  ) \
-	) \
+    $(if $(filter %.c,$<), \
+      $(c) $(flags) $1 -c $< -o $@, \
+      $(if $(filter %.cpp,$<), \
+        $(cpp) $(flags) $1 -c $< -o $@ \
+      ) \
+    ) \
   )
 
 %.o: $<; $(call compile)

@@ -3,8 +3,6 @@
 bsnes-plus (or bsnes+) is a fork of bsnes (based on bsnes-classic) intended to
 introduce some new features and improvements, mostly aimed at debugging.
 
-Optiroc/bsnes-plus fork improves the OS X builds (pulled upstream) and adds an Xcode project for easier emulator debugging on Mac.
-
 ## What's new
 
 - "Step over" and "step out" buttons in debugger
@@ -44,8 +42,8 @@ Building with the original MinGW used to be the preferred way to do it, but made
 
 ## Building on OS X
 
-- Install a C++ toolchain ([Xcode](https://developer.apple.com) is probably the easiest route)  
-- Install Qt 4.8 (get [Brew](http://brew.sh) and run `brew install qt`)  
+- Install a C++ toolchain ([Xcode](https://developer.apple.com) is probably the easiest route)
+- Install Qt 4.8 (get [Brew](http://brew.sh) and run `brew install qt`)
 - Make sure the `qtpath` environment variable points to your Qt installation, ie. add `export qtpath=/usr/local/Cellar/qt/4.8.7_2` to .bash_profile.
 - Run `make`from the bsnes directory.
 
