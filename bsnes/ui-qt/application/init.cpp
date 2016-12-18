@@ -37,7 +37,7 @@ void Application::init() {
   QApplication::processEvents();
 
   #if defined(DEBUGGER)
-  debugger = new class Debugger;
+  debugger = new Debugger;
   #endif
   settingsWindow = new SettingsWindow;
   toolsWindow = new ToolsWindow;

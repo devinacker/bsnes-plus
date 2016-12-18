@@ -29,8 +29,8 @@ StateSelectWindow::StateSelectWindow() {
   setGeometryString(&config().geometry.stateSelectWindow);
 
   layout = new QGridLayout;
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   slot[0] = new QPushButton("Slot &1");

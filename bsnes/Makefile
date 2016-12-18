@@ -72,6 +72,10 @@ all: build plugins;
 include $(snes)/Makefile
 include $(ui)/Makefile
 
+# including CoreFoundation in nall/string/platform.hpp polluted the global namespace
+objects += nall-string-platform
+obj/nall-string-platform.o: nall/string/platform.cpp
+
 objects := $(patsubst %,obj/%.o,$(objects))
 
 # targets

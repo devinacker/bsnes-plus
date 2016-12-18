@@ -19,8 +19,8 @@ AboutWindow::AboutWindow() {
 
   layout = new QVBoxLayout;
   layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   logo = new Logo;

@@ -3,7 +3,7 @@
 #if defined(DEBUGGER)
 
 #include "debugger.moc"
-class Debugger *debugger;
+Debugger *debugger;
 
 #include "tracer.cpp"
 
@@ -31,8 +31,8 @@ Debugger::Debugger() {
   application.windowList.append(this);
 
   layout = new QHBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   menu = new QMenuBar;
@@ -61,7 +61,7 @@ Debugger::Debugger() {
   console = new QTextEdit;
   console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   console->setReadOnly(true);
-  console->setFont(QFont(UIStyle::Monospace));
+  console->setFont(QFont(Style::Monospace));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
   console->setMinimumHeight((25 + 1) * console->fontMetrics().height());
@@ -94,7 +94,7 @@ Debugger::Debugger() {
   runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
   runBreak->defaultAction()->setShortcut(Qt::Key_F5);
   commandLayout->addWidget(runBreak);
-  commandLayout->addSpacing(UIStyle::WidgetSpacing);
+  commandLayout->addSpacing(Style::WidgetSpacing);
 
   stepInstruction = new QToolButton;
   stepInstruction->setDefaultAction(new QAction("Step", this));
@@ -114,7 +114,7 @@ Debugger::Debugger() {
   stepOut->defaultAction()->setShortcut(Qt::Key_F8);
   commandLayout->addWidget(stepOut);
 
-  controlLayout->addSpacing(UIStyle::WidgetSpacing);
+  controlLayout->addSpacing(Style::WidgetSpacing);
 
   stepCPU = new QCheckBox("Step S-CPU");
   stepCPU->setChecked(true);
@@ -129,7 +129,7 @@ Debugger::Debugger() {
   stepSFX = new QCheckBox("Step SuperFX");
   controlLayout->addWidget(stepSFX);
   
-  controlLayout->addSpacing(UIStyle::WidgetSpacing);
+  controlLayout->addSpacing(Style::WidgetSpacing);
 
   traceCPU = new QCheckBox("Trace S-CPU opcodes");
   controlLayout->addWidget(traceCPU);

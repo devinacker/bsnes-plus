@@ -3,7 +3,7 @@ BSXSettingsWindow *bsxSettingsWindow;
 
 BSXSettingsWindow::BSXSettingsWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
+  layout->setMargin(Style::WindowMargin);
   layout->setSpacing(0);
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
@@ -15,9 +15,9 @@ BSXSettingsWindow::BSXSettingsWindow() {
   layout->addWidget(useLocalTime);
   
   timeLayout = new QHBoxLayout;
-  timeLayout->setSpacing(UIStyle::WidgetSpacing);
+  timeLayout->setSpacing(Style::WidgetSpacing);
   layout->addLayout(timeLayout);
-  layout->addSpacing(UIStyle::WidgetSpacing);
+  layout->addSpacing(Style::WidgetSpacing);
   
   useCustomTime = new QRadioButton("Custom time:");
   timeLayout->addWidget(useCustomTime);

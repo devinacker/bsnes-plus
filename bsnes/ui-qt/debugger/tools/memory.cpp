@@ -14,8 +14,8 @@ MemoryEditor::MemoryEditor() {
   application.windowList.append(this);
 
   layout = new QGridLayout;
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   editor = new QHexEdit;
@@ -286,7 +286,7 @@ void MemoryEditor::search() {
   vbox->addWidget(new QLabel("Enter a hex string, or \"ASCII text\" (in quotes)"));
   
   QLineEdit *edit = new QLineEdit;
-  edit->setFont(QFont(UIStyle::Monospace));
+  edit->setFont(QFont(Style::Monospace));
   // TODO: put existing search string in box
   vbox->addWidget(edit);
   

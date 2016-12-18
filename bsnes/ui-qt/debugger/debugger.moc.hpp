@@ -59,4 +59,4 @@ private:
   unsigned frameCounter;
 };
 
-extern class Debugger *debugger;
+extern Debugger *debugger;

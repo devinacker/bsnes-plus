@@ -8,7 +8,7 @@ HtmlViewerWindow::HtmlViewerWindow() {
   application.windowList.append(this);
 
   layout = new QVBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
+  layout->setMargin(Style::WindowMargin);
   layout->setSpacing(0);
   setLayout(layout);
 

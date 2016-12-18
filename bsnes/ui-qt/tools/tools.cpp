@@ -18,8 +18,8 @@ ToolsWindow::ToolsWindow() {
   application.windowList.append(this);
 
   layout = new QVBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   cheatEditorWindow = new CheatEditorWindow;

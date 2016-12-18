@@ -127,7 +127,6 @@ namespace nall {
   inline string realpath(const char *name);
   inline string userpath();
   inline string currentpath();
-  inline string launchpath();
 
   //strl.hpp
   inline unsigned strlcpy(char *dest, const char *src, unsigned length);

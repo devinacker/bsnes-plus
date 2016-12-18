@@ -128,8 +128,8 @@ void SoundViewerWidget::paintEvent(QPaintEvent *event) {
 SoundViewerWindow::SoundViewerWindow() {
 	layout = new QVBoxLayout;
 	layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	layout->setMargin(UIStyle::WindowMargin);
-	layout->setSpacing(UIStyle::WidgetSpacing);
+	layout->setMargin(Style::WindowMargin);
+	layout->setSpacing(Style::WidgetSpacing);
 	layout->setSizeConstraint(QLayout::SetFixedSize);
 	setLayout(layout);
 	

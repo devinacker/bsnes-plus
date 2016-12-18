@@ -9,8 +9,8 @@ CgramViewer::CgramViewer() {
 
   layout = new QHBoxLayout;
   layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   cgramWidget = new CgramWidget;
@@ -26,7 +26,7 @@ CgramViewer::CgramViewer() {
 
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
-  controlLayout->addSpacing(UIStyle::WidgetSpacing);
+  controlLayout->addSpacing(Style::WidgetSpacing);
 
   colorInfo = new QLabel;
   controlLayout->addWidget(colorInfo);

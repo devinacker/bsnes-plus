@@ -3,15 +3,15 @@ AdvancedSettingsWindow *advancedSettingsWindow;
 
 AdvancedSettingsWindow::AdvancedSettingsWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
+  layout->setMargin(Style::WindowMargin);
   layout->setSpacing(0);
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
 
   driverLayout = new QGridLayout;
-  driverLayout->setHorizontalSpacing(UIStyle::WidgetSpacing);
+  driverLayout->setHorizontalSpacing(Style::WidgetSpacing);
   layout->addLayout(driverLayout);
-  layout->addSpacing(UIStyle::WidgetSpacing);
+  layout->addSpacing(Style::WidgetSpacing);
 
   videoLabel = new QLabel("Video driver:");
   driverLayout->addWidget(videoLabel, 0, 0);
@@ -39,9 +39,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   layout->addWidget(regionTitle);
 
   regionLayout = new QHBoxLayout;
-  regionLayout->setSpacing(UIStyle::WidgetSpacing);
+  regionLayout->setSpacing(Style::WidgetSpacing);
   layout->addLayout(regionLayout);
-  layout->addSpacing(UIStyle::WidgetSpacing);
+  layout->addSpacing(Style::WidgetSpacing);
 
   regionGroup = new QButtonGroup(this);
 
@@ -64,9 +64,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   layout->addWidget(portTitle);
 
   portLayout = new QHBoxLayout;
-  portLayout->setSpacing(UIStyle::WidgetSpacing);
+  portLayout->setSpacing(Style::WidgetSpacing);
   layout->addLayout(portLayout);
-  layout->addSpacing(UIStyle::WidgetSpacing);
+  layout->addSpacing(Style::WidgetSpacing);
 
   portGroup = new QButtonGroup(this);
 
@@ -85,9 +85,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   layout->addWidget(focusTitle);
 
   focusLayout = new QHBoxLayout;
-  focusLayout->setSpacing(UIStyle::WidgetSpacing);
+  focusLayout->setSpacing(Style::WidgetSpacing);
   layout->addLayout(focusLayout);
-  layout->addSpacing(UIStyle::WidgetSpacing);
+  layout->addSpacing(Style::WidgetSpacing);
 
   focusButtonGroup = new QButtonGroup(this);
 

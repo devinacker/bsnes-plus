@@ -15,7 +15,7 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   layout->addWidget(label);
 
   controlLayout = new QHBoxLayout;
-  controlLayout->setSpacing(UIStyle::WidgetSpacing);
+  controlLayout->setSpacing(Style::WidgetSpacing);
   layout->addLayout(controlLayout);
 
   path = new QLineEdit;
@@ -66,8 +66,8 @@ void PathSettingWidget::defaultPath() {
 
 PathSettingsWindow::PathSettingsWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   layout->setAlignment(Qt::AlignTop);
   setLayout(layout);
 

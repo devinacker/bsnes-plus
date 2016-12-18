@@ -9,8 +9,8 @@ DebuggerOptions::DebuggerOptions() {
 
   layout = new QVBoxLayout;
   layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   cacheUsageBox = new QCheckBox("Cache memory usage table to disk");

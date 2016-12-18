@@ -7,7 +7,7 @@ RegisterEditSFX *registerEditSFX;
 #define reg_editor(name, digits) \
 	layout->addWidget(new QLabel(QString(#name).toUpper())); \
 	edit_##name = new QLineEdit(this); \
-	edit_##name->setFont(QFont(UIStyle::Monospace)); \
+	edit_##name->setFont(QFont(Style::Monospace)); \
 	edit_##name->setFixedWidth((digits + 1) * edit_##name->fontMetrics().width(' ')); \
 	edit_##name->setInputMask(QString("H").repeated(digits)); \
 	edit_##name->setMaxLength(digits); \
@@ -184,7 +184,7 @@ void RegisterEditSFX::setupUI() {
 	for (int reg = 0; reg < 16; reg++) {
 		grid->addWidget(new QLabel(QString("R%1").arg(reg)), reg / 8, (reg % 8) * 2); \
 		edit_r[reg] = new QLineEdit(this); \
-		edit_r[reg]->setFont(QFont(UIStyle::Monospace)); \
+		edit_r[reg]->setFont(QFont(Style::Monospace)); \
 		edit_r[reg]->setFixedWidth((4 + 1) * edit_r[reg]->fontMetrics().width(' ')); \
 		edit_r[reg]->setInputMask("HHHH"); \
 		edit_r[reg]->setMaxLength(4); \

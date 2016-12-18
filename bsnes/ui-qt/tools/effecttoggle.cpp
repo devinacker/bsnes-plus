@@ -4,8 +4,8 @@ EffectToggleWindow *effectToggleWindow;
 EffectToggleWindow::EffectToggleWindow() {
   layout = new QGridLayout;
   layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   ppuLabel = new QLabel("<b>S-PPU (Video)</b>");

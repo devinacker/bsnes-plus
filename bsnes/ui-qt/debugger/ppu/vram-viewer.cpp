@@ -10,8 +10,8 @@ VramViewer::VramViewer() {
   layout = new QVBoxLayout;
   layout->setSizeConstraint(QLayout::SetMinimumSize);
   layout->setAlignment(Qt::AlignCenter);
-  layout->setMargin(UIStyle::WindowMargin);
-  layout->setSpacing(UIStyle::WidgetSpacing);
+  layout->setMargin(Style::WindowMargin);
+  layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
   controlLayout = new QHBoxLayout;
@@ -69,7 +69,7 @@ VramViewer::VramViewer() {
     sidebarLayout->addWidget(vramAddrItems[i]);
   }
 
-  sidebarLayout->addSpacing(UIStyle::WidgetSpacing);
+  sidebarLayout->addSpacing(Style::WidgetSpacing);
 
   useCgram = new QCheckBox("Use CGRAM");
   sidebarLayout->addWidget(useCgram);
@@ -148,7 +148,7 @@ void VramViewer::zoomChanged(int index) {
   int mainWidth = scrollWidth + sidebarLayout->minimumSize().width();
   int controlWidth = controlLayout->minimumSize().width();
 
-  setFixedWidth(max(mainWidth, controlWidth) + UIStyle::WidgetSpacing * 3);
+  setFixedWidth(max(mainWidth, controlWidth) + Style::WidgetSpacing * 3);
 }
 
 void VramViewer::gotoAddress(unsigned vram_addr) {

@@ -1,10 +1,6 @@
 #ifndef NALL_STRING_PLATFORM_HPP
 #define NALL_STRING_PLATFORM_HPP
 
-#if defined(PLATFORM_OSX)
-#include "CoreFoundation/CoreFoundation.h"
-#endif
-
 namespace nall {
 
 string realpath(const char *name) {
@@ -40,22 +36,7 @@ string currentpath() {
   return "";
 }
 
-
-string launchpath() {
-#if defined(PLATFORM_OSX)
-  CFBundleRef mainBundle = CFBundleGetMainBundle();
-  CFURLRef bundleURL = CFBundleCopyBundleURL(mainBundle);
-  char path[PATH_MAX];
-  if (!CFURLGetFileSystemRepresentation(bundleURL, TRUE, (UInt8 *)path, PATH_MAX))
-  {
-    return "";
-  }
-  CFRelease(bundleURL);
-  return nall::dir(string() << path);
-#else
-  return currentpath();
-#endif
-}
+string launchpath();
 
 }
 
