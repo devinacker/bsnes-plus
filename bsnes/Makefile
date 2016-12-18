@@ -123,9 +123,7 @@ endif
 
 distribution: clean build plugins
 ifeq ($(platform),osx)
-	@rm -f ../bsnes_$(version)_osx.zip
-	@zip -9 -r ../bsnes_$(version)_osx.zip $(osxbundle)
-	@rm -rf $(osxbundle)
+	@macdeployqt $(osxbundle) -executable=$(osxbundle)/Contents/MacOS/bsnes
 else
 	@echo Distribution target not available for current platform
 endif
