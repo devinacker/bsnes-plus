@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A7D7C801E06070F00307DD2 /* platform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A7D7C7F1E06070F00307DD2 /* platform.cpp */; };
+		2A7D7C831E060C9600307DD2 /* soundviewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A7D7C811E060C9600307DD2 /* soundviewer.cpp */; };
 		2ACADCC61AF25BE20001E28A /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CFA91AEE788E00C9236B /* system.cpp */; };
 		2ACADCC71AF25BE60001E28A /* serialization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CFA81AEE788E00C9236B /* serialization.cpp */; };
 		2ACADCC81AF25C5C0001E28A /* ruby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2A35CE531AEE788E00C9236B /* ruby.cpp */; };
@@ -634,6 +636,9 @@
 		2A35D0391AEE788E00C9236B /* utility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
 		2A35D03A1AEE788E00C9236B /* window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		2A35D03B1AEE7A9E00C9236B /* bsnes+.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "bsnes+.app"; path = "../bsnes+.app"; sourceTree = "<group>"; };
+		2A7D7C7F1E06070F00307DD2 /* platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = platform.cpp; sourceTree = "<group>"; };
+		2A7D7C811E060C9600307DD2 /* soundviewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soundviewer.cpp; sourceTree = "<group>"; };
+		2A7D7C821E060C9600307DD2 /* soundviewer.moc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = soundviewer.moc.hpp; sourceTree = "<group>"; };
 		2AD9DCCB1B1C49B0001481D3 /* QtCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtCore.framework; path = ../../../../../usr/local/lib/QtCore.framework; sourceTree = "<group>"; };
 		2AD9DCCC1B1C49B0001481D3 /* QtGui.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtGui.framework; path = ../../../../../usr/local/lib/QtGui.framework; sourceTree = "<group>"; };
 		2AD9DCCD1B1C49B0001481D3 /* QtOpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QtOpenGL.framework; path = ../../../../../usr/local/lib/QtOpenGL.framework; sourceTree = "<group>"; };
@@ -812,6 +817,7 @@
 				2A35CDE31AEE788E00C9236B /* filename.hpp */,
 				2A35CDE41AEE788E00C9236B /* math.hpp */,
 				2A35CDE51AEE788E00C9236B /* platform.hpp */,
+				2A7D7C7F1E06070F00307DD2 /* platform.cpp */,
 				2A35CDE61AEE788E00C9236B /* replace.hpp */,
 				2A35CDE71AEE788E00C9236B /* split.hpp */,
 				2A35CDE81AEE788E00C9236B /* strl.hpp */,
@@ -1938,6 +1944,8 @@
 				2A35D02E1AEE788E00C9236B /* cheatfinder.moc.hpp */,
 				2A35D02F1AEE788E00C9236B /* effecttoggle.cpp */,
 				2A35D0301AEE788E00C9236B /* effecttoggle.moc.hpp */,
+				2A7D7C811E060C9600307DD2 /* soundviewer.cpp */,
+				2A7D7C821E060C9600307DD2 /* soundviewer.moc.hpp */,
 				2A35D0311AEE788E00C9236B /* statemanager.cpp */,
 				2A35D0321AEE788E00C9236B /* statemanager.moc.hpp */,
 				2A35D0331AEE788E00C9236B /* tools.cpp */,
@@ -2123,6 +2131,7 @@
 				2ACADD051AF25FAA0001E28A /* audio.cpp in Sources */,
 				2ACADD521AF261450001E28A /* advanced.cpp in Sources */,
 				2ACADD281AF260AC0001E28A /* debugger.cpp in Sources */,
+				2A7D7C801E06070F00307DD2 /* platform.cpp in Sources */,
 				2ACADD041AF25F9F0001E28A /* input.cpp in Sources */,
 				2ACADD291AF260B50001E28A /* memory.cpp in Sources */,
 				2ACADD0C1AF260320001E28A /* serialization.cpp in Sources */,
@@ -2173,6 +2182,7 @@
 				2ACADD5C1AF261680001E28A /* effecttoggle.cpp in Sources */,
 				2ACADCD01AF25C8E0001E28A /* pulseaudiosimple.cpp in Sources */,
 				2ACADD541AF261450001E28A /* input.cpp in Sources */,
+				2A7D7C831E060C9600307DD2 /* soundviewer.cpp in Sources */,
 				2ACADD0D1AF260390001E28A /* irq.cpp in Sources */,
 				2ACADD1F1AF260A40001E28A /* algorithms.cpp in Sources */,
 				2ACADD211AF260A40001E28A /* opcode_misc.cpp in Sources */,
