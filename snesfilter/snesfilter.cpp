@@ -24,7 +24,7 @@ configuration *config;
 
 #include "direct/direct.cpp"
 #include "ntsc/ntsc.cpp"
-#if !defined(PLATFORM_OSX)
+#if !(defined(PLATFORM_OSX) && defined(__clang__))
   #include "pixellate2x/pixellate2x.cpp"
   #include "scale2x/scale2x.cpp"
   #include "2xsai/2xsai.cpp"
@@ -33,7 +33,7 @@ configuration *config;
 #endif
 
 bsnesexport const char* snesfilter_supported() {
-  #if defined(PLATFORM_OSX)
+  #if defined(PLATFORM_OSX) && defined(__clang__)
     return "NTSC";
   #else
     return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;NTSC";
@@ -54,7 +54,7 @@ bsnesexport void snesfilter_colortable(const uint32_t *colortable_) {
 bsnesexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
   switch(filter) {
     default: return filter_direct.size(outwidth, outheight, width, height);
-    #if defined(PLATFORM_OSX)
+    #if defined(PLATFORM_OSX) && defined(__clang__)
       case 1:  return filter_ntsc.size(outwidth, outheight, width, height);
     #else
       case 1:  return filter_pixellate2x.size(outwidth, outheight, width, height);
@@ -75,7 +75,7 @@ bsnesexport void snesfilter_render(
 ) {
   switch(filter) {
     default: return filter_direct.render(output, outpitch, input, pitch, width, height);
-    #if defined(PLATFORM_OSX)
+    #if defined(PLATFORM_OSX) && defined(__clang__)
       case 1:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
     #else
       case 1:  return filter_pixellate2x.render(output, outpitch, input, pitch, width, height);
@@ -93,7 +93,7 @@ bsnesexport void snesfilter_render(
 bsnesexport QWidget* snesfilter_settings(unsigned filter) {
   switch(filter) {
     default: return 0;
-    #if defined(PLATFORM_OSX)
+    #if defined(PLATFORM_OSX) && defined(__clang__)
       case 1:
     #else
       case 8:
