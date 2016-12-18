@@ -19,6 +19,7 @@ public:
   void frame();
 
   void layer_enable(unsigned layer, unsigned priority, bool enable);
+  bool frame_skipped() const { return display.framecounter > 0; }
   unsigned get_frameskip() const { return display.frameskip; }
   void set_frameskip(unsigned frameskip);
 
