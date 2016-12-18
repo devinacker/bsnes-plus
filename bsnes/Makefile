@@ -43,6 +43,9 @@ ifeq ($(platform),x)
   link += -ldl -lX11 -lXext
 else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
+  ifneq ($(profile),compatibility)
+    osxbundle := ../bsnes+\ \($(profile)\).app
+  endif
   flags += -march=native -mmacosx-version-min=10.10
   link += -F/usr/local/lib -mmacosx-version-min=10.10
 else ifeq ($(platform),win)
@@ -125,9 +128,9 @@ ifeq ($(platform),osx)
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
-distribution: clean build plugins
+distribution: build plugins
 ifeq ($(platform),osx)
-	@macdeployqt $(osxbundle) -executable=$(osxbundle)/Contents/MacOS/bsnes
+	@macdeployqt ${osxbundle} -executable=$(osxbundle)/Contents/MacOS/bsnes
 else
 	@echo Distribution target not available for current platform
 endif

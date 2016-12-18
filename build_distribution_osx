@@ -12,15 +12,17 @@ cp -a bsnes/data/bsxdat ${dist_dir}/bsxdat
 
 #build compatibility app bundle
 cd bsnes
-make distribution profile=compatibility
+make clean
+make -j4 distribution profile=compatibility
 cd ..
 mv ./bsnes+.app ${dist_dir}/bsnes+.app
 
 #build accuracy app bundle
 cd bsnes
-make distribution profile=accuracy
+make clean
+make -j4 distribution profile=accuracy
 cd ..
-mv ./bsnes+.app ${dist_dir}/bsnes+\ \(accuracy\).app
+mv ./bsnes+\ \(accuracy\).app ${dist_dir}/bsnes+\ \(accuracy\).app
 
 #zip distribution directory
 zip -9 -r ${dist_dir}.zip ${dist_dir}
