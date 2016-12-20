@@ -1,7 +1,7 @@
 #!/bin/bash
 
 version=`grep -m 1 'version := ' bsnes/Makefile | awk '{ print $3 }'`;
-dist_dir=./bsnes_${version}
+dist_dir=./distribution/bsnes_${version}
 dist_zip=${dist_dir}.zip
 
 #clean & set up distribution directory
@@ -22,7 +22,7 @@ cd bsnes
 make clean
 make -j4 distribution profile=accuracy
 cd ..
-mv ./bsnes+\ \(accuracy\).app ${dist_dir}/bsnes+\ \(accuracy\).app
+mv ./bsnes+accuracy.app ${dist_dir}/bsnes+accuracy.app
 
 #zip distribution directory
 zip -9 -r ${dist_dir}.zip ${dist_dir}

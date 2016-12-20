@@ -44,7 +44,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
   ifneq ($(profile),compatibility)
-    osxbundle := ../bsnes+\ \($(profile)\).app
+    osxbundle := ../bsnes+$(profile).app
   endif
   flags += -march=native -mmacosx-version-min=10.10
   link += -F/usr/local/lib -mmacosx-version-min=10.10
