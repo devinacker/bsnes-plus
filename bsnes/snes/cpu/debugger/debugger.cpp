@@ -19,6 +19,8 @@ void CPUDebugger::op_step() {
   usage[regs.pc] &= ~(UsageFlagM | UsageFlagX);
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
+  uint8 opcode = disassembler_read(opcode_pc);
+  ++opcode_usage[opcode];
 
   if(debugger.step_cpu &&
       (debugger.step_type == Debugger::StepType::StepInto ||
@@ -30,7 +32,6 @@ void CPUDebugger::op_step() {
   } else {
       
     if (debugger.break_on_wdm) {
-      uint8 opcode = disassembler_read(opcode_pc);
       if (opcode == 0x42) {
         debugger.breakpoint_hit = Debugger::SoftBreakCPU;
         debugger.break_event = Debugger::BreakEvent::BreakpointHit;
@@ -147,12 +148,14 @@ void CPUDebugger::mmio_w2180(uint8 data) {
 CPUDebugger::CPUDebugger() {
   usage = new uint8[1 << 24]();
   cart_usage = new uint8[1 << 24]();
+  opcode_usage = new uint64[256]();
   opcode_pc = 0x8000;
 }
 
 CPUDebugger::~CPUDebugger() {
   delete[] usage;
   delete[] cart_usage;
+  delete[] opcode_usage;
 }
 
 bool CPUDebugger::property(unsigned id, string &name, string &value) {
