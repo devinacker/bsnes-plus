@@ -66,6 +66,7 @@ public:
   void layer_enable(unsigned layer, unsigned priority, bool enable);
   unsigned frameskip;
   unsigned framecounter;
+  bool frame_skipped() const { return framecounter > 0; }
   unsigned get_frameskip() const { return frameskip; }
   void set_frameskip(unsigned frameskip);
 

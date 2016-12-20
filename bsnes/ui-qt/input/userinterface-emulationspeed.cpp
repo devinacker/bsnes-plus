@@ -56,7 +56,7 @@ struct Speedup : HotkeyInput {
 
   void pressed() {
     if(SNES::PPU::SupportsFrameSkip) {
-	  frameskip = SNES::ppu.get_frameskip();
+      frameskip = SNES::ppu.get_frameskip();
       SNES::ppu.set_frameskip(9);
     }
     

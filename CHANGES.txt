@@ -1,3 +1,12 @@
+v073+3a [2016-12-19] Minor bugfix release.
+Fixed low-res scanlines being horizontally resized too much when fast-forwarding
+  while a high-res screen mode is active (compat/performance builds only) [Revenant]
+Fixed potential issue with modifier keys triggering multiple wrong inputs [Revenant]
+Fixed potential crashes when nonexistent cart RAM would be mapped by a manifest
+  and/or certain coprocessors (such as the SA1) [Revenant]
+Fixed potential crash when tracing SA1/SuperFX with trace mask enabled [Revenant]
+Fixed trace mask being wrongly enabled when loading a cartridge [Revenant]
+
 v073+3 [2016-11-22]
 Added tilemap viewer, revamped VRAM viewer and improved OAM viewer [UnDisbeliever]
 Added all BS-X/Satellaview support from bsnes-sx2 [LuigiBlood]
