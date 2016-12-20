@@ -50,8 +50,8 @@ public:
     }
 
     void paintGL() {
-      unsigned outputWidth  = width();
-      unsigned outputHeight = height();
+      unsigned outputWidth  = width() * devicePixelRatio();
+      unsigned outputHeight = height() * devicePixelRatio();
 
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();

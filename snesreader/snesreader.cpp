@@ -12,6 +12,7 @@ extern "C" char* uncompressStream(int, int);  //micro-bunzip
 
 #define QT_CORE_LIB
 #include <QtGui>
+#include <QtWidgets>
 
 #include <nall/file.hpp>
 #include <nall/string.hpp>

@@ -1,6 +1,6 @@
 include nall/Makefile
 
-qtlibs := QtCore QtGui
+qtlibs := QtCore QtGui QtWidgets
 include nall/qt/Makefile
 
 # openmp is not available with clang, so check if g++ is available

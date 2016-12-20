@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QtGui>
+#include <QtWidgets>
 //Q_IMPORT_PLUGIN(QJpegPlugin)
 //Q_IMPORT_PLUGIN(QMngPlugin)
 
