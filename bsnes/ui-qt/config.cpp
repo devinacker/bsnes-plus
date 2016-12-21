@@ -79,7 +79,7 @@ Configuration::Configuration() {
 
   video.context = &video.windowed;
   attach(video.isFullscreen = false, "video.isFullscreen");
-  attach(video.synchronize  = false, "video.synchronize");
+  attach(video.synchronize  = true, "video.synchronize");
 
   attach(video.autoHideFullscreenMenu = false, "video.autoHideFullscreenMenu");
 
@@ -101,14 +101,14 @@ Configuration::Configuration() {
   attach(video.windowed.multiplier         =    2, "video.windowed.multiplier");
   attach(video.windowed.region             =    0, "video.windowed.region");
 
-  attach(video.windowed.hwFilter = 1, "video.windowed.hwFilter");
+  attach(video.windowed.hwFilter = 0, "video.windowed.hwFilter");
   attach(video.windowed.swFilter = 0, "video.windowed.swFilter");
 
   attach(video.fullscreen.correctAspectRatio = true, "video.fullscreen.correctAspectRatio");
   attach(video.fullscreen.multiplier         =    9, "video.fullscreen.multiplier");
   attach(video.fullscreen.region             =    0, "video.fullscreen.region");
 
-  attach(video.fullscreen.hwFilter = 1, "video.fullscreen.hwFilter");
+  attach(video.fullscreen.hwFilter = 0, "video.fullscreen.hwFilter");
   attach(video.fullscreen.swFilter = 0, "video.fullscreen.swFilter");
 
   attach(audio.synchronize = true,  "audio.synchronize");
