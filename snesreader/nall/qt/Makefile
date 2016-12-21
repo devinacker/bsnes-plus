@@ -30,14 +30,14 @@ ifeq ($(platform),x)
   qtlib := `pkg-config --libs $(qtlibs)`
 else ifeq ($(platform),osx)
   ifeq ($(qtpath),)
-    qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/5/Headers)
+    qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Headers)
     qtlib := -L/Library/Frameworks
   else
-    qtinc := -I$(qtpath)/include
-    qtinc += $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/5/Headers)
-    qtlib := -L$(qtpath)/lib -F$(qtpath)/lib
+    qtinc := -F$(qtpath)/lib
+    qtinc += $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Headers)
+    qtlib += -F$(qtpath)/lib -Wl,-rpath,$(qtpath)/lib
   endif
-  qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/5/Headers)
+  qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Headers)
   qtlib += $(foreach lib,$(qtlibs),-framework $(lib))
   qtlib += -framework Carbon
   qtlib += -framework Cocoa

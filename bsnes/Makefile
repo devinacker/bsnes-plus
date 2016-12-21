@@ -130,7 +130,7 @@ endif
 
 distribution: build plugins
 ifeq ($(platform),osx)
-	@macdeployqt ${osxbundle} -executable=$(osxbundle)/Contents/MacOS/bsnes
+	$(qtpath)/bin/macdeployqt ${osxbundle}
 else
 	@echo Distribution target not available for current platform
 endif
