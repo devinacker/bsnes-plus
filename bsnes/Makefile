@@ -119,13 +119,17 @@ endif
 
 plugins: build
 	@$(MAKE) -C ../snesreader
-	@$(MAKE) -C ../snesfilter
 	@$(MAKE) -C ../supergameboy
+ifneq ($(profile),accuracy)
+	@$(MAKE) -C ../snesfilter
+endif
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
-	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
+ifneq ($(profile),accuracy)
+	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+endif
 endif
 
 distribution: build plugins
