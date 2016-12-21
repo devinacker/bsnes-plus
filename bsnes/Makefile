@@ -132,13 +132,6 @@ ifneq ($(profile),accuracy)
 endif
 endif
 
-distribution: build plugins
-ifeq ($(platform),osx)
-	$(qtpath)/bin/macdeployqt ${osxbundle}
-else
-	@echo Distribution target not available for current platform
-endif
-
 clean: ui_clean plugins_clean
 	-@$(call delete,obj/*.o)
 	-@$(call delete,obj/*.a)

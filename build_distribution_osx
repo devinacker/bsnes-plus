@@ -13,18 +13,21 @@ cp -a bsnes/data/bsxdat ${dist_dir}/${bsnes_version}/bsxdat
 #build compatibility app bundle
 cd bsnes
 make clean
-make -j4 distribution profile=compatibility
+make -j4 profile=compatibility
 cd ..
+$qtpath/bin/macdeployqt ./bsnes+.app
 mv ./bsnes+.app ${dist_dir}/${bsnes_version}/bsnes+.app
 
 #build accuracy app bundle
 cd bsnes
 make clean
-make -j4 distribution profile=accuracy
+make -j4 profile=accuracy
 cd ..
+$qtpath/bin/macdeployqt ./bsnes+accuracy.app
 mv ./bsnes+accuracy.app ${dist_dir}/${bsnes_version}/bsnes+accuracy.app
 
 #zip distribution directory
 pushd ${dist_dir}
-zip -9 -r ${bsnes_version}.zip ${bsnes_version}
+zip -9 -r ${bsnes_version}_osx.zip ${bsnes_version}
+#7z a -r ${bsnes_version}_osx.7z ${bsnes_version}
 popd
