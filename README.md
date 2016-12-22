@@ -42,17 +42,10 @@ Building with the original MinGW used to be the preferred way to do it, but made
 
 ## Building on OS X
 
-- Install a C++ toolchain ([Xcode](https://developer.apple.com) is probably the easiest route)
-- Install Qt 4.8 (get [Brew](http://brew.sh) and run `brew install qt`)
-- Make sure the `qtpath` environment variable points to your Qt installation, ie. add `export qtpath=/usr/local/Cellar/qt/4.8.7_2` to .bash_profile.
+- Install a C++ toolchain. [Xcode](https://developer.apple.com) is probably the easiest route.
+- Install [Qt 5](https://www.qt.io/download-open-source/). (Using the `brew` package works for normal builds but currently deployment is broken.)
+- Make sure the `qtpath` environment variable points to your Qt installation, ie. add `qtpath=$HOME/Qt/5.7/clang_64` to .bash_profile.
 - Run `make`from the bsnes directory.
-
-If you're running macOS 10.12 Sierra you will (probably not) be able to install Qt4 using brew. If so, try installing this unofficial branch:
-
-```
-brew install cartr/qt4/qt
-brew linkapps qt
-```
 
 ## Building on Linux / other *nix
 
