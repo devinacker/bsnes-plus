@@ -28,6 +28,6 @@ mv ./bsnes+accuracy.app ${dist_dir}/${bsnes_version}/bsnes+accuracy.app
 
 #zip distribution directory
 pushd ${dist_dir}
-zip -9 -r ${bsnes_version}_osx.zip ${bsnes_version}
+zip -r -y -9 ${bsnes_version}_osx.zip ${bsnes_version}
 #7z a -r ${bsnes_version}_osx.7z ${bsnes_version}
 popd

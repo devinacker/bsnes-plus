@@ -46,8 +46,8 @@ else ifeq ($(platform),osx)
   ifneq ($(profile),compatibility)
     osxbundle := ../bsnes+$(profile).app
   endif
-  flags += -march=native -mmacosx-version-min=10.10
-  link += -F/usr/local/lib -mmacosx-version-min=10.10
+  flags += -mmacosx-version-min=10.9
+  link += -mmacosx-version-min=10.9 -headerpad_max_install_names
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole
@@ -101,7 +101,6 @@ ifeq ($(platform),x)
 	test -d ~/.bsnes || mkdir ~/.bsnes
 else ifeq ($(platform),osx)
 	mv -f $(osxbundle) /Applications/bsnes+.app
-	test -d ~/.bsnes || mkdir ~/.bsnes
 else
 	@echo Install not available for current platform
 endif
