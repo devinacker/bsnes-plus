@@ -166,7 +166,7 @@ void MemoryEditor::showAddress(qint64 address) {
     statusBar->setText("");
   } else {
     QString msg;
-    msg.sprintf("Address: 0x%06X", address);
+    msg.sprintf("Address: 0x%06llX", address);
     statusBar->setText(msg);
   }
 }
