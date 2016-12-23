@@ -1,6 +1,8 @@
 #ifndef NALL_STRING_UTILITY_HPP
 #define NALL_STRING_UTILITY_HPP
 
+#include <cstdlib>
+
 namespace nall {
 
 unsigned strlcpy(string &dest, const char *src, unsigned length) {
@@ -56,7 +58,7 @@ template<unsigned length, char padding> string integer(intmax_t value) {
   unsigned offset = 0;
 
   bool negative = value < 0;
-  if(negative) value = abs(value);
+  if(negative) value = std::abs(value);
 
   do {
     unsigned n = value % 10;

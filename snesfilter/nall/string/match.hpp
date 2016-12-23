@@ -56,7 +56,7 @@ bool match(const char *p, const char *s) {
 
     //literal match
     if(*p == *s) {
-      p++, *s++;
+      ++p, ++s;
       continue;
     }
 
