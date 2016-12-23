@@ -75,7 +75,7 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
   // Mac cross-compile compiler:
   //  can't find register in class 'BREG' while reloading 'asm'
   // so use class 'r' register var binding
-  register _b asm("%bx");
+  register int _b asm("%bx");
   __asm__ __volatile__ (
     "cpuid"
     : "=a" (*a) ,
@@ -86,7 +86,7 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
     *b = _b;
 
   #endif
-  
+
   #else
 
   int CPUInfo[4];

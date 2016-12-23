@@ -121,10 +121,10 @@ extern int read_bunzip_data(bunzip_data *bd)
 	/* Read CRC (which is stored big endian). */
 	bd->headerCRC=get_bits(bd,32);
 	/* Is this the last block (with CRC for file)? */
-	if(!strcmp(mtfSymbol,"\x17\x72\x45\x38\x50\x90"))
+	if(!strcmp((char *)mtfSymbol,"\x17\x72\x45\x38\x50\x90"))
 		return RETVAL_LAST_BLOCK;
 	/* If it's not a valid data block, barf. */
-	if(strcmp(mtfSymbol,"\x31\x41\x59\x26\x53\x59"))
+	if(strcmp((char *)mtfSymbol,"\x31\x41\x59\x26\x53\x59"))
 		return RETVAL_NOT_BZIP_DATA;
 
 	dbuf=bd->dbuf;
@@ -212,8 +212,8 @@ extern int read_bunzip_data(bunzip_data *bd)
 		limit=hufGroup->limit-1;
 		/* Calculate permute[] */
 		pp = 0;
-		for(i=minLen;i<=maxLen;i++) 
-			for(t=0;t<symCount;t++) 
+		for(i=minLen;i<=maxLen;i++)
+			for(t=0;t<symCount;t++)
 				if(length[t]==i) hufGroup->permute[pp++] = t;
 		/* Count cumulative symbols coded for at each bit length */
 		for (i=minLen;i<=maxLen;i++) temp[i]=limit[i]=0;
@@ -461,11 +461,11 @@ extern int start_bunzip(bunzip_data **bdp, int src_fd, char *inbuf, int len)
 	if(!(bd=*bdp=malloc(i))) return RETVAL_OUT_OF_MEMORY;
 	memset(bd,0,sizeof(bunzip_data));
 	if(len) {
-		bd->inbuf=inbuf;
+		bd->inbuf=(unsigned char*)inbuf;
 		bd->inbufCount=len;
 		bd->in_fd=-1;
 	} else {
-		bd->inbuf=(char *)(bd+1);
+		bd->inbuf=(unsigned char *)(bd+1);
 		bd->in_fd=src_fd;
 	}
 	/* Init the CRC32 table (big endian) */

@@ -61,14 +61,14 @@ static void put32(std::ofstream &file, const unsigned long data) {
 
 static void write(std::ofstream &file, const unsigned char data) {
 	static const char inf[] = { 0x00, 0x00, 0x01 };
-	
+
 	file.write(inf, sizeof(inf));
 	file.put(data & 0xFF);
 }
 
 static void write(std::ofstream &file, const unsigned short data) {
 	static const char inf[] = { 0x00, 0x00, 0x02 };
-	
+
 	file.write(inf, sizeof(inf));
 	file.put(data >> 8 & 0xFF);
 	file.put(data & 0xFF);
@@ -76,7 +76,7 @@ static void write(std::ofstream &file, const unsigned short data) {
 
 static void write(std::ofstream &file, const unsigned long data) {
 	static const char inf[] = { 0x00, 0x00, 0x04 };
-	
+
 	file.write(inf, sizeof(inf));
 	put32(file, data);
 }
@@ -92,36 +92,36 @@ static void write(std::ofstream &file, const unsigned char *data, const unsigned
 
 static void write(std::ofstream &file, const bool *data, const unsigned long sz) {
 	put24(file, sz);
-	
+
 	for (unsigned long i = 0; i < sz; ++i)
 		file.put(data[i]);
 }
 
 static unsigned long get24(std::ifstream &file) {
 	unsigned long tmp = file.get() & 0xFF;
-	
+
 	tmp = tmp << 8 | (file.get() & 0xFF);
-	
+
 	return tmp << 8 | (file.get() & 0xFF);
 }
 
 static unsigned long read(std::ifstream &file) {
 	unsigned long size = get24(file);
-	
+
 	if (size > 4) {
 		file.ignore(size - 4);
 		size = 4;
 	}
-	
+
 	unsigned long out = 0;
-	
+
 	switch (size) {
 	case 4: out = (out | (file.get() & 0xFF)) << 8;
 	case 3: out = (out | (file.get() & 0xFF)) << 8;
 	case 2: out = (out | (file.get() & 0xFF)) << 8;
 	case 1: out = out | (file.get() & 0xFF);
 	}
-	
+
 	return out;
 }
 
@@ -143,13 +143,13 @@ static inline void read(std::ifstream &file, bool &data) {
 
 static void read(std::ifstream &file, unsigned char *data, unsigned long sz) {
 	const unsigned long size = get24(file);
-	
+
 	if (size < sz)
 		sz = size;
-	
+
 	file.read(reinterpret_cast<char*>(data), sz);
 	file.ignore(size - sz);
-	
+
 	if (static_cast<unsigned char>(0x100)) {
 		for (unsigned long i = 0; i < sz; ++i)
 			data[i] &= 0xFF;
@@ -158,13 +158,13 @@ static void read(std::ifstream &file, unsigned char *data, unsigned long sz) {
 
 static void read(std::ifstream &file, bool *data, unsigned long sz) {
 	const unsigned long size = get24(file);
-	
+
 	if (size < sz)
 		sz = size;
-	
+
 	for (unsigned long i = 0; i < sz; ++i)
 		data[i] = file.get();
-	
+
 	file.ignore(size - sz);
 }
 
@@ -172,11 +172,11 @@ class SaverList {
 public:
 	typedef std::vector<Saver> list_t;
 	typedef list_t::const_iterator const_iterator;
-	
+
 private:
 	list_t list;
 	unsigned char maxLabelsize_;
-	
+
 public:
 	SaverList();
 	const_iterator begin() const { return list.begin(); }
@@ -204,7 +204,7 @@ SaverList::SaverList() {
 	Saver saver = { label, Func::save, Func::load, sizeof label }; \
 	list.push_back(saver); \
 } while (0)
-	
+
 	{ static const char label[] = { c,c,           NUL }; ADD(cpu.cycleCounter); }
 	{ static const char label[] = { p,c,           NUL }; ADD(cpu.PC); }
 	{ static const char label[] = { s,p,           NUL }; ADD(cpu.SP); }
@@ -306,16 +306,16 @@ SaverList::SaverList() {
 	{ static const char label[] = { r,t,c,m,       NUL }; ADD(rtc.dataM); }
 	{ static const char label[] = { r,t,c,s,       NUL }; ADD(rtc.dataS); }
 	{ static const char label[] = { r,t,c,l,l,d,   NUL }; ADD(rtc.lastLatchData); }
-	
+
 #undef ADD
 #undef ADDPTR
 #undef ADDTIME
 
 	list.resize(list.size());
 	std::sort(list.begin(), list.end());
-	
+
 	maxLabelsize_ = 0;
-	
+
 	for (std::size_t i = 0; i < list.size(); ++i) {
 		if (list[i].labelsize > maxLabelsize_)
 			maxLabelsize_ = list[i].labelsize;
@@ -324,26 +324,26 @@ SaverList::SaverList() {
 
 static void writeSnapShot(std::ofstream &file, const Gambatte::uint_least32_t *pixels, const unsigned pitch) {
 	put24(file, pixels ? StateSaver::SS_WIDTH * StateSaver::SS_HEIGHT * sizeof(Gambatte::uint_least32_t) : 0);
-	
+
 	if (pixels) {
 		Gambatte::uint_least32_t buf[StateSaver::SS_WIDTH];
-		
+
 		for (unsigned h = StateSaver::SS_HEIGHT; h--;) {
 			for (unsigned x = 0; x < StateSaver::SS_WIDTH; ++x) {
 				unsigned long rb = 0;
 				unsigned long g = 0;
-				
+
 				static const unsigned w[StateSaver::SS_DIV] = { 3, 5, 5, 3 };
-				
+
 				for (unsigned y = 0; y < StateSaver::SS_DIV; ++y)
 					for (unsigned xx = 0; xx < StateSaver::SS_DIV; ++xx) {
 						rb += (pixels[x * StateSaver::SS_DIV + y * pitch + xx] & 0xFF00FF) * w[y] * w[xx];
 						g += (pixels[x * StateSaver::SS_DIV + y * pitch + xx] & 0x00FF00) * w[y] * w[xx];
 					}
-				
+
 				buf[x] = (rb >> 8 & 0xFF00FF) | (g >> 8 & 0x00FF00);
 			}
-			
+
 			file.write(reinterpret_cast<const char*>(buf), sizeof(buf));
 			pixels += pitch * StateSaver::SS_DIV;
 		}
@@ -354,14 +354,14 @@ static SaverList list;
 
 void StateSaver::saveState(const SaveState &state, const char *filename) {
 	std::ofstream file(filename, std::ios_base::binary);
-	
+
 	if (file.fail())
 		return;
-	
+
 	{ static const char ver[] = { 0, 0 }; file.write(ver, sizeof(ver)); }
-	
+
 	writeSnapShot(file, state.ppu.drawBuffer.get(), state.ppu.drawBuffer.getSz() / 144);
-	
+
 	for (SaverList::const_iterator it = list.begin(); it != list.end(); ++it) {
 		file.write(it->label, it->labelsize);
 		(*it->save)(file, state);
@@ -370,38 +370,38 @@ void StateSaver::saveState(const SaveState &state, const char *filename) {
 
 bool StateSaver::loadState(SaveState &state, const char *filename) {
 	std::ifstream file(filename, std::ios_base::binary);
-	
+
 	if (file.fail() || file.get() != 0)
 		return false;
-	
+
 	file.ignore();
 	file.ignore(get24(file));
-	
+
 	Array<char> labelbuf(list.maxLabelsize());
-	const Saver labelbufSaver = { label: labelbuf, save: 0, load: 0, labelsize: (unsigned char)list.maxLabelsize() };
-	
+	const Saver labelbufSaver = { .label = labelbuf, .save = 0, .load = 0, .labelsize = (unsigned char)list.maxLabelsize() };
+
 	SaverList::const_iterator done = list.begin();
-	
+
 	while (file.good() && done != list.end()) {
 		file.getline(labelbuf, list.maxLabelsize(), NUL);
-		
+
 		SaverList::const_iterator it = done;
-		
+
 		if (std::strcmp(labelbuf, it->label)) {
 			it = std::lower_bound(it + 1, list.end(), labelbufSaver);
-			
+
 			if (it == list.end() || std::strcmp(labelbuf, it->label)) {
 				file.ignore(get24(file));
 				continue;
 			}
 		} else
 			++done;
-		
+
 		(*it->load)(file, state);
 	}
-	
+
 	state.cpu.cycleCounter &= 0x7FFFFFFF;
 	state.spu.cycleCounter &= 0x7FFFFFFF;
-	
+
 	return true;
 }
