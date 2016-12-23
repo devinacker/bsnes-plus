@@ -56,6 +56,7 @@ InputSettingsWindow::InputSettingsWindow() {
 
   connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(synchronize()));
   connect(list, SIGNAL(itemActivated(QTreeWidgetItem*, int)), this, SLOT(activateAssign()));
+  connect(list, SIGNAL(itemExpanded(QTreeWidgetItem*)), this, SLOT(shouldResize()));
   connect(assignButton, SIGNAL(released()), this, SLOT(assign()));
   connect(unassignButton, SIGNAL(released()), this, SLOT(unassign()));
   connect(xAxisButton, SIGNAL(released()), this, SLOT(xAxisAssign()));
@@ -101,6 +102,7 @@ InputSettingsWindow::InputSettingsWindow() {
 
   updateList();
   synchronize();
+  list->header()->resizeSections(QHeaderView::ResizeToContents);
 }
 
 void InputSettingsWindow::synchronize() {
@@ -362,4 +364,8 @@ void InputSettingsWindow::stop() {
 
 void InputSettingsWindow::toggleModifierEnable() {
   config().input.modifierEnable = !modifierEnable->isChecked();
+}
+
+void InputSettingsWindow::shouldResize() {
+  list->header()->resizeSections(QHeaderView::ResizeToContents);
 }
