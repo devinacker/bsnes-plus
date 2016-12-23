@@ -57,11 +57,11 @@ Debugger::Debugger() {
   consoleLayout = new QVBoxLayout;
   consoleLayout->setSpacing(0);
   layout->addLayout(consoleLayout);
-  
+
   console = new QTextEdit;
   console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   console->setReadOnly(true);
-  console->setFont(QFont(Style::Monospace));
+  console->setFont(QFont(Style::Monospace, Style::MonospaceSize));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
   console->setMinimumHeight((25 + 1) * console->fontMetrics().height());

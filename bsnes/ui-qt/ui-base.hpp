@@ -90,6 +90,7 @@ using namespace ruby;
 
 struct Style {
   static const char Monospace[64];
+  static int MonospaceSize;
 
   enum {
     WindowMargin     = 5,
