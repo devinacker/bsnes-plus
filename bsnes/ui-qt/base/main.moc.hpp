@@ -91,6 +91,10 @@ public:
     QAction *tools_effectToggle;
     QAction *tools_soundViewer;
     QAction *tools_debugger;
+#if defined(PLATFORM_OSX)
+  QMenu *debugger_menu;
+    QAction *debugger_show;
+#endif
   QMenu *help;
     QAction *help_documentation;
     QAction *help_license;
@@ -171,6 +175,7 @@ public slots:
   void showDocumentation();
   void showLicense();
   void showAbout();
+  void debuggerMenuAction(QAction*);
 };
 
 extern MainWindow *mainWindow;

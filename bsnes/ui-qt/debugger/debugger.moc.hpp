@@ -37,6 +37,8 @@ public:
   QCheckBox *traceMask;
   QWidget *spacer;
 
+  void menuAction(int);
+
   void modifySystemState(unsigned);
   void echo(const char *message);
   void event();

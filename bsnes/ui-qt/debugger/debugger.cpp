@@ -36,7 +36,9 @@ Debugger::Debugger() {
   setLayout(layout);
 
   menu = new QMenuBar;
+  #if !defined(PLATFORM_OSX)
   layout->setMenuBar(menu);
+  #endif
 
   menu_tools = menu->addMenu("Tools");
   menu_tools_disassembler = menu_tools->addAction("Disassembler ...");
@@ -288,6 +290,23 @@ void Debugger::switchWindow() {
     mainWindow->activateWindow();
   }
 }
+
+void Debugger::menuAction(int index) {
+  switch (index) {
+    case 1: disassembler->show(); break;
+    case 2: breakpointEditor->show(); break;
+    case 3: memoryEditor->show(); break;
+    case 4: propertiesViewer->show(); break;
+    case 5: vramViewer->show(); break;
+    case 6: tilemapViewer->show(); break;
+    case 7: oamViewer->show(); break;
+    case 8: cgramViewer->show(); break;
+    case 9: clear(); break;
+    case 10: debuggerOptions->show(); break;
+    default: break;
+  }
+}
+
 
 void Debugger::toggleRunStatus() {
   application.debug = !application.debug || application.debugrun;

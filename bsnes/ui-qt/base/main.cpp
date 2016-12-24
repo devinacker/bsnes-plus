@@ -187,12 +187,35 @@ MainWindow::MainWindow() {
   tools_effectToggle = tools->addAction("Effect &Toggle ...");
   if(!SNES::PPU::SupportsLayerEnable && !SNES::DSP::SupportsChannelEnable)
     tools_effectToggle->setVisible(false);
-  
+
   tools_soundViewer = tools->addAction("Sound &Viewer ...");
 
+  #if !defined(PLATFORM_OSX)
   tools_debugger = tools->addAction("&Debugger ...");
   #if !defined(DEBUGGER)
   tools_debugger->setVisible(false);
+  #endif
+  #endif
+
+  #if defined(PLATFORM_OSX) && defined(DEBUGGER)
+  debugger_menu = menuBar->addMenu("Debugger");
+  debugger_show = debugger_menu->addAction("Show Debugger");
+  debugger_menu->addSeparator();
+
+  { QAction *debug_action = debugger_menu->addAction("Disassembler"); debug_action->setData(1); }
+  { QAction *debug_action = debugger_menu->addAction("Breakpoints"); debug_action->setData(2); }
+  { QAction *debug_action = debugger_menu->addAction("Memory Editor"); debug_action->setData(3); }
+  { QAction *debug_action = debugger_menu->addAction("Properties Viewer"); debug_action->setData(4); }
+  debugger_menu->addSeparator();
+
+  { QAction *debug_action = debugger_menu->addAction("VRAM Viewer"); debug_action->setData(5); }
+  { QAction *debug_action = debugger_menu->addAction("Tilemap Viewer"); debug_action->setData(6); }
+  { QAction *debug_action = debugger_menu->addAction("Sprite Viewer"); debug_action->setData(7); }
+  { QAction *debug_action = debugger_menu->addAction("Palette Viewer"); debug_action->setData(8); }
+  debugger_menu->addSeparator();
+
+  { QAction *debug_action = debugger_menu->addAction("Clear Console"); debug_action->setData(9); }
+  { QAction *debug_action = debugger_menu->addAction("Debugger Options"); debug_action->setData(10); }
   #endif
 
   help = menuBar->addMenu("&Help");
@@ -308,7 +331,13 @@ MainWindow::MainWindow() {
   connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
   connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
   connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
-  connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
+  #if defined(DEBUGGER)
+    #if !defined(PLATFORM_OSX)
+      connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
+    #else
+      connect(debugger_menu, SIGNAL(triggered(QAction*)), this, SLOT(debuggerMenuAction(QAction*)), Qt::UniqueConnection);
+    #endif
+  #endif
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
   connect(help_license, SIGNAL(triggered()), this, SLOT(showLicense()));
   connect(help_about, SIGNAL(triggered()), this, SLOT(showAbout()));
@@ -621,6 +650,17 @@ void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 void MainWindow::showDebugger() {
   #if defined(DEBUGGER)
   debugger->show();
+  #endif
+}
+
+void MainWindow::debuggerMenuAction(QAction *action) {
+  #if defined(DEBUGGER)
+  int window = action->data().toInt();
+  if (window == 0) {
+    showDebugger();
+  } else {
+    debugger->menuAction(window);
+  }
   #endif
 }
 
