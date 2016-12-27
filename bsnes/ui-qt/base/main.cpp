@@ -22,7 +22,7 @@ MainWindow::MainWindow() {
   system_loadSpecial = system->addMenu("Load &Special");
 
   system_loadSpecial_bsx = system_loadSpecial->addAction("Load &BS-X Cartridge ...");
-  
+
   system_loadSpecial_bsxSlotted = system_loadSpecial->addAction("Load BS-X &Slotted Cartridge ...");
 
   system_loadSpecial_sufamiTurbo = system_loadSpecial->addAction("Load Sufami &Turbo Cartridge ...");
@@ -155,7 +155,7 @@ MainWindow::MainWindow() {
   tools_movies_recordFromHere = tools_movies->addAction("Record Movie (starting from here)");
 
   tools_captureScreenshot = tools->addAction("&Capture Screenshot");
-  
+
   tools_captureSPC = tools->addAction("Capture &SPC Dump");
 
   tools->addSeparator();
@@ -202,20 +202,20 @@ MainWindow::MainWindow() {
   debugger_show = debugger_menu->addAction("Show Debugger");
   debugger_menu->addSeparator();
 
-  { QAction *debug_action = debugger_menu->addAction("Disassembler"); debug_action->setData(1); }
-  { QAction *debug_action = debugger_menu->addAction("Breakpoints"); debug_action->setData(2); }
-  { QAction *debug_action = debugger_menu->addAction("Memory Editor"); debug_action->setData(3); }
-  { QAction *debug_action = debugger_menu->addAction("Properties Viewer"); debug_action->setData(4); }
+  { QAction *debug_action = debugger_menu->addAction("Disassembler"); debug_action->setData(Debugger::MenuAction::DisassemblerWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Breakpoint Editor"); debug_action->setData(Debugger::MenuAction::BreakpointsWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Memory Editor"); debug_action->setData(Debugger::MenuAction::MemoryWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Properties"); debug_action->setData(Debugger::MenuAction::PropertiesWindow); }
   debugger_menu->addSeparator();
 
-  { QAction *debug_action = debugger_menu->addAction("VRAM Viewer"); debug_action->setData(5); }
-  { QAction *debug_action = debugger_menu->addAction("Tilemap Viewer"); debug_action->setData(6); }
-  { QAction *debug_action = debugger_menu->addAction("Sprite Viewer"); debug_action->setData(7); }
-  { QAction *debug_action = debugger_menu->addAction("Palette Viewer"); debug_action->setData(8); }
+  { QAction *debug_action = debugger_menu->addAction("Video RAM Viewer"); debug_action->setData(Debugger::MenuAction::VRAMWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Tilemap Viewer"); debug_action->setData(Debugger::MenuAction::TilemapWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Sprite Viewer"); debug_action->setData(Debugger::MenuAction::OAMWindow); }
+  { QAction *debug_action = debugger_menu->addAction("Palette Viewer"); debug_action->setData(Debugger::MenuAction::CGRAMWindow); }
   debugger_menu->addSeparator();
 
-  { QAction *debug_action = debugger_menu->addAction("Clear Console"); debug_action->setData(9); }
-  { QAction *debug_action = debugger_menu->addAction("Debugger Options"); debug_action->setData(10); }
+  { QAction *debug_action = debugger_menu->addAction("Clear Console"); debug_action->setData(Debugger::MenuAction::ClearConsole); }
+  { QAction *debug_action = debugger_menu->addAction("Debugger Options"); debug_action->setData(Debugger::MenuAction::OptionsWindow); }
   #endif
 
   help = menuBar->addMenu("&Help");
@@ -655,11 +655,11 @@ void MainWindow::showDebugger() {
 
 void MainWindow::debuggerMenuAction(QAction *action) {
   #if defined(DEBUGGER)
-  int window = action->data().toInt();
-  if (window == 0) {
+  Debugger::MenuAction menu_action = (Debugger::MenuAction)action->data().toInt();
+  if (menu_action == Debugger::MenuAction::MainWindow) {
     showDebugger();
   } else {
-    debugger->menuAction(window);
+    debugger->menuAction(menu_action);
   }
   #endif
 }

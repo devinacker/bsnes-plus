@@ -130,7 +130,7 @@ Debugger::Debugger() {
 
   stepSFX = new QCheckBox("Step SuperFX");
   controlLayout->addWidget(stepSFX);
-  
+
   controlLayout->addSpacing(Style::WidgetSpacing);
 
   traceCPU = new QCheckBox("Trace S-CPU opcodes");
@@ -138,10 +138,10 @@ Debugger::Debugger() {
 
   traceSMP = new QCheckBox("Trace S-SMP opcodes");
   controlLayout->addWidget(traceSMP);
-  
+
   traceSA1 = new QCheckBox("Trace SA-1 opcodes");
   controlLayout->addWidget(traceSA1);
-  
+
   traceSFX = new QCheckBox("Trace SuperFX opcodes");
   controlLayout->addWidget(traceSFX);
 
@@ -177,11 +177,11 @@ Debugger::Debugger() {
   connect(menu_misc_options, SIGNAL(triggered()), debuggerOptions, SLOT(show()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
-  
+
   connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
   connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
   connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
-  
+
   connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
   connect(stepSA1, SIGNAL(released()), this, SLOT(synchronize()));
@@ -195,7 +195,7 @@ Debugger::Debugger() {
   frameCounter = 0;
   synchronize();
   resize(855, 425);
-  
+
   QTimer *updateTimer = new QTimer(this);
   connect(updateTimer, SIGNAL(timeout()), this, SLOT(frameTick()));
   updateTimer->start(15);
@@ -208,29 +208,29 @@ void Debugger::modifySystemState(unsigned state) {
 
   if(state == Utility::LoadCartridge) {
     memset(SNES::cpu.cart_usage, 0x00, 1 << 24);
-    
+
     memset(SNES::cpu.usage, 0x00, 1 << 24);
     memset(SNES::smp.usage, 0x00, 1 << 16);
-    
+
     memset(SNES::sa1.usage, 0x00, 1 << 24);
     memset(SNES::superfx.usage, 0x00, 1 << 23);
-    
+
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
       if (SNES::cartridge.has_sa1())     fp.read(SNES::sa1.usage, 1 << 24);
       if (SNES::cartridge.has_superfx()) fp.read(SNES::superfx.usage, 1 << 23);
       fp.close();
-      
+
       for (unsigned i = 0; i < 1 << 24; i++) {
         int offset = SNES::cartridge.rom_offset(i);
-        if (offset >= 0) 
+        if (offset >= 0)
           SNES::cpu.cart_usage[offset] |= SNES::cpu.usage[i] | SNES::sa1.usage[i];
         if (offset >= 0 && i < 0x600000)
           SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
     }
-    
+
     tracer->resetTraceState();
   }
 
@@ -249,17 +249,17 @@ void Debugger::synchronize() {
   bool active = application.debug && !application.debugrun;
 
   runBreak->defaultAction()->setText(active ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && active && 
-                     (stepCPU->isChecked() || stepSMP->isChecked() || 
+  bool stepEnabled = SNES::cartridge.loaded() && active &&
+                     (stepCPU->isChecked() || stepSMP->isChecked() ||
                       stepSA1->isChecked() || stepSFX->isChecked());
-  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + 
+  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() +
                                           stepSA1->isChecked() + stepSFX->isChecked() == 1)
                           && !stepSFX->isChecked(); // TODO: implement this for superfx
-  
+
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
-  
+
   // todo: factor in whether or not cartridge actually contains SA1/SuperFX
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
   SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
@@ -291,22 +291,21 @@ void Debugger::switchWindow() {
   }
 }
 
-void Debugger::menuAction(int index) {
-  switch (index) {
-    case 1: disassembler->show(); break;
-    case 2: breakpointEditor->show(); break;
-    case 3: memoryEditor->show(); break;
-    case 4: propertiesViewer->show(); break;
-    case 5: vramViewer->show(); break;
-    case 6: tilemapViewer->show(); break;
-    case 7: oamViewer->show(); break;
-    case 8: cgramViewer->show(); break;
-    case 9: clear(); break;
-    case 10: debuggerOptions->show(); break;
+void Debugger::menuAction(MenuAction action) {
+  switch (action) {
+    case DisassemblerWindow:  disassembler->show(); break;
+    case BreakpointsWindow:   breakpointEditor->show(); break;
+    case MemoryWindow:        memoryEditor->show(); break;
+    case PropertiesWindow:    propertiesViewer->show(); break;
+    case VRAMWindow:          vramViewer->show(); break;
+    case TilemapWindow:       tilemapViewer->show(); break;
+    case OAMWindow:           oamViewer->show(); break;
+    case CGRAMWindow:         cgramViewer->show(); break;
+    case OptionsWindow:       debuggerOptions->show(); break;
+    case ClearConsole:        clear(); break;
     default: break;
   }
 }
-
 
 void Debugger::toggleRunStatus() {
   application.debug = !application.debug || application.debugrun;
@@ -317,7 +316,7 @@ void Debugger::toggleRunStatus() {
     audio.clear();
   }
   synchronize();
-  
+
   // TODO: disassemble current address when breaking (if any are selected)
 }
 
@@ -332,7 +331,7 @@ void Debugger::stepOverAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepOver;
   SNES::debugger.step_over_new = true;
   SNES::debugger.call_count = 0;
-  
+
   application.debugrun = true;
   synchronize();
   switchWindow();
@@ -341,7 +340,7 @@ void Debugger::stepOverAction() {
 void Debugger::stepOutAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepOut;
   SNES::debugger.call_count = 0;
-  
+
   application.debugrun = true;
   synchronize();
   switchWindow();
@@ -358,7 +357,7 @@ void Debugger::event() {
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
-      
+
       if (n < SNES::Debugger::Breakpoints)
         echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
       else if (n == SNES::Debugger::SoftBreakCPU)
@@ -366,7 +365,7 @@ void Debugger::event() {
       else if (n == SNES::Debugger::SoftBreakSA1)
         echo(string() << "Software breakpoint hit (SA-1).<br>");
       else break;
-        
+
       if(n == SNES::Debugger::SoftBreakCPU
            || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus
            || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::VRAM
@@ -393,7 +392,7 @@ void Debugger::event() {
         registerEditSA1->setEnabled(true);
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
@@ -404,7 +403,7 @@ void Debugger::event() {
         registerEditSMP->setEnabled(true);
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
         SNES::debugger.step_sfx = true;
         SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
@@ -434,7 +433,7 @@ void Debugger::event() {
       disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
       registerEditSMP->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
       string s = t;
@@ -443,7 +442,7 @@ void Debugger::event() {
       disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
       registerEditSA1->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SFXStep: {
       SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc, true);
       string s = t;
@@ -457,7 +456,7 @@ void Debugger::event() {
   // disable speedup/slowdown since the main window isn't going to register
   // the user probably releasing the key while the debug window is active
   HotkeyInput::releaseSpeedKeys();
-  
+
   audio.clear();
   autoUpdate();
   activateWindow();
@@ -472,10 +471,10 @@ void Debugger::frameTick() {
     autoUpdate();
   } else {
     // update memory editor every time since once per second isn't very useful
-    // (TODO: and PPU viewers, maybe?) 
+    // (TODO: and PPU viewers, maybe?)
     memoryEditor->autoUpdate();
   }
-  
+
   frameCounter = frame;
 }
 
@@ -486,7 +485,7 @@ void Debugger::autoUpdate() {
   tilemapViewer->autoUpdate();
   oamViewer->autoUpdate();
   cgramViewer->autoUpdate();
-  
+
   registerEditCPU->synchronize();
   registerEditSA1->synchronize();
   registerEditSMP->synchronize();

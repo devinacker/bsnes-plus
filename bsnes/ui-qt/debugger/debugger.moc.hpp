@@ -37,13 +37,27 @@ public:
   QCheckBox *traceMask;
   QWidget *spacer;
 
-  void menuAction(int);
-
   void modifySystemState(unsigned);
   void echo(const char *message);
   void event();
   void autoUpdate();
   Debugger();
+
+  enum MenuAction {
+    MainWindow = 0,
+    DisassemblerWindow,
+    BreakpointsWindow,
+    MemoryWindow,
+    PropertiesWindow,
+    VRAMWindow,
+    TilemapWindow,
+    OAMWindow,
+    CGRAMWindow,
+    OptionsWindow,
+    ClearConsole
+  } MenuAction_t;
+
+  void menuAction(MenuAction);
 
 public slots:
   void clear();
