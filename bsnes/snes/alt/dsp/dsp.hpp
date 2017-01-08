@@ -11,6 +11,7 @@ public:
   bool mute();
   uint8 read(uint8 addr);
   void write(uint8 addr, uint8 data);
+  void load(uint8 const regs [SPC_DSP::register_count]);
 
   void enter();
   void power();

@@ -11,6 +11,8 @@ public:
   bool mute();
   uint8 read(uint8 addr);
   void write(uint8 addr, uint8 data);
+  enum { register_count = 128 };
+  void load(uint8 const regs [register_count]);
 
   void enter();
   void power();
@@ -58,7 +60,7 @@ private:
 
   //global state
   struct state_t {
-    uint8 regs[128];
+    uint8 regs[register_count];
 
     modulo_array<int, echo_hist_size> echo_hist[2];  //echo history keeps most recent 8 samples
     int echo_hist_pos;
@@ -179,6 +181,8 @@ private:
   //dsp
   static void Enter();
   void tick();
+  
+  void reset_common();
 
   friend class DSPDebugger;
 };
