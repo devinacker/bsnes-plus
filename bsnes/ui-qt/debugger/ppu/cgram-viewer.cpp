@@ -62,9 +62,9 @@ void CgramViewer::refresh() {
     text << "<table>";
     text << "<tr><td>Index:</td><td>" << selected << "</td></tr>";
     text << "<tr><td>Value:</td><td>0x" << hex<4>(color) << "</td></tr>";
-    text << "<tr><td>Red:</td><td>" << (unsigned)(r >> 3) << "</td></tr>";
-    text << "<tr><td>Green:</td><td>" << (unsigned)(g >> 3) << "</td></tr>";
-    text << "<tr><td>Blue:</td><td>" << (unsigned)(b >> 3) << "</td></tr>";
+    text << "<tr><td>Red:</td><td>" << (unsigned)r << "</td></tr>";
+    text << "<tr><td>Green:</td><td>" << (unsigned)g << "</td></tr>";
+    text << "<tr><td>Blue:</td><td>" << (unsigned)b << "</td></tr>";
     text << "</table>";
   }
   colorInfo->setText(text);
