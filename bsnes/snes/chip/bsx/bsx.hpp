@@ -59,6 +59,7 @@ public:
 private:
   struct {
     uint8 r[16];
+    bool dirty;
   } regs;
 
   void update_memory_map();
