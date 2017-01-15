@@ -118,6 +118,10 @@ void PPU::serialize(serializer &s) {
   s.integer(regs.oam_interlace);
   s.integer(regs.interlace);
 
+  s.integer(regs.mpyl);
+  s.integer(regs.mpym);
+  s.integer(regs.mpyh);
+
   s.integer(regs.hcounter);
   s.integer(regs.vcounter);
   s.integer(regs.latch_hcounter);

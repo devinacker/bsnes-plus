@@ -64,6 +64,10 @@ void PPU::serialize(serializer &s) {
   s.integer(regs.overscan);
   s.integer(regs.interlace);
 
+  s.integer(regs.mpyl);
+  s.integer(regs.mpym);
+  s.integer(regs.mpyh);
+
   s.integer(regs.hcounter);
   s.integer(regs.vcounter);
 

@@ -577,6 +577,7 @@ uint8 PPU::mmio_r2134() {
     return result >> 0;
   
   regs.ppu1_mdr = (result >>  0);
+  regs.mpyl = regs.ppu1_mdr;
   return regs.ppu1_mdr;
 }
 
@@ -587,6 +588,7 @@ uint8 PPU::mmio_r2135() {
     return result >> 8;
   
   regs.ppu1_mdr = (result >>  8);
+  regs.mpym = regs.ppu1_mdr;
   return regs.ppu1_mdr;
 }
 
@@ -597,6 +599,7 @@ uint8 PPU::mmio_r2136() {
     return result >> 16;
     
   regs.ppu1_mdr = (result >> 16);
+  regs.mpyh = regs.ppu1_mdr;
   return regs.ppu1_mdr;
 }
 
@@ -839,6 +842,13 @@ void PPU::mmio_reset() {
   regs.pseudo_hires = random(false);
   regs.overscan = false;
   regs.interlace = false;
+
+  //$2134  MPYL
+  //$2135  MPYM
+  //$2136  MPYH
+  regs.mpyl = random(0x00);
+  regs.mpym = random(0x00);
+  regs.mpyh = random(0x00);
 
   //$213c  OPHCT
   regs.hcounter = 0;

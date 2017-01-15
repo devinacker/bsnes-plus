@@ -379,6 +379,18 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("OAM Interlace", regs.oam_interlace);
   item("Interlace", regs.interlace);
 
+  //$2134
+  item("$2134", "");
+  item("Multiplication Result Low", string("0x", hex<2>(regs.mpyl)));
+
+  //$2135
+  item("$2135", "");
+  item("Multiplication Result Mid", string("0x", hex<2>(regs.mpym)));
+
+  //$2136
+  item("$2136", "");
+  item("Multiplication Result High", string("0x", hex<2>(regs.mpyh)));
+
   //$213c
   item("$213c", "");
   item("H-counter", (unsigned)regs.hcounter);

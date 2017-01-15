@@ -68,6 +68,11 @@ struct Regs {
   bool overscan;
   bool interlace;
 
+  //$2134-$2136
+  uint8 mpyl;
+  uint8 mpym;
+  uint8 mpyh;
+
   //$213c
   uint16 hcounter;
 
