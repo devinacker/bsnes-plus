@@ -323,11 +323,6 @@ void PPU::power() {
   regs.oam_interlace = false;
   regs.interlace     = false;
 
-  //$2134-$2136
-  regs.mpyl = 0;
-  regs.mpym = 0;
-  regs.mpyh = 0;
-
   //$2137
   regs.hcounter         = 0;
   regs.vcounter         = 0;

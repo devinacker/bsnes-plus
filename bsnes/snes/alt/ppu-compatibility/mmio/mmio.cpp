@@ -434,10 +434,8 @@ void PPU::mmio_w2133(uint8 value) {
 uint8 PPU::mmio_r2134() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  if(!Memory::debugger_access()) {
+  if(!Memory::debugger_access())
     regs.ppu1_mdr = r;
-    regs.mpyl = regs.ppu1_mdr;
-  }
   return r;
 }
 
@@ -445,10 +443,8 @@ uint32 r;
 uint8 PPU::mmio_r2135() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  if(!Memory::debugger_access()) {
+  if(!Memory::debugger_access())
     regs.ppu1_mdr = r >> 8;
-    regs.mpym = regs.ppu1_mdr;
-  }
   return r >> 8;
 }
 
@@ -456,10 +452,8 @@ uint32 r;
 uint8 PPU::mmio_r2136() {
 uint32 r;
   r = ((int16)regs.m7a * (int8)(regs.m7b >> 8));
-  if(!Memory::debugger_access()) {
+  if(!Memory::debugger_access())
     regs.ppu1_mdr = r >> 16;
-    regs.mpyh = regs.ppu1_mdr;
-  }
   return r >> 16;
 }
 

@@ -175,7 +175,6 @@ uint8 PPU::mmio_read(unsigned addr) {
         return result;
       
       regs.ppu1_mdr = result >>  0;
-      regs.mpyl = regs.ppu1_mdr;
       return regs.ppu1_mdr;
     }
 
@@ -186,7 +185,6 @@ uint8 PPU::mmio_read(unsigned addr) {
         return result >> 8;
         
       regs.ppu1_mdr = result >>  8;
-      regs.mpym = regs.ppu1_mdr;
       return regs.ppu1_mdr;
     }
 
@@ -197,7 +195,6 @@ uint8 PPU::mmio_read(unsigned addr) {
         return result >> 16;
       
       regs.ppu1_mdr = result >> 16;
-      regs.mpyh = regs.ppu1_mdr;
       return regs.ppu1_mdr;
     }
 
@@ -943,11 +940,6 @@ void PPU::mmio_reset() {
   regs.overscan = 0;
   oam.regs.interlace = 0;
   regs.interlace = 0;
-
-  //$2134-$2136
-  regs.mpyl = 0;
-  regs.mpym = 0;
-  regs.mpyh = 0;
 
   //$213e
   oam.regs.time_over = 0;

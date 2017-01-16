@@ -117,11 +117,6 @@ struct {
   bool   oam_interlace;
   bool   interlace;
 
-  //$2134-$2136
-  uint8 mpyl;
-  uint8 mpym;
-  uint8 mpyh;
-
   //$2137
   uint16 hcounter, vcounter;
   bool   latch_hcounter, latch_vcounter;

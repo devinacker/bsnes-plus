@@ -75,13 +75,6 @@ struct {
   bool overscan;
   bool interlace;
 
-  //$2134  MPYL
-  //$2135  MPYM
-  //$2136  MPYH
-  uint8 mpyl;
-  uint8 mpym;
-  uint8 mpyh;
-
   //$213c  OPHCT
   uint16 hcounter;
 
