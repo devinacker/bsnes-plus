@@ -31,3 +31,8 @@ pushd ${dist_dir}
 zip -r -y -9 ${bsnes_version}_osx.zip ${bsnes_version}
 #7z a -r ${bsnes_version}_osx.7z ${bsnes_version}
 popd
+
+#clean up
+cd bsnes
+make clean
+cd ..
