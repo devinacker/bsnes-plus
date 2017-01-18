@@ -35,19 +35,15 @@ public:
   bool acquire() {
     if(acquired()) return true;
 
-    printf("acquire()\n");
     CGDisplayHideCursor(0);
     CGAssociateMouseAndMouseCursorPosition(false);
-
     return device.mouse_acquired = true;
   }
 
   bool unacquire() {
     if(acquired()) {
-      printf("unacquire()\n");
       CGDisplayShowCursor(0);
       CGAssociateMouseAndMouseCursorPosition(true);
-
       device.mouse_acquired = false;
     }
     return true;
