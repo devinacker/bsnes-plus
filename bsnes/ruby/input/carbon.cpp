@@ -1,25 +1,68 @@
+#include <Carbon/Carbon.h>
+
 namespace ruby {
 
 class pInputCarbon {
 public:
+  struct {
+    bool mouse_acquired;
+  } device;
+
+  struct {
+    uintptr_t handle;
+  } settings;
+
   bool cap(const string& name) {
+    if(name == Input::Handle) return true;
+    if(name == Input::KeyboardSupport) return true;
+    if(name == Input::MouseSupport) return true;
     return false;
   }
 
   any get(const string& name) {
+    if(name == Input::Handle) return (uintptr_t)settings.handle;
     return false;
   }
 
-  bool set(const string& name, const any& value) {
+  bool set(const string& name, const any &value) {
+    if(name == Input::Handle) {
+      settings.handle = any_cast<uintptr_t>(value);
+      return true;
+    }
     return false;
   }
 
-  bool acquire() { return false; }
-  bool unacquire() { return false; }
-  bool acquired() { return false; }
+  bool acquire() {
+    if(acquired()) return true;
+
+    printf("acquire()\n");
+    CGDisplayHideCursor(0);
+    CGAssociateMouseAndMouseCursorPosition(false);
+
+    return device.mouse_acquired = true;
+  }
+
+  bool unacquire() {
+    if(acquired()) {
+      printf("unacquire()\n");
+      CGDisplayShowCursor(0);
+      CGAssociateMouseAndMouseCursorPosition(true);
+
+      device.mouse_acquired = false;
+    }
+    return true;
+  }
+
+  bool acquired() {
+    return device.mouse_acquired;
+  }
 
   bool poll(int16_t *table) {
     memset(table, 0, Scancode::Limit * sizeof(int16_t));
+
+    //========
+    //Keyboard
+    //========
 
     KeyMap keys;
     GetKeys(keys);
@@ -141,6 +184,21 @@ public:
     map(0x37, Keyboard::Super);
     #undef map
 
+    //=====
+    //Mouse
+    //=====
+
+    if (acquired()) {
+      int32_t delta_x, delta_y;
+      CGGetLastMouseDelta(&delta_x, &delta_y);
+      uint32 button_state = GetCurrentEventButtonState();
+
+      table[mouse(0).axis(0)] = delta_x;
+      table[mouse(0).axis(1)] = delta_y;
+      table[mouse(0).button(0)] = (bool)(button_state & 1) != 0;
+      table[mouse(0).button(1)] = (bool)(button_state & 2) != 0;
+    }
+
     return true;
   }
 
@@ -149,7 +207,13 @@ public:
   }
 
   void term() {
+    unacquire();
   }
+
+  pInputCarbon() {
+    settings.handle = 0;
+  }
+
 };
 
 DeclareInput(Carbon)
