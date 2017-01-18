@@ -193,10 +193,14 @@ public:
       CGGetLastMouseDelta(&delta_x, &delta_y);
       uint32 button_state = GetCurrentEventButtonState();
 
-      table[mouse(0).axis(0)] = delta_x;
-      table[mouse(0).axis(1)] = delta_y;
-      table[mouse(0).button(0)] = (bool)(button_state & 1) != 0;
-      table[mouse(0).button(1)] = (bool)(button_state & 2) != 0;
+      for (unsigned i = 0; i < (unsigned)Mouse::Count; ++i) {
+        table[mouse(i).axis(0)] = delta_x;
+        table[mouse(i).axis(1)] = delta_y;
+        table[mouse(i).axis(2)] = 0;
+
+        table[mouse(i).button(0)] = (bool)(button_state & 1);
+        for(unsigned n = 1; n < Mouse::Buttons; ++n) table[mouse(i).button(n)] = (bool)(button_state & 2);
+      }
     }
 
     return true;
