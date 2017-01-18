@@ -44,6 +44,7 @@ public:
   BreakpointEditor();
 
   void addBreakpoint(const string& addr, const string& mode, const string& source);
+  void setBreakOnWDM(bool value);
 
 public slots:
   void toggle();

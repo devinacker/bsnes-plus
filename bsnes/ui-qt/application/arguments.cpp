@@ -44,6 +44,8 @@ bool Application::parseArgumentSwitch(const string& arg, const string& parameter
 
     return true;
   }
+
+  if(arg == "--break-on-wdm") { breakpointEditor->setBreakOnWDM(true); return false; }
   #endif
 
   return false;
@@ -56,10 +58,12 @@ void Application::printArguments() {
   puts("  -h / --help                       show help");
   #if defined(DEBUGGER)
   puts("  --show-debugger                   open debugger window on startup\n"
+       "  --break-on-wdm                    break on wdm opcode\n"
        "  -b / --breakpoint <breakpoint>    add breakpoint\n"
        "\n"
-       "Breakpoint format: <addr>[-<addr end>][:<rwx>[:<source>]]\n"
-       "                   rwx = read / write / execute flags\n"
-       "                   source = cpu, smp, vram, oam, cgram, sa1, sfx");
+       "  Breakpoint format: <addr>[-<addr end>][:<rwx>[:<source>]]\n"
+       "                     rwx = read / write / execute flags\n"
+       "                     source = cpu, smp, vram, oam, cgram, sa1, sfx"
+       );
   #endif
 }

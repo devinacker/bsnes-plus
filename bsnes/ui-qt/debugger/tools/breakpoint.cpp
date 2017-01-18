@@ -152,3 +152,7 @@ void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, con
     }
   }
 }
+
+void BreakpointEditor::setBreakOnWDM(bool value) {
+  breakOnWDM->setChecked(value);
+}
