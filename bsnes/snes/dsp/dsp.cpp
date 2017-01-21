@@ -274,6 +274,25 @@ void DSP::write(uint8 addr, uint8 data) {
   }
 }
 
+void DSP::load(uint8 const regs [register_count])
+{
+	memcpy( state.regs, regs, sizeof state.regs );
+	
+	// Internal state
+	for ( int i = 8; --i >= 0; )
+	{
+		voice_t* v = &voice[i];
+		v->brr_offset = 1;
+		v->vbit       = 1 << i;
+		v->vidx       = i * 0x10;
+	}
+	state.new_kon = REG(kon);
+	state.t_dir   = REG(dir);
+	state.t_esa   = REG(esa);
+	
+	reset_common();
+}
+
 /* initialization */
 
 void DSP::power() {
@@ -327,6 +346,14 @@ void DSP::power() {
   reset();
 }
 
+void DSP::reset_common() {
+  state.noise              = 0x4000;
+  state.echo_hist_pos      = 0;
+  state.every_other_sample = 1;
+  state.echo_offset        = 0;
+  state.counter            = 0;
+}
+
 void DSP::reset() {
 #if DSP_THREADED
   create(Enter, system.apu_frequency());
@@ -338,11 +365,7 @@ void DSP::reset() {
 
   REG(flg) = 0xe0;
 
-  state.noise              = 0x4000;
-  state.echo_hist_pos      = 0;
-  state.every_other_sample = 1;
-  state.echo_offset        = 0;
-  state.counter            = 0;
+  reset_common();
 }
 
 DSP::DSP() {

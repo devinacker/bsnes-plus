@@ -113,11 +113,13 @@ endif
 plugins: build
 	@$(MAKE) -C ../snesreader
 	@$(MAKE) -C ../snesfilter
+	@$(MAKE) -C ../snesmusic
 	@$(MAKE) -C ../supergameboy
 ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
 	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
+	cp -f ../snesfilter/libsnesmusic.dylib $(osxbundle)/Contents/Frameworks/libsnesmusic.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
@@ -149,6 +151,7 @@ endif
 plugins_clean:
 	@$(MAKE) clean -C ../snesreader
 	@$(MAKE) clean -C ../snesfilter
+	@$(MAKE) clean -C ../snesmusic
 	@$(MAKE) clean -C ../supergameboy
 
 archive-all:

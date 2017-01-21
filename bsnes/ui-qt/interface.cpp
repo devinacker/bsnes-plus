@@ -1,5 +1,9 @@
 Interface interface;
 
+void Interface::video_extras(uint16_t *data, unsigned width, unsigned height) {
+    if (music.loaded()) music.render((uint16_t*)data, 1024, width, height);
+}
+
 void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned height) {
   bool interlace = (height >= 240);
   bool overscan = (height == 239 || height == 478);

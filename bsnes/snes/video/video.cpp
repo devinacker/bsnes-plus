@@ -72,6 +72,8 @@ void Video::update() {
     }
   }
 
+  system.interface->video_extras(data, width, height);
+
   if(frame_interlace) {
     height <<= 1;
   }

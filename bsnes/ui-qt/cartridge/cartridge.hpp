@@ -26,6 +26,8 @@ public:
   bool loadBsx(const char*, const char*);
   bool loadSufamiTurbo(const char*, const char *, const char*);
   bool loadSuperGameBoy(const char*, const char*);
+  bool loadSpc(const char*);
+  bool loadSnsf(const char*);
   void saveMemory();
   void saveMemoryPack();
   void unload();

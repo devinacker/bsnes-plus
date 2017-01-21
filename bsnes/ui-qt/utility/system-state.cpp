@@ -47,6 +47,7 @@ void Utility::modifySystemState(system_state_t systemState) {
       SNES::system.unload();     //flush all memory to memory::* devices
       cartridge.saveMemory();    //save memory to disk
       SNES::cartridge.unload();  //deallocate memory
+      music.unload();            //disable music display
 
       application.power = false;
       application.pause = true;
