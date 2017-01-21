@@ -32,6 +32,7 @@ const char defaultStylesheet[] =
 
 #include "application/application.cpp"
 #include "link/filter.cpp"
+#include "link/music.cpp"
 #include "link/reader.cpp"
 #include "utility/utility.cpp"
 

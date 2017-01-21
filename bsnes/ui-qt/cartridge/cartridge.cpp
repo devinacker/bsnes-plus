@@ -209,6 +209,80 @@ bool Cartridge::loadSuperGameBoy(const char *base, const char *slot) {
   return true;
 }
 
+bool Cartridge::loadSpc(const char *base) {
+  unload();
+  if (!music.opened()) return false;
+  
+  bool status = false;
+  // APU RAM + DSP registers
+  uint8_t *dump = new uint8_t[0x10000 + 128];
+  // SMP registers
+  uint16_t pc;
+  uint8_t regs[4];
+  uint8_t p;
+  audio.clear();
+  
+  status = music.load_spc(baseName = base, dump, pc, regs, p);
+  
+  if (status) {
+    SNES::cartridge.basename = nall::basename(baseName);
+
+    fileName = baseName;
+    name = notdir(nall::basename(baseName));
+
+    application.currentRom = base;
+  
+    // dummy cartridge
+    const char *dummyCart = "\
+    <?xml version='1.0' encoding='UTF-8'?>\
+    <cartridge region='NTSC' />\
+    ";
+    SNES::cartridge.load(SNES::Cartridge::Mode::Normal, lstring() << dummyCart);
+  
+    utility.modifySystemState(Utility::LoadCartridge);
+  
+    // load the SPC dump
+    SNES::smp.load_dump(dump, pc, regs, p);
+  
+    // put the CPU to sleep (hacky)
+    SNES::memory::wram[0] = 0xDB; // STP
+    SNES::cpu.regs.pc = 0;
+  }
+  
+  delete[] dump;
+  return status;
+}
+
+bool Cartridge::loadSnsf(const char *base) {
+  unload();
+  if (!music.opened()) return false;
+  
+  uint8_t *data;
+  unsigned size;
+  audio.clear();
+  
+  bool status = music.load_snsf(baseName = base, data, size);
+  
+  if (status) {
+    SNES::memory::cartrom.copy(data, size);
+    cartridge.baseXml = SNESCartridge(data, size).xmlMemoryMap;
+	
+	SNES::cartridge.basename = nall::basename(baseName);
+    SNES::cartridge.load(SNES::Cartridge::Mode::Normal, lstring() << cartridge.baseXml);
+
+    fileName = baseName;
+    name = notdir(nall::basename(baseName));
+
+    application.currentRom = base;
+
+	utility.modifySystemState(Utility::LoadCartridge);
+  
+    delete[] data;
+  }
+  
+  return status;
+}
+
 void Cartridge::saveMemory() {
   if(SNES::cartridge.loaded() == false) return;
 

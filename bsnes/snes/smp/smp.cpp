@@ -138,6 +138,39 @@ SMP::SMP() {
 SMP::~SMP() {
 }
 
+void SMP::load_dump(uint8 *dump, uint16_t pc, uint8_t r[4], uint8_t p) {
+  memcpy(memory::apuram.data(), dump, memory::apuram.size());
+
+  // set up some status from RAM values
+  op_buswrite(0xFC, dump[0xFC]);
+  op_buswrite(0xFB, dump[0xFB]);
+  op_buswrite(0xFA, dump[0xFA]);
+  op_buswrite(0xF9, dump[0xF9]);
+  op_buswrite(0xF8, dump[0xF8]);
+  op_buswrite(0xF2, dump[0xF2]);
+  op_buswrite(0xF1, dump[0xF1] & 0x87);
+ 
+  port.cpu_to_smp[0] = dump[0xF4];
+  port.cpu_to_smp[1] = dump[0xF5];
+  port.cpu_to_smp[2] = dump[0xF6];
+  port.cpu_to_smp[3] = dump[0xF7];
+  
+  t0.stage3_ticks = dump[0xFD] & 15;
+  t1.stage3_ticks = dump[0xFE] & 15;
+  t2.stage3_ticks = dump[0xFF] & 15;
+  
+  // set SMP registers
+  regs.pc   = pc;
+  regs.r[0] = r[0];
+  regs.r[1] = r[1];
+  regs.r[2] = r[2];
+  regs.r[3] = r[3];
+  regs.p    = p;
+  
+  // read DSP registers
+  dsp.load(dump + memory::apuram.size());
+}
+
 void SMP::save_spc_dump(string path) {
   dump_spc = true;
   spc_path = path;

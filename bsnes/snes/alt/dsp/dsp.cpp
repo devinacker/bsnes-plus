@@ -48,6 +48,10 @@ void DSP::write(uint8 addr, uint8 data) {
   spc_dsp.write(addr, data);
 }
 
+void DSP::load(uint8 const regs [SPC_DSP::register_count]) {
+  spc_dsp.load(regs);
+}
+
 void DSP::power() {
   spc_dsp.init(memory::apuram.data());
   spc_dsp.reset();

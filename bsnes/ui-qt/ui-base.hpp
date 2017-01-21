@@ -62,6 +62,7 @@ using namespace ruby;
 #include "input/input.hpp"
 
 #include "link/filter.hpp"
+#include "link/music.hpp"
 #include "link/reader.hpp"
 
 #include "movie/movie.hpp"
