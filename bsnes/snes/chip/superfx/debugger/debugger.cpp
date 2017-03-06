@@ -100,6 +100,9 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   item("$3034", "")
   item("Program Bank Register", string("0x", hex<2>(regs.pbr)))
   
+  item("$3036", "")
+  item("Rom Bank Register", string("0x", hex<2>(regs.rombr)))
+
   item("$3037", "")
   item("Multiplier Speed", (regs.cfgr & 0x20) ? "High Speed" : "Normal")
   item("IRQ Enable", (regs.cfgr & 0x80) ? "Disabled" : "Enabled")
@@ -108,7 +111,7 @@ bool SFXDebugger::property(unsigned id, string &name, string &value) {
   item("Screen Base Register (SCBR)", string("0x", hex<2>(regs.scbr)))
   
   item("$3039", "")
-  item("Clock Register (CLSR)", regs.clsr.divider > 1 ? "21.4 MHz" : "10.7 MHz")
+  item("Clock Register (CLSR)", regs.clsr.divider == 1 ? "21.4 MHz" : "10.7 MHz")
   
   item("$303a", "")
   string md, ht;
