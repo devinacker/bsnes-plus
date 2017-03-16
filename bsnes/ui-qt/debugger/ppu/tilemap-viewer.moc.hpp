@@ -11,11 +11,10 @@ public slots:
   void refresh();
 
   void onZoomChanged(int);
-  void onFormChanged();
-  void updateForm();
 
-  void setCustomScreenMode(bool);
-  void setCustomTilemap(bool);
+private:
+  void updateRendererSettings();
+  void updateForm();
 
 private:
   TilemapRenderer renderer;

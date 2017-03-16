@@ -96,9 +96,6 @@ TilemapViewer::TilemapViewer() {
   tileAddr = new QLineEdit;
   sidebarLayout->addRow("Tile Addr:", tileAddr);
 
-  setCustomScreenMode(false);
-  setCustomTilemap(false);
-
   scene = new QGraphicsScene;
 
   scenePixmap = new QGraphicsPixmapItem();
@@ -110,24 +107,24 @@ TilemapViewer::TilemapViewer() {
   layout->addWidget(view, 10);
 
 
-  onFormChanged();
+  updateForm();
 
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
 
-  connect(customScreenMode, SIGNAL(clicked(bool)), this, SLOT(setCustomScreenMode(bool)));
-  connect(customTilemap,    SIGNAL(clicked(bool)), this, SLOT(setCustomTilemap(bool)));
+  connect(customScreenMode, SIGNAL(clicked(bool)), this, SLOT(refresh()));
+  connect(customTilemap,    SIGNAL(clicked(bool)), this, SLOT(refresh()));
 
   for(int i = 0; i < 4; i++) {
-    connect(bgButtons[i],SIGNAL(clicked(bool)),               this, SLOT(onFormChanged()));
+    connect(bgButtons[i],SIGNAL(clicked(bool)),               this, SLOT(refresh()));
   }
-  connect(screenMode,    SIGNAL(valueChanged(int)),           this, SLOT(onFormChanged()));
-  connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
-  connect(screenSize,    SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
-  connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(onFormChanged()));
-  connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(onFormChanged()));
-  connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(onFormChanged()));
+  connect(screenMode,    SIGNAL(valueChanged(int)),           this, SLOT(refresh()));
+  connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
+  connect(screenSize,    SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
+  connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
+  connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
+  connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
 }
 
 void TilemapViewer::autoUpdate() {
@@ -140,13 +137,11 @@ void TilemapViewer::show() {
 }
 
 void TilemapViewer::refresh() {
-  if(SNES::cartridge.loaded()) {
-    bool loadMode = customScreenMode->isChecked() == false;
-    bool loadTilemap = customTilemap->isChecked() == false;
+  if(inUpdateFormCall) return;
 
-    if(loadMode) renderer.loadScreenMode();
-    if(loadTilemap) renderer.loadTilemapSettings();
-    if(loadMode || loadTilemap) updateForm();
+  if(SNES::cartridge.loaded()) {
+    updateRendererSettings();
+    updateForm();
 
     renderer.buildPalette();
 
@@ -167,9 +162,7 @@ void TilemapViewer::onZoomChanged(int index) {
   scene->setSceneRect(scenePixmap->boundingRect());
 }
 
-void TilemapViewer::onFormChanged() {
-  if(inUpdateFormCall) return;
-
+void TilemapViewer::updateRendererSettings() {
   unsigned layer = 0;
   for(int i = 0; i < 4; i++) {
     if(bgButtons[i]->isChecked()) layer = i;
@@ -179,6 +172,8 @@ void TilemapViewer::onFormChanged() {
 
   if(customScreenMode->isChecked()) {
     renderer.screenMode = screenMode->value();
+  } else {
+    renderer.loadScreenMode();
   }
 
   if(customTilemap->isChecked()) {
@@ -192,13 +187,20 @@ void TilemapViewer::onFormChanged() {
     renderer.screenSizeX = screenSize->currentIndex() & 1;
     renderer.screenSizeY = screenSize->currentIndex() & 2;
     renderer.tileSize = tileSize->currentIndex();
+  } else {
+    renderer.loadTilemapSettings();
   }
-
-  refresh();
 }
 
 void TilemapViewer::updateForm() {
   inUpdateFormCall = true;
+
+  bool csm = customScreenMode->isChecked();
+  screenMode->setEnabled(csm);
+
+  if(csm == false) {
+    screenMode->setValue(renderer.screenMode);
+  }
 
   unsigned nLayers = renderer.nLayersInMode();
   if(renderer.screenMode == 7) nLayers = 0;
@@ -207,11 +209,14 @@ void TilemapViewer::updateForm() {
     bgButtons[i]->setEnabled(i < nLayers);
   }
 
-  if(customScreenMode->isChecked() == false) {
-    screenMode->setValue(renderer.screenMode);
-  }
+  bool ct = customTilemap->isChecked();
+  bitDepth->setEnabled(ct);
+  screenAddr->setEnabled(ct);
+  tileAddr->setEnabled(ct);
+  screenSize->setEnabled(ct);
+  tileSize->setEnabled(ct);
 
-  if(customTilemap->isChecked() == false) {
+  if(ct == false) {
     renderer.updateBitDepth();
     bitDepth->setCurrentIndex(bitDepth->findData(renderer.bitDepth));
 
@@ -226,22 +231,3 @@ void TilemapViewer::updateForm() {
   inUpdateFormCall = false;
 }
 
-void TilemapViewer::setCustomScreenMode(bool v) {
-  customScreenMode->setChecked(v);
-
-  screenMode->setEnabled(v);
-
-  refresh();
-}
-
-void TilemapViewer::setCustomTilemap(bool v) {
-  customTilemap->setChecked(v);
-
-  bitDepth->setEnabled(v);
-  screenAddr->setEnabled(v);
-  tileAddr->setEnabled(v);
-  screenSize->setEnabled(v);
-  tileSize->setEnabled(v);
-
-  refresh();
-}
