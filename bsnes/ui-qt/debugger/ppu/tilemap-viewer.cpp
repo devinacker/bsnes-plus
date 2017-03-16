@@ -210,11 +210,13 @@ void TilemapViewer::updateForm() {
   }
 
   bool ct = customTilemap->isChecked();
+  bool mode7 = renderer.bitDepth == TilemapRenderer::MODE7;
+
   bitDepth->setEnabled(ct);
-  screenAddr->setEnabled(ct);
-  tileAddr->setEnabled(ct);
-  screenSize->setEnabled(ct);
-  tileSize->setEnabled(ct);
+  screenAddr->setEnabled(ct & !mode7);
+  tileAddr->setEnabled(ct & !mode7);
+  screenSize->setEnabled(ct & !mode7);
+  tileSize->setEnabled(ct & !mode7);
 
   if(ct == false) {
     renderer.updateBitDepth();
