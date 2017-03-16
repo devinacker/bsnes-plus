@@ -22,6 +22,7 @@ public:
   void loadTilemapSettings();
 
   unsigned nLayersInMode() const;
+  unsigned tileSizePx() const;
 
   void buildPalette();
 

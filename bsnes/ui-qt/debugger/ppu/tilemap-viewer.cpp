@@ -37,8 +37,11 @@ TilemapViewer::TilemapViewer() {
   zoomCombo->addItem("8x", QVariant(8));
   zoomCombo->addItem("9x", QVariant(9));
 
+  showGrid = new QCheckBox("Show Grid");
+  sidebarLayout->addRow(zoomCombo, showGrid);
+
   autoUpdateBox = new QCheckBox("Auto update");
-  sidebarLayout->addRow(zoomCombo, autoUpdateBox);
+  sidebarLayout->addRow("", autoUpdateBox);
 
   refreshButton = new QPushButton("Refresh");
   sidebarLayout->addRow(refreshButton);
@@ -96,15 +99,9 @@ TilemapViewer::TilemapViewer() {
   tileAddr = new QLineEdit;
   sidebarLayout->addRow("Tile Addr:", tileAddr);
 
-  scene = new QGraphicsScene;
-
-  scenePixmap = new QGraphicsPixmapItem();
-  scenePixmap->setTransformationMode(Qt::FastTransformation);
-  scene->addItem(scenePixmap);
-
-  view = new QGraphicsView(scene);
-  view->setMinimumSize(256, 256);
-  layout->addWidget(view, 10);
+  imageGridWidget = new ImageGridWidget();
+  imageGridWidget->setMinimumSize(256, 256);
+  layout->addWidget(imageGridWidget, 10);
 
 
   updateForm();
@@ -112,6 +109,7 @@ TilemapViewer::TilemapViewer() {
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
+  connect(showGrid,      SIGNAL(clicked(bool)), imageGridWidget, SLOT(setShowGrid(bool)));
 
   connect(customScreenMode, SIGNAL(clicked(bool)), this, SLOT(refresh()));
   connect(customTilemap,    SIGNAL(clicked(bool)), this, SLOT(refresh()));
@@ -146,20 +144,14 @@ void TilemapViewer::refresh() {
     renderer.buildPalette();
 
     QImage image = renderer.drawTilemap();
-    scenePixmap->setPixmap(QPixmap::fromImage(image));
-
-    scene->setSceneRect(scenePixmap->boundingRect());
+    imageGridWidget->setImage(image);
+    imageGridWidget->setGridSize(renderer.tileSizePx());
   }
 }
 
 void TilemapViewer::onZoomChanged(int index) {
   unsigned z = zoomCombo->itemData(index).toUInt();
-  if(z == 0) z = 1;
-
-  view->resetTransform();
-  view->scale(z, z);
-
-  scene->setSceneRect(scenePixmap->boundingRect());
+  imageGridWidget->setZoom(z);
 }
 
 void TilemapViewer::updateRendererSettings() {

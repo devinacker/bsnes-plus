@@ -25,7 +25,9 @@ private:
 
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
+
   QComboBox *zoomCombo;
+  QCheckBox *showGrid;
 
   QCheckBox *customScreenMode;
   QCheckBox *customTilemap;
@@ -38,10 +40,7 @@ private:
   QLineEdit *tileAddr;
   QLineEdit *screenAddr;
 
-  QGraphicsScene *scene;
-  QGraphicsPixmapItem *scenePixmap;
-
-  QGraphicsView* view;
+  ImageGridWidget* imageGridWidget;
 
   bool inUpdateFormCall;
 };
