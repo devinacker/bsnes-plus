@@ -99,6 +99,13 @@ TilemapViewer::TilemapViewer() {
   tileAddr = new QLineEdit;
   sidebarLayout->addRow("Tile Addr:", tileAddr);
 
+  sidebarLayout->addRow(new QWidget);
+
+
+  tileInfo = new QLabel;
+  sidebarLayout->addRow(tileInfo);
+
+
   imageGridWidget = new ImageGridWidget();
   imageGridWidget->setMinimumSize(256, 256);
   layout->addWidget(imageGridWidget, 10);
@@ -123,6 +130,8 @@ TilemapViewer::TilemapViewer() {
   connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
   connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
   connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
+
+  connect(imageGridWidget, SIGNAL(selectedChanged()),         this, SLOT(refresh()));
 }
 
 void TilemapViewer::autoUpdate() {
@@ -147,6 +156,8 @@ void TilemapViewer::refresh() {
     imageGridWidget->setImage(image);
     imageGridWidget->setGridSize(renderer.tileSizePx());
   }
+
+  updateTileInfo();
 }
 
 void TilemapViewer::onZoomChanged(int index) {
@@ -225,3 +236,77 @@ void TilemapViewer::updateForm() {
   inUpdateFormCall = false;
 }
 
+void TilemapViewer::updateTileInfo() {
+  if(SNES::cartridge.loaded() && imageGridWidget->selectionValid()) {
+    if(renderer.bitDepth != TilemapRenderer::MODE7) {
+      updateTileInfoNormal();
+    } else {
+      updateTileInfoMode7();
+    }
+  }
+  else {
+    tileInfo->clear();
+  }
+}
+
+void TilemapViewer::updateTileInfoNormal() {
+  const uint8_t *vram = SNES::memory::vram.data();
+
+  unsigned xPos = imageGridWidget->selected().x() & 0x3f;
+  unsigned yPos = imageGridWidget->selected().y() & 0x3f;
+
+  unsigned mapId = 0;
+  if(xPos >= 32 && renderer.screenSizeX) mapId += 1;
+  if(yPos >= 32 && renderer.screenSizeY) mapId += (renderer.screenSizeX) ? 2 : 1;
+
+  xPos &= 0x1f;
+  yPos &= 0x1f;
+
+  unsigned tileAddr = (renderer.screenAddr + mapId * 0x800 + yPos * 64 + xPos * 2) & 0xfffe;
+  unsigned tile = vram[tileAddr] | (vram[tileAddr + 1] << 8);
+
+  unsigned character = tile & 0x03ff;
+  unsigned pal = (tile >> 10) & 7;
+  bool priority = tile & 0x2000;
+  bool hFlip = tile & 0x4000;
+  bool vFlip = tile & 0x8000;
+
+  string text;
+
+  text << "<table>";
+  text << "<tr><td>Map: </td><td>" << mapId << "</td></tr>";
+  text << "<tr><td>Position: </td><td>" << xPos << ", " << yPos << "</td></tr>";
+  text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  text << "<tr><td>Address: </td><td>0x" << hex<4>(tileAddr) << "</td></tr>";
+  text << "<tr><td>Value: </td><td>0x" << hex<4>(tile) << "</td></tr>";
+  text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  text << "<tr><td>Character: </td><td>" << character << "</td></tr>";
+  text << "<tr><td>Palette: </td><td>" << pal << "</td></tr>";
+  text << "<tr><td>Priority: </td><td>" << (unsigned)priority << "</td></tr>";
+  text << "<tr><td>hFlip: </td><td>" << (unsigned)hFlip << "</td></tr>";
+  text << "<tr><td>vFlip: </td><td>" << (unsigned)vFlip << "</td></tr>";
+  text << "</table>";
+
+  tileInfo->setText(text);
+}
+
+void TilemapViewer::updateTileInfoMode7() {
+  const uint8_t *vram = SNES::memory::vram.data();
+
+  int xPos = imageGridWidget->selected().x() & 0x7f;
+  int yPos = imageGridWidget->selected().y() & 0x7f;
+
+  unsigned addr = yPos * 256 + xPos * 2;
+  unsigned tile = vram[addr];
+
+  string text;
+
+  text << "<table>";
+  text << "<tr><td>Position: </td><td>" << xPos << ", " << yPos << "</td></tr>";
+  text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  text << "<tr><td>Address: </td><td>0x" << hex<4>(addr) << "</td></tr>";
+  text << "<tr><td>Value: </td><td>" << tile << "</td></tr>";
+  text << "</table>";
+
+  tileInfo->setText(text);
+}

@@ -15,6 +15,9 @@ public slots:
 private:
   void updateRendererSettings();
   void updateForm();
+  void updateTileInfo();
+  void updateTileInfoNormal();
+  void updateTileInfoMode7();
 
 private:
   TilemapRenderer renderer;
@@ -39,6 +42,8 @@ private:
   QComboBox *tileSize;
   QLineEdit *tileAddr;
   QLineEdit *screenAddr;
+
+  QLabel *tileInfo;
 
   ImageGridWidget* imageGridWidget;
 
