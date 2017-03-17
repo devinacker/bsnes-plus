@@ -38,6 +38,7 @@ void ImageGridWidget::setImage(const QImage& image) {
 
 void ImageGridWidget::setZoom(unsigned z) {
   if(z == 0) z = 1;
+  zoom = z;
 
   resetTransform();
   scale(z, z);
@@ -139,19 +140,18 @@ void ImageGridWidget::drawSelectedCell(QPainter* painter, const QRectF&) {
 
   painter->save();
 
+  qreal onePx = 1.0 / zoom;
+
   QRectF cell(selectedCell.x() * gridSize, selectedCell.y() * gridSize,
               gridSize, gridSize);
-  cell = painter->combinedTransform().mapRect(cell);
 
   painter->setBrush(QBrush());
 
-  painter->resetTransform();
-
-  painter->setPen(QPen(SELECTED_INNER_COLOR, 1));
+  painter->setPen(QPen(SELECTED_INNER_COLOR, onePx));
   painter->drawRect(cell);
 
-  cell.adjust(-1, -1, 1, 1);
-  painter->setPen(QPen(SELECTED_OUTER_COLOR, 1));
+  cell.adjust(-onePx, -onePx, onePx, onePx);
+  painter->setPen(QPen(SELECTED_OUTER_COLOR, onePx));
   painter->drawRect(cell);
 
   painter->restore();

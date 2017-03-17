@@ -36,6 +36,7 @@ private:
 
 private:
   bool showGrid;
+  unsigned zoom;
   unsigned gridSize;
 
   QPoint selectedCell;
