@@ -340,6 +340,8 @@ bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width
 
 #define PAD 8
 #define PXL(x,y) ((uint16_t *)(data + (x) + (y)*pitch))
+#define COLOR_CATEGORY 0x001f
+#define COLOR_INFO 0x7fff
 
 	width  -= PAD*2;
 	height -= PAD*2;
@@ -348,19 +350,21 @@ bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width
 
 	// show title
 	const char titleStr[] = {T, i, t, l, e, 0};
-	print(PXL(PAD+0, PAD+0), pitch, point_shadow<0x001f>, titleStr);
-	print(PXL(PAD+40, PAD+0), pitch, point_shadow<0x7fff>, string_convert(info.title, width-40));
+	print(PXL(PAD+0, PAD+0), pitch, point_shadow<COLOR_CATEGORY>, titleStr);
+	print(PXL(PAD+40, PAD+0), pitch, point_shadow<COLOR_INFO>, string_convert(info.title, width-40));
 	// show artist
 	const char artistStr[] = {A, r, t, i, s, t, 0};
-	print(PXL(PAD+0, PAD+HEIGHT), pitch, point_shadow<0x001f>, artistStr);
-	print(PXL(PAD+40, PAD+HEIGHT), pitch, point_shadow<0x7fff>, string_convert(info.artist, width-40));
+	print(PXL(PAD+0, PAD+HEIGHT), pitch, point_shadow<COLOR_CATEGORY>, artistStr);
+	print(PXL(PAD+40, PAD+HEIGHT), pitch, point_shadow<COLOR_INFO>, string_convert(info.artist, width-40));
 	// show game name
 	const char gameStr[] = {G, a, m, e, 0};
-	print(PXL(PAD+0, PAD+HEIGHT*2), pitch, point_shadow<0x001f>, gameStr);
-	print(PXL(PAD+40, PAD+HEIGHT*2), pitch, point_shadow<0x7fff>, string_convert(info.game, width-40));
+	print(PXL(PAD+0, PAD+HEIGHT*2), pitch, point_shadow<COLOR_CATEGORY>, gameStr);
+	print(PXL(PAD+40, PAD+HEIGHT*2), pitch, point_shadow<COLOR_INFO>, string_convert(info.game, width-40));
 
 #undef PAD
 #undef PXL
+#undef COLOR_CATEGORY
+#undef COLOR_TITLE
 }
 
 const char* string_convert(const char *in, unsigned maxwidth) {
