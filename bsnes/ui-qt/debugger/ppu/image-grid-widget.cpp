@@ -123,7 +123,7 @@ void ImageGridWidget::drawGrid(QPainter* painter, const QRectF& rect) {
   qreal xStart = int(left) + (gridSize - (int(left) % gridSize));
 
   painter->save();
-  painter->setPen(QPen(GRID_COLOR));
+  painter->setPen(QPen(GRID_COLOR, 1.0 / zoom));
 
   for(qreal y = yStart; y < bottom; y += gridSize) {
     painter->drawLine(left, y, right, y);
