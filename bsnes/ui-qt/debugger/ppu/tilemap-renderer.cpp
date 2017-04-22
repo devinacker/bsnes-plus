@@ -34,6 +34,14 @@ unsigned TilemapRenderer::nLayersInMode() const {
   return layers[screenMode & 7];
 }
 
+unsigned TilemapRenderer::tileSizePx() const {
+  if(bitDepth != BitDepth::MODE7) {
+    return tileSize ? 16 : 8;
+  } else {
+    return 8;
+  }
+}
+
 void TilemapRenderer::loadScreenMode() {
   screenMode = SNES::ppu.bg_mode() & 7;
 }
