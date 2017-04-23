@@ -93,7 +93,7 @@ void BreakpointItem::toggle() {
 }
 
 void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr) {
-  if (addrStr == "" || mode == "") return;
+  if (addrStr == "") return;
 
   sourceStr.lower();
   if(sourceStr == "cpu")        { source->setCurrentIndex(0); }
@@ -111,7 +111,10 @@ void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr
   if(mode.position("x")) { mode_x->setChecked(true); }
 
   lstring addresses;
-  addresses.split<2>("-", addrStr);
+  addresses.split<2>("=", addrStr);
+  if (addresses.size() >= 2) { data->setText(addresses[1]); }
+  
+  addresses.split<2>("-", addresses[0]);
   addr->setText(addresses[0]);
   if (addresses.size() >= 2) { addr_end->setText(addresses[1]); }
 
