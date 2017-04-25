@@ -35,12 +35,7 @@ bool Application::parseArgumentSwitch(const string& arg, const string& parameter
   if(arg == "--breakpoint" || arg == "-b") {
     if(parameter == "" || parameter[0] == '-') return false;
 
-    lstring param;
-    param.split<3>(":", string(parameter).lower());
-    if(param.size() == 1) { param.append("rwx"); }
-    if(param.size() == 2) { param.append("cpu"); }
-
-    breakpointEditor->addBreakpoint(param[0], param[1], param[2]);
+    breakpointEditor->addBreakpoint(parameter);
 
     return true;
   }

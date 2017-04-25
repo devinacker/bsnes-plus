@@ -202,7 +202,9 @@ Debugger::Debugger() {
 
 void Debugger::modifySystemState(unsigned state) {
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
+  string bpfile = usagefile;
   usagefile << "-usage.bin";
+  bpfile << ".bp";
   file fp;
 
   if(state == Utility::LoadCartridge) {
@@ -230,6 +232,20 @@ void Debugger::modifySystemState(unsigned state) {
       }
     }
     
+    string data;
+    if(config().debugger.saveBreakpoints) {
+      breakpointEditor->clear();
+      if (data.readfile(bpfile)) {
+  	    lstring line;
+        data.replace("\r", "");
+        line.split("\n", data);
+      
+        for (int i = 0; i < line.size(); i++) {
+          breakpointEditor->addBreakpoint(line[i]);
+        }
+      }
+    }
+    
     tracer->resetTraceState();
   }
 
@@ -240,6 +256,16 @@ void Debugger::modifySystemState(unsigned state) {
       if (SNES::cartridge.has_sa1())     fp.write(SNES::sa1.usage, 1 << 24);
       if (SNES::cartridge.has_superfx()) fp.write(SNES::superfx.usage, 1 << 23);
       fp.close();
+    }
+    
+    if(config().debugger.saveBreakpoints) {
+      string data = breakpointEditor->toStrings();
+      
+	  // don't write an empty list of breakpoints unless the file already exists
+      if ((data.length() || file::exists(bpfile)) && fp.open(bpfile, file::mode::write)) {
+        fp.print(data);
+		fp.close();
+      }
     }
   }
 }

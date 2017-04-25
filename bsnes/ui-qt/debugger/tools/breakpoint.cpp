@@ -92,6 +92,18 @@ void BreakpointItem::toggle() {
   }
 }
 
+void BreakpointItem::clear() {
+  addr->setText("");
+  addr_end->setText("");
+  data->setText("");
+  
+  mode_r->setChecked(false);
+  mode_w->setChecked(false);
+  mode_x->setChecked(false);
+  
+  source->setCurrentIndex(0);
+}
+
 void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr) {
   if (addrStr == "") return;
 
@@ -121,6 +133,39 @@ void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr
   toggle();
 }
 
+string BreakpointItem::toString() const {
+  if (addr->text().isEmpty()) return "";
+  
+  string breakpoint;
+  
+  breakpoint << addr->text().toUtf8().data();
+  if (!addr_end->text().isEmpty()) {
+    breakpoint << "-" << addr_end->text().toUtf8().data();
+  }
+  if (!data->text().isEmpty()) {
+    breakpoint << "=" << data->text().toUtf8().data();
+  }
+  
+  breakpoint << ":";
+  if (mode_r->isChecked()) breakpoint << "r";
+  if (mode_w->isChecked()) breakpoint << "w";
+  if (mode_x->isChecked()) breakpoint << "x";
+  
+  breakpoint << ":";
+  switch (source->currentIndex()) {
+  default:
+  case 0: breakpoint << "cpu";   break;
+  case 1: breakpoint << "smp";   break;
+  case 2: breakpoint << "vram";  break;
+  case 3: breakpoint << "oam";   break;
+  case 4: breakpoint << "cgram"; break;
+  case 5: breakpoint << "sa1";   break;
+  case 6: breakpoint << "sfx";   break;
+  }
+  
+  return breakpoint;
+}
+
 BreakpointEditor::BreakpointEditor() {
   setObjectName("breakpoint-editor");
   setWindowTitle("Breakpoint Editor");
@@ -147,6 +192,12 @@ void BreakpointEditor::toggle() {
   SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
 }
 
+void BreakpointEditor::clear() {
+  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
+    breakpoint[n]->clear();
+  }
+}
+
 void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, const string& source) {
   for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
     if(breakpoint[n]->addr->text().isEmpty()) {
@@ -154,4 +205,25 @@ void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, con
       return;
     }
   }
+}
+
+void BreakpointEditor::addBreakpoint(const string& breakpoint) {
+  lstring param;
+  param.split<3>(":", breakpoint);
+  if(param.size() == 1) { param.append("rwx"); }
+  if(param.size() == 2) { param.append("cpu"); }
+  
+  this->addBreakpoint(param[0], param[1], param[2]);
+}
+
+string BreakpointEditor::toStrings() const {
+  string breakpoints;
+  
+  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
+    if(!breakpoint[n]->addr->text().isEmpty()) {
+      breakpoints << breakpoint[n]->toString() << "\n";
+    }
+  }
+  
+  return breakpoints;
 }
