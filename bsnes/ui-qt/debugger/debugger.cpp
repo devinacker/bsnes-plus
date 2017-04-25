@@ -468,6 +468,7 @@ void Debugger::event() {
   
   audio.clear();
   autoUpdate();
+  show();
   activateWindow();
 }
 
