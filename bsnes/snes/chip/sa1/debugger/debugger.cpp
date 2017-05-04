@@ -184,8 +184,8 @@ void SA1Debugger::setRegister(unsigned id, unsigned value) {
   switch (id) {
   case RegisterPC: regs.pc = value; return;
   case RegisterA:  regs.a  = value; return;
-  case RegisterX:  regs.x  = value; return;
-  case RegisterY:  regs.y  = value; return;
+  case RegisterX:  regs.x  = regs.p.x ? (value & 0xff) : value; return;
+  case RegisterY:  regs.y  = regs.p.x ? (value & 0xff) : value; return;
   case RegisterS:  regs.s  = value; return;
   case RegisterD:  regs.d  = value; return;
   case RegisterDB: regs.db = value; return;
@@ -214,12 +214,20 @@ void SA1Debugger::setFlag(unsigned id, bool value) {
   case FlagE: regs.e   = value; return;
   case FlagN: regs.p.n = value; return;
   case FlagV: regs.p.v = value; return;
-  case FlagM: regs.p.m = value; return;
-  case FlagX: regs.p.x = value; return;
   case FlagD: regs.p.d = value; return;
   case FlagI: regs.p.i = value; return;
   case FlagZ: regs.p.z = value; return;
   case FlagC: regs.p.c = value; return;
+  case FlagM: 
+    regs.p.m = value; 
+    update_table();
+    return;
+  case FlagX: 
+    regs.p.x = value;
+    if (value)
+      regs.x.h = regs.y.h = 0; 
+    update_table();
+    return;
   }
 }
 
