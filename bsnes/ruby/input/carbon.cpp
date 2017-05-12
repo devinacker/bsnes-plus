@@ -1,11 +1,44 @@
 #include <Carbon/Carbon.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/hid/IOHIDLib.h>
 
 namespace ruby {
 
+static void CI_hid_device_added_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
+static void CI_hid_device_removed_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
+
+static uint32_t CI_hid_usage_pairs[]  = {
+  kHIDPage_GenericDesktop, kHIDUsage_GD_Joystick,
+  kHIDPage_GenericDesktop, kHIDUsage_GD_GamePad
+};
+
+static int CI_hid_usage_length = 2;
+
+
 class pInputCarbon {
+private:
+  CFMutableDictionaryRef create_matching_dict(uint32_t usage_page, uint32_t	usage) {
+    CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                                            &kCFTypeDictionaryKeyCallBacks,
+                                                            &kCFTypeDictionaryValueCallBacks);
+    CFNumberRef usage_page_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage_page);
+    CFNumberRef usage_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage);
+
+    if (dict && usage_page_ref && usage_ref) {
+      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsagePageKey), usage_page_ref);
+      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsageKey), usage_ref);
+    }
+
+    CFRelease(usage_ref);
+    CFRelease(usage_page_ref);
+    return dict;
+  }
+
 public:
   struct {
     bool mouse_acquired;
+    IOHIDManagerRef hid_manager_ref = NULL;
+
   } device;
 
   struct {
@@ -16,6 +49,7 @@ public:
     if(name == Input::Handle) return true;
     if(name == Input::KeyboardSupport) return true;
     if(name == Input::MouseSupport) return true;
+    if(name == Input::JoypadSupport) return true;
     return false;
   }
 
@@ -202,19 +236,88 @@ public:
     return true;
   }
 
+  void init_hid_manager() {
+    if (device.hid_manager_ref) return;
+
+    device.hid_manager_ref = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+
+    if (device.hid_manager_ref && kIOReturnSuccess == IOHIDManagerOpen(device.hid_manager_ref, kIOHIDOptionsTypeNone)) {
+
+      IOHIDManagerRegisterDeviceMatchingCallback(device.hid_manager_ref, &CI_hid_device_added_cb, (void *)this);
+      IOHIDManagerRegisterDeviceRemovalCallback(device.hid_manager_ref, &CI_hid_device_removed_cb, (void *)this);
+      IOHIDManagerScheduleWithRunLoop(device.hid_manager_ref, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+
+      CFMutableArrayRef matches = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+
+      if (matches) {
+        for (int i = 0; i < CI_hid_usage_length; ++i) {
+          CFMutableDictionaryRef match = create_matching_dict(CI_hid_usage_pairs[i << 1], CI_hid_usage_pairs[(i << 1) + 1]);
+          if (match) {
+            CFArrayAppendValue(matches, (void *)match);
+            CFRelease(match);
+          }
+        }
+
+        IOHIDManagerSetDeviceMatchingMultiple(device.hid_manager_ref, matches);
+        CFRelease(matches);
+      }
+    }
+  }
+
+  void term_hid_manager() {
+    if (device.hid_manager_ref) {
+      printf("carbon: release all hid things (TODO!)\n");
+
+      IOHIDManagerClose(device.hid_manager_ref, 0);
+      device.hid_manager_ref = NULL;
+    }
+  }
+
+
+  void hid_device_added(IOHIDDeviceRef device_ref) {
+    printf("hid_device_added()\n");
+
+    if (IOHIDDeviceConformsTo(device_ref, kHIDPage_GenericDesktop, kHIDUsage_GD_GamePad)) {
+      printf(" - gamepad\n");
+    }
+    if (IOHIDDeviceConformsTo(device_ref, kHIDPage_GenericDesktop, kHIDUsage_GD_Joystick)) {
+      printf(" - joystick\n");
+    }
+
+  }
+
+  void hid_device_removed(IOHIDDeviceRef device_ref) {
+    printf("hid_device_removed()\n");
+  }
+
+
   bool init() {
+    init_hid_manager();
     return true;
   }
 
   void term() {
     unacquire();
+    term_hid_manager();
   }
 
   pInputCarbon() {
     settings.handle = 0;
   }
 
+  ~pInputCarbon() {
+    term();
+  }
+
 };
+
+static void CI_hid_device_added_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
+  ((pInputCarbon*)ctx)->hid_device_added(device_ref);
+}
+
+static void CI_hid_device_removed_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
+  ((pInputCarbon*)ctx)->hid_device_removed(device_ref);
+}
 
 DeclareInput(Carbon)
 

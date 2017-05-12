@@ -40,6 +40,8 @@ else ifeq ($(platform),osx)
   qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/5/Headers)
   qtlib += $(foreach lib,$(qtlibs),-framework $(lib))
   qtlib += -framework Carbon
+  qtlib += -framework CoreFoundation
+  qtlib += -framework IOKit
   qtlib += -framework Cocoa
   qtlib += -framework OpenGL
   qtlib += -framework AppKit
