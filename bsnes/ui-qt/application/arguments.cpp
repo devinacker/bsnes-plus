@@ -56,15 +56,8 @@ void Application::printArguments() {
        "  --break-on-wdm                    break on wdm opcode\n"
        "  -b / --breakpoint <breakpoint>    add breakpoint\n"
        "\n"
-<<<<<<< HEAD
-       "  Breakpoint format: <addr>[-<addr end>][:<rwx>[:<source>]]\n"
-       "                     rwx = read / write / execute flags\n"
-       "                     source = cpu, smp, vram, oam, cgram, sa1, sfx"
-       );
-=======
        "Breakpoint format: <addr>[-<addr end>][=<value>][:<rwx>[:<source>]]\n"
        "                   rwx = read / write / execute flags\n"
        "                   source = cpu, smp, vram, oam, cgram, sa1, sfx");
->>>>>>> 4bf8196826a3b33efbe28f8c454f42a3b4a1c744
   #endif
 }
