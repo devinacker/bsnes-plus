@@ -35,12 +35,7 @@ bool Application::parseArgumentSwitch(const string& arg, const string& parameter
   if(arg == "--breakpoint" || arg == "-b") {
     if(parameter == "" || parameter[0] == '-') return false;
 
-    lstring param;
-    param.split<3>(":", string(parameter).lower());
-    if(param.size() == 1) { param.append("rwx"); }
-    if(param.size() == 2) { param.append("cpu"); }
-
-    breakpointEditor->addBreakpoint(param[0], param[1], param[2]);
+    breakpointEditor->addBreakpoint(parameter);
 
     return true;
   }
@@ -61,9 +56,15 @@ void Application::printArguments() {
        "  --break-on-wdm                    break on wdm opcode\n"
        "  -b / --breakpoint <breakpoint>    add breakpoint\n"
        "\n"
+<<<<<<< HEAD
        "  Breakpoint format: <addr>[-<addr end>][:<rwx>[:<source>]]\n"
        "                     rwx = read / write / execute flags\n"
        "                     source = cpu, smp, vram, oam, cgram, sa1, sfx"
        );
+=======
+       "Breakpoint format: <addr>[-<addr end>][=<value>][:<rwx>[:<source>]]\n"
+       "                   rwx = read / write / execute flags\n"
+       "                   source = cpu, smp, vram, oam, cgram, sa1, sfx");
+>>>>>>> 4bf8196826a3b33efbe28f8c454f42a3b4a1c744
   #endif
 }

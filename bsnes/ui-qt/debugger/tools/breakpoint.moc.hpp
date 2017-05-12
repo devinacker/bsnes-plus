@@ -24,10 +24,12 @@ public:
   BreakpointItem(unsigned id);
 
   void setBreakpoint(string addr, string mode, string source);
+  string toString() const;
 
 public slots:
   void init();
   void toggle();
+  void clear();
 
 private:
   const unsigned id;
@@ -44,10 +46,14 @@ public:
   BreakpointEditor();
 
   void addBreakpoint(const string& addr, const string& mode, const string& source);
+  void addBreakpoint(const string& breakpoint);
+  string toStrings() const;
+
   void setBreakOnWDM(bool value);
 
 public slots:
   void toggle();
+  void clear();
 };
 
 extern BreakpointEditor *breakpointEditor;

@@ -126,6 +126,7 @@ Configuration::Configuration() {
   attach(input.modifierEnable = true, "input.modifierEnable");
 
   attach(debugger.cacheUsageToDisk = false, "debugger.cacheUsageToDisk");
+  attach(debugger.saveBreakpoints = false, "debugger.saveBreakpoints");
   attach(debugger.showHClocks = false, "debugger.showHClocks");
 
   attach(geometry.mainWindow        = "", "geometry.mainWindow");
