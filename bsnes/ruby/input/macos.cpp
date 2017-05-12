@@ -1,49 +1,61 @@
+//==================
+//macOS input driver
+//==================
+//Original (Carbon) implementation by byuu
+//Mouse and gamepad (IOKit/IOHIDLib) additions by optiroc@gmail.com
+//
+//Techically keyboard and mouse could also use IOHIDLib, but as long
+//as Carbon is still available there's no good reason to pull it out.
+
 #include <Carbon/Carbon.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/hid/IOHIDLib.h>
 
 namespace ruby {
 
-static void CI_hid_device_added_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
-static void CI_hid_device_removed_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
+static void CI_hid_device_added_cb(void *p, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
+static void CI_hid_device_removed_cb(void *p, IOReturn result, void *sender, IOHIDDeviceRef device_ref);
+static void CI_hid_input_value_cb(void *p, IOReturn result, void *sender, IOHIDValueRef value_ref);
 
 static uint32_t CI_hid_usage_pairs[]  = {
   kHIDPage_GenericDesktop, kHIDUsage_GD_Joystick,
   kHIDPage_GenericDesktop, kHIDUsage_GD_GamePad
 };
-
 static int CI_hid_usage_length = 2;
 
 
-class pInputCarbon {
-private:
-  CFMutableDictionaryRef create_matching_dict(uint32_t usage_page, uint32_t	usage) {
-    CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-                                                            &kCFTypeDictionaryKeyCallBacks,
-                                                            &kCFTypeDictionaryValueCallBacks);
-    CFNumberRef usage_page_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage_page);
-    CFNumberRef usage_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage);
-
-    if (dict && usage_page_ref && usage_ref) {
-      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsagePageKey), usage_page_ref);
-      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsageKey), usage_ref);
-    }
-
-    CFRelease(usage_ref);
-    CFRelease(usage_page_ref);
-    return dict;
-  }
+class pInputmacOS {
+  int16_t table_buffer[Scancode::Limit];
 
 public:
   struct {
     bool mouse_acquired;
     IOHIDManagerRef hid_manager_ref = NULL;
-
+    IOHIDDeviceRef hid_joypads[Joypad::Count];
   } device;
 
   struct {
     uintptr_t handle;
   } settings;
+
+  pInputmacOS() {
+    settings.handle = 0;
+    memset(table_buffer, 0, Scancode::Limit * sizeof(int16_t));
+  }
+
+  ~pInputmacOS() {
+    term();
+  }
+
+  bool init() {
+    init_hid_manager();
+    return true;
+  }
+
+  void term() {
+    unacquire();
+    term_hid_manager();
+  }
 
   bool cap(const string& name) {
     if(name == Input::Handle) return true;
@@ -88,7 +100,7 @@ public:
   }
 
   bool poll(int16_t *table) {
-    memset(table, 0, Scancode::Limit * sizeof(int16_t));
+    memcpy(table, table_buffer, Scancode::Limit * sizeof(int16_t));
 
     //========
     //Keyboard
@@ -236,15 +248,21 @@ public:
     return true;
   }
 
-  void init_hid_manager() {
-    if (device.hid_manager_ref) return;
 
+  //===============
+  //IOHIDLib access
+  //===============
+
+  void init_hid_manager() {
+    // Create HID manager and register callbacks on current thread
+
+    if (device.hid_manager_ref) return;
     device.hid_manager_ref = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 
-    if (device.hid_manager_ref && kIOReturnSuccess == IOHIDManagerOpen(device.hid_manager_ref, kIOHIDOptionsTypeNone)) {
-
+    if (device.hid_manager_ref) {
       IOHIDManagerRegisterDeviceMatchingCallback(device.hid_manager_ref, &CI_hid_device_added_cb, (void *)this);
       IOHIDManagerRegisterDeviceRemovalCallback(device.hid_manager_ref, &CI_hid_device_removed_cb, (void *)this);
+      IOHIDManagerRegisterInputValueCallback(device.hid_manager_ref, &CI_hid_input_value_cb, (void *)this);
       IOHIDManagerScheduleWithRunLoop(device.hid_manager_ref, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 
       CFMutableArrayRef matches = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
@@ -260,65 +278,108 @@ public:
 
         IOHIDManagerSetDeviceMatchingMultiple(device.hid_manager_ref, matches);
         CFRelease(matches);
+
+        IOHIDManagerOpen(device.hid_manager_ref, kIOHIDOptionsTypeNone);
       }
     }
   }
 
   void term_hid_manager() {
     if (device.hid_manager_ref) {
-      printf("carbon: release all hid things (TODO!)\n");
-
+      IOHIDManagerRegisterInputValueCallback(device.hid_manager_ref, NULL, NULL);
+      IOHIDManagerRegisterDeviceRemovalCallback(device.hid_manager_ref, NULL, NULL);
+      IOHIDManagerRegisterDeviceMatchingCallback(device.hid_manager_ref, NULL, NULL);
+      IOHIDManagerUnscheduleFromRunLoop(device.hid_manager_ref, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
       IOHIDManagerClose(device.hid_manager_ref, 0);
       device.hid_manager_ref = NULL;
     }
   }
 
-
-  void hid_device_added(IOHIDDeviceRef device_ref) {
-    printf("hid_device_added()\n");
-
-    if (IOHIDDeviceConformsTo(device_ref, kHIDPage_GenericDesktop, kHIDUsage_GD_GamePad)) {
-      printf(" - gamepad\n");
+  int hid_get_device_slot(IOHIDDeviceRef device_ref) {
+    for(unsigned i = 0; i < Joypad::Count; ++i) {
+      if (device.hid_joypads[i] == device_ref) return i;
     }
-    if (IOHIDDeviceConformsTo(device_ref, kHIDPage_GenericDesktop, kHIDUsage_GD_Joystick)) {
-      printf(" - joystick\n");
+    return -1;
+  }
+
+  void hid_register_device(IOHIDDeviceRef device_ref) {
+    if (hid_get_device_slot(device_ref) != -1) return;
+
+    for (unsigned i = 0; i < Joypad::Count; ++i) {
+      if (!device.hid_joypads[i]) {
+        device.hid_joypads[i] = device_ref;
+        break;
+      }
+    }
+  }
+
+  void hid_unregister_device(IOHIDDeviceRef device_ref) {
+    int device_slot = hid_get_device_slot(device_ref);
+    if (device_slot != -1) {
+      device.hid_joypads[device_slot] = NULL;
+      // TODO: Check that cleared range is correct
+      memset((void *)(table_buffer + joypad(device_slot).hat(0)), 0, Joypad::Scancode::Limit * sizeof(int16_t));
+    }
+  }
+
+  void hid_input_value_received(IOHIDValueRef value_ref) {
+    IOHIDElementRef element_ref = IOHIDValueGetElement(value_ref);
+    if (CFGetTypeID(element_ref) != IOHIDElementGetTypeID()) return;
+
+    IOHIDDeviceRef device_ref = IOHIDElementGetDevice(element_ref);
+    int device_slot = hid_get_device_slot(device_ref);
+    if (device_slot == -1) return;
+
+    int value = IOHIDValueGetIntegerValue(value_ref);
+    IOHIDElementCookie cookie = IOHIDElementGetCookie(element_ref);
+    IOHIDElementType type = IOHIDElementGetType(element_ref);
+
+    if (type == kIOHIDElementTypeInput_Button) {
+      table_buffer[joypad(device_slot).button(cookie)] = (bool)value;
+    }
+    else if (type == kIOHIDElementTypeInput_Axis) {
+      printf("slot %d axis input: %d %d %d\n", device_slot, value, cookie, device_ref);
+    }
+    else if (type == kIOHIDElementTypeInput_Misc) {
+      printf("slot %d misc input: %d %d %d\n", device_slot, value, cookie, device_ref);
+    }
+  }
+
+  CFMutableDictionaryRef create_matching_dict(uint32_t usage_page, uint32_t	usage) {
+    CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                                            &kCFTypeDictionaryKeyCallBacks,
+                                                            &kCFTypeDictionaryValueCallBacks);
+    CFNumberRef usage_page_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage_page);
+    CFNumberRef usage_ref = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usage);
+
+    if (dict && usage_page_ref && usage_ref) {
+      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsagePageKey), usage_page_ref);
+      CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsageKey), usage_ref);
     }
 
-  }
-
-  void hid_device_removed(IOHIDDeviceRef device_ref) {
-    printf("hid_device_removed()\n");
-  }
-
-
-  bool init() {
-    init_hid_manager();
-    return true;
-  }
-
-  void term() {
-    unacquire();
-    term_hid_manager();
-  }
-
-  pInputCarbon() {
-    settings.handle = 0;
-  }
-
-  ~pInputCarbon() {
-    term();
+    CFRelease(usage_ref);
+    CFRelease(usage_page_ref);
+    return dict;
   }
 
 };
 
-static void CI_hid_device_added_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
-  ((pInputCarbon*)ctx)->hid_device_added(device_ref);
+static void CI_hid_device_added_cb(void *p, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
+  if (result == kIOReturnSuccess) {
+    ((pInputmacOS*)p)->hid_register_device(device_ref);
+  }
 }
 
-static void CI_hid_device_removed_cb(void *ctx, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
-  ((pInputCarbon*)ctx)->hid_device_removed(device_ref);
+static void CI_hid_device_removed_cb(void *p, IOReturn result, void *sender, IOHIDDeviceRef device_ref) {
+  ((pInputmacOS*)p)->hid_unregister_device(device_ref);
 }
 
-DeclareInput(Carbon)
+static void CI_hid_input_value_cb(void *p, IOReturn result, void *sender, IOHIDValueRef value_ref) {
+  if (result == kIOReturnSuccess) {
+    ((pInputmacOS*)p)->hid_input_value_received(value_ref);
+  }
+}
+
+DeclareInput(macOS)
 
 };
