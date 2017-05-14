@@ -40,12 +40,12 @@ Non-debugging features:
 
 Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported.
 
-## Building on OS X
+## Building on macOS
 
 - Install a C++ toolchain. [Xcode](https://developer.apple.com) is probably the easiest route.
-- Install [Qt 5](https://www.qt.io/download-open-source/). (Using the `brew` package works for normal builds but currently deployment is broken.)
-- Make sure the `qtpath` environment variable points to your Qt installation, ie. add `qtpath=$HOME/Qt/5.7/clang_64` to .bash_profile.
-- Run `make`from the bsnes directory.
+- Install [Qt 5](https://www.qt.io/download-open-source/). Only the core macOS package is required.
+- Make sure the `qtpath` environment variable points to your Qt installation, ie. add `export qtpath=$HOME/Qt/5.8/clang_64` to .bash_profile.
+- Run `make` from the bsnes directory.
 
 ## Building on Linux / other *nix
 
