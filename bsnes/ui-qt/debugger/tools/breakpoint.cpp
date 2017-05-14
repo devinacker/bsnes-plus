@@ -126,7 +126,8 @@ void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr
   addresses.split<2>("=", addrStr);
   if (addresses.size() >= 2) { data->setText(addresses[1]); }
   
-  addresses.split<2>("-", addresses[0]);
+  addrStr = addresses[0];
+  addresses.split<2>("-", addrStr);
   addr->setText(addresses[0]);
   if (addresses.size() >= 2) { addr_end->setText(addresses[1]); }
 
