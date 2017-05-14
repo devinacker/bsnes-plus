@@ -39,6 +39,7 @@ public:
   } settings;
 
   pInputmacOS() {
+    printf("input_macos::ctor\n");
     settings.handle = 0;
     memset(table_buffer, 0, Scancode::Limit * sizeof(int16_t));
   }
@@ -48,6 +49,7 @@ public:
   }
 
   bool init() {
+    printf("input_macos::init\n");
     init_hid_manager();
     return true;
   }
@@ -260,6 +262,8 @@ public:
     device.hid_manager_ref = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 
     if (device.hid_manager_ref) {
+      printf("init_hid_manager: hid manager created\n");
+
       IOHIDManagerRegisterDeviceMatchingCallback(device.hid_manager_ref, &CI_hid_device_added_cb, (void *)this);
       IOHIDManagerRegisterDeviceRemovalCallback(device.hid_manager_ref, &CI_hid_device_removed_cb, (void *)this);
       IOHIDManagerRegisterInputValueCallback(device.hid_manager_ref, &CI_hid_input_value_cb, (void *)this);
@@ -307,6 +311,7 @@ public:
 
     for (unsigned i = 0; i < Joypad::Count; ++i) {
       if (!device.hid_joypads[i]) {
+        printf("hid_register_device: 0x%08x - slot %d\n", device_ref, i);
         device.hid_joypads[i] = device_ref;
         break;
       }
@@ -316,6 +321,7 @@ public:
   void hid_unregister_device(IOHIDDeviceRef device_ref) {
     int device_slot = hid_get_device_slot(device_ref);
     if (device_slot != -1) {
+      printf("hid_unregister_device: 0x%08x - slot %d\n", device_ref, device_slot);
       device.hid_joypads[device_slot] = NULL;
       // TODO: Check that cleared range is correct
       memset((void *)(table_buffer + joypad(device_slot).hat(0)), 0, Joypad::Scancode::Limit * sizeof(int16_t));
@@ -331,18 +337,45 @@ public:
     if (device_slot == -1) return;
 
     int value = IOHIDValueGetIntegerValue(value_ref);
-    IOHIDElementCookie cookie = IOHIDElementGetCookie(element_ref);
+    uint32_t usage = IOHIDElementGetUsage(element_ref);
     IOHIDElementType type = IOHIDElementGetType(element_ref);
+    IOHIDElementCookie cookie = IOHIDElementGetCookie(element_ref);
 
     if (type == kIOHIDElementTypeInput_Button) {
+      printf("hid_input_value_received - slot %d - button #%d %d\n", device_slot, cookie, value);
       table_buffer[joypad(device_slot).button(cookie)] = (bool)value;
     }
     else if (type == kIOHIDElementTypeInput_Axis) {
-      printf("slot %d axis input: %d %d %d\n", device_slot, value, cookie, device_ref);
+      printf("hid_input_value_received - slot %d - axis - usage 0x%04x %d %d\n", device_slot, usage, value, cookie);
     }
     else if (type == kIOHIDElementTypeInput_Misc) {
-      printf("slot %d misc input: %d %d %d\n", device_slot, value, cookie, device_ref);
+      
+      printf("hid_input_value_received - slot %d - usage 0x%04x %d %d\n", device_slot, usage, value, cookie);
     }
+    /*
+    else if (usage == kHIDUsage_GD_Hatswitch) {
+
+    }
+     
+    kHIDUsage_GD_X    = 0x30,  // Dynamic Values
+    kHIDUsage_GD_Y    = 0x31,
+    kHIDUsage_GD_Z    = 0x32,
+    kHIDUsage_GD_Rx   = 0x33,
+    kHIDUsage_GD_Ry   = 0x34,
+    kHIDUsage_GD_Rz   = 0x35,
+    kHIDUsage_GD_Vx   = 0x40,
+    kHIDUsage_GD_Vy   = 0x41,
+    kHIDUsage_GD_Vz   = 0x42,
+    kHIDUsage_GD_Vbrx = 0x43,
+    kHIDUsage_GD_Vbry = 0x44,
+    kHIDUsage_GD_Vbrz = 0x45,
+
+    kHIDUsage_GD_DPadUp    = 0x90,   // On/Off Control
+    kHIDUsage_GD_DPadDown  = 0x91,
+    kHIDUsage_GD_DPadRight = 0x92,
+    kHIDUsage_GD_DPadLeft  = 0x93,
+
+    */
   }
 
   CFMutableDictionaryRef create_matching_dict(uint32_t usage_page, uint32_t	usage) {
