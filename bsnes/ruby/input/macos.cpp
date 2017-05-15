@@ -306,7 +306,7 @@ public:
 
     for (unsigned i = 0; i < Joypad::Count; ++i) {
       if (!device.hid_joypads[i]) {
-        printf("hid_register_device: 0x%08x - slot %d\n", device_ref, i);
+        //printf("hid_register_device: slot %d\n", i);
         device.hid_joypads[i] = device_ref;
         break;
       }
@@ -316,7 +316,7 @@ public:
   void hid_unregister_device(IOHIDDeviceRef device_ref) {
     int device_slot = hid_get_device_slot(device_ref);
     if (device_slot != -1) {
-      printf("hid_unregister_device: 0x%08x - slot %d\n", device_ref, device_slot);
+      //printf("hid_unregister_device: slot %d\n", device_slot);
       device.hid_joypads[device_slot] = NULL;
       memset((void *)(table_buffer + joypad(device_slot).hat(0)), 0, Joypad::Scancode::Limit * sizeof(int16_t));
     }
@@ -371,10 +371,10 @@ public:
       // Type: Misc - Usage: D-Pad
       else if (usage_is_dpad(usage)) {
         int16_t direction = Joypad::HatCenter;
-        if (usage == kHIDUsage_GD_DPadUp) direction |= Joypad::HatUp;
-        if (usage == kHIDUsage_GD_DPadDown) direction |= Joypad::HatDown;
-        if (usage == kHIDUsage_GD_DPadRight) direction |= Joypad::HatRight;
-        if (usage == kHIDUsage_GD_DPadLeft) direction |= Joypad::HatLeft;
+        if (usage == kHIDUsage_GD_DPadUp && (bool)value) direction |= Joypad::HatUp;
+        if (usage == kHIDUsage_GD_DPadDown && (bool)value) direction |= Joypad::HatDown;
+        if (usage == kHIDUsage_GD_DPadRight && (bool)value) direction |= Joypad::HatRight;
+        if (usage == kHIDUsage_GD_DPadLeft && (bool)value) direction |= Joypad::HatLeft;
         table_buffer[joypad(device_slot).hat(1)] = direction;
       }
 
