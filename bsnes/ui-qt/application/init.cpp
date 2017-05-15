@@ -19,6 +19,10 @@ void Application::init() {
     config().system.input = "None";
   }
 
+  // "Carbon" driver is retired, fallback to default if encountered in serialized settings
+  if(config().system.input == "Carbon") config().system.input = input.default_driver();
+
+  // Default drivers
   if(config().system.video == "") config().system.video = video.default_driver();
   if(config().system.audio == "") config().system.audio = audio.default_driver();
   if(config().system.input == "") config().system.input = input.default_driver();
