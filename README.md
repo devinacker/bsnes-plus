@@ -46,6 +46,8 @@ Building with the original MinGW used to be the preferred way to do it, but made
 - Install [Qt 5](https://www.qt.io/download-open-source/). Only the core macOS package is required.
 - Make sure the `qtpath` environment variable points to your Qt installation, ie. add `export qtpath=$HOME/Qt/5.8/clang_64` to .bash_profile.
 - Run `make` from the bsnes directory.
+- Alternatively run `./build_distribution_osx`. When done you should end up with stand-alone app bundles and a redistributable archive in the `distribution` folder.
+
 
 ## Building on Linux / other *nix
 
