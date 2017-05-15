@@ -259,8 +259,6 @@ public:
     device.hid_manager_ref = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 
     if (device.hid_manager_ref) {
-      printf("init_hid_manager: hid manager created\n");
-
       IOHIDManagerRegisterDeviceMatchingCallback(device.hid_manager_ref, &CI_hid_device_added_cb, (void *)this);
       IOHIDManagerRegisterDeviceRemovalCallback(device.hid_manager_ref, &CI_hid_device_removed_cb, (void *)this);
       IOHIDManagerRegisterInputValueCallback(device.hid_manager_ref, &CI_hid_input_value_cb, (void *)this);
@@ -280,8 +278,7 @@ public:
         IOHIDManagerSetDeviceMatchingMultiple(device.hid_manager_ref, matches);
         CFRelease(matches);
 
-        IOReturn opened = IOHIDManagerOpen(device.hid_manager_ref, kIOHIDOptionsTypeNone);
-        if (opened == kIOReturnSuccess) printf("init_hid_manager: hid manager opened\n");
+        IOHIDManagerOpen(device.hid_manager_ref, kIOHIDOptionsTypeNone);
       }
     }
   }
@@ -321,7 +318,6 @@ public:
     if (device_slot != -1) {
       printf("hid_unregister_device: 0x%08x - slot %d\n", device_ref, device_slot);
       device.hid_joypads[device_slot] = NULL;
-      // TODO: Check that cleared range is correct
       memset((void *)(table_buffer + joypad(device_slot).hat(0)), 0, Joypad::Scancode::Limit * sizeof(int16_t));
     }
   }
@@ -339,14 +335,21 @@ public:
     IOHIDElementType type = IOHIDElementGetType(element_ref);
     IOHIDElementCookie cookie = IOHIDElementGetCookie(element_ref);
 
+    // Type: Button
     if (type == kIOHIDElementTypeInput_Button) {
-      //printf("hid_input_value_received - slot %d - button #%d %d\n", device_slot, cookie, value);
       table_buffer[joypad(device_slot).button(cookie)] = (bool)value;
+      //printf("hid_input_value_received - slot %d - button #%d %d\n", device_slot, cookie, value);
     }
+
+    // Type: Axis (nop, implement when a suitable device is encountered)
     else if (type == kIOHIDElementTypeInput_Axis) {
       printf("hid_input_value_received - slot %d - axis - usage 0x%04x %d %d\n", device_slot, usage, value, cookie);
     }
+
+    // Type: Misc
     else if (type == kIOHIDElementTypeInput_Misc) {
+
+      // Type: Misc - Usage: Hat switch
       if (usage == kHIDUsage_GD_Hatswitch) {
         int range = (int)(IOHIDElementGetLogicalMax(element_ref) - IOHIDElementGetLogicalMin(element_ref));
         if (range == 3) value *= 2;
@@ -362,32 +365,40 @@ public:
           default:
             table_buffer[joypad(device_slot).hat(0)] = Joypad::HatCenter; break;
         }
-        printf("hid_input_value_received - slot %d - hat %d %d\n", device_slot, value, cookie);
+        //printf("hid_input_value_received - slot %d - hat %d %d\n", device_slot, value, cookie);
       }
+
+      // Type: Misc - Usage: D-Pad
+      else if (usage_is_dpad(usage)) {
+        int16_t direction = Joypad::HatCenter;
+        if (usage == kHIDUsage_GD_DPadUp) direction |= Joypad::HatUp;
+        if (usage == kHIDUsage_GD_DPadDown) direction |= Joypad::HatDown;
+        if (usage == kHIDUsage_GD_DPadRight) direction |= Joypad::HatRight;
+        if (usage == kHIDUsage_GD_DPadLeft) direction |= Joypad::HatLeft;
+        table_buffer[joypad(device_slot).hat(1)] = direction;
+      }
+
+      // Type: Misc - Usage: Not hat/d-pad
       else {
+
+        // Type: Misc - Usage: Axis
         int axis = axis_index_from_usage(usage);
         if (axis != -1) {
-          //printf("hid_input_value_received - slot %d - axis %d - %d %d\n", device_slot, axis, value, cookie);
           int scaled_value = IOHIDValueGetScaledValue(value_ref, kIOHIDValueScaleTypePhysical);
           int min = IOHIDElementGetPhysicalMin(element_ref);
           int max = IOHIDElementGetPhysicalMax(element_ref);
           scaled_value = (((scaled_value - min) * (INT16_MAX - INT16_MIN)) / (max - min)) + INT16_MIN;
           if (abs(scaled_value) < 1024) scaled_value = 0;
-          //printf("scaled - %d %d %d\n", min, max, scaled_value);
           table_buffer[joypad(device_slot).axis(axis)] = (int16_t)scaled_value;
         }
+
+        // Drill down further when need arises
         else {
           printf("hid_input_value_received - slot %d - usage 0x%04x %d %d\n", device_slot, usage, value, cookie);
         }
-      }
 
+      }
     }
-    /*
-    kHIDUsage_GD_DPadUp    = 0x90,   // On/Off Control
-    kHIDUsage_GD_DPadDown  = 0x91,
-    kHIDUsage_GD_DPadRight = 0x92,
-    kHIDUsage_GD_DPadLeft  = 0x93,
-    */
   }
 
   int axis_index_from_usage(uint32_t usage) {
@@ -408,6 +419,11 @@ public:
       default:
         return -1;
     }
+  }
+
+  bool usage_is_dpad(uint32_t usage) {
+    return usage == kHIDUsage_GD_DPadUp || usage == kHIDUsage_GD_DPadDown ||
+           usage == kHIDUsage_GD_DPadLeft || usage == kHIDUsage_GD_DPadRight;
   }
 
   CFMutableDictionaryRef create_matching_dict(uint32_t usage_page, uint32_t	usage) {
