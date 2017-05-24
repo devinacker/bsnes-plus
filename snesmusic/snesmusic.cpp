@@ -349,15 +349,15 @@ bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width
 	// show title
 	const char titleStr[] = {T, i, t, l, e, 0};
 	print(PXL(PAD+0, PAD+0), pitch, point_shadow<0x001f>, titleStr);
-	print(PXL(PAD+40, PAD+0), pitch, point_shadow, string_convert(info.title, width-40));
+	print(PXL(PAD+40, PAD+0), pitch, point_shadow<0x7fff>, string_convert(info.title, width-40));
 	// show artist
 	const char artistStr[] = {A, r, t, i, s, t, 0};
 	print(PXL(PAD+0, PAD+HEIGHT), pitch, point_shadow<0x001f>, artistStr);
-	print(PXL(PAD+40, PAD+HEIGHT), pitch, point_shadow, string_convert(info.artist, width-40));
+	print(PXL(PAD+40, PAD+HEIGHT), pitch, point_shadow<0x7fff>, string_convert(info.artist, width-40));
 	// show game name
 	const char gameStr[] = {G, a, m, e, 0};
 	print(PXL(PAD+0, PAD+HEIGHT*2), pitch, point_shadow<0x001f>, gameStr);
-	print(PXL(PAD+40, PAD+HEIGHT*2), pitch, point_shadow, string_convert(info.game, width-40));
+	print(PXL(PAD+40, PAD+HEIGHT*2), pitch, point_shadow<0x7fff>, string_convert(info.game, width-40));
 	
 #undef PAD
 #undef PXL
