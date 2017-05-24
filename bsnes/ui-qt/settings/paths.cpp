@@ -77,7 +77,11 @@ PathSettingsWindow::PathSettingsWindow() {
   patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path", "");
   cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path", "");
   dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path", "");
+#if defined(PLATFORM_OSX)
+  satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", nall::launchpath() << "bsxdat/", "Default Satellaview Signal Data Path", nall::launchpath() << "bsxdat/");
+#else
   satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
+#endif
 
   layout->addWidget(gamePath);
   layout->addWidget(savePath);

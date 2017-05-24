@@ -72,6 +72,10 @@ all: build plugins;
 include $(snes)/Makefile
 include $(ui)/Makefile
 
+# including CoreFoundation in nall/string/platform.hpp polluted the global namespace
+objects += nall-string-platform
+obj/nall-string-platform.o: nall/string/platform.cpp
+
 objects := $(patsubst %,obj/%.o,$(objects))
 
 # targets
@@ -125,9 +129,7 @@ endif
 
 distribution: clean build plugins
 ifeq ($(platform),osx)
-	@rm -f ../bsnes_$(version)_osx.zip
-	@zip -9 -r ../bsnes_$(version)_osx.zip $(osxbundle)
-	@rm -rf $(osxbundle)
+	@macdeployqt $(osxbundle) -executable=$(osxbundle)/Contents/MacOS/bsnes
 else
 	@echo Distribution target not available for current platform
 endif

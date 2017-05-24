@@ -1,0 +1,26 @@
+#!/bin/bash
+
+version=`grep -m 1 'version := ' bsnes/Makefile | awk '{ print $3 }'`;
+dist_dir=./bsnes_${version}
+dist_zip=${dist_dir}.zip
+
+#clean & set up distribution directory
+rm -frd ${dist_dir}
+rm -f ${dist_zip}
+mkdir -pv ${dist_dir}
+cp -a bsnes/data/bsxdat ${dist_dir}/bsxdat
+
+#build compatibility app bundle
+cd bsnes
+make distribution profile=compatibility
+cd ..
+mv ./bsnes+.app ${dist_dir}/bsnes+.app
+
+#build accuracy app bundle
+cd bsnes
+make distribution profile=accuracy
+cd ..
+mv ./bsnes+.app ${dist_dir}/bsnes+\ \(accuracy\).app
+
+#zip distribution directory
+zip -9 -r ${dist_dir}.zip ${dist_dir}
