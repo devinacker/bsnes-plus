@@ -3,8 +3,8 @@ CheatFinderWindow *cheatFinderWindow;
 
 CheatFinderWindow::CheatFinderWindow() {
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   list = new QTreeWidget;
@@ -85,7 +85,7 @@ CheatFinderWindow::CheatFinderWindow() {
   controlLayout->addWidget(valueLabel, 3, 0);
 
   actionLayout = new QHBoxLayout;
-  actionLayout->setSpacing(Style::WidgetSpacing);
+  actionLayout->setSpacing(UIStyle::WidgetSpacing);
   controlLayout->addLayout(actionLayout, 3, 1, 1, 4);
 
   valueEdit = new QLineEdit;

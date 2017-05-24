@@ -7,8 +7,8 @@ CheatEditorWindow::CheatEditorWindow() {
   document = 0;
 
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   list = new QTreeWidget;
@@ -320,8 +320,8 @@ CheatImportWindow::CheatImportWindow() {
   application.windowList.append(this);
 
   layout = new QVBoxLayout;
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   title = new QLabel("Test");

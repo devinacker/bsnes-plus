@@ -90,7 +90,7 @@ using namespace ruby;
 
 #include "utility/utility.hpp"
 
-struct Style {
+struct UIStyle {
   static const char Monospace[64];
 
   enum {

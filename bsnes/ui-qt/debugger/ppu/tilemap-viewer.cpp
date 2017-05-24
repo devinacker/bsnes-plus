@@ -13,8 +13,8 @@ TilemapViewer::TilemapViewer() {
   layout = new QHBoxLayout;
   layout->setSizeConstraint(QLayout::SetMinimumSize);
   layout->setAlignment(Qt::AlignLeft);
-  layout->setMargin(Style::WindowMargin);
-  layout->setSpacing(Style::WidgetSpacing);
+  layout->setMargin(UIStyle::WindowMargin);
+  layout->setSpacing(UIStyle::WidgetSpacing);
   setLayout(layout);
 
   sidebarLayout = new QFormLayout;

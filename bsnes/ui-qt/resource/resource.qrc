@@ -16,7 +16,7 @@
 
     <file alias="16x16/folder-new.png">../data/icons-16x16/folder-new.png</file>
     <file alias="16x16/go-up.png">../data/icons-16x16/go-up.png</file>
-    
+
     <file alias="16x16/mem-prev-code.png">../data/icons-16x16/mem-prev-code.png</file>
     <file alias="16x16/mem-next-code.png">../data/icons-16x16/mem-next-code.png</file>
     <file alias="16x16/mem-prev-data.png">../data/icons-16x16/mem-prev-data.png</file>
