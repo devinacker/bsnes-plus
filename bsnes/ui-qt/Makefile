@@ -21,7 +21,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
   ruby := video.qtopengl video.qtraster
   ruby += audio.openal
-  ruby += input.carbon
+  ruby += input.macos
 
   link += $(if $(findstring audio.openal,$(ruby)),-framework OpenAL)
 else ifeq ($(platform),win)

@@ -179,6 +179,6 @@
   #include <ruby/input/x.cpp>
 #endif
 
-#ifdef INPUT_CARBON
-  #include <ruby/input/carbon.cpp>
+#ifdef INPUT_MACOS
+  #include <ruby/input/macos.cpp>
 #endif
