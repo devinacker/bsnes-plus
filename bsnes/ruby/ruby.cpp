@@ -302,8 +302,8 @@ void InputInterface::driver(const char *driver) {
   else if(!strcmp(driver, "X-Windows")) p = new InputX();
   #endif
 
-  #ifdef INPUT_CARBON
-  else if(!strcmp(driver, "Carbon")) p = new InputCarbon();
+  #ifdef INPUT_MACOS
+  else if(!strcmp(driver, "macOS")) p = new InputmacOS();
   #endif
 
   else p = new Input();
@@ -319,8 +319,8 @@ const char* InputInterface::default_driver() {
   return "SDL";
   #elif defined(INPUT_X)
   return "X-Windows";
-  #elif defined(INPUT_CARBON)
-  return "Carbon";
+  #elif defined(INPUT_MACOS)
+  return "macOS";
   #else
   return "none";
   #endif
@@ -351,8 +351,8 @@ const char* InputInterface::driver_list() {
 
   //OS X
 
-  #if defined(INPUT_CARBON)
-  "Carbon;"
+  #if defined(INPUT_MACOS)
+  "macOS;"
   #endif
 
   "None";

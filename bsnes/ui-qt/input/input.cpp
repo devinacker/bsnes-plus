@@ -179,13 +179,17 @@ InputMapper& mapper() {
 void InputMapper::calibrate() {
   calibrated = true;
   audio.clear();
+  QCoreApplication::processEvents();
+
   QMessageBox::information(settingsWindow, "Joypad Calibration",
     "Joypads must be calibrated prior to mapping. Please ensure that "
     "all axes and analog buttons are not pressed or moved in any specific "
     "direction, and then press ok."
   );
 
+  QCoreApplication::processEvents();
   poll();
+
   for(unsigned i = 0; i < Joypad::Count; i++) {
     for(unsigned axis = 0; axis < Joypad::Axes; axis++) {
       int16_t n = state(joypad(i).axis(axis));
