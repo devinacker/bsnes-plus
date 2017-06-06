@@ -141,18 +141,25 @@ void ImageGridWidget::drawSelectedCell(QPainter* painter, const QRectF&) {
 
   painter->save();
 
-  qreal onePx = 1.0 / zoom;
-
   QRectF cell(selectedCell.x() * gridSize, selectedCell.y() * gridSize,
               gridSize, gridSize);
 
+  cell = painter->worldTransform().mapRect(cell);
+
+  painter->resetTransform();
+
   painter->setBrush(QBrush());
 
-  painter->setPen(cosmeticPen(SELECTED_INNER_COLOR));
+  QPen innerPen = cosmeticPen(SELECTED_INNER_COLOR);
+  innerPen.setJoinStyle(Qt::MiterJoin);
+  painter->setPen(innerPen);
   painter->drawRect(cell);
 
-  cell.adjust(-onePx, -onePx, onePx, onePx);
-  painter->setPen(cosmeticPen(SELECTED_OUTER_COLOR));
+  cell.adjust(-1, -1, 1, 1);
+
+  QPen outerPen = cosmeticPen(SELECTED_OUTER_COLOR);
+  outerPen.setJoinStyle(Qt::MiterJoin);
+  painter->setPen(outerPen);
   painter->drawRect(cell);
 
   painter->restore();
