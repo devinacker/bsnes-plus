@@ -123,7 +123,8 @@ void ImageGridWidget::drawGrid(QPainter* painter, const QRectF& rect) {
   qreal xStart = int(left) + (gridSize - (int(left) % gridSize));
 
   painter->save();
-  painter->setPen(QPen(GRID_COLOR, 1.0 / zoom));
+
+  painter->setPen(cosmeticPen(GRID_COLOR));
 
   for(qreal y = yStart; y < bottom; y += gridSize) {
     painter->drawLine(left, y, right, y);
@@ -147,12 +148,27 @@ void ImageGridWidget::drawSelectedCell(QPainter* painter, const QRectF&) {
 
   painter->setBrush(QBrush());
 
-  painter->setPen(QPen(SELECTED_INNER_COLOR, onePx));
+  painter->setPen(cosmeticPen(SELECTED_INNER_COLOR));
   painter->drawRect(cell);
 
   cell.adjust(-onePx, -onePx, onePx, onePx);
-  painter->setPen(QPen(SELECTED_OUTER_COLOR, onePx));
+  painter->setPen(cosmeticPen(SELECTED_OUTER_COLOR));
   painter->drawRect(cell);
 
   painter->restore();
+}
+
+QPen ImageGridWidget::cosmeticPen(const QColor& color) const {
+#if QT_VERSION >= 0x050600
+    qreal pixelRatio = devicePixelRatioF();
+#elif QT_VERSION >= 0x050000
+    int pixelRatio = devicePixelRatio();
+#else
+    int pixelRatio = 1;
+#endif
+
+  QPen pen(color, pixelRatio);
+  pen.setCosmetic(true);
+
+  return pen;
 }
