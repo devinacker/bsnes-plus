@@ -28,6 +28,7 @@ DebuggerOptions::DebuggerOptions() {
 
 void DebuggerOptions::synchronize() {
   cacheUsageBox->setChecked(config().debugger.cacheUsageToDisk);
+  saveBreakpointsBox->setChecked(config().debugger.saveBreakpoints);
   showHClocksBox->setChecked(config().debugger.showHClocks);
 }
 
