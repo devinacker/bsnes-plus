@@ -34,6 +34,8 @@ private:
   void drawGrid(QPainter* painter, const QRectF& rect);
   void drawSelectedCell(QPainter* painter, const QRectF& rect);
 
+  QPen cosmeticPen(const QColor& color) const;
+
 private:
   bool showGrid;
   unsigned zoom;

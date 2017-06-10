@@ -60,8 +60,10 @@ void CgramWidget::paintEvent(QPaintEvent*) {
   painter.drawImage(0, 0, image->scaled(image->width() * scale, image->height() * scale, Qt::IgnoreAspectRatio, Qt::FastTransformation));
 
   if(selected >= 0 && selected < 256) {
-    const static QPen white(Qt::white, 1, Qt::SolidLine);
-    const static QPen black(Qt::black, 1, Qt::DashLine);
+    QPen white(Qt::white, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+
+    QPen black(Qt::black, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+    black.setDashPattern({ 2.0, 2.0 });
 
     painter.resetTransform();
 
