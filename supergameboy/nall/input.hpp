@@ -11,7 +11,7 @@
 namespace nall {
 
 struct Keyboard;
-Keyboard& keyboard(unsigned = 0);
+Keyboard keyboard(unsigned = 0);
 
 static const char KeyboardScancodeName[][64] = {
   "Escape", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
@@ -122,12 +122,9 @@ struct Keyboard {
   Keyboard(unsigned ID_) : ID(ID_) {}
 };
 
-inline Keyboard& keyboard(unsigned id) {
-  static Keyboard kb0(0), kb1(1), kb2(2), kb3(3), kb4(4), kb5(5), kb6(6), kb7(7);
-  switch(id) { default:
-    case 0: return kb0; case 1: return kb1; case 2: return kb2; case 3: return kb3;
-    case 4: return kb4; case 5: return kb5; case 6: return kb6; case 7: return kb7;
-  }
+inline Keyboard keyboard(unsigned id) {
+  assert(id < Keyboard::Count);
+  return Keyboard(id);
 }
 
 static const char MouseScancodeName[][64] = {
@@ -136,7 +133,7 @@ static const char MouseScancodeName[][64] = {
 };
 
 struct Mouse;
-Mouse& mouse(unsigned = 0);
+Mouse mouse(unsigned = 0);
 
 struct Mouse {
   const unsigned ID;
@@ -220,12 +217,9 @@ struct Mouse {
   Mouse(unsigned ID_) : ID(ID_) {}
 };
 
-inline Mouse& mouse(unsigned id) {
-  static Mouse ms0(0), ms1(1), ms2(2), ms3(3), ms4(4), ms5(5), ms6(6), ms7(7);
-  switch(id) { default:
-    case 0: return ms0; case 1: return ms1; case 2: return ms2; case 3: return ms3;
-    case 4: return ms4; case 5: return ms5; case 6: return ms6; case 7: return ms7;
-  }
+inline Mouse mouse(unsigned id) {
+  assert(id < Mouse::Count);
+  return Mouse(id);
 }
 
 static const char JoypadScancodeName[][64] = {
@@ -239,7 +233,7 @@ static const char JoypadScancodeName[][64] = {
 };
 
 struct Joypad;
-Joypad& joypad(unsigned = 0);
+Joypad joypad(unsigned = 0);
 
 struct Joypad {
   const unsigned ID;
@@ -345,12 +339,9 @@ struct Joypad {
   Joypad(unsigned ID_) : ID(ID_) {}
 };
 
-inline Joypad& joypad(unsigned id) {
-  static Joypad jp0(0), jp1(1), jp2(2), jp3(3), jp4(4), jp5(5), jp6(6), jp7(7);
-  switch(id) { default:
-    case 0: return jp0; case 1: return jp1; case 2: return jp2; case 3: return jp3;
-    case 4: return jp4; case 5: return jp5; case 6: return jp6; case 7: return jp7;
-  }
+inline Joypad joypad(unsigned id) {
+  assert(id < Joypad::Count);
+  return Joypad(id);
 }
 
 struct Scancode {
