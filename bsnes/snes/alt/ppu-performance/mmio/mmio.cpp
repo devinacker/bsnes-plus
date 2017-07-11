@@ -443,7 +443,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
       regs.mode7_hoffset = (data << 8) | regs.mode7_latchdata;
       regs.mode7_latchdata = data;
 
-      bg1.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg1.regs.hoffset >> 8) & 7);
+      bg1.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
@@ -458,7 +458,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
     }
 
     case 0x0f: {  //BG2HOFS
-      bg2.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg2.regs.hoffset >> 8) & 7);
+      bg2.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
@@ -470,7 +470,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
     }
 
     case 0x11: {  //BG3HOFS
-      bg3.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg3.regs.hoffset >> 8) & 7);
+      bg3.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
@@ -482,7 +482,7 @@ void PPU::mmio_write(unsigned addr, uint8 data) {
     }
 
     case 0x13: {  //BG4HOFS
-      bg4.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg4.regs.hoffset >> 8) & 7);
+      bg4.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
       regs.bgofs_latchdata = data;
       return;
     }
