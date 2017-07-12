@@ -126,7 +126,7 @@ void PPU::mmio_w210e(uint8 value) {
 
 //BG2HOFS
 void PPU::mmio_w210f(uint8 value) {
-  regs.bg_hofs[BG2] = (value << 8) | (regs.bg_ofslatch);
+  regs.bg_hofs[BG2] = (value << 8) | (regs.bg_ofslatch & ~7) | ((regs.bg_hofs[BG2] >> 8) & 7);
   regs.bg_ofslatch  = value;
 }
 
@@ -138,7 +138,7 @@ void PPU::mmio_w2110(uint8 value) {
 
 //BG3HOFS
 void PPU::mmio_w2111(uint8 value) {
-  regs.bg_hofs[BG3] = (value << 8) | (regs.bg_ofslatch);
+  regs.bg_hofs[BG3] = (value << 8) | (regs.bg_ofslatch & ~7) | ((regs.bg_hofs[BG3] >> 8) & 7);
   regs.bg_ofslatch  = value;
 }
 
@@ -150,7 +150,7 @@ void PPU::mmio_w2112(uint8 value) {
 
 //BG4HOFS
 void PPU::mmio_w2113(uint8 value) {
-  regs.bg_hofs[BG4] = (value << 8) | (regs.bg_ofslatch);
+  regs.bg_hofs[BG4] = (value << 8) | (regs.bg_ofslatch & ~7) | ((regs.bg_hofs[BG4] >> 8) & 7);
   regs.bg_ofslatch  = value;
 }
 

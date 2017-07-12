@@ -266,7 +266,7 @@ void PPU::mmio_w210d(uint8 data) {
   regs.mode7_hoffset = (data << 8) | regs.mode7_latchdata;
   regs.mode7_latchdata = data;
 
-  bg1.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
+  bg1.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg1.regs.hoffset >> 8) & 7);
   regs.bgofs_latchdata = data;
 }
 
@@ -281,7 +281,7 @@ void PPU::mmio_w210e(uint8 data) {
 
 //BG2HOFS
 void PPU::mmio_w210f(uint8 data) {
-  bg2.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
+  bg2.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg2.regs.hoffset >> 8) & 7);
   regs.bgofs_latchdata = data;
 }
 
@@ -293,7 +293,7 @@ void PPU::mmio_w2110(uint8 data) {
 
 //BG3HOFS
 void PPU::mmio_w2111(uint8 data) {
-  bg3.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
+  bg3.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg3.regs.hoffset >> 8) & 7);
   regs.bgofs_latchdata = data;
 }
 
@@ -305,7 +305,7 @@ void PPU::mmio_w2112(uint8 data) {
 
 //BG4HOFS
 void PPU::mmio_w2113(uint8 data) {
-  bg4.regs.hoffset = (data << 8) | regs.bgofs_latchdata;
+  bg4.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg4.regs.hoffset >> 8) & 7);
   regs.bgofs_latchdata = data;
 }
 
