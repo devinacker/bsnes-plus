@@ -45,7 +45,8 @@ struct {
   uint16 bg_tdaddr[4];
 
   //$210d-$2114
-  uint8  bg_ofslatch;
+  uint8  bg_ppu1ofslatch;
+  uint8  bg_ppu2ofslatch;
   uint16 m7_hofs, m7_vofs;
   uint16 bg_hofs[4];
   uint16 bg_vofs[4];

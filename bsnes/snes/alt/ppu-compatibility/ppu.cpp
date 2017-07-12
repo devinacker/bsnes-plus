@@ -191,7 +191,8 @@ void PPU::power() {
   regs.bg_tdaddr[BG4] = 0x0000;
 
   //$210d-$2114
-  regs.bg_ofslatch = 0x00;
+  regs.bg_ppu1ofslatch = 0x00;
+  regs.bg_ppu2ofslatch = 0x00;
   regs.m7_hofs = regs.m7_vofs = 0x0000;
   regs.bg_hofs[BG1] = regs.bg_vofs[BG1] = 0x0000;
   regs.bg_hofs[BG2] = regs.bg_vofs[BG2] = 0x0000;

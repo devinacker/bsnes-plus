@@ -6,7 +6,8 @@ struct Regs {
   uint16 vram_readbuffer;
   uint8 oam_latchdata;
   uint8 cgram_latchdata;
-  uint8 bgofs_latchdata;
+  uint8 bgofs_ppu1latchdata;
+  uint8 bgofs_ppu2latchdata;
   uint8 mode7_latchdata;
 
   bool counters_latched;
