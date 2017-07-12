@@ -266,8 +266,9 @@ void PPU::mmio_w210d(uint8 data) {
   regs.mode7_hoffset = (data << 8) | regs.mode7_latchdata;
   regs.mode7_latchdata = data;
 
-  bg1.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg1.regs.hoffset >> 8) & 7);
-  regs.bgofs_latchdata = data;
+  bg1.regs.hoffset = (data << 8) | (regs.bgofs_ppu1latchdata & ~7) | (regs.bgofs_ppu2latchdata);
+  regs.bgofs_ppu1latchdata = data;
+  regs.bgofs_ppu2latchdata = data;
 }
 
 //BG1VOFS
@@ -275,44 +276,47 @@ void PPU::mmio_w210e(uint8 data) {
   regs.mode7_voffset = (data << 8) | regs.mode7_latchdata;
   regs.mode7_latchdata = data;
 
-  bg1.regs.voffset = (data << 8) | regs.bgofs_latchdata;
-  regs.bgofs_latchdata = data;
+  bg1.regs.voffset = (data << 8) | regs.bgofs_ppu1latchdata;
+  regs.bgofs_ppu1latchdata = data;
 }
 
 //BG2HOFS
 void PPU::mmio_w210f(uint8 data) {
-  bg2.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg2.regs.hoffset >> 8) & 7);
-  regs.bgofs_latchdata = data;
+  bg2.regs.hoffset = (data << 8) | (regs.bgofs_ppu1latchdata & ~7) | (regs.bgofs_ppu2latchdata);
+  regs.bgofs_ppu1latchdata = data;
+  regs.bgofs_ppu2latchdata = data;
 }
 
 //BG2VOFS
 void PPU::mmio_w2110(uint8 data) {
-  bg2.regs.voffset = (data << 8) | regs.bgofs_latchdata;
-  regs.bgofs_latchdata = data;
+  bg2.regs.voffset = (data << 8) | regs.bgofs_ppu1latchdata;
+  regs.bgofs_ppu1latchdata = data;
 }
 
 //BG3HOFS
 void PPU::mmio_w2111(uint8 data) {
-  bg3.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg3.regs.hoffset >> 8) & 7);
-  regs.bgofs_latchdata = data;
+  bg3.regs.hoffset = (data << 8) | (regs.bgofs_ppu1latchdata & ~7) | (regs.bgofs_ppu2latchdata);
+  regs.bgofs_ppu1latchdata = data;
+  regs.bgofs_ppu2latchdata = data;
 }
 
 //BG3VOFS
 void PPU::mmio_w2112(uint8 data) {
-  bg3.regs.voffset = (data << 8) | regs.bgofs_latchdata;
-  regs.bgofs_latchdata = data;
+  bg3.regs.voffset = (data << 8) | regs.bgofs_ppu1latchdata;
+  regs.bgofs_ppu1latchdata = data;
 }
 
 //BG4HOFS
 void PPU::mmio_w2113(uint8 data) {
-  bg4.regs.hoffset = (data << 8) | (regs.bgofs_latchdata & ~7) | ((bg4.regs.hoffset >> 8) & 7);
-  regs.bgofs_latchdata = data;
+  bg4.regs.hoffset = (data << 8) | (regs.bgofs_ppu1latchdata & ~7) | (regs.bgofs_ppu2latchdata);
+  regs.bgofs_ppu1latchdata = data;
+  regs.bgofs_ppu2latchdata = data;
 }
 
 //BG4VOFS
 void PPU::mmio_w2114(uint8 data) {
-  bg4.regs.voffset = (data << 8) | regs.bgofs_latchdata;
-  regs.bgofs_latchdata = data;
+  bg4.regs.voffset = (data << 8) | regs.bgofs_ppu1latchdata;
+  regs.bgofs_ppu1latchdata = data;
 }
 
 //VMAIN
@@ -770,7 +774,8 @@ void PPU::mmio_reset() {
   regs.vram_readbuffer = random(0x0000);
   regs.oam_latchdata = random(0x00);
   regs.cgram_latchdata = random(0x00);
-  regs.bgofs_latchdata = random(0x00);
+  regs.bgofs_ppu1latchdata = random(0x00);
+  regs.bgofs_ppu2latchdata = random(0x00);
   regs.mode7_latchdata = random(0x00);
   regs.counters_latched = false;
   regs.latch_hcounter = 0;

@@ -53,7 +53,8 @@ void PPU::serialize(serializer &s) {
 
   for(unsigned n = 0; n < 4; n++) s.integer(regs.bg_tdaddr[n]);
 
-  s.integer(regs.bg_ofslatch);
+  s.integer(regs.bg_ppu1ofslatch);
+  s.integer(regs.bg_ppu2ofslatch);
   s.integer(regs.m7_hofs);
   s.integer(regs.m7_vofs);
   for(unsigned n = 0; n < 4; n++) s.integer(regs.bg_hofs[n]);

@@ -18,7 +18,8 @@ void PPU::serialize(serializer &s) {
   s.integer(regs.vram_readbuffer);
   s.integer(regs.oam_latchdata);
   s.integer(regs.cgram_latchdata);
-  s.integer(regs.bgofs_latchdata);
+  s.integer(regs.bgofs_ppu1latchdata);
+  s.integer(regs.bgofs_ppu2latchdata);
   s.integer(regs.mode7_latchdata);
   s.integer(regs.counters_latched);
   s.integer(regs.latch_hcounter);
