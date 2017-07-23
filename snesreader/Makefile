@@ -22,7 +22,7 @@ ifeq ($(platform),x)
   link += -s
 else ifeq ($(platform),osx)
   flags += -fPIC -mmacosx-version-min=10.9
-  link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names
+  link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 endif
 
 objects := snesreader

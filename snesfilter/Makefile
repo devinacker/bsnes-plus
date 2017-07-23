@@ -33,10 +33,10 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
   ifeq ($(osx_with_gcc),)
     flags += -fPIC -mmacosx-version-min=10.9
-    link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names
+    link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
   else
     flags += -fPIC -fopenmp -mmacosx-version-min=10.9
-    link += -fopenmp -lpthread -lgomp -mmacosx-version-min=10.9 -headerpad_max_install_names
+    link += -fopenmp -lpthread -lgomp -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
   endif
 else ifeq ($(platform),win)
   flags := -fopenmp $(flags)

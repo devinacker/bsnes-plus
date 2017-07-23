@@ -47,7 +47,7 @@ else ifeq ($(platform),osx)
     osxbundle := ../bsnes+$(profile).app
   endif
   flags += -mmacosx-version-min=10.9
-  link += -mmacosx-version-min=10.9 -headerpad_max_install_names
+  link += -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 else ifeq ($(platform),win)
   link += -mwindows
 # link += -mconsole

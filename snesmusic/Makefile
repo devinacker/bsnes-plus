@@ -20,7 +20,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
   flags += -fPIC -mmacosx-version-min=10.9
   #link += -F/usr/local/lib -mmacosx-version-min=10.10
-  link += -mmacosx-version-min=10.9 -headerpad_max_install_names
+  link += -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 endif
 
 objects := snesmusic
