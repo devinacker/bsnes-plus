@@ -2,7 +2,7 @@ include nall/Makefile
 
 c     := $(compiler) -x c -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -O3 -fomit-frame-pointer -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
+flags := -O3 -DNDEBUG -fomit-frame-pointer -march=native -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
 link  :=
 
 ifeq ($(platform),x)

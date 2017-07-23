@@ -20,31 +20,24 @@
 using namespace nall;
 
 const uint32_t *colortable;
-configuration *config;
 
 #include "direct/direct.cpp"
-#include "ntsc/ntsc.cpp"
 #include "pixellate2x/pixellate2x.cpp"
 #include "scale2x/scale2x.cpp"
 #include "2xsai/2xsai.cpp"
 #include "lq2x/lq2x.cpp"
-#if !(defined(PLATFORM_OSX) && defined(__clang__))
-  #include "hq2x/hq2x.cpp"
-#endif
+#include "hq2x/hq2x.cpp"
+#include "ntsc/ntsc.cpp"
+#include "xbrz/xbrzfilter.cpp"
 
 bsnesexport const char* snesfilter_supported() {
-  #if defined(PLATFORM_OSX) && defined(__clang__)
-    return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;NTSC";
-  #else
-    return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;NTSC";
-  #endif
+  return "Pixellate2x;Scale2x;2xSaI;Super 2xSaI;Super Eagle;LQ2x;HQ2x;xBRZ;NTSC";
 }
 
-bsnesexport void snesfilter_configuration(configuration &config_) {
-  config = &config_;
-  if(config) {
-    filter_ntsc.bind(*config);
-  }
+bsnesexport void snesfilter_configuration(configuration &config) {
+  // A reference should never be null
+  filter_xbrz.bind(config);
+  filter_ntsc.bind(config);
 }
 
 bsnesexport void snesfilter_colortable(const uint32_t *colortable_) {
@@ -60,12 +53,9 @@ bsnesexport void snesfilter_size(unsigned filter, unsigned &outwidth, unsigned &
     case 4:  return filter_super2xsai.size(outwidth, outheight, width, height);
     case 5:  return filter_supereagle.size(outwidth, outheight, width, height);
     case 6:  return filter_lq2x.size(outwidth, outheight, width, height);
-    #if defined(PLATFORM_OSX) && defined(__clang__)
-      case 7:  return filter_ntsc.size(outwidth, outheight, width, height);
-    #else
-      case 7:  return filter_hq2x.size(outwidth, outheight, width, height);
-      case 8:  return filter_ntsc.size(outwidth, outheight, width, height);
-    #endif
+    case 7:  return filter_hq2x.size(outwidth, outheight, width, height);
+    case 8:  return filter_xbrz.size(outwidth, outheight, width, height);
+    case 9:  return filter_ntsc.size(outwidth, outheight, width, height);
   }
 }
 
@@ -81,23 +71,16 @@ bsnesexport void snesfilter_render(
     case 4:  return filter_super2xsai.render(output, outpitch, input, pitch, width, height);
     case 5:  return filter_supereagle.render(output, outpitch, input, pitch, width, height);
     case 6:  return filter_lq2x.render(output, outpitch, input, pitch, width, height);
-    #if defined(PLATFORM_OSX) && defined(__clang__)
-      case 7:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
-    #else
-      case 7:  return filter_hq2x.render(output, outpitch, input, pitch, width, height);
-      case 8:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
-    #endif
+    case 7:  return filter_hq2x.render(output, outpitch, input, pitch, width, height);
+    case 8:  return filter_xbrz.render(output, outpitch, input, pitch, width, height);
+    case 9:  return filter_ntsc.render(output, outpitch, input, pitch, width, height);
   }
 }
 
 bsnesexport QWidget* snesfilter_settings(unsigned filter) {
   switch(filter) {
     default: return 0;
-    #if defined(PLATFORM_OSX) && defined(__clang__)
-      case 7:
-    #else
-      case 8:
-    #endif
-      return filter_ntsc.settings();
+    case 8:  return filter_xbrz.settings();
+    case 9:  return filter_ntsc.settings();
   }
 }
