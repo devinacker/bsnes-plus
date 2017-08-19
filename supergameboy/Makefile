@@ -2,15 +2,15 @@ include nall/Makefile
 
 c     := $(compiler) -x c -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -O3 -fomit-frame-pointer -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
+flags := -O3 -DNDEBUG -fomit-frame-pointer -march=native -I. -Icommon -Ilibgambatte/include -Ilibgambatte/src
 link  :=
 
 ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native -mmacosx-version-min=10.10
-  link += -F/usr/local/lib -mmacosx-version-min=10.10
+  flags += -fPIC -mmacosx-version-min=10.9
+  link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 endif
 
 objects := supergameboy

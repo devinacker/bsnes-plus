@@ -15,8 +15,8 @@ const int BYTES_PER_LINE = 16;
 QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
 {
     _undoStack = new UndoStack(this);
-    setFont(QFont(Style::Monospace));
-    
+    setFont(QFont(Style::Monospace, Style::MonospaceSize));
+
     setAddressAreaColor(this->palette().alternateBase().color());
     setHighlightingColor(QColor(0xff, 0xff, 0x99, 0xff));
     setSelectionColor(this->palette().highlight().color());

@@ -29,6 +29,7 @@ private slots:
   void yAxisAssign();
   void stop();
   void toggleModifierEnable();
+  void shouldResize();
 
 private:
   QTreeWidgetItem *port1, *port2, *userInterface;

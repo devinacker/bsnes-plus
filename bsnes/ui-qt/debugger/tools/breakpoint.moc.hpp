@@ -49,6 +49,8 @@ public:
   void addBreakpoint(const string& breakpoint);
   string toStrings() const;
 
+  void setBreakOnWDM(bool value);
+
 public slots:
   void toggle();
   void clear();

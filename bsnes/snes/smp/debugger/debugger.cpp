@@ -5,6 +5,7 @@ void SMPDebugger::op_step() {
 
   usage[regs.pc] |= UsageOpcode;
   opcode_pc = regs.pc;
+  ++opcode_usage[memory::apuram[opcode_pc]];
 
   if(debugger.step_smp &&
       (debugger.step_type == Debugger::StepType::StepInto ||
@@ -61,11 +62,13 @@ void SMPDebugger::op_write(uint16 addr, uint8 data) {
 
 SMPDebugger::SMPDebugger() {
   usage = new uint8[1 << 16]();
+  opcode_usage = new uint64[256]();
   opcode_pc = 0xffc0;
 }
 
 SMPDebugger::~SMPDebugger() {
   delete[] usage;
+  delete[] opcode_usage;
 }
 
 static string clockdivide(double base, unsigned divide) {

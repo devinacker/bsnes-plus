@@ -4,12 +4,15 @@
 #if defined(PLATFORM_X)
   #include "platform/platform_x.cpp"
   const char Style::Monospace[64] = "Liberation Mono";
+  int Style::MonospaceSize = 12;
 #elif defined(PLATFORM_OSX)
   #include "platform/platform_osx.cpp"
-  const char Style::Monospace[64] = "Courier New";
+  const char Style::Monospace[64] = "SF Mono, Menlo, Courier New";
+  int Style::MonospaceSize = 11;
 #elif defined(PLATFORM_WIN)
   #include "platform/platform_win.cpp"
   const char Style::Monospace[64] = "Lucida Console";
+  int Style::MonospaceSize = 12;
 #else
   #error "unsupported platform"
 #endif

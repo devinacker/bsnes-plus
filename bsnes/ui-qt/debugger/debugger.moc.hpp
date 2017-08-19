@@ -43,6 +43,22 @@ public:
   void autoUpdate();
   Debugger();
 
+  enum MenuAction {
+    MainWindow = 0,
+    DisassemblerWindow,
+    BreakpointsWindow,
+    MemoryWindow,
+    PropertiesWindow,
+    VRAMWindow,
+    TilemapWindow,
+    OAMWindow,
+    CGRAMWindow,
+    OptionsWindow,
+    ClearConsole
+  } MenuAction_t;
+
+  void menuAction(MenuAction);
+
 public slots:
   void clear();
   void synchronize();

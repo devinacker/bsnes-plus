@@ -13,7 +13,7 @@ DisasmWidget::DisasmWidget() {
 
   view = new QTextEdit;
   view->setReadOnly(true);
-  view->setFont(QFont(Style::Monospace));
+  view->setFont(QFont(Style::Monospace, Style::MonospaceSize));
   view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   view->setMinimumHeight((25 + 1) * view->fontMetrics().height());
   layout->addWidget(view);

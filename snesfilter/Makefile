@@ -1,7 +1,17 @@
 include nall/Makefile
 
-qtlibs := QtCore QtGui
+qtlibs := QtCore QtGui QtWidgets
 include nall/qt/Makefile
+
+ifeq ($(OSX_USE_GCC), 1)
+# openmp is not available with clang, so optionally check if g++ is available.
+# if so, compile only snesreader using that with full filter support
+# (check for specific version since "g++" is aliased to clang)
+  ifneq ($(shell command -v g++-6 2> /dev/null),)
+    compiler      := g++-6
+    osx_with_gcc  :=1
+  endif
+endif
 
 c     := $(compiler) -xc -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
@@ -9,9 +19,9 @@ flags := -I. -Iobj $(qtinc)
 link  :=
 
 ifeq ($(DEBUG), 1)
-  flags += -O0 -g
+  flags += -O0 -g -DDEBUG
 else
-  flags += -O3 -fomit-frame-pointer
+  flags += -O3 -fomit-frame-pointer -DNDEBUG -march=native
 endif
 
 # silence warnings
@@ -21,11 +31,13 @@ ifeq ($(platform),x)
   flags := -fPIC -fopenmp $(flags)
   link += -s -fopenmp -lpthread -lgomp
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native -mmacosx-version-min=10.10
-  link += -F/usr/local/lib -lpthread -mmacosx-version-min=10.10
-#TODO: openmp not currently supported in Apple clang
-#  flags += -fopenmp
-#  link += -fopenmp -lgomp
+  ifeq ($(osx_with_gcc),)
+    flags += -fPIC -mmacosx-version-min=10.9
+    link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
+  else
+    flags += -fPIC -fopenmp -mmacosx-version-min=10.9
+    link += -fopenmp -lpthread -lgomp -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
+  endif
 else ifeq ($(platform),win)
   flags := -fopenmp $(flags)
   link += -fopenmp -lpthread

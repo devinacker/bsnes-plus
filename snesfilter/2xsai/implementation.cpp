@@ -83,10 +83,10 @@ static inline uint32_t INTERPOLATE (uint32_t A, uint32_t B)
 
 static inline uint32_t Q_INTERPOLATE (uint32_t A, uint32_t B, uint32_t C, uint32_t D)
 {
-  register uint32_t x = ((A & qcolorMask) >> 2) +
+  uint32_t x = ((A & qcolorMask) >> 2) +
     ((B & qcolorMask) >> 2) +
     ((C & qcolorMask) >> 2) + ((D & qcolorMask) >> 2);
-  register uint32_t y = (A & qlowpixelMask) +
+  uint32_t y = (A & qlowpixelMask) +
     (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask);
 
   y = (y >> 2) & qlowpixelMask;
@@ -198,7 +198,7 @@ void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
           } else if (color5 == color3 && color2 != color6) {
             product2b = product1b = color5;
           } else if (color5 == color3 && color2 == color6) {
-            register int r = 0;
+            int r = 0;
 
             r += GetResult (color6, color5, color1, colorA1);
             r += GetResult (color6, color5, color4, colorB1);
@@ -330,7 +330,7 @@ void Super2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch,
       } else if (color5 == color3 && color2 != color6) {
         product2b = product1b = color5;
       } else if (color5 == color3 && color2 == color6) {
-        register int r = 0;
+        int r = 0;
 
         r += GetResult (color6, color5, color1, colorA1);
         r += GetResult (color6, color5, color4, colorB1);
@@ -479,7 +479,7 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
           }
 
         } else if (color5 == color3 && color2 == color6) {
-          register int r = 0;
+          int r = 0;
 
           r += GetResult (color6, color5, color1, colorA1);
           r += GetResult (color6, color5, color4, colorB1);
@@ -614,7 +614,7 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t */*deltaPtr*/,
         }
 
       } else if (color5 == color3 && color2 == color6) {
-        register int r = 0;
+        int r = 0;
 
         r += GetResult (color6, color5, color1, colorA1);
         r += GetResult (color6, color5, color4, colorB1);
@@ -684,7 +684,7 @@ void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
       for (uint32_t finish = width; finish; finish -= inc_bP) {
 
-        register uint32_t colorA, colorB;
+        uint32_t colorA, colorB;
         uint32_t colorC, colorD,
           colorE, colorF, colorG, colorH,
           colorI, colorJ, colorK, colorL,
@@ -757,7 +757,7 @@ void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
             product1 = colorA;
             product2 = colorA;
           } else {
-            register int r = 0;
+            int r = 0;
 
             product1 = INTERPOLATE (colorA, colorC);
             product = INTERPOLATE (colorA, colorB);
@@ -844,7 +844,7 @@ void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dP = (uint32_t *) dstPtr;
 
     for (uint32_t finish = width; finish; finish -= inc_bP) {
-      register uint32_t colorA, colorB;
+      uint32_t colorA, colorB;
       uint32_t colorC, colorD,
         colorE, colorF, colorG, colorH,
         colorI, colorJ, colorK, colorL,
@@ -917,7 +917,7 @@ void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
           product1 = colorA;
           product2 = colorA;
         } else {
-          register int r = 0;
+          int r = 0;
 
           product1 = INTERPOLATE (colorA, colorC);
           product = INTERPOLATE (colorA, colorB);

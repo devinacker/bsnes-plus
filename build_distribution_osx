@@ -1,0 +1,38 @@
+#!/bin/bash
+
+version=`grep -m 1 'version := ' bsnes/Makefile | awk '{ print $3 }'`;
+bsnes_version=bsnes_${version}
+dist_dir=distribution
+
+#clean & set up distribution directory
+rm -f ${dist_dir}/${bsnes_version}.zip
+rm -frd ${dist_dir}/${bsnes_version}
+mkdir -pv ${dist_dir}/${bsnes_version}
+cp -a bsnes/data/bsxdat ${dist_dir}/${bsnes_version}/bsxdat
+
+#build compatibility app bundle
+cd bsnes
+make clean
+make -j4 profile=compatibility
+cd ..
+$qtpath/bin/macdeployqt ./bsnes+.app
+mv ./bsnes+.app ${dist_dir}/${bsnes_version}/bsnes+.app
+
+#build accuracy app bundle
+cd bsnes
+make clean
+make -j4 profile=accuracy
+cd ..
+$qtpath/bin/macdeployqt ./bsnes+accuracy.app
+mv ./bsnes+accuracy.app ${dist_dir}/${bsnes_version}/bsnes+accuracy.app
+
+#zip distribution directory
+pushd ${dist_dir}
+zip -r -y -9 ${bsnes_version}_osx.zip ${bsnes_version}
+#7z a -r ${bsnes_version}_osx.7z ${bsnes_version}
+popd
+
+#clean up
+cd bsnes
+make clean
+cd ..

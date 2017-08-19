@@ -29,7 +29,12 @@ Configuration::Configuration() {
   attach(SNES::config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
   attach(SNES::config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
 
+#if defined(PLATFORM_OSX)
+  attach(SNES::config.sat.path = nall::launchpath() << "bsxdat/", "bsx.satdata");
+#else
   attach(SNES::config.sat.path = "./bsxdat/", "bsx.satdata");
+#endif
+
   attach(SNES::config.sat.local_time = true, "bsx.localTime");
   attach((signed&)(SNES::config.sat.custom_time = 798653040) /* 1995-04-23 16:04 */, "bsx.customTime");
 
@@ -74,7 +79,7 @@ Configuration::Configuration() {
 
   video.context = &video.windowed;
   attach(video.isFullscreen = false, "video.isFullscreen");
-  attach(video.synchronize  = false, "video.synchronize");
+  attach(video.synchronize  = true, "video.synchronize");
 
   attach(video.autoHideFullscreenMenu = false, "video.autoHideFullscreenMenu");
 
@@ -96,14 +101,14 @@ Configuration::Configuration() {
   attach(video.windowed.multiplier         =    2, "video.windowed.multiplier");
   attach(video.windowed.region             =    0, "video.windowed.region");
 
-  attach(video.windowed.hwFilter = 1, "video.windowed.hwFilter");
+  attach(video.windowed.hwFilter = 0, "video.windowed.hwFilter");
   attach(video.windowed.swFilter = 0, "video.windowed.swFilter");
 
   attach(video.fullscreen.correctAspectRatio = true, "video.fullscreen.correctAspectRatio");
   attach(video.fullscreen.multiplier         =    9, "video.fullscreen.multiplier");
   attach(video.fullscreen.region             =    0, "video.fullscreen.region");
 
-  attach(video.fullscreen.hwFilter = 1, "video.fullscreen.hwFilter");
+  attach(video.fullscreen.hwFilter = 0, "video.fullscreen.hwFilter");
   attach(video.fullscreen.swFilter = 0, "video.fullscreen.swFilter");
 
   attach(audio.synchronize = true,  "audio.synchronize");

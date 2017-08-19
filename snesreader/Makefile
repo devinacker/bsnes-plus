@@ -1,6 +1,6 @@
 include nall/Makefile
 
-qtlibs := QtCore QtGui
+qtlibs := QtCore QtGui QtWidgets
 include nall/qt/Makefile
 
 c     := $(compiler) -xc -std=gnu99
@@ -9,9 +9,9 @@ flags := -I. -Iobj
 link  :=
 
 ifeq ($(DEBUG), 1)
-  flags += -O0 -g
+  flags += -O0 -g -DDEBUG
 else
-  flags += -O3 -fomit-frame-pointer
+  flags += -O3 -fomit-frame-pointer -DNDEBUG -march=native
 endif
 
 # silence warnings
@@ -21,8 +21,8 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native -mmacosx-version-min=10.10
-  link += -F/usr/local/lib -mmacosx-version-min=10.10
+  flags += -fPIC -mmacosx-version-min=10.9
+  link += -lpthread -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 endif
 
 objects := snesreader

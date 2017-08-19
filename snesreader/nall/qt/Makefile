@@ -9,6 +9,10 @@
 # $(qtinc) -- includes for compiling
 # $(qtlib) -- libraries for linking
 
+ifeq ($(qtlib_version),)
+  qtlib_version := 5
+endif
+
 ifeq ($(moc),)
   ifeq ($(qtpath),)
     moc := moc
@@ -30,14 +34,14 @@ ifeq ($(platform),x)
   qtlib := `pkg-config --libs $(qtlibs)`
 else ifeq ($(platform),osx)
   ifeq ($(qtpath),)
-    qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/4/Headers)
+    qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/$(qtlib_version)/Headers)
     qtlib := -L/Library/Frameworks
   else
-    qtinc := -I$(qtpath)/include
-    qtinc += $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/4/Headers)
-    qtlib := -L$(qtpath)/lib -F$(qtpath)/lib
+    qtinc := -F$(qtpath)/lib
+    qtinc += $(foreach lib,$(qtlibs),-I$(qtpath)/lib/$(lib).framework/Versions/$(qtlib_version)/Headers)
+    qtlib += -F$(qtpath)/lib -Wl,-rpath,$(qtpath)/lib
   endif
-  qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/4/Headers)
+  qtinc += $(foreach lib,$(qtlibs),-I/usr/local/lib/$(lib).framework/Versions/$(qtlib_version)/Headers)
   qtlib += $(foreach lib,$(qtlibs),-framework $(lib))
   qtlib += -framework Carbon
   qtlib += -framework Cocoa
@@ -59,10 +63,9 @@ else ifeq ($(platform),win)
   qtlib := -L$(qtpath)/lib
   qtlib += -L$(qtpath)/plugins/imageformats
 
-  qtlib += $(foreach lib,$(qtlibs),-l$(lib)4)
+  qtlib += $(foreach lib,$(qtlibs),-l$(lib)$(qtlib_version))
   qtlib += -lmingw32 -lqtmain -lcomdlg32 -loleaut32 -limm32 -lwinmm
   qtlib += -lwinspool -lmsimg32 -lole32 -ladvapi32 -lws2_32 -luuid -lgdi32
-  qtlib += $(foreach lib,$(qtlibs),-l$(lib)4)
 
   # optional image-file support:
   # qtlib += -lqjpeg -lqmng

@@ -36,6 +36,8 @@ string currentpath() {
   return "";
 }
 
+string launchpath();
+
 }
 
 #endif

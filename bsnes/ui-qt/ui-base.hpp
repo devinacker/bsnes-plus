@@ -3,7 +3,7 @@
 #define QT_THREAD_SUPPORT
 
 #include <QApplication>
-#include <QtGui>
+#include <QtWidgets>
 //Q_IMPORT_PLUGIN(QJpegPlugin)
 //Q_IMPORT_PLUGIN(QMngPlugin)
 
@@ -92,6 +92,7 @@ using namespace ruby;
 
 struct Style {
   static const char Monospace[64];
+  static int MonospaceSize;
 
   enum {
     WindowMargin     = 5,

@@ -18,8 +18,9 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native -mmacosx-version-min=10.10
-  link += -F/usr/local/lib -mmacosx-version-min=10.10
+  flags += -fPIC -mmacosx-version-min=10.9
+  #link += -F/usr/local/lib -mmacosx-version-min=10.10
+  link += -mmacosx-version-min=10.9 -headerpad_max_install_names -F/usr/local/opt/qt5/lib
 endif
 
 objects := snesmusic
@@ -76,7 +77,7 @@ ifeq ($(platform),win)
 	$(cpp) $(link) -o snesmusic.dll -shared -Wl,--out-implib,libsnesmusic.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
 	ar rcs libsnesmusic.a $(objects)
-	$(cpp) $(link) -o libssnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
+	$(cpp) $(link) -o libsnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
 else
 	ar rcs libsnesmusic.a $(objects)
 	$(cpp) $(link) -o libsnesmusic.so -shared -Wl,-soname,libsnesmusic.so.1 $(objects) $(qtlib)
