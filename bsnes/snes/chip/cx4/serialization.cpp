@@ -1,39 +1,42 @@
 #ifdef CX4_CPP
 
 void Cx4::serialize(serializer &s) {
-  s.array(ram);
-  s.array(reg);
+  Processor::serialize(s);
 
-  s.integer(r0);
-  s.integer(r1);
-  s.integer(r2);
-  s.integer(r3);
-  s.integer(r4);
-  s.integer(r5);
-  s.integer(r6);
-  s.integer(r7);
-  s.integer(r8);
-  s.integer(r9);
-  s.integer(r10);
-  s.integer(r11);
-  s.integer(r12);
-  s.integer(r13);
-  s.integer(r14);
-  s.integer(r15);
+  for(auto& n : stack) s.integer(n);
+  s.integer(opcode);
 
-  s.integer(C4WFXVal);
-  s.integer(C4WFYVal);
-  s.integer(C4WFZVal);
-  s.integer(C4WFX2Val);
-  s.integer(C4WFY2Val);
-  s.integer(C4WFDist);
-  s.integer(C4WFScale);
+  s.integer(regs.halt);
 
-  s.integer(C41FXVal);
-  s.integer(C41FYVal);
-  s.integer(C41FAngleRes);
-  s.integer(C41FDist);
-  s.integer(C41FDistVal);
+  s.integer(regs.pc);
+  s.integer(regs.p);
+  s.integer(regs.n);
+  s.integer(regs.z);
+  s.integer(regs.c);
+
+  s.integer(regs.a);
+  s.integer(regs.acch);
+  s.integer(regs.accl);
+  s.integer(regs.busdata);
+  s.integer(regs.romdata);
+  s.integer(regs.ramdata);
+  s.integer(regs.busaddr);
+  s.integer(regs.ramaddr);
+  for(auto& n : regs.gpr) s.integer(n);
+
+  s.integer(mmio.dma);
+  s.integer(mmio.dmaSource);
+  s.integer(mmio.dmaLength);
+  s.integer(mmio.dmaTarget);
+  s.integer(mmio.r1f48);
+  s.integer(mmio.programOffset);
+  s.integer(mmio.r1f4c);
+  s.integer(mmio.pageNumber);
+  s.integer(mmio.programCounter);
+  s.integer(mmio.r1f50);
+  s.integer(mmio.r1f51);
+  s.integer(mmio.r1f52);
+  s.array(mmio.vector);
 }
 
 #endif

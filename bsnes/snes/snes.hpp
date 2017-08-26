@@ -3,7 +3,7 @@ namespace SNES {
     static const char Name[] = "bsnes-plus";
     static const char Version[] = "073+3a";
     static const unsigned SerializerSignature = 0x43545342; //'BSTC'
-    static const unsigned SerializerVersion = 9;
+    static const unsigned SerializerVersion = 10;
   }
 }
 
@@ -45,6 +45,8 @@ namespace SNES {
   typedef int16_t  int16;
   typedef int32_t  int32;
   typedef int64_t  int64;
+
+  typedef int_t<24> int24;
 
   typedef uint8_t  uint8;
   typedef uint16_t uint16;

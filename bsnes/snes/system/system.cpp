@@ -160,6 +160,7 @@ void System::power() {
   if(cartridge.has_superfx()) cpu.coprocessors.append(&superfx);
   if(cartridge.has_sa1()) cpu.coprocessors.append(&sa1);
   if(cartridge.has_necdsp()) cpu.coprocessors.append(&necdsp);
+  if(cartridge.has_cx4()) cpu.coprocessors.append(&cx4);
   if(cartridge.has_msu1()) cpu.coprocessors.append(&msu1);
   if(cartridge.has_serial()) cpu.coprocessors.append(&serial);
 
@@ -197,6 +198,7 @@ void System::reset() {
   if(cartridge.has_superfx()) cpu.coprocessors.append(&superfx);
   if(cartridge.has_sa1()) cpu.coprocessors.append(&sa1);
   if(cartridge.has_necdsp()) cpu.coprocessors.append(&necdsp);
+  if(cartridge.has_cx4()) cpu.coprocessors.append(&cx4);
   if(cartridge.has_msu1()) cpu.coprocessors.append(&msu1);
   if(cartridge.has_serial()) cpu.coprocessors.append(&serial);
 

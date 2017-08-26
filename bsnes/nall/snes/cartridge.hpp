@@ -61,6 +61,7 @@ public:
     BSCHiROM,
     BSXROM,
     STROM,
+	Cx4ROM,
   };
 
   enum DSP1MemoryMapper {
@@ -87,7 +88,6 @@ public:
   bool has_bsx_slot;
   bool has_spc7110rtc;
   bool has_srtc;
-  bool has_cx4;
   bool has_dsp1;
   bool has_dsp2;
   bool has_dsp3;
@@ -382,6 +382,18 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      </ram>\n";
     xml << "    </slot>\n";
     xml << "  </sufamiturbo>\n";
+  } else if(mapper == Cx4ROM) {
+    xml << "  <cx4 frequency='20000000'>\n";
+    xml << "    <rom>\n";
+    xml << "      <map mode='linear' address='00-3f:8000-ffff'/>\n";
+    xml << "      <map mode='linear' address='80-bf:8000-ffff'/>\n";
+    xml << "    </rom>\n";
+    xml << "    <ram size='" << hex(ram_size) << "'>\n";
+    xml << "      <map mode='linear' address='70-77:0000-7fff'/>\n";
+    xml << "    </ram>\n";
+    xml << "    <map address='00-3f:6000-7fff'/>\n";
+    xml << "    <map address='80-bf:6000-7fff'/>\n";
+    xml << "  </cx4>\n";
   }
 
   if(has_srtc) {
@@ -389,13 +401,6 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map address='00-3f:2800-2801'/>\n";
     xml << "    <map address='80-bf:2800-2801'/>\n";
     xml << "  </srtc>\n";
-  }
-
-  if(has_cx4) {
-    xml << "  <cx4>\n";
-    xml << "    <map address='00-3f:6000-7fff'/>\n";
-    xml << "    <map address='80-bf:6000-7fff'/>\n";
-    xml << "  </cx4>\n";
   }
 
   if(has_dsp1) {
@@ -496,7 +501,6 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   has_bsx_slot   = false;
   has_spc7110rtc = false;
   has_srtc       = false;
-  has_cx4        = false;
   has_dsp1       = false;
   has_dsp2       = false;
   has_dsp3       = false;
@@ -688,7 +692,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   }
 
   if(mapperid == 0x20 && rom_type == 0xf3) {
-    has_cx4 = true;
+    mapper = Cx4ROM;
   }
 
   if((mapperid == 0x20 || mapperid == 0x21) && rom_type == 0x03) {

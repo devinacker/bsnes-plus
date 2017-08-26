@@ -180,9 +180,9 @@ void Cartridge::xml_parse_sa1(xml_element &root) {
       foreach(attr, node.attribute) {
         if(attr.name == "size") ram_size = hex(attr.content);
       }
-	  if (ram_size) {
+      if (ram_size) {
         xml_parse_memory(node, memory::cc1bwram);
-	  }
+      }
     } else if(node.name == "mmio") {
       foreach(leaf, node.element) {
         if(leaf.name == "map") {
@@ -461,9 +461,22 @@ void Cartridge::xml_parse_spc7110(xml_element &root) {
 
 void Cartridge::xml_parse_cx4(xml_element &root) {
   has_cx4 = true;
+  cx4.frequency = 20000000;
 
+  // TODO: allow custom data ROM, maybe
+
+  foreach(attr, root.attribute) {
+    if(attr.name == "frequency") {
+      cx4.frequency = decimal(attr.content);
+    }
+  }
+  
   foreach(node, root.element) {
-    if(node.name == "map") {
+    if(node.name == "rom") {
+      xml_parse_memory(node, memory::cx4rom);
+    } else if(node.name == "ram") {
+      xml_parse_memory(node, memory::cx4ram);
+    } else if(node.name == "map") {
       Mapping m(cx4);
       foreach(attr, node.attribute) {
         if(attr.name == "address") xml_parse_address(m, attr.content);
