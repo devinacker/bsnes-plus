@@ -58,6 +58,16 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   parse_xml(xml_list);
 //print(xml_list[0], "\n\n");
 
+  // autodetect MSU1 if it wasn't specified in a manifest
+  if(!has_msu1 && file::exists(string(basename(), ".msu"))) {
+    has_msu1 = true;
+    
+    Mapping m(msu1);
+    m.addrlo = 0x2000;
+    m.addrhi = 0x2007;
+    mapping.append(m);
+  }
+
   if(ram_size > 0) {
     memory::cartram.map(allocate<uint8_t>(ram_size, 0xff), ram_size);
   }
