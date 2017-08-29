@@ -21,12 +21,12 @@ void Cx4::write(unsigned addr, uint8 data) {
 }
 
 uint8 Cx4::rom_read(unsigned addr) {
-  if (regs.halt) {
+  if (active() || regs.halt) {
     return memory::cartrom.read(addr);
   }
   
   if ((addr & 0xffffe0) == 0x007fe0) return mmio.vector[addr & 0x1f];
-  return cpu.regs.mdr;
+  return 0; // not open bus
 }
 
 uint8 Cx4::dram_read(unsigned addr) {

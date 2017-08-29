@@ -22,6 +22,7 @@ Cartridge cartridge;
 int Cartridge::rom_offset(unsigned addr) const {
   Bus::Page &page = bus.page[addr >> 8];
   if (page.access == &memory::cartrom ||
+      page.access == &memory::cx4rom ||
       page.access == &memory::vsprom) {
     return page.offset + addr;
   }

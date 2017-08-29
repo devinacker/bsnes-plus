@@ -103,6 +103,10 @@ namespace SNES {
       s.integer(frequency);
       s.integer(clock);
     }
+    
+    inline bool active() const {
+      return co_active() == thread;
+    }
 
     inline Processor() : thread(0) {}
   };
