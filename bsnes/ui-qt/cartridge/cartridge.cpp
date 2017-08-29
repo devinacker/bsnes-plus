@@ -266,8 +266,8 @@ bool Cartridge::loadSnsf(const char *base) {
   if (status) {
     SNES::memory::cartrom.copy(data, size);
     cartridge.baseXml = SNESCartridge(data, size).xmlMemoryMap;
-	
-	SNES::cartridge.basename = nall::basename(baseName);
+    
+    SNES::cartridge.basename = nall::basename(baseName);
     SNES::cartridge.load(SNES::Cartridge::Mode::Normal, lstring() << cartridge.baseXml);
 
     fileName = baseName;
@@ -275,7 +275,7 @@ bool Cartridge::loadSnsf(const char *base) {
 
     application.currentRom = base;
 
-	utility.modifySystemState(Utility::LoadCartridge);
+    utility.modifySystemState(Utility::LoadCartridge);
   
     delete[] data;
   }

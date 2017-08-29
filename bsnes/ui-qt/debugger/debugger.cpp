@@ -261,10 +261,10 @@ void Debugger::modifySystemState(unsigned state) {
     if(config().debugger.saveBreakpoints) {
       string data = breakpointEditor->toStrings();
       
-	  // don't write an empty list of breakpoints unless the file already exists
+      // don't write an empty list of breakpoints unless the file already exists
       if ((data.length() || file::exists(bpfile)) && fp.open(bpfile, file::mode::write)) {
         fp.print(data);
-		fp.close();
+        fp.close();
       }
     }
   }

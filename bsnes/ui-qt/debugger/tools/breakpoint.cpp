@@ -69,7 +69,7 @@ BreakpointItem::BreakpointItem(unsigned id_) : id(id_) {
 
 void BreakpointItem::init() {
   SNES::debugger.breakpoint[id].enabled = false;
-  SNES::debugger.breakpoint[id].counter = 0;	
+  SNES::debugger.breakpoint[id].counter = 0;
 }
 
 void BreakpointItem::toggle() {

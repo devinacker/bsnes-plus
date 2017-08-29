@@ -332,7 +332,7 @@ void MemoryEditor::search() {
     
     if (searchDown->isChecked()) {
       searchPos = searchFromEnd->isChecked() ? -1 : offset;
-      searchNext();	  
+      searchNext();
     } else {
       searchPos = searchFromEnd->isChecked() ? editor->editorSize() : offset;
       searchPrev();
