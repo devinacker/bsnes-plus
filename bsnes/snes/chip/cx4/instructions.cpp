@@ -56,6 +56,8 @@ void Cx4::instruction() {
     //jump i
     if(opcode & 0x2000) push();
     regs.pc = np();
+    change_page();
+    step(2);
   }
 
   else if((opcode & 0xdd00) == 0x0c00) {
@@ -64,6 +66,8 @@ void Cx4::instruction() {
     if(regs.z) {
       if(opcode & 0x2000) push();
       regs.pc = np();
+      change_page();
+      step(2);
     }
   }
 
@@ -73,6 +77,8 @@ void Cx4::instruction() {
     if(regs.c) {
       if(opcode & 0x2000) push();
       regs.pc = np();
+      change_page();
+      step(2);
     }
   }
 
@@ -82,42 +88,60 @@ void Cx4::instruction() {
     if(regs.n) {
       if(opcode & 0x2000) push();
       regs.pc = np();
+      change_page();
+      step(2);
     }
   }
 
   else if((opcode & 0xffff) == 0x1c00) {
     //0001 1100 0000 0000
-    //loop?
+    //loop
+    if (regs.rwbustime > 1) {
+      step(regs.rwbustime - 1);
+      synchronize_cpu();
+      regs.rwbustime = 1;
+    }
   }
 
   else if((opcode & 0xfffe) == 0x2500) {
     //0010 0101 0000 000.
     //skiplt/skipge
-    if(regs.c == (opcode & 1)) regs.pc++;
+    if(regs.c == (opcode & 1)) {
+      nextpc();
+      step(1);
+    }
   }
 
   else if((opcode & 0xfffe) == 0x2600) {
     //0010 0110 0000 000.
     //skipne/skipeq
-    if(regs.z == (opcode & 1)) regs.pc++;
+    if(regs.z == (opcode & 1)) {
+      nextpc();
+      step(1);
+    }
   }
 
   else if((opcode & 0xfffe) == 0x2700) {
     //0010 0111 0000 000.
     //skipmi/skippl
-    if(regs.n == (opcode & 1)) regs.pc++;
+    if(regs.n == (opcode & 1)) {
+      nextpc();
+      step(1);
+    }
   }
 
   else if((opcode & 0xffff) == 0x3c00) {
     //0011 1100 0000 0000
     //ret
     pull();
+    change_page();
+    step(2);
   }
 
   else if((opcode & 0xffff) == 0x4000) {
     //0100 0000 0000 0000
-    //rdbus
-    regs.busdata = cx4bus.read(regs.busaddr++);
+    //inc
+    regs.busaddr++;
   }
 
   else if((opcode & 0xf800) == 0x4800) {
@@ -158,7 +182,8 @@ void Cx4::instruction() {
 
   else if((opcode & 0xfb00) == 0x6100) {
     //0110 0.01 .... ....
-    //ld ?,ri
+    //rdbus r
+    register_read(opcode & 0xff);
   }
 
   else if((opcode & 0xfb00) == 0x6300) {
@@ -309,6 +334,12 @@ void Cx4::instruction() {
     //1110 0000 .... ....
     //st r,a
     register_write(opcode & 0xff, regs.a);
+  }
+  
+  else if((opcode & 0xff00) == 0xe1000) {
+    //1110 0001 .... ....
+    //wrbus r
+    register_write(opcode & 0xff, regs.busdata);
   }
 
   else if((opcode & 0xfb00) == 0xe800) {

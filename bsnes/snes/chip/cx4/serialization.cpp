@@ -7,6 +7,11 @@ void Cx4::serialize(serializer &s) {
   s.integer(opcode);
 
   s.integer(regs.halt);
+  s.integer(regs.cachePage);
+  s.integer(regs.rwbusaddr);
+  s.integer(regs.rwbustime);
+  s.integer(regs.writebus);
+  s.integer(regs.writebusdata);
 
   s.integer(regs.pc);
   s.integer(regs.p);
@@ -25,18 +30,27 @@ void Cx4::serialize(serializer &s) {
   for(auto& n : regs.gpr) s.integer(n);
 
   s.integer(mmio.dma);
+  s.integer(mmio.suspend);
+  s.integer(mmio.cacheLoading);
   s.integer(mmio.dmaSource);
   s.integer(mmio.dmaLength);
   s.integer(mmio.dmaTarget);
-  s.integer(mmio.r1f48);
+  s.integer(mmio.cachePreload);
   s.integer(mmio.programOffset);
-  s.integer(mmio.r1f4c);
   s.integer(mmio.pageNumber);
   s.integer(mmio.programCounter);
-  s.integer(mmio.r1f50);
+  s.integer(mmio.romSpeed);
+  s.integer(mmio.ramSpeed);
   s.integer(mmio.r1f51);
   s.integer(mmio.r1f52);
+  s.integer(mmio.suspendCycles);
   s.array(mmio.vector);
+  
+  for(auto& page : cache) {
+    s.integer(page.lock);
+    s.integer(page.pageNumber);
+    s.array(page.data);
+  }
 }
 
 #endif

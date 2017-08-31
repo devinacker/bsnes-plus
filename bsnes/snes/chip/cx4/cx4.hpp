@@ -22,8 +22,11 @@ public:
   static const uint24 dataROM[1024];
 
 protected:
+  void add_clocks(unsigned);
   
   //memory.cpp
+  unsigned speed(unsigned addr);
+  
   uint8 dram_read(unsigned addr);
   void dram_write(unsigned addr, uint8 data);
   
@@ -36,15 +39,23 @@ protected:
   unsigned ri();
   unsigned np();
   void instruction();
+  void nextpc();
+  void change_page();
+  void load_page(uint8 cachePage, uint16 programPage);
 
   //registers.cpp
-  uint24 register_read(uint8 addr) const;
+  uint24 register_read(uint8 addr);
   void register_write(uint8 addr, uint24 data);
 
   uint8 dataRAM[3072];
   
   struct Registers {
     bool halt;
+    uint8 cachePage;
+    uint24 rwbusaddr;
+    uint8 rwbustime;
+    bool writebus;
+    uint24 writebusdata;
 
     uint24 pc;
     uint16 p;
@@ -68,20 +79,39 @@ protected:
 
   struct MMIO {
     bool dma;  //true during DMA transfers
+    bool suspend;
+    bool cacheLoading;
 
     uint24 dmaSource;       //$1f40-$1f42
     uint24 dmaLength;       //$1f43-$1f44
     uint24 dmaTarget;       //$1f45-$1f47
-    uint8  r1f48;           //$1f48
+    uint8  cachePreload;    //$1f48
     uint24 programOffset;   //$1f49-$1f4b
-    uint8  r1f4c;           //$1f4c
     uint16 pageNumber;      //$1f4d-$1f4e
     uint8  programCounter;  //$1f4f
-    uint8  r1f50;           //$1f50
+    uint8  romSpeed;        //$1f50
+    uint8  ramSpeed;        //$1f50
     uint8  r1f51;           //$1f51
     uint8  r1f52;           //$1f52
+    uint8  suspendCycles;   //$1f55-$1f5c
     uint8  vector[32];      //$1f60-$1f7f
   } mmio;
+
+  struct CachePage {
+    bool lock;
+    uint16 pageNumber;
+    uint16 data[256];
+  } cache[2];
+
+  alwaysinline bool busy() {
+    // cartridge bus in use
+    return mmio.dma || mmio.cacheLoading || regs.rwbustime > 0;
+  }
+  
+  alwaysinline bool running() {
+    // performing DMA, cache preload, or running code
+    return mmio.dma || mmio.cacheLoading || !regs.halt;
+  }
 
 };
 
