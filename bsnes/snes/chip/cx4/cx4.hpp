@@ -52,6 +52,9 @@ protected:
   struct Registers {
     bool halt;
     uint8 cachePage;
+	bool irq;
+	bool irqPending;
+	
     uint24 rwbusaddr;
     uint8 rwbustime;
     bool writebus;
@@ -91,7 +94,7 @@ protected:
     uint8  programCounter;  //$1f4f
     uint8  romSpeed;        //$1f50
     uint8  ramSpeed;        //$1f50
-    uint8  r1f51;           //$1f51
+    uint8  irqDisable;      //$1f51
     uint8  r1f52;           //$1f52
     uint8  suspendCycles;   //$1f55-$1f5c
     uint8  vector[32];      //$1f60-$1f7f

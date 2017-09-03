@@ -20,6 +20,8 @@ void Cx4::enter() {
       scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
     }
 
+    bool wasRunning = running();
+
     if (mmio.dma) {
       for (unsigned n = 0; n < mmio.dmaLength; n++) {
         uint8 data = cx4bus.read(mmio.dmaSource + n);
@@ -50,11 +52,18 @@ void Cx4::enter() {
           regs.busdata = cx4bus.read(regs.rwbusaddr);
       }
     }
+    
+    regs.irqPending = wasRunning && !running() && !mmio.irqDisable;
     add_clocks(1);
   }
 }
 
 void Cx4::add_clocks(unsigned num) {
+  if (regs.irqPending)
+    regs.irq = true;
+  if (regs.irq)
+    cpu.regs.irq = true;
+
   step(num);
   synchronize_cpu();
   
@@ -132,6 +141,8 @@ void Cx4::reset() {
   
   regs.halt = true;
   regs.cachePage = 0;
+  regs.irq = false;
+  regs.irqPending = false;
   regs.rwbustime = 0;
 
   regs.n = 0;
@@ -151,7 +162,7 @@ void Cx4::reset() {
   mmio.programCounter = 0x00;
   mmio.romSpeed = 0x3;
   mmio.ramSpeed = 0x3;
-  mmio.r1f51 = 0x00;
+  mmio.irqDisable = 0x00;
   mmio.r1f52 = 0x01;
   
   for (auto& cachePage : cache) {

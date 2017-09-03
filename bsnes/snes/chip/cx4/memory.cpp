@@ -80,12 +80,12 @@ uint8 Cx4::dsp_read(unsigned addr) {
   case 0x7f4e: return mmio.pageNumber >> 8;
   case 0x7f4f: return mmio.programCounter;
   case 0x7f50: return (mmio.romSpeed << 4) | mmio.ramSpeed;
-  case 0x7f51: return mmio.r1f51;
+  case 0x7f51: return mmio.irqDisable;
   case 0x7f52: return mmio.r1f52;
   case 0x7f53: case 0x7f54: case 0x7f55: case 0x7f56:
   case 0x7f57: case 0x7f59: 
   case 0x7f5b: case 0x7f5c: case 0x7f5d: case 0x7f5e:
-  case 0x7f5f: return (busy() << 7) | (running() << 6) | (regs.halt << 1) | mmio.suspend;
+  case 0x7f5f: return (busy() << 7) | (running() << 6) | (regs.irqPending << 1) | mmio.suspend;
   }
 
   //Vector
@@ -146,7 +146,12 @@ void Cx4::dsp_write(unsigned addr, uint8 data) {
     mmio.romSpeed = (data >> 4) & 0x7;
     mmio.ramSpeed = (data >> 0) & 0x7;
     return;
-  case 0x7f51: mmio.r1f51 = data & 0x01; return;
+  case 0x7f51: 
+    mmio.irqDisable = data & 0x01;
+    if (mmio.irqDisable) {
+      regs.irq = regs.irqPending = false;
+    }
+    return;
   case 0x7f52: mmio.r1f52 = data & 0x01; return;
   case 0x7f53: regs.halt = true; return;
   case 0x7f55: case 0x7f56: case 0x7f57: case 0x7f58: 
@@ -155,6 +160,7 @@ void Cx4::dsp_write(unsigned addr, uint8 data) {
     mmio.suspendCycles = 32 * (addr - 0x7f55);
     return;
   case 0x7f5d: mmio.suspend = false; return;
+  case 0x7f5e: regs.irqPending = false; return;
   }
 
   //Vector

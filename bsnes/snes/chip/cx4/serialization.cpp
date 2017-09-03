@@ -8,6 +8,9 @@ void Cx4::serialize(serializer &s) {
 
   s.integer(regs.halt);
   s.integer(regs.cachePage);
+  s.integer(regs.irq);
+  s.integer(regs.irqPending);
+  
   s.integer(regs.rwbusaddr);
   s.integer(regs.rwbustime);
   s.integer(regs.writebus);
@@ -41,7 +44,7 @@ void Cx4::serialize(serializer &s) {
   s.integer(mmio.programCounter);
   s.integer(mmio.romSpeed);
   s.integer(mmio.ramSpeed);
-  s.integer(mmio.r1f51);
+  s.integer(mmio.irqDisable);
   s.integer(mmio.r1f52);
   s.integer(mmio.suspendCycles);
   s.array(mmio.vector);
