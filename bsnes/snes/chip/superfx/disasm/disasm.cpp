@@ -70,7 +70,7 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr, bool track_regs) {
 #define op0 superfxbus.read(addr + 0)
 #define op1 superfxbus.read(addr + 1)
 #define op2 superfxbus.read(addr + 2)
-#define bdest (addr + (int8_t)op1 + 1) & 0xffff
+#define bdest (addr + (int8_t)op1 + 2) & 0xffff
 
 #define R(n) disassemble_regs |= (1 << n)
 #define Ri disassemble_regs |= (1 << (op0 & 15))

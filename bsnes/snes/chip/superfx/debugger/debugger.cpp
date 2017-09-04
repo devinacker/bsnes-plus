@@ -1,31 +1,36 @@
 #ifdef SUPERFX_CPP
 
+void SFXDebugger::reset() {
+  SuperFX::reset();
+  
+  pc_valid = false;
+  opcode_pc = 0;
+}
+
 void SFXDebugger::op_step() {
-  bool break_event = false;
+  if (pc_valid) {
+    usage[opcode_pc] |= UsageOpcode;
 
-  // subtract 1 since r15 will have already advanced one byte
-  // (putting the current opcode in the pipeline)
-  opcode_pc = (regs.pbr << 16) + regs.r[15] - 1;
-  usage[opcode_pc] |= UsageOpcode;
-
-  if(debugger.step_sfx &&
-      (debugger.step_type == Debugger::StepType::StepInto ||
-       (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
+    if(debugger.step_sfx &&
+        (debugger.step_type == Debugger::StepType::StepInto ||
+         (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
       
-    debugger.break_event = Debugger::BreakEvent::SFXStep;
-    debugger.step_type = Debugger::StepType::None;
-    scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
-  } else {
-    debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Exec, opcode_pc, 0x00);
+      debugger.break_event = Debugger::BreakEvent::SFXStep;
+      debugger.step_type = Debugger::StepType::None;
+      scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
+    } else {
+      debugger.breakpoint_test(Debugger::Breakpoint::Source::SFXBus, Debugger::Breakpoint::Mode::Exec, opcode_pc, 0x00);
+    }
+    if(step_event) step_event();
   }
-  if(step_event) step_event();
 }
 
 uint8 SFXDebugger::op_read(uint16 addr) {
-  uint32 fulladdr = addr + (regs.pbr << 16);
-  usage[fulladdr] |= UsageExec;
+  pc_valid = true;
+  opcode_pc = addr + (regs.pbr << 16);
+  usage[opcode_pc] |= UsageExec;
   
-  int offset = cartridge.rom_offset(fulladdr);
+  int offset = cartridge.rom_offset(opcode_pc);
   if (offset >= 0) (*cart_usage)[offset] |= UsageExec;
   
   return SuperFX::op_read(addr);
@@ -69,7 +74,6 @@ void SFXDebugger::rambuffer_write(uint16 addr, uint8 data) {
 SFXDebugger::SFXDebugger() {
   usage = new uint8[1 << 23]();
   cart_usage = &SNES::cpu.cart_usage;
-  opcode_pc = 0;
 }
 
 SFXDebugger::~SFXDebugger() {

@@ -13,7 +13,7 @@ public:
   void init();
   void enable();
   void power();
-  void reset();
+  debugvirtual void reset();
   void serialize(serializer&);
 
   // used by the superfx debugger prior to executing instructions

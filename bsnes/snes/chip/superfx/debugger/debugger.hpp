@@ -39,10 +39,13 @@ public:
   uint8 **cart_usage;
 
   uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
+  bool pc_valid;
+
+  void reset();
 
   void op_step();
   
-  // mark pipelined instruction bytes as executed
+  // mark pipelined instruction bytes as executed and update last pipeline read address
   uint8 op_read(uint16 addr);
   
   // mark (and break on) buffered i/o
