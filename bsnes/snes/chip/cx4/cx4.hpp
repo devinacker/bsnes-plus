@@ -106,12 +106,12 @@ protected:
     uint16 data[256];
   } cache[2];
 
-  alwaysinline bool busy() {
+  alwaysinline bool bus_access() {
     // cartridge bus in use
     return mmio.dma || mmio.cacheLoading || regs.rwbustime > 0;
   }
   
-  alwaysinline bool running() {
+  alwaysinline bool busy() {
     // performing DMA, cache preload, or running code
     return mmio.dma || mmio.cacheLoading || !regs.halt;
   }

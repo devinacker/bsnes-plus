@@ -57,7 +57,7 @@ void Cx4::instruction() {
     if(opcode & 0x2000) push();
     regs.pc = np();
     change_page();
-    step(2);
+    add_clocks(2);
   }
 
   else if((opcode & 0xdd00) == 0x0c00) {
@@ -67,7 +67,7 @@ void Cx4::instruction() {
       if(opcode & 0x2000) push();
       regs.pc = np();
       change_page();
-      step(2);
+      add_clocks(2);
     }
   }
 
@@ -78,7 +78,7 @@ void Cx4::instruction() {
       if(opcode & 0x2000) push();
       regs.pc = np();
       change_page();
-      step(2);
+      add_clocks(2);
     }
   }
 
@@ -89,7 +89,7 @@ void Cx4::instruction() {
       if(opcode & 0x2000) push();
       regs.pc = np();
       change_page();
-      step(2);
+      add_clocks(2);
     }
   }
 
@@ -97,7 +97,7 @@ void Cx4::instruction() {
     //0001 1100 0000 0000
     //loop
     if (regs.rwbustime > 1) {
-      step(regs.rwbustime - 1);
+      add_clocks(regs.rwbustime - 1);
       synchronize_cpu();
       regs.rwbustime = 1;
     }
@@ -108,7 +108,7 @@ void Cx4::instruction() {
     //skiplt/skipge
     if(regs.c == (opcode & 1)) {
       nextpc();
-      step(1);
+      add_clocks(1);
     }
   }
 
@@ -117,7 +117,7 @@ void Cx4::instruction() {
     //skipne/skipeq
     if(regs.z == (opcode & 1)) {
       nextpc();
-      step(1);
+      add_clocks(1);
     }
   }
 
@@ -126,7 +126,7 @@ void Cx4::instruction() {
     //skipmi/skippl
     if(regs.n == (opcode & 1)) {
       nextpc();
-      step(1);
+      add_clocks(1);
     }
   }
 
@@ -135,7 +135,7 @@ void Cx4::instruction() {
     //ret
     pull();
     change_page();
-    step(2);
+    add_clocks(2);
   }
 
   else if((opcode & 0xffff) == 0x4000) {

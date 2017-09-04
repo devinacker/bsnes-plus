@@ -20,7 +20,7 @@ void Cx4::enter() {
       scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
     }
 
-    bool wasRunning = running();
+    bool wasBusy = busy();
 
     if (mmio.dma) {
       for (unsigned n = 0; n < mmio.dmaLength; n++) {
@@ -44,27 +44,28 @@ void Cx4::enter() {
       opcode = cache[regs.cachePage].data[regs.pc & 0xff];
       nextpc();
       instruction();
-      
-      if (regs.rwbustime && !--regs.rwbustime) {
-        if (regs.writebus)
-          cx4bus.write(regs.rwbusaddr, regs.writebusdata);
-        else
-          regs.busdata = cx4bus.read(regs.rwbusaddr);
-      }
     }
     
-    regs.irqPending = wasRunning && !running() && !mmio.irqDisable;
+    regs.irqPending = wasBusy && !busy() && !mmio.irqDisable;
     add_clocks(1);
   }
 }
 
-void Cx4::add_clocks(unsigned num) {
-  if (regs.irqPending)
-    regs.irq = true;
-  if (regs.irq)
-    cpu.regs.irq = true;
+void Cx4::add_clocks(unsigned clocks) {
+  if(regs.rwbustime) {
+    regs.rwbustime -= min(clocks, regs.rwbustime);
+    if(regs.rwbustime == 0) {
+      if (regs.writebus)
+        cx4bus.write(regs.rwbusaddr, regs.writebusdata);
+      else
+        regs.busdata = cx4bus.read(regs.rwbusaddr);
+    }
+  }
 
-  step(num);
+  regs.irq |= regs.irqPending;
+  cpu.regs.irq |= regs.irq;
+
+  step(clocks);
   synchronize_cpu();
   
   while (mmio.suspend) {

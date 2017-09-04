@@ -15,7 +15,7 @@ uint8 Cx4::read(unsigned addr) {
   if (!Memory::debugger_access())
     active() ? synchronize_cpu() : cpu.synchronize_coprocessor();
 
-  if((addr & 0x0c00) == 0x0c00) {  //$00-3f,80-bf:6c00-6cff,7c00-7cff
+  if((addr & 0x1c00) == 0x1c00) {  //$00-3f,80-bf:7c00-7cff
     return dsp_read(addr);
   }
   if((addr & 0x0c00) < 0x0c00) {  //$00-3f,80-bf:6000-6bff,7000-7bff
@@ -29,7 +29,7 @@ void Cx4::write(unsigned addr, uint8 data) {
   if (!Memory::debugger_access())
     active() ? synchronize_cpu() : cpu.synchronize_coprocessor();
 
-  if((addr & 0x0c00) == 0x0c00) {  //$00-3f,80-bf:6c00-6cff,7c00-7cff
+  if((addr & 0x1c00) == 0x1c00) {  //$00-3f,80-bf:7c00-7cff
     return dsp_write(addr, data);
   }
   if((addr & 0x0c00) < 0x0c00) {  //$00-3f,80-bf:6000-6bff,7000-7bff
@@ -38,7 +38,7 @@ void Cx4::write(unsigned addr, uint8 data) {
 }
 
 uint8 Cx4::rom_read(unsigned addr) {
-  if (active() || mmio.suspend || !busy()) {
+  if (active() || mmio.suspend || !bus_access()) {
     return memory::cartrom.read(addr);
   }
   
@@ -85,7 +85,7 @@ uint8 Cx4::dsp_read(unsigned addr) {
   case 0x7f53: case 0x7f54: case 0x7f55: case 0x7f56:
   case 0x7f57: case 0x7f59: 
   case 0x7f5b: case 0x7f5c: case 0x7f5d: case 0x7f5e:
-  case 0x7f5f: return (busy() << 7) | (running() << 6) | (regs.irqPending << 1) | mmio.suspend;
+  case 0x7f5f: return (bus_access() << 7) | (busy() << 6) | (regs.irqPending << 1) | mmio.suspend;
   }
 
   //Vector
