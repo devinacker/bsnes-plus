@@ -100,6 +100,7 @@ void NECDSP::exec_op(uint24 opcode) {
 
     flag.s0 = (r & 0x8000);
     flag.z = (r == 0);
+    if (!flag.ov1) flag.s1 = flag.s0;
 
     switch(alu) {
       case  1: case  2: case  3: case 10: case 13: case 14: case 15: {
@@ -111,17 +112,14 @@ void NECDSP::exec_op(uint24 opcode) {
       case  4: case  5: case  6: case  7: case  8: case  9: {
         if(alu & 1) {
           //addition
-          flag.ov0 = (q ^ r) & ~(q ^ p) & 0x8000;
+          flag.ov0 = (q ^ r) & (p ^ r) & 0x8000;
           flag.c = (r < q);
         } else {
           //subtraction
-          flag.ov0 = (q ^ r) &  (q ^ p) & 0x8000;
+          flag.ov0 = (q ^ r) & (q ^ p) & 0x8000;
           flag.c = (r > q);
         }
-        if(flag.ov0) {
-          flag.s1 = flag.ov1 ^ !(r & 0x8000);
-          flag.ov1 = !flag.ov1;
-        }
+        flag.ov1 = (flag.ov0 & flag.ov1) ? (flag.s1 == flag.s0) : (flag.ov0 | flag.ov1);
         break;
       }
       case 11: {
@@ -146,15 +144,16 @@ void NECDSP::exec_op(uint24 opcode) {
 
   exec_ld((idb << 6) + dst);
 
-  switch(dpl) {
-    case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
-    case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
-    case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+  if (dst != 4) {
+    switch(dpl) {
+      case 1: regs.dp = (regs.dp & 0xf0) + ((regs.dp + 1) & 0x0f); break;  //DPINC
+      case 2: regs.dp = (regs.dp & 0xf0) + ((regs.dp - 1) & 0x0f); break;  //DPDEC
+      case 3: regs.dp = (regs.dp & 0xf0); break;  //DPCLR
+    }
+    regs.dp ^= dphm << 4;
   }
 
-  regs.dp ^= dphm << 4;
-
-  if(rpdcr) regs.rp--;
+  if(rpdcr && dst != 5) regs.rp--;
 }
 
 void NECDSP::exec_rt(uint24 opcode) {
