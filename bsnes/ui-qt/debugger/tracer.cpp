@@ -39,13 +39,13 @@ void Tracer::stepSa1() {
 
 void Tracer::stepSfx() {
   if(traceSfx) {
-    unsigned addr = SNES::superfx.regs.r[15] + (SNES::superfx.regs.pbr << 16);
+    unsigned addr = SNES::superfx.opcode_pc;
     if(!traceMask || !(traceMaskSFX[addr >> 3] & (0x80 >> (addr & 7)))) {
       char text[256];
       SNES::superfx.disassemble_opcode(text, addr);
       tracefile.print(string() << text << "\n");
     }
-    traceMaskSA1[addr >> 3] |= 0x80 >> (addr & 7);
+    traceMaskSFX[addr >> 3] |= 0x80 >> (addr & 7);
   }
 }
 
