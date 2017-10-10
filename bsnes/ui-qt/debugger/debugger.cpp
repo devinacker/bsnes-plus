@@ -7,9 +7,12 @@ Debugger *debugger;
 
 #include "tracer.cpp"
 
-#include "registeredit.cpp"
+#include "disassembler/processor/processor.cpp"
+#include "disassembler/processor/common_processor.cpp"
 
-#include "tools/disassembler.cpp"
+#include "registeredit.cpp"
+#include "debuggerview.cpp"
+
 #include "tools/breakpoint.cpp"
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
@@ -32,7 +35,7 @@ Debugger::Debugger() {
   setGeometryString(&config().geometry.debugger);
   application.windowList.append(this);
 
-  layout = new QHBoxLayout;
+  layout = new QVBoxLayout;
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
@@ -41,7 +44,6 @@ Debugger::Debugger() {
   layout->setMenuBar(menu);
 
   menu_tools = menu->addMenu("Tools");
-  menu_tools_disassembler = menu_tools->addAction("Disassembler ...");
   menu_tools_breakpoint = menu_tools->addAction("Breakpoint Editor ...");
   menu_tools_memory = menu_tools->addAction("Memory Editor ...");
   menu_tools_propertiesViewer = menu_tools->addAction("Properties Viewer ...");
@@ -65,104 +67,75 @@ Debugger::Debugger() {
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
-  consoleLayout = new QVBoxLayout;
-  consoleLayout->setSpacing(0);
-  layout->addLayout(consoleLayout);
-  
+  registerEditCPU = new RegisterEditCPU(SNES::cpu);
+  registerEditSMP = new RegisterEditSMP;
+  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
+  registerEditSFX = new RegisterEditSFX;
+
+  QToolBar *toolBar = new QToolBar;
+  layout->addWidget(toolBar);
+
+  consoleLayout = new QSplitter(Qt::Vertical);
+  layout->addWidget(consoleLayout);
+
+  debugCPU = new DebuggerView(registerEditCPU, new CommonDisasmProcessor(CommonDisasmProcessor::CPU), true);
+  debugSMP = new DebuggerView(registerEditSMP, new CommonDisasmProcessor(CommonDisasmProcessor::SMP));
+  debugSA1 = new DebuggerView(registerEditSA1, new CommonDisasmProcessor(CommonDisasmProcessor::SA1));
+  debugSFX = new DebuggerView(registerEditSFX, new CommonDisasmProcessor(CommonDisasmProcessor::SFX));
+
+  QTabWidget *editTabs = new QTabWidget;
+  editTabs->addTab(debugCPU, "CPU");
+  editTabs->addTab(debugSMP, "SMP");
+  editTabs->addTab(debugSA1, "SA-1");
+  editTabs->addTab(debugSFX, "SuperFX");
+  editTabs->setTabPosition(QTabWidget::North);
+  editTabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  consoleLayout->addWidget(editTabs);
+
   console = new QTextEdit;
-  console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   console->setReadOnly(true);
   console->setFont(QFont(Style::Monospace));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
-  console->setMinimumHeight((25 + 1) * console->fontMetrics().height());
+  console->setMinimumHeight((6 + 1) * console->fontMetrics().height());
   consoleLayout->addWidget(console);
 
-  QTabWidget *editTabs = new QTabWidget;
-  editTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  registerEditCPU = new RegisterEditCPU(SNES::cpu);
-  editTabs->addTab(registerEditCPU, "CPU Registers");
-  registerEditSMP = new RegisterEditSMP;
-  editTabs->addTab(registerEditSMP, "SMP Registers");
-  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
-  editTabs->addTab(registerEditSA1, "SA-1 Registers");
-  registerEditSFX = new RegisterEditSFX;
-  editTabs->addTab(registerEditSFX, "SuperFX Registers");
-  editTabs->setTabPosition(QTabWidget::South);
-  consoleLayout->addWidget(editTabs);
-
-  controlLayout = new QVBoxLayout;
-  controlLayout->setSpacing(0);
-  layout->addLayout(controlLayout);
-
-  commandLayout = new QHBoxLayout;
-  controlLayout->addLayout(commandLayout);
-
-  // TODO: icons instead of text
   runBreak = new QToolButton;
-  runBreak->setDefaultAction(new QAction("Break", this));
+  runBreak->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  runBreak->setDefaultAction(new QAction(QIcon(":16x16/dbg-break.png"), "Break", this));
   runBreak->setFixedWidth(runBreak->minimumSizeHint().width());
   runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
   runBreak->defaultAction()->setShortcut(Qt::Key_F5);
-  commandLayout->addWidget(runBreak);
-  commandLayout->addSpacing(Style::WidgetSpacing);
+  toolBar->addWidget(runBreak);
 
   stepInstruction = new QToolButton;
-  stepInstruction->setDefaultAction(new QAction("Step", this));
+  stepInstruction->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepInstruction->setDefaultAction(new QAction(QIcon(":16x16/dbg-step.png"), "Step", this));
   stepInstruction->defaultAction()->setToolTip("Step through current instruction (F6)");
   stepInstruction->defaultAction()->setShortcut(Qt::Key_F6);
-  commandLayout->addWidget(stepInstruction);
+  toolBar->addWidget(stepInstruction);
 
   stepOver = new QToolButton;
-  stepOver->setDefaultAction(new QAction("Over", this));
+  stepOver->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepOver->setDefaultAction(new QAction(QIcon(":16x16/dbg-step-over.png"), "Over", this));
   stepOver->defaultAction()->setToolTip("Step over current instruction (F7)");
   stepOver->defaultAction()->setShortcut(Qt::Key_F7);
-  commandLayout->addWidget(stepOver);
+  toolBar->addWidget(stepOver);
 
   stepOut = new QToolButton;
-  stepOut->setDefaultAction(new QAction("Out", this));
+  stepOut->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepOut->setDefaultAction(new QAction(QIcon(":16x16/dbg-step-out.png"), "Out", this));
   stepOut->defaultAction()->setToolTip("Step out of current routine (F8)");
   stepOut->defaultAction()->setShortcut(Qt::Key_F8);
-  commandLayout->addWidget(stepOut);
+  toolBar->addWidget(stepOut);
 
-  controlLayout->addSpacing(Style::WidgetSpacing);
-
-  stepCPU = new QCheckBox("Step S-CPU");
-  stepCPU->setChecked(true);
-  controlLayout->addWidget(stepCPU);
-
-  stepSMP = new QCheckBox("Step S-SMP");
-  controlLayout->addWidget(stepSMP);
-
-  stepSA1 = new QCheckBox("Step SA-1");
-  controlLayout->addWidget(stepSA1);
-
-  stepSFX = new QCheckBox("Step SuperFX");
-  controlLayout->addWidget(stepSFX);
-  
-  controlLayout->addSpacing(Style::WidgetSpacing);
-
-  traceCPU = new QCheckBox("Trace S-CPU opcodes");
-  controlLayout->addWidget(traceCPU);
-
-  traceSMP = new QCheckBox("Trace S-SMP opcodes");
-  controlLayout->addWidget(traceSMP);
-  
-  traceSA1 = new QCheckBox("Trace SA-1 opcodes");
-  controlLayout->addWidget(traceSA1);
-  
-  traceSFX = new QCheckBox("Trace SuperFX opcodes");
-  controlLayout->addWidget(traceSFX);
-
-  traceMask = new QCheckBox("Enable trace mask");
-  controlLayout->addWidget(traceMask);
-
-  spacer = new QWidget;
-  spacer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-  controlLayout->addWidget(spacer);
+  traceMask = new QToolButton;
+  traceMask->setDefaultAction(new QAction("Enable trace mask", this));
+  traceMask->defaultAction()->setCheckable(true);
+  toolBar->addWidget(traceMask);
 
   tracer = new Tracer;
-  disassembler = new Disassembler;
   breakpointEditor = new BreakpointEditor;
   memoryEditor = new MemoryEditor;
   propertiesViewer = new PropertiesViewer;
@@ -171,7 +144,6 @@ Debugger::Debugger() {
   oamViewer = new OamViewer;
   cgramViewer = new CgramViewer;
 
-  connect(menu_tools_disassembler, SIGNAL(triggered()), disassembler, SLOT(show()));
   connect(menu_tools_breakpoint, SIGNAL(triggered()), breakpointEditor, SLOT(show()));
   connect(menu_tools_memory, SIGNAL(triggered()), memoryEditor, SLOT(show()));
   connect(menu_tools_propertiesViewer, SIGNAL(triggered()), propertiesViewer, SLOT(show()));
@@ -187,25 +159,26 @@ Debugger::Debugger() {
   connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
-  
+
   connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
   connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
   connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
-  
-  connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSA1, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSFX, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(traceCPU, SIGNAL(stateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
-  connect(traceSMP, SIGNAL(stateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
-  connect(traceSA1, SIGNAL(stateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
-  connect(traceSFX, SIGNAL(stateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
-  connect(traceMask, SIGNAL(stateChanged(int)), tracer, SLOT(setTraceMaskState(int)));
+
+  connect(debugCPU, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSMP, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSA1, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSFX, SIGNAL(synchronized()), this, SLOT(synchronize()));
+
+  connect(debugCPU, SIGNAL(traceStateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
+  connect(debugSMP, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
+  connect(debugSA1, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
+  connect(debugSFX, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
+  connect(traceMask->defaultAction(), SIGNAL(toggled(bool)), tracer, SLOT(setTraceMaskState(bool)));
 
   frameCounter = 0;
   synchronize();
   resize(855, 425);
-  
+
   QTimer *updateTimer = new QTimer(this);
   connect(updateTimer, SIGNAL(timeout()), this, SLOT(frameTick()));
   updateTimer->start(15);
@@ -284,14 +257,16 @@ void Debugger::modifySystemState(unsigned state) {
 void Debugger::synchronize() {
   bool active = application.debug && !application.debugrun;
 
+  runBreak->defaultAction()->setIcon(active ? QIcon(":16x16/dbg-run.png") : QIcon(":16x16/dbg-break.png"));
   runBreak->defaultAction()->setText(active ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && active && 
-                     (stepCPU->isChecked() || stepSMP->isChecked() || 
-                      stepSA1->isChecked() || stepSFX->isChecked());
-  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + 
-                                          stepSA1->isChecked() + stepSFX->isChecked() == 1)
-                          && !stepSFX->isChecked(); // TODO: implement this for superfx
-  
+
+  bool stepEnabled = SNES::cartridge.loaded() && active &&
+                     (debugCPU->stepProcessor->isChecked() || debugSMP->stepProcessor->isChecked() ||
+                      debugSA1->stepProcessor->isChecked() || debugSFX->stepProcessor->isChecked());
+  bool stepOtherEnabled = stepEnabled && (debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
+                                          debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() == 1)
+                          && !debugSFX->stepProcessor->isChecked(); // TODO: implement this for superfx
+
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
@@ -301,10 +276,10 @@ void Debugger::synchronize() {
   config().debugger.showHClocks = menu_misc_showHClocks->isChecked();
   
   // todo: factor in whether or not cartridge actually contains SA1/SuperFX
-  SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
-  SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
-  SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
-  SNES::debugger.step_sfx = application.debug && stepSFX->isChecked();
+  SNES::debugger.step_cpu = application.debug && debugCPU->stepProcessor->isChecked();
+  SNES::debugger.step_smp = application.debug && debugSMP->stepProcessor->isChecked();
+  SNES::debugger.step_sa1 = application.debug && debugSA1->stepProcessor->isChecked();
+  SNES::debugger.step_sfx = application.debug && debugSFX->stepProcessor->isChecked();
 
   if(!active) {
     registerEditCPU->setEnabled(false);
@@ -400,7 +375,7 @@ void Debugger::event() {
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+        debugCPU->refresh(SNES::cpu.opcode_pc);
         registerEditCPU->setEnabled(true);
         break;
       }
@@ -412,29 +387,29 @@ void Debugger::event() {
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        debugSA1->refresh(SNES::sa1.opcode_pc);
         registerEditSA1->setEnabled(true);
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+        debugSMP->refresh(SNES::smp.opcode_pc);
         registerEditSMP->setEnabled(true);
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
         SNES::debugger.step_sfx = true;
         SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+        debugSFX->refresh(SNES::superfx.opcode_pc);
         registerEditSFX->setEnabled(true);
         break;
       }
@@ -445,7 +420,7 @@ void Debugger::event() {
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+      debugCPU->refresh(SNES::cpu.opcode_pc);
       registerEditCPU->setEnabled(true);
     } break;
 
@@ -454,25 +429,25 @@ void Debugger::event() {
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+      debugSMP->refresh(SNES::smp.opcode_pc);
       registerEditSMP->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+      debugSA1->refresh(SNES::sa1.opcode_pc);
       registerEditSA1->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SFXStep: {
       SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc, true);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+      debugSFX->refresh(SNES::superfx.opcode_pc);
       registerEditSFX->setEnabled(true);
     } break;
   }

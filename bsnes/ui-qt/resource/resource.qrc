@@ -16,14 +16,20 @@
 
     <file alias="16x16/folder-new.png">../data/icons-16x16/folder-new.png</file>
     <file alias="16x16/go-up.png">../data/icons-16x16/go-up.png</file>
-    
+
+    <file alias="16x16/dbg-break.png">../data/icons-16x16/dbg-break.png</file>
+    <file alias="16x16/dbg-run.png">../data/icons-16x16/dbg-run.png</file>
+    <file alias="16x16/dbg-step-out.png">../data/icons-16x16/dbg-step-out.png</file>
+    <file alias="16x16/dbg-step-over.png">../data/icons-16x16/dbg-step-over.png</file>
+    <file alias="16x16/dbg-step.png">../data/icons-16x16/dbg-step.png</file>
+
     <file alias="16x16/mem-prev-code.png">../data/icons-16x16/mem-prev-code.png</file>
     <file alias="16x16/mem-next-code.png">../data/icons-16x16/mem-next-code.png</file>
     <file alias="16x16/mem-prev-data.png">../data/icons-16x16/mem-prev-data.png</file>
     <file alias="16x16/mem-next-data.png">../data/icons-16x16/mem-next-data.png</file>
     <file alias="16x16/mem-prev-unknown.png">../data/icons-16x16/mem-prev-unknown.png</file>
     <file alias="16x16/mem-next-unknown.png">../data/icons-16x16/mem-next-unknown.png</file>
-    
+
     <file alias="16x16/mem-find.png">../data/icons-16x16/mem-find.png</file>
   </qresource>
 </RCC>

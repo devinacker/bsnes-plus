@@ -4,7 +4,6 @@ class Debugger : public Window {
 public:
   QMenuBar *menu;
   QMenu *menu_tools;
-  QAction *menu_tools_disassembler;
   QAction *menu_tools_breakpoint;
   QAction *menu_tools_memory;
   QAction *menu_tools_propertiesViewer;
@@ -20,25 +19,20 @@ public:
   QAction *menu_misc_showHClocks;
   QAction *menu_misc_options;
 
-  QHBoxLayout *layout;
+  QVBoxLayout *layout;
+  QSplitter *consoleLayout;
   QTextEdit *console;
-  QVBoxLayout *consoleLayout;
-  QVBoxLayout *controlLayout;
-  QHBoxLayout *commandLayout;
+  QToolBar *toolBar;
   QToolButton *runBreak;
   QToolButton *stepInstruction;
   QToolButton *stepOver;
   QToolButton *stepOut;
-  QCheckBox *stepCPU;
-  QCheckBox *stepSMP;
-  QCheckBox *stepSA1;
-  QCheckBox *stepSFX;
-  QCheckBox *traceCPU;
-  QCheckBox *traceSMP;
-  QCheckBox *traceSA1;
-  QCheckBox *traceSFX;
-  QCheckBox *traceMask;
-  QWidget *spacer;
+  QToolButton *traceMask;
+
+  class DebuggerView *debugCPU;
+  class DebuggerView *debugSFX;
+  class DebuggerView *debugSA1;
+  class DebuggerView *debugSMP;
 
   void modifySystemState(unsigned);
   void echo(const char *message);

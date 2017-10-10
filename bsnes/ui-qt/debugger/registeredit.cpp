@@ -5,14 +5,15 @@ RegisterEditSMP *registerEditSMP;
 RegisterEditSFX *registerEditSFX;
 
 #define reg_editor(name, digits) \
-	layout->addWidget(new QLabel(QString(#name).toUpper())); \
+	layout->addWidget(new QLabel(QString(#name).toUpper()), layout->rowCount(), 0); \
 	edit_##name = new QLineEdit(this); \
 	edit_##name->setFont(QFont(Style::Monospace)); \
+	edit_##name->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum); \
 	edit_##name->setFixedWidth((digits + 1) * edit_##name->fontMetrics().width(' ')); \
 	edit_##name->setInputMask(QString("H").repeated(digits)); \
 	edit_##name->setMaxLength(digits); \
 	connect(edit_##name, SIGNAL(textEdited(QString)), this, SLOT(commit())); \
-	layout->addWidget(edit_##name);
+	layout->addWidget(edit_##name, layout->rowCount() - 1, 1);
 
 #define reg_sync(name, reg) \
 	edit_##name->setText(QString::number(_debugger.getRegister(reg), 16) \
@@ -28,11 +29,12 @@ RegisterEditSFX *registerEditSFX;
 		return; \
 	}
 
-#define flag_editor(flag, num) \
+#define flag_editor(flag, num, row, column) \
 	flag_btn[num] = new QCheckBox(this); \
+	flag_btn[num]->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum); \
 	flag_btn[num]->setText(QString(flag)); \
 	connect(flag_btn[num], SIGNAL(toggled(bool)), this, SLOT(commit())); \
-	layout->addWidget(flag_btn[num]);
+	layout->addWidget(flag_btn[num], row, column);
 
 #define flag_sync(flag, num) \
 	flag_btn[num]->blockSignals(true); \
@@ -48,8 +50,8 @@ RegisterEditSFX *registerEditSFX;
 void RegisterEditCPU::setupUI() {
 	QVBoxLayout *fullLayout = new QVBoxLayout;
 	this->setLayout(fullLayout);
-	
-	QHBoxLayout *layout = new QHBoxLayout;
+
+	QGridLayout *layout = new QGridLayout;
 	reg_editor(pc, 6);
 	reg_editor(a, 4);
 	reg_editor(x, 4);
@@ -57,17 +59,15 @@ void RegisterEditCPU::setupUI() {
 	reg_editor(s, 4);
 	reg_editor(d, 4);
 	reg_editor(db, 2);
-	layout->addStretch();
-	fullLayout->addLayout(layout);
-	
-	layout = new QHBoxLayout;
 	reg_editor(p, 2);
-	for (int i = 0; i < 9; i++) {
-		flag_editor(i["ENVMXDIZC"], i);
-	}
-	layout->addStretch();
 	fullLayout->addLayout(layout);
-	
+
+	layout = new QGridLayout;
+	for (int i = 0; i < 9; i++) {
+		flag_editor(i["ENVMXDIZC"], i, (i >> 1), i & 1);
+	}
+	fullLayout->addLayout(layout);
+
 	fullLayout->addStretch();
 }
 
@@ -116,25 +116,23 @@ void RegisterEditCPU::synchronize() {
 void RegisterEditSMP::setupUI() {
 	QVBoxLayout *fullLayout = new QVBoxLayout;
 	this->setLayout(fullLayout);
-	
-	QHBoxLayout *layout = new QHBoxLayout;
+
+	QGridLayout *layout = new QGridLayout;
 	reg_editor(pc, 4);
 	reg_editor(a, 2);
 	reg_editor(x, 2);
 	reg_editor(y, 2);
 	reg_editor(s, 2);
 	reg_editor(ya, 4);
-	layout->addStretch();
-	fullLayout->addLayout(layout);
-	
-	layout = new QHBoxLayout;
 	reg_editor(p, 2);
-	for (int i = 0; i < 8; i++) {
-		flag_editor(i["NVPBHIZC"], i);
-	}
-	layout->addStretch();
 	fullLayout->addLayout(layout);
-	
+
+	layout = new QGridLayout;
+	for (int i = 0; i < 8; i++) {
+		flag_editor(i["NVPBHIZC"], i, i >> 1, i & 1);
+	}
+	fullLayout->addLayout(layout);
+
 	fullLayout->addStretch();
 }
 
@@ -179,39 +177,38 @@ void RegisterEditSMP::synchronize() {
 void RegisterEditSFX::setupUI() {
 	QVBoxLayout *fullLayout = new QVBoxLayout;
 	this->setLayout(fullLayout);
-	
-	QGridLayout *grid = new QGridLayout;
+
+	QGridLayout *layout = new QGridLayout;
 	for (int reg = 0; reg < 16; reg++) {
-		grid->addWidget(new QLabel(QString("R%1").arg(reg)), reg / 8, (reg % 8) * 2); \
-		edit_r[reg] = new QLineEdit(this); \
-		edit_r[reg]->setFont(QFont(Style::Monospace)); \
-		edit_r[reg]->setFixedWidth((4 + 1) * edit_r[reg]->fontMetrics().width(' ')); \
-		edit_r[reg]->setInputMask("HHHH"); \
-		edit_r[reg]->setMaxLength(4); \
-		connect(edit_r[reg], SIGNAL(textEdited(QString)), this, SLOT(commit())); \
-		grid->addWidget(edit_r[reg], reg / 8, ((reg % 8) * 2) + 1);
+		layout->addWidget(new QLabel(QString("R%1").arg(reg)), reg>>1, (reg&1)<<1);
+		edit_r[reg] = new QLineEdit(this);
+		edit_r[reg]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+		edit_r[reg]->setFont(QFont(Style::Monospace));
+		edit_r[reg]->setFixedWidth((4 + 1) * edit_r[reg]->fontMetrics().width(' '));
+		edit_r[reg]->setInputMask("HHHH");
+		edit_r[reg]->setMaxLength(4);
+		connect(edit_r[reg], SIGNAL(textEdited(QString)), this, SLOT(commit()));
+		layout->addWidget(edit_r[reg], reg>>1, ((reg&1)<<1) + 1);
 	}
-	fullLayout->addLayout(grid);
-	
-	QHBoxLayout *layout = new QHBoxLayout;
-	// TODO: some other registers here (ROMBR, etc)
 	reg_editor(sfr, 4);
-	flag_editor("I", 0);
-	flag_editor("B", 1);
-	flag_editor("IH", 2);
-	flag_editor("IL", 3);
-	flag_editor("A2", 4);
-	flag_editor("A1", 5);
-	flag_editor("R", 6);
-	flag_editor("G", 7);
-	flag_editor("V", 8);
-	flag_editor("N", 9);
-	flag_editor("C", 10);
-	flag_editor("Z", 11);
-	layout->addStretch();
 	fullLayout->addLayout(layout);
-	
-	fullLayout->addStretch();
+
+	layout = new QGridLayout;
+	// TODO: some other registers here (ROMBR, etc)
+	flag_editor("I", 0, 0, 0);
+	flag_editor("B", 1, 0, 1);
+	flag_editor("IH", 2, 1, 0);
+	flag_editor("IL", 3, 1, 1);
+	flag_editor("A2", 4, 2, 0);
+	flag_editor("A1", 5, 2, 1);
+	flag_editor("R", 6, 3, 0);
+	flag_editor("G", 7, 3, 1);
+	flag_editor("V", 8, 4, 0);
+	flag_editor("N", 9, 4, 1);
+	flag_editor("C", 10, 5, 0);
+	flag_editor("Z", 11, 5, 1);
+	//layout->addStretch();
+	fullLayout->addLayout(layout);
 }
 
 void RegisterEditSFX::commit() {

@@ -52,10 +52,10 @@ void Tracer::stepSfx() {
 void Tracer::resetTraceState() {
   tracefile.close();
   setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx);
-  
+
   // reset trace masks
   if (traceMask)
-    setTraceMaskState(Qt::Checked);
+    setTraceMaskState(true);
 }
 
 void Tracer::setTraceState(bool state) {
@@ -88,9 +88,7 @@ void Tracer::setSfxTraceState(int state) {
   setTraceState(traceSfx);
 }
 
-void Tracer::setTraceMaskState(int state) {
-  traceMask = (state == Qt::Checked);
-
+void Tracer::setTraceMaskState(bool traceMask) {
   if(traceMask) {
     //flush all bitmasks once enabled
     memset(traceMaskCPU, 0x00, (1 << 24) >> 3);
