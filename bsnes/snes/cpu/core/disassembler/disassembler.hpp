@@ -20,9 +20,43 @@ enum {
   OPTYPE_IADDR_PC,  //pbr:(addr)
   OPTYPE_RELB,      //relb
   OPTYPE_RELW,      //relw
+  OPTYPE_IMPL,      //-
+  OPTYPE_IM,        //#123
+  OPTYPE_A,         //A
+  OPTYPE_MV,        //bnk,bnk
+};
+
+struct Opcode {
+  void set(uint8 size, uint8 optype, const char *opcode, uint8 (&param)[4], uint8 paramsize=8) {
+    this->size = size;
+    this->optype = optype;
+    this->opcode = opcode;
+
+    *((uint32*)&this->param) = *((uint32*)&param);
+    this->paramsize = paramsize;
+  }
+
+  uint8 op8() {
+    return param[1];
+  }
+
+  uint16 op16() {
+    return *((uint16*)&param[1]);
+  }
+
+  uint32 op24() {
+    return *((uint16*)&param[1]) | param[3] << 16;
+  }
+
+  uint8 size;
+  uint8 optype;
+  uint8 param[4];
+  uint8 paramsize;
+  const char *opcode;
 };
 
 void   disassemble_opcode(char *output, uint32 addr, bool hclocks = false);
+void   disassemble_opcode_ex(Opcode &opcode, uint32 addr, bool e, bool m, bool x);
 uint8  dreadb(uint32 addr);
 uint16 dreadw(uint32 addr);
 uint32 dreadl(uint32 addr);

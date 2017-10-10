@@ -9,6 +9,7 @@ Debugger *debugger;
 
 #include "disassembler/processor/processor.cpp"
 #include "disassembler/processor/common_processor.cpp"
+#include "disassembler/processor/cpu_processor.cpp"
 
 #include "registeredit.cpp"
 #include "debuggerview.cpp"
@@ -78,9 +79,9 @@ Debugger::Debugger() {
   consoleLayout = new QSplitter(Qt::Vertical);
   layout->addWidget(consoleLayout);
 
-  debugCPU = new DebuggerView(registerEditCPU, new CommonDisasmProcessor(CommonDisasmProcessor::CPU), true);
+  debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU), true);
   debugSMP = new DebuggerView(registerEditSMP, new CommonDisasmProcessor(CommonDisasmProcessor::SMP));
-  debugSA1 = new DebuggerView(registerEditSA1, new CommonDisasmProcessor(CommonDisasmProcessor::SA1));
+  debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1));
   debugSFX = new DebuggerView(registerEditSFX, new CommonDisasmProcessor(CommonDisasmProcessor::SFX));
 
   QTabWidget *editTabs = new QTabWidget;

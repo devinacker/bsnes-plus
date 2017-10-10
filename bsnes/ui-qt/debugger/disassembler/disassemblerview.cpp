@@ -116,17 +116,118 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &line, int y) {
   QString address;
 
+  QColor addressColor, opColor, textColor;
+  QColor paramImmediateColor, paramAddressColor, paramSymbolColor;
+
   if (line.address == currentAddress) {
     painter.fillRect(QRect(0, y - charHeight + 3, viewport()->width(), charHeight), _selectionColor);
-    painter.setPen(viewport()->palette().highlightedText().color());
+
+    addressColor = viewport()->palette().highlightedText().color();
+    textColor = addressColor;
+    opColor = addressColor;
+    paramImmediateColor = addressColor;
+    paramAddressColor = addressColor;
+    paramSymbolColor = addressColor;
   } else {
-    painter.setPen(viewport()->palette().color(QPalette::WindowText));
+    addressColor = Qt::gray;
+    textColor = viewport()->palette().color(QPalette::WindowText);
+    opColor = QColor(0x00, 0x00, 0x88, 0xff);
+    paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
+    paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
+    paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
   }
 
-
+  int x = opcodeAreaLeft;
   address = QString("%1").arg(line.address, 6, 16, QChar('0'));
+
+  painter.setPen(addressColor);
   painter.drawText(0, y, address);
-  painter.drawText(opcodeAreaLeft, y, line.text);
+
+  painter.setPen(opColor);
+  painter.drawText(x, y, line.text);
+
+  QString directComment;
+
+  if (line.paramFormat) {
+    x += (line.text.length() + 1) * charWidth;
+
+    painter.setPen(textColor);
+    int left = 0;
+    int textLength = line.paramFormat.length();
+    for (int i=0; i<textLength; i++) {
+      if (line.paramFormat[i] == '%') {
+        if (left < i) {
+          painter.drawText(x, y, nall::substr(line.paramFormat, left, i - left));
+          x += (i - left) * charWidth;
+        }
+
+        uint8_t argNum = line.paramFormat[i+1] - '1';
+        uint8_t argType = line.paramFormat[i+2];
+        uint8_t argLength = line.paramFormat[i+3] - '0';
+
+        if (line.params.size() <= argNum) {
+          painter.setPen(paramAddressColor);
+          painter.drawText(x, y, "???");
+          x += 3 * charWidth;
+        } else {
+          const DisassemblerParam &param = line.params[argNum];
+
+          switch (param.type) {
+            case DisassemblerParam::Value:
+              painter.setPen(paramImmediateColor);
+              x += renderValue(painter, x, y, argType, argLength, param.value);
+              break;
+
+            case DisassemblerParam::Address:
+              painter.setPen(paramAddressColor);
+              x += renderValue(painter, x, y, argType, argLength, param.value);
+              directComment += QString("[%1]").arg(param.address, 6, 16, QChar('0'));
+              break;
+
+            default:
+              painter.drawText(x, y, "???");
+              x += 3 * charWidth;
+              break;
+
+          }
+        }
+        painter.setPen(opColor);
+
+        i += 3;
+        left = i + 1;
+
+      }
+    }
+
+    if (left + 1 < textLength) {
+      painter.drawText(x, y, nall::substr(line.paramFormat, left, textLength - left));
+      x += (textLength - left) * charWidth;
+    }
+
+    if (directComment.length()) {
+      x = opcodeAreaLeft + 20 * charWidth;
+      painter.setPen(Qt::gray);
+      painter.drawText(x, y, directComment);
+    }
+  }
+}
+
+// ------------------------------------------------------------------------
+int DisassemblerView::renderValue(QPainter &painter, int x, int y, uint8_t type, uint8_t size, uint32_t value) {
+  QString text;
+
+  switch (type) {
+    case 'X':
+      text = QString("$%1").arg(value, size, 16, QChar('0'));
+      break;
+
+    default:
+      text = "???";
+      break;
+  }
+
+  painter.drawText(x, y, text);
+  return text.length() * charWidth;
 }
 
 // ------------------------------------------------------------------------

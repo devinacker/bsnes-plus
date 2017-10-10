@@ -25,6 +25,7 @@ private slots:
 
 private:
   void paintOpcode(QPainter &painter, const DisassemblerLine &line, int y);
+  int renderValue(QPainter &painter, int x, int y, uint8_t type, uint8_t size, uint32_t value);
 
   DisasmProcessor *processor;
   bool hasValidAddress;
