@@ -2,9 +2,11 @@ class CpuDisasmProcessor : public DisasmProcessor {
 public:
   enum Source { CPU, SA1 };
 
-  CpuDisasmProcessor(Source);
+  CpuDisasmProcessor(Source, SymbolMap*);
 
   void setSource(Source);
+
+  virtual class SymbolMap *getSymbols();
 
   virtual uint32_t getBusSize();
   virtual uint32_t findStartLineAddress(uint32_t currentAddress, uint32_t linesBelow);
@@ -14,6 +16,7 @@ public:
 private:
   Source source;
 
+  SymbolMap *symbols;
   uint8_t *usage;
 
   uint32_t decode(uint32_t type, uint32_t address, uint32_t pc);

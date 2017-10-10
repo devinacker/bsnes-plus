@@ -6,6 +6,10 @@ public:
 
   void setSource(Source);
 
+  virtual class SymbolMap *getSymbols() {
+    return NULL;
+  }
+
   virtual uint32_t getBusSize();
   virtual uint32_t findStartLineAddress(uint32_t currentAddress, uint32_t linesBelow);
   virtual void findKnownRange(uint32_t currentAddress, uint32_t &startAddress, uint32_t &endAddress, uint32_t &currentAddressLine, uint32_t &numLines);

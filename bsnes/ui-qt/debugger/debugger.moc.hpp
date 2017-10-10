@@ -34,6 +34,9 @@ public:
   class DebuggerView *debugSA1;
   class DebuggerView *debugSMP;
 
+  class SymbolMap *symbolsCPU;
+  class SymbolMap *symbolsSA1;
+
   void modifySystemState(unsigned);
   void echo(const char *message);
   void event();

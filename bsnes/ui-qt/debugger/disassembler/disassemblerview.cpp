@@ -147,6 +147,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
   painter.drawText(x, y, line.text);
 
   QString directComment;
+  SymbolMap *symbols = processor->getSymbols();
 
   if (line.paramFormat) {
     x += (line.text.length() + 1) * charWidth;
@@ -179,8 +180,22 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
               break;
 
             case DisassemblerParam::Address:
-              painter.setPen(paramAddressColor);
-              x += renderValue(painter, x, y, argType, argLength, param.value);
+              if (symbols) {
+                Symbol sym = symbols->getSymbol(param.address);
+
+                if (sym.type != Symbol::INVALID) {
+                  QString text = QString("<%1>").arg(sym.name);
+                  painter.setPen(paramSymbolColor);
+                  painter.drawText(x, y, text);
+                  x += text.length() * charWidth;
+                } else {
+                  painter.setPen(paramAddressColor);
+                  x += renderValue(painter, x, y, argType, argLength, param.value);
+                }
+              } else {
+                painter.setPen(paramAddressColor);
+                x += renderValue(painter, x, y, argType, argLength, param.value);
+              }
               directComment += QString("[%1]").arg(param.address, 6, 16, QChar('0'));
               break;
 
@@ -205,9 +220,14 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     }
 
     if (directComment.length()) {
-      x = opcodeAreaLeft + 20 * charWidth;
+      x += 5 * charWidth;
+      int newX = opcodeAreaLeft + 25 * charWidth;
+      if (newX < x) {
+        newX = x;
+      }
+
       painter.setPen(Qt::gray);
-      painter.drawText(x, y, directComment);
+      painter.drawText(newX, y, directComment);
     }
   }
 }

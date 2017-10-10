@@ -7,6 +7,9 @@ Debugger *debugger;
 
 #include "tracer.cpp"
 
+#include "disassembler/symbols/symbol_map.cpp"
+#include "disassembler/symbols/symbol_map_cpu.hpp"
+
 #include "disassembler/processor/processor.cpp"
 #include "disassembler/processor/common_processor.cpp"
 #include "disassembler/processor/cpu_processor.cpp"
@@ -79,9 +82,14 @@ Debugger::Debugger() {
   consoleLayout = new QSplitter(Qt::Vertical);
   layout->addWidget(consoleLayout);
 
-  debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU), true);
+  symbolsCPU = new SymbolMap();
+  symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
+  
+  symbolsSA1 = new SymbolMap();
+
+  debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
   debugSMP = new DebuggerView(registerEditSMP, new CommonDisasmProcessor(CommonDisasmProcessor::SMP));
-  debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1));
+  debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
   debugSFX = new DebuggerView(registerEditSFX, new CommonDisasmProcessor(CommonDisasmProcessor::SFX));
 
   QTabWidget *editTabs = new QTabWidget;

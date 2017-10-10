@@ -3,8 +3,13 @@
 #define MAX_LINES_PER_DIRECTION 128
 
 // ------------------------------------------------------------------------
-CpuDisasmProcessor::CpuDisasmProcessor(CpuDisasmProcessor::Source source) {
+CpuDisasmProcessor::CpuDisasmProcessor(CpuDisasmProcessor::Source source, SymbolMap *symbols) : symbols(symbols) {
   setSource(source);
+}
+
+// ------------------------------------------------------------------------
+SymbolMap *CpuDisasmProcessor::getSymbols() {
+  return symbols;
 }
 
 // ------------------------------------------------------------------------
