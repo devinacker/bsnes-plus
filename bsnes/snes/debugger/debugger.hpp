@@ -33,9 +33,10 @@ public:
   bool step_sfx;
   bool bus_access;
   bool break_on_wdm;
+  bool break_on_brk;
 
-  enum class StepType : unsigned { 
-    None, StepInto, StepOver, StepOut 
+  enum class StepType : unsigned {
+    None, StepInto, StepOver, StepOut
   } step_type;
   int call_count;
   bool step_over_new;

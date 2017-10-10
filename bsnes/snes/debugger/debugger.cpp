@@ -158,7 +158,8 @@ Debugger::Debugger() {
   step_sfx = false;
   bus_access = false;
   break_on_wdm = false;
-  
+  break_on_brk = false;
+
   step_type = StepType::None;
 }
 

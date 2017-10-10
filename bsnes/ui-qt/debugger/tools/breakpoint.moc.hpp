@@ -42,11 +42,13 @@ public:
   QVBoxLayout *layout;
   BreakpointItem *breakpoint[SNES::Debugger::Breakpoints];
   QCheckBox *breakOnWDM;
+  QCheckBox *breakOnBRK;
 
   BreakpointEditor();
 
   void addBreakpoint(const string& addr, const string& mode, const string& source);
   void addBreakpoint(const string& breakpoint);
+  void setBreakOnBrk(bool b);
   string toStrings() const;
 
 public slots:

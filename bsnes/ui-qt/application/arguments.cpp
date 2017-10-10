@@ -63,6 +63,18 @@ bool Application::parseArgumentSwitch(const string& arg, const string& parameter
   #if defined(DEBUGGER)
   if(arg == "--show-debugger") { debugger->show(); return false; }
 
+  if(arg == "--break-immediately") {
+    application.debug = true;
+    application.debugrun = false;
+    debugger->synchronize();
+    return false;
+  }
+
+  if(arg == "--break-on-brk") {
+    breakpointEditor->setBreakOnBrk(true);
+    return false;
+  }
+
   if(arg == "--breakpoint" || arg == "-b") {
     if(parameter == "" || parameter[0] == '-') return false;
 
@@ -90,6 +102,8 @@ void Application::printArguments() {
   #if defined(DEBUGGER)
   puts("\n"
        "  --show-debugger                   open debugger window on startup\n"
+       "  --break-immediately               breaks when loading the cartridge\n"
+       "  --break-on-brk                    break on BRK opcodes\n"
        "  -b / --breakpoint <breakpoint>    add breakpoint\n"
        "\n"
        "Breakpoint format: <addr>[-<addr end>][=<value>][:<rwx>[:<source>]]\n"

@@ -183,13 +183,20 @@ BreakpointEditor::BreakpointEditor() {
     breakpoint[n] = new BreakpointItem(n);
     layout->addWidget(breakpoint[n]);
   }
-  
+
   breakOnWDM = new QCheckBox("Break on WDM (CPU/SA-1 opcode 0x42)");
+  breakOnWDM->setChecked(SNES::debugger.break_on_wdm);
   connect(breakOnWDM, SIGNAL(toggled(bool)), this, SLOT(toggle()));
   layout->addWidget(breakOnWDM);
+
+  breakOnBRK = new QCheckBox("Break on BRK (CPU/SA-1 opcode 0x00)");
+  breakOnBRK->setChecked(SNES::debugger.break_on_brk);
+  connect(breakOnBRK, SIGNAL(toggled(bool)), this, SLOT(toggle()));
+  layout->addWidget(breakOnBRK);
 }
 
 void BreakpointEditor::toggle() {
+  SNES::debugger.break_on_brk = breakOnBRK->isChecked();
   SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
 }
 
@@ -197,6 +204,11 @@ void BreakpointEditor::clear() {
   for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
     breakpoint[n]->clear();
   }
+}
+
+void BreakpointEditor::setBreakOnBrk(bool b) {
+  breakOnBRK->setChecked(b);
+  SNES::debugger.break_on_brk = b;
 }
 
 void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, const string& source) {
