@@ -6,6 +6,7 @@ DisassemblerView::DisassemblerView(DisasmProcessor *processor) : hasValidAddress
 
   _addressAreaColor = this->palette().alternateBase().color();
   _selectionColor = this->palette().highlight().color();
+  _breakpointColor = QColor(255, 0, 0, 255);
 
   connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onScroll()));
 
@@ -28,6 +29,7 @@ void DisassemblerView::setFont(const QFont &font) {
 
   charWidth = fontMetrics().width(QLatin1Char('2'));
   charHeight = fontMetrics().height() + 1;
+  lineOffset = 3;
   addressAreaSize = charWidth * 6 + charWidth;
   opcodeAreaLeft = addressAreaSize + charWidth;
 
@@ -113,6 +115,33 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::mousePressEvent(QMouseEvent * event) {
+  const QPoint pos = event->pos();
+  int32_t row = ((pos.y() - lineOffset + charHeight) / charHeight);
+
+  if (row < 0 || row >= lines.size()) {
+    return;
+  }
+
+  const DisassemblerLine &line = lines[row];
+  if (line.isEmpty()) {
+    return;
+  }
+
+  if (pos.x() < addressAreaSize && line.hasAddress()) {
+    int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(line.address, processor->getBreakpointBusName());
+
+    if (breakpoint >= 0) {
+      breakpointEditor->removeBreakpoint(breakpoint);
+    } else {
+      breakpointEditor->addBreakpoint(nall::hex(line.address), "x", processor->getBreakpointBusName());
+    }
+  }
+
+  viewport()->update();
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &line, int y) {
   QString address;
 
@@ -120,7 +149,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
   QColor paramImmediateColor, paramAddressColor, paramSymbolColor;
 
   if (line.address == currentAddress) {
-    painter.fillRect(QRect(0, y - charHeight + 3, viewport()->width(), charHeight), _selectionColor);
+    painter.fillRect(QRect(0, y - charHeight + lineOffset, viewport()->width(), charHeight), _selectionColor);
 
     addressColor = viewport()->palette().highlightedText().color();
     textColor = addressColor;
@@ -135,6 +164,11 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
     paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
     paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
+  }
+
+  if (breakpointEditor->indexOfBreakpointExec(line.address, processor->getBreakpointBusName()) >= 0) {
+    painter.fillRect(QRect(0, y - charHeight + lineOffset, addressAreaSize, charHeight), _breakpointColor);
+    addressColor = Qt::white;
   }
 
   int x = opcodeAreaLeft;

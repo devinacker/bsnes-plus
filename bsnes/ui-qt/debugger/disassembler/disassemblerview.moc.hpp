@@ -13,6 +13,7 @@ public:
 protected:
   void paintEvent(QPaintEvent *event);
   void resizeEvent(QResizeEvent *);
+  void mousePressEvent(QMouseEvent * event);
 
   void updateLines();
   void updateLineRange();
@@ -30,6 +31,7 @@ private:
   DisasmProcessor *processor;
   bool hasValidAddress;
   uint32_t currentAddress;
+  uint32_t lineOffset;
 
   uint32_t charWidth;
   uint32_t charHeight;
@@ -46,5 +48,6 @@ private:
   ::nall::linear_vector<DisassemblerLine> lines;
 
   QColor _addressAreaColor;
+  QColor _breakpointColor;
   QColor _selectionColor;
 };

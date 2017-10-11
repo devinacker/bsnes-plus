@@ -8,6 +8,18 @@ CommonDisasmProcessor::CommonDisasmProcessor(CommonDisasmProcessor::Source sourc
 }
 
 // ------------------------------------------------------------------------
+string CommonDisasmProcessor::getBreakpointBusName() {
+  switch (source) {
+    case CPU: return "cpu";
+    case SMP: return "smp";
+    case SFX: return "sfx";
+    case SA1: return "sa1";
+  }
+
+  return "";
+}
+
+// ------------------------------------------------------------------------
 void CommonDisasmProcessor::setSource(Source source) {
   this->source = source;
 

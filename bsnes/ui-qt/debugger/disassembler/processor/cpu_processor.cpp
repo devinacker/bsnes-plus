@@ -8,6 +8,16 @@ CpuDisasmProcessor::CpuDisasmProcessor(CpuDisasmProcessor::Source source, Symbol
 }
 
 // ------------------------------------------------------------------------
+string CpuDisasmProcessor::getBreakpointBusName() {
+  switch (source) {
+    case CPU: return "cpu";
+    case SA1: return "sa1";
+  }
+
+  return "";
+}
+
+// ------------------------------------------------------------------------
 SymbolMap *CpuDisasmProcessor::getSymbols() {
   return symbols;
 }

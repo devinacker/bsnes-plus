@@ -72,6 +72,49 @@ void BreakpointItem::init() {
   SNES::debugger.breakpoint[id].counter = 0;
 }
 
+bool BreakpointItem::isEnabled() const {
+  return SNES::debugger.breakpoint[id].enabled;
+}
+
+uint32_t BreakpointItem::getAddressFrom() const {
+  return SNES::debugger.breakpoint[id].addr;
+}
+
+uint32_t BreakpointItem::getAddressTo() const {
+  if (SNES::debugger.breakpoint[id].addr_end == 0) {
+    return SNES::debugger.breakpoint[id].addr;
+  } else {
+    return SNES::debugger.breakpoint[id].addr_end;
+  }
+}
+
+bool BreakpointItem::isModeR() const {
+  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Read;
+}
+
+bool BreakpointItem::isModeW() const {
+  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write;
+}
+
+bool BreakpointItem::isModeX() const {
+  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec;
+}
+
+string BreakpointItem::getBus() const {
+  switch (source->currentIndex()) {
+  default:
+  case 0: return "cpu";
+  case 1: return "smp";
+  case 2: return "vram";
+  case 3: return "oam";
+  case 4: return "cgram";
+  case 5: return "sa1";
+  case 6: return "sfx";
+  }
+
+  return "";
+}
+
 void BreakpointItem::toggle() {
   bool state = mode_r->isChecked() | mode_w->isChecked() | mode_x->isChecked();
   SNES::debugger.breakpoint[id].enabled = state;
@@ -102,6 +145,11 @@ void BreakpointItem::clear() {
   mode_x->setChecked(false);
   
   source->setCurrentIndex(0);
+}
+
+void BreakpointItem::removeBreakpoint() {
+  clear();
+  toggle();
 }
 
 void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr) {
@@ -152,17 +200,7 @@ string BreakpointItem::toString() const {
   if (mode_w->isChecked()) breakpoint << "w";
   if (mode_x->isChecked()) breakpoint << "x";
   
-  breakpoint << ":";
-  switch (source->currentIndex()) {
-  default:
-  case 0: breakpoint << "cpu";   break;
-  case 1: breakpoint << "smp";   break;
-  case 2: breakpoint << "vram";  break;
-  case 3: breakpoint << "oam";   break;
-  case 4: breakpoint << "cgram"; break;
-  case 5: breakpoint << "sa1";   break;
-  case 6: breakpoint << "sfx";   break;
-  }
+  breakpoint << ":" << getBus();
   
   return breakpoint;
 }
@@ -227,6 +265,24 @@ void BreakpointEditor::addBreakpoint(const string& breakpoint) {
   if(param.size() == 2) { param.append("cpu"); }
   
   this->addBreakpoint(param[0], param[1], param[2]);
+}
+
+void BreakpointEditor::removeBreakpoint(uint32_t index) {
+  if (index >= SNES::Debugger::Breakpoints) {
+    return;
+  }
+
+  breakpoint[index]->removeBreakpoint();
+}
+
+int32_t BreakpointEditor::indexOfBreakpointExec(uint32_t addr, const string &source) const {
+  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
+    if(breakpoint[n]->isEnabled() && breakpoint[n]->isModeX() && breakpoint[n]->getAddressFrom() <= addr && breakpoint[n]->getAddressTo() >= addr) {
+      return n;
+    }
+  }
+
+  return -1;
 }
 
 string BreakpointEditor::toStrings() const {

@@ -48,6 +48,14 @@ struct DisassemblerLine {
     params.reset();
   }
 
+  bool isEmpty() const {
+    return type == Empty;
+  }
+
+  bool hasAddress() const {
+    return type == Opcode;
+  }
+
   Type type;
   string text;
   string paramFormat;
