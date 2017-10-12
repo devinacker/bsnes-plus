@@ -32,6 +32,7 @@ void DisassemblerView::setFont(const QFont &font) {
   lineOffset = 3;
   addressAreaSize = charWidth * 6 + charWidth;
   opcodeAreaLeft = addressAreaSize + charWidth;
+  commentAreaLeft = opcodeAreaLeft + 70 * charWidth;
 
   adjust();
   viewport()->update();
@@ -171,6 +172,16 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     addressColor = Qt::white;
   }
 
+  SymbolMap *symbols = processor->getSymbols();
+  Symbol currentRow = symbols->getSymbol(line.address);
+
+  if (currentRow.type != Symbol::INVALID) {
+    painter.setPen(Qt::gray);
+    painter.drawLine(0, y - charHeight + lineOffset, width(), y - charHeight + lineOffset);
+    painter.setPen(paramAddressColor);
+    painter.drawText(commentAreaLeft + charWidth / 2, y, currentRow.name);
+  }
+
   int x = opcodeAreaLeft;
   address = QString("%1").arg(line.address, 6, 16, QChar('0'));
 
@@ -181,7 +192,6 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
   painter.drawText(x, y, line.text);
 
   QString directComment;
-  SymbolMap *symbols = processor->getSymbols();
 
   if (line.paramFormat) {
     x += (line.text.length() + 1) * charWidth;
@@ -290,6 +300,9 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
 
   painter.fillRect(event->rect(), viewport()->palette().color(QPalette::Base));
   painter.fillRect(QRect(0, 0, addressAreaSize, height()), _addressAreaColor);
+
+  painter.setPen(Qt::gray);
+  painter.drawLine(commentAreaLeft, event->rect().top(), commentAreaLeft, height());
 
   int y = 0;
   for (uint32_t index=0; index<lines.size(); index++, y+=charHeight) {

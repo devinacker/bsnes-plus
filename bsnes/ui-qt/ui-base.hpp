@@ -42,11 +42,12 @@ using namespace ruby;
 
 #if defined(DEBUGGER)
   #include "debugger/debugger.moc.hpp"
-  #include "debugger/disassembler/symbols/symbol_map.hpp"
+  #include "debugger/disassembler/symbols/symbol_map.moc.hpp"
   #include "debugger/debuggerview.moc.hpp"
   #include "debugger/tracer.moc.hpp"
   #include "debugger/registeredit.moc.hpp"
 
+  #include "debugger/disassembler/symbolsview.moc.hpp"
   #include "debugger/disassembler/disassemblerview.moc.hpp"
 
   #include "debugger/tools/breakpoint.moc.hpp"

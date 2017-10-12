@@ -9,6 +9,8 @@ public:
   QVBoxLayout *controlLayout;
   QCheckBox *stepProcessor;
   QCheckBox *traceProcessor;
+  QPushButton *symbolsViewer;
+  class SymbolsView *symbolsViewerDialog;
   class DisassemblerView *disassembler;
 
   void refresh(uint32_t address);

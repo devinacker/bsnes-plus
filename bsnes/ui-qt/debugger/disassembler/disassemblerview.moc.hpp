@@ -38,6 +38,7 @@ private:
   uint32_t rowsShown;
   uint32_t addressAreaSize;
   uint32_t opcodeAreaLeft;
+  uint32_t commentAreaLeft;
 
   uint32_t emptyRowsAround;
 

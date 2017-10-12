@@ -1,3 +1,4 @@
+#include "disassembler/symbolsview.cpp"
 #include "disassembler/disassemblerview.cpp"
 #include "debuggerview.moc"
 
@@ -35,10 +36,20 @@ DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, 
   traceProcessor = new QCheckBox("Trace");
   controlLayout->addWidget(traceProcessor);
 
+  if (processor->getSymbols() != NULL) {
+    symbolsViewerDialog = new SymbolsView(processor);
+    symbolsViewer = new QPushButton("Symbols");
+    controlLayout->addWidget(symbolsViewer);
+  }
+
   controlLayout->addStretch();
 
   connect(stepProcessor, SIGNAL(released()), this, SLOT(synchronize()));
   connect(traceProcessor, SIGNAL(stateChanged(int)), this, SIGNAL(traceStateChanged(int)));
+
+  if (processor->getSymbols() != NULL) {
+    connect(symbolsViewer, SIGNAL(released()), symbolsViewerDialog, SLOT(show()));
+  }
 
   synchronize();
 }

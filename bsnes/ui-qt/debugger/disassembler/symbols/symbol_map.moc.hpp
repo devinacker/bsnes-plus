@@ -27,13 +27,16 @@ struct Symbol {
   Type type;
 };
 
-class SymbolMap {
+class SymbolMap : public QObject {
+  Q_OBJECT
+
 public:
   SymbolMap();
 
   void addLocation(uint32_t address, const string &name);
   void loadFromString(const string &file);
   void loadFromFile(const string &baseName, const string &ext);
+  void finishUpdates();
 
   void revalidate();
 
@@ -41,6 +44,9 @@ public:
 
   bool isValid;
   nall::linear_vector<Symbol> symbols;
+
+signals:
+  void updated();
 };
 
 #endif

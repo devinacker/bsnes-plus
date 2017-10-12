@@ -1,4 +1,4 @@
-#include "symbol_map.hpp"
+#include "symbol_map.moc"
 
 // ------------------------------------------------------------------------
 SymbolMap::SymbolMap() {
@@ -9,6 +9,11 @@ SymbolMap::SymbolMap() {
 void SymbolMap::addLocation(uint32_t address, const string &name) {
   symbols.append(Symbol::createLocation(address, name));
   isValid = false;
+}
+
+// ------------------------------------------------------------------------
+void SymbolMap::finishUpdates() {
+  emit updated();
 }
 
 // ------------------------------------------------------------------------
@@ -127,6 +132,8 @@ void SymbolMap::loadFromString(const string &file) {
       break;
     }
   }
+
+  finishUpdates();
 }
 
 // ------------------------------------------------------------------------
