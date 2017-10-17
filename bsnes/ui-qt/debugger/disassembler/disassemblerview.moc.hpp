@@ -32,7 +32,9 @@ protected:
   void mouseReleaseEvent(QMouseEvent *e);
   void mouseMoveEvent(QMouseEvent *e);
   void toggleBreakpoint(uint32_t address);
+  void setComment(uint32_t address);
   void updateCurrentMousePosition();
+
 
   void updateLines();
   void updateLineRange();

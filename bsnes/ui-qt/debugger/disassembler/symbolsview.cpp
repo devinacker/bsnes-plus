@@ -63,7 +63,10 @@ void SymbolsView::synchronize() {
 
   uint32_t count = symbols->symbols.size();
   for (uint32_t i=0; i<count; i++) {
-    const Symbol &sym = symbols->symbols[i];
+    const Symbol &sym = symbols->symbols[i].getSymbol();
+    if (sym.isInvalid()) {
+      continue;
+    }
 
     if (filter.length()) {
       QStringList list = filter.split(" ");

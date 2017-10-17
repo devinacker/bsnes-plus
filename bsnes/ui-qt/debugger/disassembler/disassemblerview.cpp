@@ -130,6 +130,33 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::setComment(uint32_t address) {
+  Symbol comment = processor->getSymbols()->getComment(address);
+  QString currentComment("");
+
+  if (comment.isComment()) {
+    currentComment = (const char*)comment.name;
+  }
+
+  bool ok;
+  QString value = QInputDialog::getText(this, "Comment", "Enter comment for address " + nall::hex(address), QLineEdit::Normal, currentComment, &ok);
+  string s;
+  s = qPrintable(value);
+
+  if (ok) {
+    if (comment.isComment()) {
+      processor->getSymbols()->removeSymbol(address, Symbol::COMMENT);
+    }
+
+    if (s.length()) {
+      processor->getSymbols()->addComment(address, s);
+    }
+  }
+
+  viewport()->update();
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::toggleBreakpoint(uint32_t address) {
   int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(address, processor->getBreakpointBusName());
 
@@ -159,6 +186,12 @@ void DisassemblerView::mousePressEvent(QMouseEvent * event) {
     if (left) {
       mouseState = STATE_RESIZING_COLUMN;
       mouseStateValue2 = columnSizes[mouseStateValue];
+    }
+    break;
+
+  case STATE_SET_COMMENT:
+    if (left) {
+      setComment(mouseStateValue);
     }
     break;
 
@@ -294,6 +327,11 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     painter.setPen(paramAddressColor);
     SET_CLIPPING(COLUMN_COMMENT);
     painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
+  } else {
+    currentRow = symbols->getComment(line.address);
+    painter.setPen(Qt::gray);
+    SET_CLIPPING(COLUMN_COMMENT);
+    painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
   }
 
   int x = columnPositions[1] + charPadding;
@@ -426,7 +464,7 @@ void DisassemblerView::paintHeader(QPainter &painter) {
   SET_CLIPPING(1);
   painter.drawText(columnPositions[1] + charPadding, headerHeight - charPadding, "Disassemble");
   SET_CLIPPING(2);
-  painter.drawText(columnPositions[2] + charPadding, headerHeight - charPadding, "Symbol");
+  painter.drawText(columnPositions[2] + charPadding, headerHeight - charPadding, "Comment");
   NO_CLIPPING();
 }
 

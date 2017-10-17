@@ -128,6 +128,7 @@ Configuration::Configuration() {
 
   attach(debugger.cacheUsageToDisk = false, "debugger.cacheUsageToDisk");
   attach(debugger.saveBreakpoints = false, "debugger.saveBreakpoints");
+  attach(debugger.saveSymbols = true, "debugger.saveSymbols");
   attach(debugger.showHClocks = false, "debugger.showHClocks");
 
   attach(geometry.mainWindow        = "", "geometry.mainWindow");

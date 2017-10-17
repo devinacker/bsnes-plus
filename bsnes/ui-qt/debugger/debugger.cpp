@@ -186,7 +186,7 @@ Debugger::Debugger() {
 
   frameCounter = 0;
   synchronize();
-  resize(855, 425);
+  resize(855, 745);
 
   QTimer *updateTimer = new QTimer(this);
   connect(updateTimer, SIGNAL(timeout()), this, SLOT(frameTick()));
@@ -196,6 +196,8 @@ Debugger::Debugger() {
 void Debugger::modifySystemState(unsigned state) {
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
   string bpfile = usagefile;
+  string symfile = usagefile;
+
   usagefile << "-usage.bin";
   bpfile << ".bp";
   file fp;
@@ -253,6 +255,10 @@ void Debugger::modifySystemState(unsigned state) {
       fp.close();
     }
     
+    if(config().debugger.saveSymbols) {
+      debugger->symbolsCPU->saveToFile(nall::basename(symfile), ".sym");
+    }
+
     if(config().debugger.saveBreakpoints) {
       string data = breakpointEditor->toStrings();
       
