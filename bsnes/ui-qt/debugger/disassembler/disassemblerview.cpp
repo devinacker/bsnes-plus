@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------
 DisassemblerView::DisassemblerView(DisasmProcessor *processor) : hasValidAddress(false), processor(processor) {
   setFont(QFont(Style::Monospace));
+  setMouseTracking(true);
 
   _addressAreaColor = this->palette().alternateBase().color();
   _selectionColor = this->palette().highlight().color();
@@ -17,10 +18,13 @@ DisassemblerView::DisassemblerView(DisasmProcessor *processor) : hasValidAddress
 void DisassemblerView::init() {
   verticalScrollBar()->setValue(0);
 
+  mouseState = NO_STATE;
   emptyRowsAround = 5;
   currentRangeStartAddress = 0;
   currentRangeEndAddress = 0;
   currentAddress = 0;
+  mouseX = 0;
+  mouseY = 0;
 }
 
 // ------------------------------------------------------------------------
@@ -29,10 +33,12 @@ void DisassemblerView::setFont(const QFont &font) {
 
   charWidth = fontMetrics().width(QLatin1Char('2'));
   charHeight = fontMetrics().height() + 1;
+  charPadding = charWidth / 2;
+  headerHeight = charHeight + 3;
   lineOffset = 3;
-  addressAreaSize = charWidth * 6 + charWidth;
-  opcodeAreaLeft = addressAreaSize + charWidth;
-  commentAreaLeft = opcodeAreaLeft + 70 * charWidth;
+
+  columnSizes[0] = charWidth * 6 + charWidth;
+  columnSizes[1] = columnSizes[0] + 30 * charWidth;
 
   adjust();
   viewport()->update();
@@ -44,6 +50,11 @@ void DisassemblerView::adjust() {
   if (rowsShown == 0) {
     rowsShown = 1;
   }
+
+  columnPositions[0] = 0;
+  columnPositions[1] = columnPositions[0] + columnSizes[0];
+  columnPositions[2] = columnPositions[1] + columnSizes[1];
+  columnSizes[2] = width() - columnPositions[2];
 }
 
 // ------------------------------------------------------------------------
@@ -58,6 +69,7 @@ void DisassemblerView::refresh(uint32_t address) {
 
   updateLines();
   viewport()->update();
+  updateCurrentMousePosition();
 }
 
 // ------------------------------------------------------------------------
@@ -116,31 +128,128 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::toggleBreakpoint(uint32_t address) {
+  int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(address, processor->getBreakpointBusName());
+
+  if (breakpoint >= 0) {
+    breakpointEditor->removeBreakpoint(breakpoint);
+  } else {
+    breakpointEditor->addBreakpoint(nall::hex(address), "x", processor->getBreakpointBusName());
+  }
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::mouseReleaseEvent(QMouseEvent *event) {
+  switch (mouseState) {
+  case STATE_RESIZING_COLUMN:
+    mouseState = STATE_RESIZE_COLUMN;
+    mouseMoveEvent(event);
+    break;
+  }
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::mousePressEvent(QMouseEvent * event) {
-  const QPoint pos = event->pos();
-  int32_t row = ((pos.y() - lineOffset + charHeight) / charHeight);
+  bool left = event->button() & Qt::LeftButton;
 
-  if (row < 0 || row >= lines.size()) {
-    return;
-  }
-
-  const DisassemblerLine &line = lines[row];
-  if (line.isEmpty()) {
-    return;
-  }
-
-  if (pos.x() < addressAreaSize && line.hasAddress()) {
-    int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(line.address, processor->getBreakpointBusName());
-
-    if (breakpoint >= 0) {
-      breakpointEditor->removeBreakpoint(breakpoint);
-    } else {
-      breakpointEditor->addBreakpoint(nall::hex(line.address), "x", processor->getBreakpointBusName());
+  switch (mouseState) {
+  case STATE_RESIZE_COLUMN:
+    if (left) {
+      mouseState = STATE_RESIZING_COLUMN;
+      mouseStateValue2 = columnSizes[mouseStateValue];
     }
+    break;
+
+  case STATE_TOGGLE_BREAKPOINT:
+    if (left) {
+      toggleBreakpoint(mouseStateValue);
+    }
+    break;
   }
 
   viewport()->update();
 }
+
+// ------------------------------------------------------------------------
+void DisassemblerView::mouseMoveEvent(QMouseEvent *e) {
+  switch (mouseState) {
+  case STATE_RESIZING_COLUMN:
+    {
+      int32_t newSize = mouseStateValue2 + (e->x() - mouseX);
+      if (newSize < 10) {
+        newSize= 10;
+      }
+
+      columnSizes[mouseStateValue] = newSize;
+      adjust();
+      viewport()->update();
+    }
+    break;
+
+  default:
+    mouseX = e->x();
+    mouseY = e->y();
+    updateCurrentMousePosition();
+  }
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::updateCurrentMousePosition() {
+  MouseState oldState = mouseState;
+  int32_t row = (mouseY - lineOffset + charHeight) / charHeight;
+
+  mouseState = NO_STATE;
+
+  if (mouseY < headerHeight) {
+    for (uint32_t i=1; i<NUM_COLUMNS; i++) {
+      if (mouseX < columnPositions[i] - 5 || mouseX > columnPositions[i] + 5) {
+        continue;
+      }
+
+      mouseState = STATE_RESIZE_COLUMN;
+      mouseStateValue = i - 1;
+      break;
+    }
+  } else if (row > 0 && row <= lines.size()) {
+    const DisassemblerLine &line = lines[row];
+
+    if (!line.isEmpty()) {
+      if (mouseX < columnSizes[COLUMN_ADDRESS]) {
+        if (line.hasAddress()) {
+          mouseState = STATE_TOGGLE_BREAKPOINT;
+          mouseStateValue = line.address;
+        }
+      } else if (mouseX >= columnPositions[COLUMN_COMMENT]) {
+        mouseState = STATE_SET_COMMENT;
+        mouseStateValue = line.address;
+      }
+    }
+  }
+
+  if (mouseState != oldState) {
+    switch (mouseState) {
+    case STATE_RESIZE_COLUMN:
+      setCursor(Qt::SplitHCursor);
+      break;
+
+    case STATE_TOGGLE_BREAKPOINT:
+      setCursor(Qt::PointingHandCursor);
+      break;
+
+    case NO_STATE:
+    default:
+      unsetCursor();
+      break;
+    }
+  }
+}
+
+#define SET_CLIPPING(region) \
+  painter.setClipping(true); \
+  painter.setClipRegion(QRect(columnPositions[region], 0, columnSizes[region], height()));
+
+#define NO_CLIPPING() \
+  painter.setClipping(false)
 
 // ------------------------------------------------------------------------
 void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &line, int y) {
@@ -148,6 +257,8 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
 
   QColor addressColor, opColor, textColor;
   QColor paramImmediateColor, paramAddressColor, paramSymbolColor;
+
+  NO_CLIPPING();
 
   if (line.address == currentAddress) {
     painter.fillRect(QRect(0, y - charHeight + lineOffset, viewport()->width(), charHeight), _selectionColor);
@@ -168,7 +279,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
   }
 
   if (breakpointEditor->indexOfBreakpointExec(line.address, processor->getBreakpointBusName()) >= 0) {
-    painter.fillRect(QRect(0, y - charHeight + lineOffset, addressAreaSize, charHeight), _breakpointColor);
+    painter.fillRect(QRect(0, y - charHeight + lineOffset, columnSizes[COLUMN_ADDRESS], charHeight), _breakpointColor);
     addressColor = Qt::white;
   }
 
@@ -179,15 +290,18 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     painter.setPen(Qt::gray);
     painter.drawLine(0, y - charHeight + lineOffset, width(), y - charHeight + lineOffset);
     painter.setPen(paramAddressColor);
-    painter.drawText(commentAreaLeft + charWidth / 2, y, currentRow.name);
+    SET_CLIPPING(COLUMN_COMMENT);
+    painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
   }
 
-  int x = opcodeAreaLeft;
+  int x = columnPositions[1] + charPadding;
   address = QString("%1").arg(line.address, 6, 16, QChar('0'));
 
+  SET_CLIPPING(COLUMN_ADDRESS);
   painter.setPen(addressColor);
   painter.drawText(0, y, address);
 
+  SET_CLIPPING(COLUMN_DISASM);
   painter.setPen(opColor);
   painter.drawText(x, y, line.text);
 
@@ -264,14 +378,15 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     }
 
     if (directComment.length()) {
-      x += 5 * charWidth;
-      int newX = opcodeAreaLeft + 25 * charWidth;
-      if (newX < x) {
-        newX = x;
+      x += 2 * charWidth;
+      uint32_t right = columnPositions[COLUMN_DISASM + 1] - (directComment.length() + 1) * charWidth;
+
+      if (x < right) {
+        x = right;
       }
 
       painter.setPen(Qt::gray);
-      painter.drawText(newX, y, directComment);
+      painter.drawText(x, y, directComment);
     }
   }
 }
@@ -295,14 +410,33 @@ int DisassemblerView::renderValue(QPainter &painter, int x, int y, uint8_t type,
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::paintHeader(QPainter &painter) {
+  painter.fillRect(0, 0, width(), headerHeight, _addressAreaColor);
+
+  painter.setPen(Qt::gray);
+  painter.drawLine(0, headerHeight, width(), headerHeight);
+
+  for (uint8_t i=1; i<NUM_COLUMNS; i++) {
+    painter.drawLine(columnPositions[i], 0, columnPositions[i], headerHeight);
+  }
+
+  painter.setPen(Qt::black);
+  SET_CLIPPING(1);
+  painter.drawText(columnPositions[1] + charPadding, headerHeight - charPadding, "Disassemble");
+  SET_CLIPPING(2);
+  painter.drawText(columnPositions[2] + charPadding, headerHeight - charPadding, "Symbol");
+  NO_CLIPPING();
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::paintEvent(QPaintEvent *event) {
   QPainter painter(viewport());
 
   painter.fillRect(event->rect(), viewport()->palette().color(QPalette::Base));
-  painter.fillRect(QRect(0, 0, addressAreaSize, height()), _addressAreaColor);
+  painter.fillRect(QRect(0, 0, columnSizes[COLUMN_ADDRESS], height()), _addressAreaColor);
 
   painter.setPen(Qt::gray);
-  painter.drawLine(commentAreaLeft, event->rect().top(), commentAreaLeft, height());
+  painter.drawLine(columnPositions[2], event->rect().top(), columnPositions[2], height());
 
   int y = 0;
   for (uint32_t index=0; index<lines.size(); index++, y+=charHeight) {
@@ -317,4 +451,7 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
       break;
     }
   }
+
+  NO_CLIPPING();
+  paintHeader(painter);
 }

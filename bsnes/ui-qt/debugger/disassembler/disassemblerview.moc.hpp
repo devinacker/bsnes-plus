@@ -3,6 +3,21 @@
 class DisassemblerView : public QAbstractScrollArea {
   Q_OBJECT
 
+  enum MouseState {
+    NO_STATE,
+    STATE_TOGGLE_BREAKPOINT,
+    STATE_SET_COMMENT,
+    STATE_RESIZE_COLUMN,
+    STATE_RESIZING_COLUMN
+  };
+
+  enum {
+    COLUMN_ADDRESS,
+    COLUMN_DISASM,
+    COLUMN_COMMENT,
+    NUM_COLUMNS = 3
+  };
+
 public:
   DisassemblerView(class DisasmProcessor *processor);
 
@@ -14,6 +29,10 @@ protected:
   void paintEvent(QPaintEvent *event);
   void resizeEvent(QResizeEvent *);
   void mousePressEvent(QMouseEvent * event);
+  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseMoveEvent(QMouseEvent *e);
+  void toggleBreakpoint(uint32_t address);
+  void updateCurrentMousePosition();
 
   void updateLines();
   void updateLineRange();
@@ -25,6 +44,7 @@ private slots:
   void onScroll();
 
 private:
+  void paintHeader(QPainter &painter);
   void paintOpcode(QPainter &painter, const DisassemblerLine &line, int y);
   int renderValue(QPainter &painter, int x, int y, uint8_t type, uint8_t size, uint32_t value);
 
@@ -35,10 +55,9 @@ private:
 
   uint32_t charWidth;
   uint32_t charHeight;
+  uint32_t charPadding;
   uint32_t rowsShown;
-  uint32_t addressAreaSize;
-  uint32_t opcodeAreaLeft;
-  uint32_t commentAreaLeft;
+  uint32_t headerHeight;
 
   uint32_t emptyRowsAround;
 
@@ -46,7 +65,15 @@ private:
   uint32_t currentRangeEndAddress;
   uint32_t currentRangeLineNumbers;
 
+  uint32_t columnSizes[NUM_COLUMNS];
+  uint32_t columnPositions[NUM_COLUMNS];
   ::nall::linear_vector<DisassemblerLine> lines;
+
+  MouseState mouseState;
+  uint32_t mouseStateValue;
+  uint32_t mouseStateValue2;
+  int32_t mouseX;
+  int32_t mouseY;
 
   QColor _addressAreaColor;
   QColor _breakpointColor;
