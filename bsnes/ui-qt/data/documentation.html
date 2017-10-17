@@ -71,9 +71,9 @@ and optionally keep a trace log of executed code saved to disk for long-term deb
 
 When emulation is stopped, either by pressing the Break/Run button or after a breakpoint is triggered (see below),
 you can press the Step button to execute a single instruction, the Step Over button to execute a single instruction or
-entire subroutine, or the Step Out button to exit the current subroutine. The checkboxes underneath allow you to select
-which combination of processors to single-step; each processor's code appears with a different color in the
-disassembly window.
+entire subroutine, or the Step Out button to exit the current subroutine. The checkboxes on the different processor
+tabs allow you to select which combination of processors to single-step; each processor's code appears with a different
+color in the disassembly log window on the bottom.
 <p>
 
 (Note: the Step Over and Step Out buttons are unavailable when stepping multiple processors, and when stepping the
@@ -87,23 +87,21 @@ be logged the first time it is executed; disabling this provides more thorough a
 increased file size and CPU usage.
 <p>
 
-At the bottom of the main debug window, you can view the current register values for all steppable processors, and edit
+At the right of the main debug window, you can view the current register values for all steppable processors, and edit
 register values for the processor currently being stepped.
 <p>
 
-<h3>Debugger Menu: Tools</h3>
-<h4>Disassembler Window</h4><br>
-
-When single-stepping code, the disassembler window allows you to see other code in the vicinity of the current instruction.
-Only memory within a certain range that is known to actually be code is shown here.
+By clicking on the address bar in the main disassembly window, you can toggle a breakpoint at the given address. You
+can identify a breakpoint by its red background color.
 <p>
 
+<h3>Debugger Menu: Tools</h3>
 <h4>Breakpoint Editor</h4><br>
 
 Breakpoints allow you to automatically pause execution when code at a given location is executed, or when specific data is
 read or modified. Each breakpoint contains these fields:<p>
 
-<b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end 
+<b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end
 of an address range, and is optional.<br>
 <b>Data:</b> (optional) If this is specified, read and write breakpoints will only trigger if the byte being read from or written to
 the given address equals this value.<br>
@@ -233,6 +231,7 @@ This is a list of others who have contributed to bsnes-plus, either directly or 
 &bull; Alex W. Jackson<br>
 &bull; Andreas Naive<br>
 &bull; anomie<br>
+&bull; Benjamin Schulte<br>
 &bull; David Lindecrantz<br>
 &bull; _Demo_<br>
 &bull; Derrick Sobodash<br>
