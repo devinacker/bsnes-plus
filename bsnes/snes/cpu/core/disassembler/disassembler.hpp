@@ -27,14 +27,79 @@ enum {
 };
 
 struct Opcode {
-  void set(uint8 size, uint8 optype, const char *opcode, uint8 (&param)[4], uint8 paramsize=8) {
-    this->size = size;
+  enum Flag {
+    FLAG_BRA = 0x01,
+    FLAG_BRA_CONTINUE = 0x02,
+    FLAG_RESET_M = 0x10,
+    FLAG_RESET_X = 0x20,
+    FLAG_SET_M = 0x40,
+    FLAG_SET_X = 0x80,
+    FLAG_PUSH_P = 0x100,
+    FLAG_POP_P = 0x200,
+    FLAG_RETURN = 0x400,
+    FLAG_BRK = 0x1000,
+    FLAG_RESET_E = 0x8000
+  };
+
+  void set(uint16 flags, uint8 optype, const char *opcode, uint8 (&param)[4], uint8 paramsize=8) {
+    this->flags = flags;
     this->optype = optype;
     this->opcode = opcode;
 
     *((uint32*)&this->param) = *((uint32*)&param);
     this->paramsize = paramsize;
   }
+
+  uint8 size() const {
+    switch (optype) {
+      case OPTYPE_IMPL:
+      case OPTYPE_A:
+        return 1;
+
+      case OPTYPE_DP:
+      case OPTYPE_DPX:
+      case OPTYPE_DPY:
+      case OPTYPE_IDP:
+      case OPTYPE_IDPX:
+      case OPTYPE_IDPY:
+      case OPTYPE_ILDP:
+      case OPTYPE_ILDPY:
+      case OPTYPE_SR:
+      case OPTYPE_ISRY:
+      case OPTYPE_RELB:
+        return 2;
+
+      case OPTYPE_ADDR:
+      case OPTYPE_ADDRX:
+      case OPTYPE_ADDRY:
+      case OPTYPE_IADDRX:
+      case OPTYPE_ILADDR:
+      case OPTYPE_ADDR_PC:
+      case OPTYPE_IADDR_PC:
+      case OPTYPE_RELW:
+      case OPTYPE_MV:
+        return 3;
+
+      case OPTYPE_LONG:
+      case OPTYPE_LONGX:
+        return 4;
+
+      case OPTYPE_IM:
+        return (paramsize == 8 ? 2 : 3);
+    }
+  }
+
+  inline bool isBra() const { return flags & FLAG_BRA; }
+  inline bool isBraWithContinue() const { return flags & FLAG_BRA_CONTINUE; }
+  inline bool resetsX() const { return flags & FLAG_RESET_X; }
+  inline bool resetsM() const { return flags & FLAG_RESET_M; }
+  inline bool resetsE() const { return flags & FLAG_RESET_E; }
+  inline bool setsX() const { return flags & FLAG_SET_X; }
+  inline bool setsM() const { return flags & FLAG_SET_M; }
+  inline bool pushesP() const { return flags & FLAG_PUSH_P; }
+  inline bool popsP() const { return flags & FLAG_POP_P; }
+  inline bool breaks() const { return flags & FLAG_BRK; }
+  inline bool returns() const { return flags & FLAG_RETURN; }
 
   uint8 op8() {
     return param[1];
@@ -48,7 +113,16 @@ struct Opcode {
     return *((uint16*)&param[1]) | param[3] << 16;
   }
 
-  uint8 size;
+  uint32 opall() {
+    switch (size()) {
+      case 1: return 0;
+      case 2: return op8();
+      case 3: return op16();
+      case 4: return op24();
+    }
+  }
+
+  uint16 flags;
   uint8 optype;
   uint8 param[4];
   uint8 paramsize;

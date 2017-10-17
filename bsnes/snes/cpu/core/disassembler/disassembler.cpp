@@ -115,11 +115,11 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
   param[2] = dreadb(pc.d); pc.w++;
   param[3] = dreadb(pc.d);
 
-  #define a8   (regs.e || regs.p.m)
-  #define x8   (regs.e || regs.p.x)
+  #define a8   (e || m)
+  #define x8   (e || x)
 
   switch (param[0]) {
-    case 0x00: opcode.set(0, OPTYPE_IM, "brk", param); break;
+    case 0x00: opcode.set(Opcode::FLAG_BRK, OPTYPE_IM, "brk", param); break;
     case 0x01: opcode.set(0, OPTYPE_IDPX, "ora", param); break;
     case 0x02: opcode.set(0, OPTYPE_IM, "cop", param); break;
     case 0x03: opcode.set(0, OPTYPE_SR, "ora", param); break;
@@ -127,7 +127,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x05: opcode.set(0, OPTYPE_DP, "ora", param); break;
     case 0x06: opcode.set(0, OPTYPE_DP, "asl", param); break;
     case 0x07: opcode.set(0, OPTYPE_ILDP, "ora", param); break;
-    case 0x08: opcode.set(0, OPTYPE_IMPL, "php", param); break;
+    case 0x08: opcode.set(Opcode::FLAG_PUSH_P, OPTYPE_IMPL, "php", param); break;
     case 0x09: if(a8)opcode.set(0, OPTYPE_IM, "ora", param, 8);
                else  opcode.set(0, OPTYPE_IM, "ora", param, 16); break;
     case 0x0a: opcode.set(0, OPTYPE_IMPL, "asl", param); break;
@@ -136,7 +136,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x0d: opcode.set(0, OPTYPE_ADDR, "ora", param); break;
     case 0x0e: opcode.set(0, OPTYPE_ADDR, "asl", param); break;
     case 0x0f: opcode.set(0, OPTYPE_LONG, "ora", param); break;
-    case 0x10: opcode.set(0, OPTYPE_RELB, "bpl", param); break;
+    case 0x10: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bpl", param); break;
     case 0x11: opcode.set(0, OPTYPE_IDPY, "ora", param); break;
     case 0x12: opcode.set(0, OPTYPE_IDP, "ora", param); break;
     case 0x13: opcode.set(0, OPTYPE_ISRY, "ora", param); break;
@@ -152,15 +152,15 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x1d: opcode.set(0, OPTYPE_ADDRX, "ora", param); break;
     case 0x1e: opcode.set(0, OPTYPE_ADDRX, "asl", param); break;
     case 0x1f: opcode.set(0, OPTYPE_LONGX, "ora", param); break;
-    case 0x20: opcode.set(0, OPTYPE_ADDR_PC, "jsr", param); break;
+    case 0x20: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_ADDR_PC, "jsr", param, 16); break;
     case 0x21: opcode.set(0, OPTYPE_IDPX, "and", param); break;
-    case 0x22: opcode.set(0, OPTYPE_LONG, "jsl", param); break;
+    case 0x22: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_LONG, "jsl", param, 24); break;
     case 0x23: opcode.set(0, OPTYPE_SR, "and", param); break;
     case 0x24: opcode.set(0, OPTYPE_DP, "bit", param); break;
     case 0x25: opcode.set(0, OPTYPE_DP, "and", param); break;
     case 0x26: opcode.set(0, OPTYPE_DP, "rol", param); break;
     case 0x27: opcode.set(0, OPTYPE_ILDP, "and", param); break;
-    case 0x28: opcode.set(0, OPTYPE_IMPL, "plp", param); break;
+    case 0x28: opcode.set(Opcode::FLAG_POP_P, OPTYPE_IMPL, "plp", param); break;
     case 0x29: if(a8)opcode.set(0, OPTYPE_IM, "and", param, 8);
                else  opcode.set(0, OPTYPE_IM, "and", param, 16); break;
     case 0x2a: opcode.set(0, OPTYPE_IMPL, "rol", param); break;
@@ -169,7 +169,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x2d: opcode.set(0, OPTYPE_ADDR, "and", param); break;
     case 0x2e: opcode.set(0, OPTYPE_ADDR, "rol", param); break;
     case 0x2f: opcode.set(0, OPTYPE_LONG, "and", param); break;
-    case 0x30: opcode.set(0, OPTYPE_RELB, "bmi", param); break;
+    case 0x30: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bmi", param); break;
     case 0x31: opcode.set(0, OPTYPE_IDPY, "and", param); break;
     case 0x32: opcode.set(0, OPTYPE_IDP, "and", param); break;
     case 0x33: opcode.set(0, OPTYPE_ISRY, "and", param); break;
@@ -185,11 +185,11 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x3d: opcode.set(0, OPTYPE_ADDRX, "and", param); break;
     case 0x3e: opcode.set(0, OPTYPE_ADDRX, "rol", param); break;
     case 0x3f: opcode.set(0, OPTYPE_LONGX, "and", param); break;
-    case 0x40: opcode.set(0, OPTYPE_IMPL, "rti", param); break;
+    case 0x40: opcode.set(Opcode::FLAG_RETURN, OPTYPE_IMPL, "rti", param); break;
     case 0x41: opcode.set(0, OPTYPE_IDPX, "eor", param); break;
     case 0x42: opcode.set(0, OPTYPE_IM, "wdm", param); break;
     case 0x43: opcode.set(0, OPTYPE_SR, "eor", param); break;
-    case 0x44: opcode.set(0, OPTYPE_IM, "mvp", param); break;
+    case 0x44: opcode.set(0, OPTYPE_MV, "mvp", param); break;
     case 0x45: opcode.set(0, OPTYPE_DP, "eor", param); break;
     case 0x46: opcode.set(0, OPTYPE_DP, "lsr", param); break;
     case 0x47: opcode.set(0, OPTYPE_ILDP, "eor", param); break;
@@ -198,15 +198,15 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
                else  opcode.set(0, OPTYPE_IM, "eor", param, 16); break;
     case 0x4a: opcode.set(0, OPTYPE_IMPL, "lsr", param); break;
     case 0x4b: opcode.set(0, OPTYPE_IMPL, "phk", param); break;
-    case 0x4c: opcode.set(0, OPTYPE_ADDR_PC, "jmp", param); break;
+    case 0x4c: opcode.set(Opcode::FLAG_BRA, OPTYPE_ADDR_PC, "jmp", param, 16); break;
     case 0x4d: opcode.set(0, OPTYPE_ADDR, "eor", param); break;
     case 0x4e: opcode.set(0, OPTYPE_ADDR, "lsr", param); break;
     case 0x4f: opcode.set(0, OPTYPE_LONG, "eor", param); break;
-    case 0x50: opcode.set(0, OPTYPE_RELB, "bvc", param); break;
+    case 0x50: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bvc", param); break;
     case 0x51: opcode.set(0, OPTYPE_IDPY, "eor", param); break;
     case 0x52: opcode.set(0, OPTYPE_IDP, "eor", param); break;
     case 0x53: opcode.set(0, OPTYPE_ISRY, "eor", param); break;
-    case 0x54: opcode.set(0, OPTYPE_IM, "mvn", param); break;
+    case 0x54: opcode.set(0, OPTYPE_MV, "mvn", param); break;
     case 0x55: opcode.set(0, OPTYPE_DPX, "eor", param); break;
     case 0x56: opcode.set(0, OPTYPE_DPX, "lsr", param); break;
     case 0x57: opcode.set(0, OPTYPE_ILDPY, "eor", param); break;
@@ -214,11 +214,11 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x59: opcode.set(0, OPTYPE_ADDRY, "eor", param); break;
     case 0x5a: opcode.set(0, OPTYPE_IMPL, "phy", param); break;
     case 0x5b: opcode.set(0, OPTYPE_IMPL, "tcd", param); break;
-    case 0x5c: opcode.set(0, OPTYPE_LONG, "jml", param); break;
+    case 0x5c: opcode.set(Opcode::FLAG_BRA, OPTYPE_LONG, "jml", param, 24); break;
     case 0x5d: opcode.set(0, OPTYPE_ADDRX, "eor", param); break;
     case 0x5e: opcode.set(0, OPTYPE_ADDRX, "lsr", param); break;
     case 0x5f: opcode.set(0, OPTYPE_LONGX, "eor", param); break;
-    case 0x60: opcode.set(0, OPTYPE_IMPL, "rts", param); break;
+    case 0x60: opcode.set(Opcode::FLAG_RETURN, OPTYPE_IMPL, "rts", param); break;
     case 0x61: opcode.set(0, OPTYPE_IDPX, "adc", param); break;
     case 0x62: opcode.set(0, OPTYPE_RELW, "per", param); break;
     case 0x63: opcode.set(0, OPTYPE_SR, "adc", param); break;
@@ -230,12 +230,12 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x69: if(a8)opcode.set(0, OPTYPE_IM, "adc", param, 8);
                else  opcode.set(0, OPTYPE_IM, "adc", param, 16); break;
     case 0x6a: opcode.set(0, OPTYPE_IMPL, "ror", param); break;
-    case 0x6b: opcode.set(0, OPTYPE_IMPL, "rtl", param); break;
-    case 0x6c: opcode.set(0, OPTYPE_IADDR_PC, "jmp", param); break;
+    case 0x6b: opcode.set(Opcode::FLAG_RETURN, OPTYPE_IMPL, "rtl", param); break;
+    case 0x6c: opcode.set(Opcode::FLAG_BRA, OPTYPE_IADDR_PC, "jmp", param, 24); break;
     case 0x6d: opcode.set(0, OPTYPE_ADDR, "adc", param); break;
     case 0x6e: opcode.set(0, OPTYPE_ADDR, "ror", param); break;
     case 0x6f: opcode.set(0, OPTYPE_LONG, "adc", param); break;
-    case 0x70: opcode.set(0, OPTYPE_RELB, "bvs", param); break;
+    case 0x70: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bvs", param); break;
     case 0x71: opcode.set(0, OPTYPE_IDPY, "adc", param); break;
     case 0x72: opcode.set(0, OPTYPE_IDP, "adc", param); break;
     case 0x73: opcode.set(0, OPTYPE_ISRY, "adc", param); break;
@@ -247,13 +247,13 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x79: opcode.set(0, OPTYPE_ADDRY, "adc", param); break;
     case 0x7a: opcode.set(0, OPTYPE_IMPL, "ply", param); break;
     case 0x7b: opcode.set(0, OPTYPE_IMPL, "tdc", param); break;
-    case 0x7c: opcode.set(0, OPTYPE_IADDRX, "jmp", param); break;
+    case 0x7c: opcode.set(Opcode::FLAG_BRA, OPTYPE_IADDRX, "jmp", param, 24); break;
     case 0x7d: opcode.set(0, OPTYPE_ADDRX, "adc", param); break;
     case 0x7e: opcode.set(0, OPTYPE_ADDRX, "ror", param); break;
     case 0x7f: opcode.set(0, OPTYPE_LONGX, "adc", param); break;
-    case 0x80: opcode.set(0, OPTYPE_RELB, "bra", param); break;
+    case 0x80: opcode.set(Opcode::FLAG_BRA, OPTYPE_RELB, "bra", param, 8); break;
     case 0x81: opcode.set(0, OPTYPE_IDPX, "sta", param); break;
-    case 0x82: opcode.set(0, OPTYPE_RELW, "brl", param); break;
+    case 0x82: opcode.set(Opcode::FLAG_BRA, OPTYPE_RELW, "brl", param, 16); break;
     case 0x83: opcode.set(0, OPTYPE_SR, "sta", param); break;
     case 0x84: opcode.set(0, OPTYPE_DP, "sty", param); break;
     case 0x85: opcode.set(0, OPTYPE_DP, "sta", param); break;
@@ -268,7 +268,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0x8d: opcode.set(0, OPTYPE_ADDR, "sta", param); break;
     case 0x8e: opcode.set(0, OPTYPE_ADDR, "stx", param); break;
     case 0x8f: opcode.set(0, OPTYPE_LONG, "sta", param); break;
-    case 0x90: opcode.set(0, OPTYPE_RELB, "bcc", param); break;
+    case 0x90: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bcc", param); break;
     case 0x91: opcode.set(0, OPTYPE_IDPY, "sta", param); break;
     case 0x92: opcode.set(0, OPTYPE_IDP, "sta", param); break;
     case 0x93: opcode.set(0, OPTYPE_ISRY, "sta", param); break;
@@ -303,7 +303,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0xad: opcode.set(0, OPTYPE_ADDR, "lda", param); break;
     case 0xae: opcode.set(0, OPTYPE_ADDR, "ldx", param); break;
     case 0xaf: opcode.set(0, OPTYPE_LONG, "lda", param); break;
-    case 0xb0: opcode.set(0, OPTYPE_RELB, "bcs", param); break;
+    case 0xb0: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bcs", param); break;
     case 0xb1: opcode.set(0, OPTYPE_IDPY, "lda", param); break;
     case 0xb2: opcode.set(0, OPTYPE_IDP, "lda", param); break;
     case 0xb3: opcode.set(0, OPTYPE_ISRY, "lda", param); break;
@@ -322,7 +322,11 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0xc0: if(x8)opcode.set(0, OPTYPE_IM, "cpy", param, 8);
                else  opcode.set(0, OPTYPE_IM, "cpy", param, 16); break;
     case 0xc1: opcode.set(0, OPTYPE_IDPX, "cmp", param); break;
-    case 0xc2: opcode.set(0, OPTYPE_IM, "rep", param); break;
+    case 0xc2:
+      opcode.set(0, OPTYPE_IM, "rep", param);
+      if (opcode.op8() & 0x10) opcode.flags |= Opcode::FLAG_RESET_X;
+      if (opcode.op8() & 0x20) opcode.flags |= Opcode::FLAG_RESET_M;
+      break;
     case 0xc3: opcode.set(0, OPTYPE_SR, "cmp", param); break;
     case 0xc4: opcode.set(0, OPTYPE_DP, "cpy", param); break;
     case 0xc5: opcode.set(0, OPTYPE_DP, "cmp", param); break;
@@ -337,7 +341,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0xcd: opcode.set(0, OPTYPE_ADDR, "cmp", param); break;
     case 0xce: opcode.set(0, OPTYPE_ADDR, "dec", param); break;
     case 0xcf: opcode.set(0, OPTYPE_LONG, "cmp", param); break;
-    case 0xd0: opcode.set(0, OPTYPE_RELB, "bne", param); break;
+    case 0xd0: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "bne", param); break;
     case 0xd1: opcode.set(0, OPTYPE_IDPY, "cmp", param); break;
     case 0xd2: opcode.set(0, OPTYPE_IDP, "cmp", param); break;
     case 0xd3: opcode.set(0, OPTYPE_ISRY, "cmp", param); break;
@@ -349,14 +353,18 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0xd9: opcode.set(0, OPTYPE_ADDRY, "cmp", param); break;
     case 0xda: opcode.set(0, OPTYPE_IMPL, "phx", param); break;
     case 0xdb: opcode.set(0, OPTYPE_IMPL, "stp", param); break;
-    case 0xdc: opcode.set(0, OPTYPE_ILADDR, "jmp", param); break;
+    case 0xdc: opcode.set(Opcode::FLAG_BRA, OPTYPE_ILADDR, "jmp", param, 16); break;
     case 0xdd: opcode.set(0, OPTYPE_ADDRX, "cmp", param); break;
     case 0xde: opcode.set(0, OPTYPE_ADDRX, "dec", param); break;
     case 0xdf: opcode.set(0, OPTYPE_LONGX, "cmp", param); break;
     case 0xe0: if(x8)opcode.set(0, OPTYPE_IM, "cpx", param, 8);
                else  opcode.set(0, OPTYPE_IM, "cpx", param, 16); break;
     case 0xe1: opcode.set(0, OPTYPE_IDPX, "sbc", param); break;
-    case 0xe2: opcode.set(0, OPTYPE_IM, "sep", param); break;
+    case 0xe2:
+      opcode.set(0, OPTYPE_IM, "sep", param);
+      if (opcode.op8() & 0x10) opcode.flags |= Opcode::FLAG_SET_X;
+      if (opcode.op8() & 0x20) opcode.flags |= Opcode::FLAG_SET_M;
+      break;
     case 0xe3: opcode.set(0, OPTYPE_SR, "sbc", param); break;
     case 0xe4: opcode.set(0, OPTYPE_DP, "cpx", param); break;
     case 0xe5: opcode.set(0, OPTYPE_DP, "sbc", param); break;
@@ -371,19 +379,19 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
     case 0xed: opcode.set(0, OPTYPE_ADDR, "sbc", param); break;
     case 0xee: opcode.set(0, OPTYPE_ADDR, "inc", param); break;
     case 0xef: opcode.set(0, OPTYPE_LONG, "sbc", param); break;
-    case 0xf0: opcode.set(0, OPTYPE_RELB, "beq", param); break;
+    case 0xf0: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_RELB, "beq", param); break;
     case 0xf1: opcode.set(0, OPTYPE_IDPY, "sbc", param); break;
     case 0xf2: opcode.set(0, OPTYPE_IDP, "sbc", param); break;
     case 0xf3: opcode.set(0, OPTYPE_ISRY, "sbc", param); break;
-    case 0xf4: opcode.set(0, OPTYPE_IM, "pea", param); break;
+    case 0xf4: opcode.set(0, OPTYPE_IM, "pea", param, 16); break;
     case 0xf5: opcode.set(0, OPTYPE_DPX, "sbc", param); break;
     case 0xf6: opcode.set(0, OPTYPE_DPX, "inc", param); break;
     case 0xf7: opcode.set(0, OPTYPE_ILDPY, "sbc", param); break;
     case 0xf8: opcode.set(0, OPTYPE_IMPL, "sed", param); break;
     case 0xf9: opcode.set(0, OPTYPE_ADDRY, "sbc", param); break;
     case 0xfa: opcode.set(0, OPTYPE_IMPL, "plx", param); break;
-    case 0xfb: opcode.set(0, OPTYPE_IMPL, "xce", param); break;
-    case 0xfc: opcode.set(0, OPTYPE_IADDRX, "jsr", param); break;
+    case 0xfb: opcode.set(Opcode::FLAG_RESET_E, OPTYPE_IMPL, "xce", param); break;
+    case 0xfc: opcode.set(Opcode::FLAG_BRA_CONTINUE, OPTYPE_IADDRX, "jsr", param); break;
     case 0xfd: opcode.set(0, OPTYPE_ADDRX, "sbc", param); break;
     case 0xfe: opcode.set(0, OPTYPE_ADDRX, "inc", param); break;
     case 0xff: opcode.set(0, OPTYPE_LONGX, "sbc", param); break;

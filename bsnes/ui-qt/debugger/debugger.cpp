@@ -223,6 +223,8 @@ void Debugger::modifySystemState(unsigned state) {
         if (offset >= 0 && i < 0x600000)
           SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
+    } else {
+      SNES::cpuAnalyst.performFullAnalysis();
     }
     
     string data;

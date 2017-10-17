@@ -67,6 +67,8 @@ void DisassemblerView::refresh(uint32_t address) {
   currentAddress = address;
   hasValidAddress = true;
 
+  SNES::cpuAnalyst.performAnalysis(address, SNES::CPUAnalystState(SNES::cpu.regs.e, SNES::cpu.regs.p.m, SNES::cpu.regs.p.x), true);
+
   updateLines();
   viewport()->update();
   updateCurrentMousePosition();

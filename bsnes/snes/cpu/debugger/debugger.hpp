@@ -41,6 +41,7 @@ public:
     UsageWrite  = 0x40,
     UsageExec   = 0x20,
     UsageOpcode = 0x10,
+    UsageFlagE  = 0x04,
     UsageFlagM  = 0x02,
     UsageFlagX  = 0x01,
   };
