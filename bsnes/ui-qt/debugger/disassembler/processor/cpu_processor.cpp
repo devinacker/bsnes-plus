@@ -155,12 +155,12 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_RELB:
       result.paramFormat = "%1X4";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(), decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_RELW:
       result.paramFormat = "%1X4";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_A:
