@@ -4,12 +4,14 @@
 DisassemblerView::DisassemblerView(DisasmProcessor *processor) : hasValidAddress(false), processor(processor) {
   setFont(QFont(Style::Monospace));
   setMouseTracking(true);
+  setContextMenuPolicy(Qt::CustomContextMenu);
 
   _addressAreaColor = this->palette().alternateBase().color();
   _selectionColor = this->palette().highlight().color();
   _breakpointColor = QColor(255, 0, 0, 255);
 
   connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onScroll()));
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
 
   init();
 }
@@ -88,12 +90,19 @@ void DisassemblerView::updateVisibleLines() {
   lines.reset();
   lines.reserve(maxDisplayLines);
 
+  bool first = true;
   uint32_t line = topLine;
   for (uint32_t index=0; index<maxDisplayLines; index++, line++) {
     if (line < emptyRowsAround || line >= maxLines - emptyRowsAround) {
       lines[index].setEmpty();
     } else {
+      if (first) {
+        topLineAddress = address;
+        first = false;
+      }
+
       processor->getLine(lines[index], address);
+      bottomLineAddress = address;
     }
   }
 }
@@ -108,7 +117,12 @@ void DisassemblerView::updateLines() {
 
   if (currentAddress < currentRangeStartAddress || currentAddress >= currentRangeEndAddress) {
     updateLineRange();
+  } else if (lines.size()) {
+    if (currentAddress <= topLineAddress || currentAddress >= bottomLineAddress) {
+      updateLineRange();
+    }
   }
+
   updateVisibleLines();
 }
 
@@ -121,6 +135,8 @@ void DisassemblerView::updateLineRange() {
   verticalScrollBar()->setPageStep(rowsShown);
 
   verticalScrollBar()->setValue(currentAddressLine - emptyRowsAround);
+
+  lines.reset();
 }
 
 // ------------------------------------------------------------------------
@@ -130,7 +146,36 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 }
 
 // ------------------------------------------------------------------------
-void DisassemblerView::setComment(uint32_t address) {
+void DisassemblerView::setSymbol() {
+  uint32_t address = mouseStateValue;
+  Symbol symbol = processor->getSymbols()->getSymbol(address);
+  QString currentSymbol("");
+
+  if (symbol.isSymbol()) {
+    currentSymbol = (const char*)symbol.name;
+  }
+
+  bool ok;
+  QString value = QInputDialog::getText(this, "Symbol", "Enter name for address " + nall::hex(address), QLineEdit::Normal, currentSymbol, &ok);
+  string s;
+  s = qPrintable(value);
+
+  if (ok) {
+    if (symbol.isSymbol()) {
+      processor->getSymbols()->removeSymbol(address, Symbol::LOCATION);
+    }
+
+    if (s.length()) {
+      processor->getSymbols()->addLocation(address, s);
+    }
+  }
+
+  viewport()->update();
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::setComment() {
+  uint32_t address = mouseStateValue;
   Symbol comment = processor->getSymbols()->getComment(address);
   QString currentComment("");
 
@@ -157,7 +202,8 @@ void DisassemblerView::setComment(uint32_t address) {
 }
 
 // ------------------------------------------------------------------------
-void DisassemblerView::toggleBreakpoint(uint32_t address) {
+void DisassemblerView::toggleBreakpoint() {
+  uint32_t address = mouseStateValue;
   int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(address, processor->getBreakpointBusName());
 
   if (breakpoint >= 0) {
@@ -165,6 +211,8 @@ void DisassemblerView::toggleBreakpoint(uint32_t address) {
   } else {
     breakpointEditor->addBreakpoint(nall::hex(address), "x", processor->getBreakpointBusName());
   }
+
+  viewport()->update();
 }
 
 // ------------------------------------------------------------------------
@@ -191,18 +239,46 @@ void DisassemblerView::mousePressEvent(QMouseEvent * event) {
 
   case STATE_SET_COMMENT:
     if (left) {
-      setComment(mouseStateValue);
+      setComment();
     }
     break;
 
   case STATE_TOGGLE_BREAKPOINT:
     if (left) {
-      toggleBreakpoint(mouseStateValue);
+      toggleBreakpoint();
     }
     break;
   }
+}
 
-  viewport()->update();
+// ------------------------------------------------------------------------
+void DisassemblerView::showLineContextMenu(const QPoint &point) {
+  QMenu contextMenu("Context menu", this);
+
+  QAction setBreakpoint("Toggle breakpoint", this);
+  connect(&setBreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
+  contextMenu.addAction(&setBreakpoint);
+
+  QAction setCommentAction("Set comment", this);
+  connect(&setCommentAction, SIGNAL(triggered()), this, SLOT(setComment()));
+  contextMenu.addAction(&setCommentAction);
+
+  QAction setSymbolAction("Set symbol", this);
+  connect(&setSymbolAction, SIGNAL(triggered()), this, SLOT(setSymbol()));
+  contextMenu.addAction(&setSymbolAction);
+
+  contextMenu.exec(mapToGlobal(point));
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::showContextMenu(const QPoint &point) {
+  switch (mouseState) {
+  case STATE_SET_COMMENT:
+  case STATE_TOGGLE_BREAKPOINT:
+  case STATE_LINE:
+    showLineContextMenu(point);
+    break;
+  }
 }
 
 // ------------------------------------------------------------------------
@@ -256,6 +332,9 @@ void DisassemblerView::updateCurrentMousePosition() {
         }
       } else if (mouseX >= columnPositions[COLUMN_COMMENT]) {
         mouseState = STATE_SET_COMMENT;
+        mouseStateValue = line.address;
+      } else {
+        mouseState = STATE_LINE;
         mouseStateValue = line.address;
       }
     }

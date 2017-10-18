@@ -195,20 +195,29 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 // ------------------------------------------------------------------------
 bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   SNES::CPU::Opcode opcode;
+  uint8_t u = usage[address & 0xFFFFFF];
   bool e, m, x;
+
+  e = u & SNES::CPUDebugger::UsageFlagE;
+  m = u & SNES::CPUDebugger::UsageFlagM;
+  x = u & SNES::CPUDebugger::UsageFlagX;
 
   switch (source) {
   case CPU:
-    e = SNES::cpu.regs.e;
-    m = SNES::cpu.regs.p.m;
-    x = SNES::cpu.regs.p.x;
+    if (!u) {
+      e = SNES::cpu.regs.e;
+      m = SNES::cpu.regs.p.m;
+      x = SNES::cpu.regs.p.x;
+    }
     SNES::cpu.disassemble_opcode_ex(opcode, address, e, m, x);
     break;
 
   case SA1:
-    e = SNES::cpu.regs.e;
-    m = SNES::cpu.regs.p.m;
-    x = SNES::cpu.regs.p.x;
+    if (!u) {
+      e = SNES::sa1.regs.e;
+      m = SNES::sa1.regs.p.m;
+      x = SNES::sa1.regs.p.x;
+    }
     SNES::sa1.disassemble_opcode_ex(opcode, address, e, m, x);
     break;
   }

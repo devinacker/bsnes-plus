@@ -34,7 +34,7 @@ void CPUAnalyst::performAnalysisForVector(uint32_t address, bool emulation) {
 
   uint32_t numRoutines = performAnalysis(bus.read(address) | bus.read(address + 1) << 8, state);
 
-  puts(string("Found ", numRoutines, " new symbols at vector $", hex<6,'0'>(address)));
+  //puts(string("Found ", numRoutines, " new symbols at vector $", hex<6,'0'>(address)));
 }
 
 // ------------------------------------------------------------------------

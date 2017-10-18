@@ -8,7 +8,8 @@ class DisassemblerView : public QAbstractScrollArea {
     STATE_TOGGLE_BREAKPOINT,
     STATE_SET_COMMENT,
     STATE_RESIZE_COLUMN,
-    STATE_RESIZING_COLUMN
+    STATE_RESIZING_COLUMN,
+    STATE_LINE
   };
 
   enum {
@@ -31,10 +32,8 @@ protected:
   void mousePressEvent(QMouseEvent * event);
   void mouseReleaseEvent(QMouseEvent *e);
   void mouseMoveEvent(QMouseEvent *e);
-  void toggleBreakpoint(uint32_t address);
-  void setComment(uint32_t address);
   void updateCurrentMousePosition();
-
+  void showLineContextMenu(const QPoint &);
 
   void updateLines();
   void updateLineRange();
@@ -44,6 +43,10 @@ protected:
 private slots:
   void adjust();
   void onScroll();
+  void showContextMenu(const QPoint &);
+  void toggleBreakpoint();
+  void setComment();
+  void setSymbol();
 
 private:
   void paintHeader(QPainter &painter);
@@ -66,6 +69,8 @@ private:
   uint32_t currentRangeStartAddress;
   uint32_t currentRangeEndAddress;
   uint32_t currentRangeLineNumbers;
+  uint32_t topLineAddress;
+  uint32_t bottomLineAddress;
 
   uint32_t columnSizes[NUM_COLUMNS];
   uint32_t columnPositions[NUM_COLUMNS];
