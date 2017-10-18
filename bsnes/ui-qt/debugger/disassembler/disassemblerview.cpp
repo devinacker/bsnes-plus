@@ -77,6 +77,43 @@ void DisassemblerView::refresh(uint32_t address) {
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::createLoopUpwards(uint32_t line, uint32_t targetAddress) {
+  int32_t topLine = line;
+
+  while (topLine >= 0) {
+    const RenderableDisassemblerLine &rop = lines[topLine];
+    if (rop.line.address <= targetAddress) {
+      // Do not highlight if we end inside another loop
+      if (rop.depth > 0) {
+        return;
+      }
+
+      break;
+    }
+
+    // Do not highlight if there is a return inside
+    if (rop.isReturn()) {
+      return;
+    }
+
+    --topLine;
+  }
+
+  int32_t currentLine = topLine;
+  if (currentLine >= 0) {
+    lines[currentLine].flags |= RenderableDisassemblerLine::FLAG_START_BRA;
+    lines[currentLine].numStarts++;
+  }
+
+  while (++currentLine <= line) {
+    lines[currentLine].depth++;
+  }
+
+  lines[line].braRelativeLine = topLine - line;
+  lines[line].flags |= RenderableDisassemblerLine::FLAG_END_BRA;
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::updateVisibleLines() {
   uint32_t topLine = verticalScrollBar()->value();
   uint32_t maxLines = currentRangeLineNumbers + emptyRowsAround + emptyRowsAround;
@@ -94,14 +131,27 @@ void DisassemblerView::updateVisibleLines() {
   uint32_t line = topLine;
   for (uint32_t index=0; index<maxDisplayLines; index++, line++) {
     if (line < emptyRowsAround || line >= maxLines - emptyRowsAround) {
-      lines[index].setEmpty();
+      lines[index].line.setEmpty();
     } else {
+      uint32_t currentAddress = address;
+
       if (first) {
         topLineAddress = address;
         first = false;
       }
 
-      processor->getLine(lines[index], address);
+      RenderableDisassemblerLine &rop = lines[index];
+      processor->getLine(rop.line, address);
+      const DisassemblerLine &op = rop.line;
+
+      if (op.isReturn()) {
+        rop.flags |= RenderableDisassemblerLine::FLAG_RETURN;
+      }
+
+      if (op.isBra()&& op.targetAddress < currentAddress && op.targetAddress >= currentRangeStartAddress) {
+        createLoopUpwards(index, op.targetAddress);
+      }
+
       bottomLineAddress = address;
     }
   }
@@ -147,6 +197,10 @@ void DisassemblerView::resizeEvent(QResizeEvent *) {
 
 // ------------------------------------------------------------------------
 void DisassemblerView::setSymbol() {
+  if (!processor->getSymbols()) {
+    return;
+  }
+
   uint32_t address = mouseStateValue;
   Symbol symbol = processor->getSymbols()->getSymbol(address);
   QString currentSymbol("");
@@ -175,6 +229,10 @@ void DisassemblerView::setSymbol() {
 
 // ------------------------------------------------------------------------
 void DisassemblerView::setComment() {
+  if (!processor->getSymbols()) {
+    return;
+  }
+
   uint32_t address = mouseStateValue;
   Symbol comment = processor->getSymbols()->getComment(address);
   QString currentComment("");
@@ -259,13 +317,15 @@ void DisassemblerView::showLineContextMenu(const QPoint &point) {
   connect(&setBreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
   contextMenu.addAction(&setBreakpoint);
 
-  QAction setCommentAction("Set comment", this);
-  connect(&setCommentAction, SIGNAL(triggered()), this, SLOT(setComment()));
-  contextMenu.addAction(&setCommentAction);
+  if (processor->getSymbols()) {
+    QAction setCommentAction("Set comment", this);
+    connect(&setCommentAction, SIGNAL(triggered()), this, SLOT(setComment()));
+    contextMenu.addAction(&setCommentAction);
 
-  QAction setSymbolAction("Set symbol", this);
-  connect(&setSymbolAction, SIGNAL(triggered()), this, SLOT(setSymbol()));
-  contextMenu.addAction(&setSymbolAction);
+    QAction setSymbolAction("Set symbol", this);
+    connect(&setSymbolAction, SIGNAL(triggered()), this, SLOT(setSymbol()));
+    contextMenu.addAction(&setSymbolAction);
+  }
 
   contextMenu.exec(mapToGlobal(point));
 }
@@ -322,7 +382,7 @@ void DisassemblerView::updateCurrentMousePosition() {
       break;
     }
   } else if (row > 0 && row <= lines.size()) {
-    const DisassemblerLine &line = lines[row];
+    const DisassemblerLine &line = lines[row].line;
 
     if (!line.isEmpty()) {
       if (mouseX < columnSizes[COLUMN_ADDRESS]) {
@@ -366,7 +426,7 @@ void DisassemblerView::updateCurrentMousePosition() {
   painter.setClipping(false)
 
 // ------------------------------------------------------------------------
-void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &line, int y) {
+void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassemblerLine &line, int y) {
   QString address;
 
   QColor addressColor, opColor, textColor;
@@ -374,7 +434,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
 
   NO_CLIPPING();
 
-  if (line.address == currentAddress) {
+  if (line.line.address == currentAddress) {
     painter.fillRect(QRect(0, y - charHeight + lineOffset, viewport()->width(), charHeight), _selectionColor);
 
     addressColor = viewport()->palette().highlightedText().color();
@@ -392,13 +452,18 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
   }
 
-  if (breakpointEditor->indexOfBreakpointExec(line.address, processor->getBreakpointBusName()) >= 0) {
+  if (breakpointEditor->indexOfBreakpointExec(line.line.address, processor->getBreakpointBusName()) >= 0) {
     painter.fillRect(QRect(0, y - charHeight + lineOffset, columnSizes[COLUMN_ADDRESS], charHeight), _breakpointColor);
     addressColor = Qt::white;
   }
 
   SymbolMap *symbols = processor->getSymbols();
-  Symbol currentRow = symbols->getSymbol(line.address);
+  Symbol currentRow = symbols ? symbols->getSymbol(line.line.address) : Symbol::createInvalid();
+
+  if (line.isReturn()) {
+    painter.setPen(Qt::gray);
+    painter.drawLine(0, y + lineOffset, width(), y + lineOffset);
+  }
 
   if (currentRow.type != Symbol::INVALID) {
     painter.setPen(Qt::gray);
@@ -407,14 +472,51 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     SET_CLIPPING(COLUMN_COMMENT);
     painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
   } else {
-    currentRow = symbols->getComment(line.address);
+    currentRow = symbols ? symbols->getComment(line.line.address) : Symbol::createInvalid();
+
     painter.setPen(Qt::gray);
     SET_CLIPPING(COLUMN_COMMENT);
-    painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
+
+    if (currentRow.isComment()) {
+      painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, currentRow.name);
+    } else if (line.isReturn()) {
+      painter.drawText(columnPositions[COLUMN_COMMENT] + charPadding, y, "Return");
+    }
   }
 
-  int x = columnPositions[1] + charPadding;
-  address = QString("%1").arg(line.address, 6, 16, QChar('0'));
+  int x = columnPositions[1] + charPadding + line.depth * 2 * charWidth;
+
+  SET_CLIPPING(COLUMN_DISASM);
+  if (line.isStartBra()) {
+    x += line.numStarts * 2 * charWidth;
+  }
+  if (line.isEndBra()) {
+    int l = x - charWidth - charWidth + 1;
+    int r = x - charPadding;
+    int w = 4;
+    int hw = w >> 1;
+    int ap = 2;
+    int ar = r + 2;
+    int al = ar - (ap + hw);
+    int b = y + lineOffset + hw - (charHeight >> 1);
+    int t = b - w + (line.braRelativeLine) * charHeight - 1;
+
+    QPainterPath path;
+    path.moveTo(al, t-ap);
+    path.lineTo(ar, t + hw);
+    path.lineTo(al, t + w + ap);
+
+    painter.setPen(Qt::black);
+    painter.setBrush(Qt::black);
+    painter.drawEllipse(QPoint(l + hw, b - hw), hw, hw);
+    painter.drawEllipse(QPoint(l + hw, t + hw), hw, hw);
+    painter.drawRect(l, t + hw, w, b - t - w);
+    painter.drawRect(l + hw, b - w, r - l - hw, w);
+    painter.drawRect(l + hw, t, al - l - hw, w);
+    painter.drawPath(path);
+  }
+
+  address = QString("%1").arg(line.line.address, 6, 16, QChar('0'));
 
   SET_CLIPPING(COLUMN_ADDRESS);
   painter.setPen(addressColor);
@@ -422,33 +524,33 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
 
   SET_CLIPPING(COLUMN_DISASM);
   painter.setPen(opColor);
-  painter.drawText(x, y, line.text);
+  painter.drawText(x, y, line.line.text);
 
   QString directComment;
 
-  if (line.paramFormat) {
-    x += (line.text.length() + 1) * charWidth;
+  if (line.line.paramFormat) {
+    x += (line.line.text.length() + 1) * charWidth;
 
     painter.setPen(textColor);
     int left = 0;
-    int textLength = line.paramFormat.length();
+    int textLength = line.line.paramFormat.length();
     for (int i=0; i<textLength; i++) {
-      if (line.paramFormat[i] == '%') {
+      if (line.line.paramFormat[i] == '%') {
         if (left < i) {
-          painter.drawText(x, y, nall::substr(line.paramFormat, left, i - left));
+          painter.drawText(x, y, nall::substr(line.line.paramFormat, left, i - left));
           x += (i - left) * charWidth;
         }
 
-        uint8_t argNum = line.paramFormat[i+1] - '1';
-        uint8_t argType = line.paramFormat[i+2];
-        uint8_t argLength = line.paramFormat[i+3] - '0';
+        uint8_t argNum = line.line.paramFormat[i+1] - '1';
+        uint8_t argType = line.line.paramFormat[i+2];
+        uint8_t argLength = line.line.paramFormat[i+3] - '0';
 
-        if (line.params.size() <= argNum) {
+        if (line.line.params.size() <= argNum) {
           painter.setPen(paramAddressColor);
           painter.drawText(x, y, "???");
           x += 3 * charWidth;
         } else {
-          const DisassemblerParam &param = line.params[argNum];
+          const DisassemblerParam &param = line.line.params[argNum];
 
           switch (param.type) {
             case DisassemblerParam::Value:
@@ -492,7 +594,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const DisassemblerLine &li
     }
 
     if (left + 1 < textLength) {
-      painter.drawText(x, y, nall::substr(line.paramFormat, left, textLength - left));
+      painter.drawText(x, y, nall::substr(line.line.paramFormat, left, textLength - left));
       x += (textLength - left) * charWidth;
     }
 
@@ -559,9 +661,9 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
 
   int y = 0;
   for (uint32_t index=0; index<lines.size(); index++, y+=charHeight) {
-    const DisassemblerLine &line = lines[index];
+    const RenderableDisassemblerLine &line = lines[index];
 
-    switch (line.type) {
+    switch (line.line.type) {
     case DisassemblerLine::Empty:
       break;
 

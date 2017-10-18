@@ -35,6 +35,13 @@ struct DisassemblerParam {
 struct DisassemblerLine {
   enum Type { Empty, Opcode };
 
+  enum Flag {
+    FLAG_BRA = 0x01,
+    FLAG_RETURN = 0x02
+  };
+
+  DisassemblerLine() : flags(0) {}
+
   void setEmpty() {
     type = Empty;
   }
@@ -48,6 +55,11 @@ struct DisassemblerLine {
     params.reset();
   }
 
+  void setBra(uint32_t target) {
+    flags |= FLAG_BRA;
+    targetAddress = target;
+  }
+
   bool isEmpty() const {
     return type == Empty;
   }
@@ -56,10 +68,20 @@ struct DisassemblerLine {
     return type == Opcode;
   }
 
+  bool isBra() const {
+    return flags & FLAG_BRA;
+  }
+
+  bool isReturn() const {
+    return flags & FLAG_RETURN;
+  }
+
   Type type;
   string text;
   string paramFormat;
   uint32_t address;
+  uint32_t targetAddress;
+  uint8_t flags;
   linear_vector<DisassemblerParam> params;
 };
 

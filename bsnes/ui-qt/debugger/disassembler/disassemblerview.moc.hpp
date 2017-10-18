@@ -1,5 +1,26 @@
 #include "line.hpp"
 
+struct RenderableDisassemblerLine {
+  enum Flag {
+    FLAG_START_BRA = 0x1,
+    FLAG_END_BRA = 0x2,
+    FLAG_RETURN = 0x4
+  };
+
+  RenderableDisassemblerLine() : flags(0), depth(0), numStarts(0) {}
+
+  bool isStartBra() const { return flags & FLAG_START_BRA; }
+  bool isEndBra() const { return flags & FLAG_END_BRA; }
+  bool isReturn() const { return flags & FLAG_RETURN; }
+
+  DisassemblerLine line;
+  int8_t braRelativeLine;
+  uint8_t flags;
+  uint8_t depth;
+  uint8_t numStarts;
+
+};
+
 class DisassemblerView : public QAbstractScrollArea {
   Q_OBJECT
 
@@ -35,6 +56,7 @@ protected:
   void updateCurrentMousePosition();
   void showLineContextMenu(const QPoint &);
 
+  void createLoopUpwards(uint32_t line, uint32_t targetAddress);
   void updateLines();
   void updateLineRange();
   void updateVisibleLines();
@@ -50,7 +72,7 @@ private slots:
 
 private:
   void paintHeader(QPainter &painter);
-  void paintOpcode(QPainter &painter, const DisassemblerLine &line, int y);
+  void paintOpcode(QPainter &painter, const RenderableDisassemblerLine &line, int y);
   int renderValue(QPainter &painter, int x, int y, uint8_t type, uint8_t size, uint32_t value);
 
   DisasmProcessor *processor;
@@ -74,7 +96,7 @@ private:
 
   uint32_t columnSizes[NUM_COLUMNS];
   uint32_t columnPositions[NUM_COLUMNS];
-  ::nall::linear_vector<DisassemblerLine> lines;
+  ::nall::linear_vector<RenderableDisassemblerLine> lines;
 
   MouseState mouseState;
   uint32_t mouseStateValue;

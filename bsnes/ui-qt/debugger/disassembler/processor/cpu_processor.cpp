@@ -225,6 +225,13 @@ bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   result.setOpcode(address, opcode.opcode);
   setOpcodeParams(result, opcode, address);
 
+  if (opcode.isBra() || opcode.isBraWithContinue()) {
+    result.setBra(decode(opcode.optype, opcode.opall(), address));
+  }
+  if (opcode.returns()) {
+    result.flags |= DisassemblerLine::FLAG_RETURN;
+  }
+
   // Advance to next
   for (uint32_t i=1; i<=4; i++) {
     if ((usage[(address + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
