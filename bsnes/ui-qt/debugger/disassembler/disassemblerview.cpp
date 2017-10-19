@@ -67,6 +67,7 @@ void DisassemblerView::onScroll() {
 // ------------------------------------------------------------------------
 void DisassemblerView::refresh(uint32_t address) {
   currentAddress = address;
+  currentPcAddress = processor->getCurrentAddress();
   hasValidAddress = true;
 
   SNES::cpuAnalyst.performAnalysis(address, SNES::CPUAnalystState(SNES::cpu.regs.e, SNES::cpu.regs.p.m, SNES::cpu.regs.p.x), true);
@@ -295,6 +296,17 @@ void DisassemblerView::mousePressEvent(QMouseEvent * event) {
     }
     break;
 
+  case STATE_JUMP_TO_ADDRESS:
+    if (left) {
+      refresh(mouseStateValue);
+    }
+    break;
+
+  case STATE_LINE:
+    currentAddress = mouseStateValue;
+    viewport()->update();
+    break;
+
   case STATE_SET_COMMENT:
     if (left) {
       setComment();
@@ -310,22 +322,51 @@ void DisassemblerView::mousePressEvent(QMouseEvent * event) {
 }
 
 // ------------------------------------------------------------------------
+void DisassemblerView::jumpToPc() {
+  refresh(processor->getCurrentAddress());
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::jumpToAddress() {
+  bool ok;
+  QString value = QInputDialog::getText(this, "Jump to address", "Enter address to jump to", QLineEdit::Normal, hex(currentPcAddress), &ok);
+  string s;
+  s = qPrintable(value);
+
+  if (ok) {
+    refresh(hex(s) & (processor->getBusSize() - 1));
+  }
+}
+
+// ------------------------------------------------------------------------
 void DisassemblerView::showLineContextMenu(const QPoint &point) {
   QMenu contextMenu("Context menu", this);
+
+  QAction setCommentAction("Set comment", this);
+  connect(&setCommentAction, SIGNAL(triggered()), this, SLOT(setComment()));
+
+  QAction setSymbolAction("Set symbol", this);
+  connect(&setSymbolAction, SIGNAL(triggered()), this, SLOT(setSymbol()));
 
   QAction setBreakpoint("Toggle breakpoint", this);
   connect(&setBreakpoint, SIGNAL(triggered()), this, SLOT(toggleBreakpoint()));
   contextMenu.addAction(&setBreakpoint);
 
-  if (processor->getSymbols()) {
-    QAction setCommentAction("Set comment", this);
-    connect(&setCommentAction, SIGNAL(triggered()), this, SLOT(setComment()));
-    contextMenu.addAction(&setCommentAction);
+  QAction jumpToPcAction("Jump to PC", this);
+  connect(&jumpToPcAction, SIGNAL(triggered()), this, SLOT(jumpToPc()));
 
-    QAction setSymbolAction("Set symbol", this);
-    connect(&setSymbolAction, SIGNAL(triggered()), this, SLOT(setSymbol()));
+  QAction jumpToAddressAction("Jump to address", this);
+  connect(&jumpToAddressAction, SIGNAL(triggered()), this, SLOT(jumpToAddress()));
+
+  if (processor->getSymbols() != NULL) {
+    contextMenu.addAction(&setCommentAction);
     contextMenu.addAction(&setSymbolAction);
   }
+
+  contextMenu.addSeparator();
+
+  contextMenu.addAction(&jumpToPcAction);
+  contextMenu.addAction(&jumpToAddressAction);
 
   contextMenu.exec(mapToGlobal(point));
 }
@@ -335,6 +376,7 @@ void DisassemblerView::showContextMenu(const QPoint &point) {
   switch (mouseState) {
   case STATE_SET_COMMENT:
   case STATE_TOGGLE_BREAKPOINT:
+  case STATE_JUMP_TO_ADDRESS:
   case STATE_LINE:
     showLineContextMenu(point);
     break;
@@ -381,7 +423,7 @@ void DisassemblerView::updateCurrentMousePosition() {
       mouseStateValue = i - 1;
       break;
     }
-  } else if (row > 0 && row <= lines.size()) {
+  } else if (row > 0 && row < lines.size()) {
     const DisassemblerLine &line = lines[row].line;
 
     if (!line.isEmpty()) {
@@ -393,6 +435,9 @@ void DisassemblerView::updateCurrentMousePosition() {
       } else if (mouseX >= columnPositions[COLUMN_COMMENT]) {
         mouseState = STATE_SET_COMMENT;
         mouseStateValue = line.address;
+      } else if (line.hasAddress() && line.isBra() && mouseX >= lines[row].addressPosX && mouseX < lines[row].addressPosX + lines[row].addressSizeX) {
+        mouseState = STATE_JUMP_TO_ADDRESS;
+        mouseStateValue = line.targetAddress;
       } else {
         mouseState = STATE_LINE;
         mouseStateValue = line.address;
@@ -406,6 +451,7 @@ void DisassemblerView::updateCurrentMousePosition() {
       setCursor(Qt::SplitHCursor);
       break;
 
+    case STATE_JUMP_TO_ADDRESS:
     case STATE_TOGGLE_BREAKPOINT:
       setCursor(Qt::PointingHandCursor);
       break;
@@ -426,7 +472,7 @@ void DisassemblerView::updateCurrentMousePosition() {
   painter.setClipping(false)
 
 // ------------------------------------------------------------------------
-void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassemblerLine &line, int y) {
+void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine &line, int y) {
   QString address;
 
   QColor addressColor, opColor, textColor;
@@ -434,7 +480,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassembl
 
   NO_CLIPPING();
 
-  if (line.line.address == currentAddress) {
+  if (line.line.address == currentPcAddress) {
     painter.fillRect(QRect(0, y - charHeight + lineOffset, viewport()->width(), charHeight), _selectionColor);
 
     addressColor = viewport()->palette().highlightedText().color();
@@ -444,6 +490,10 @@ void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassembl
     paramAddressColor = addressColor;
     paramSymbolColor = addressColor;
   } else {
+    if (line.line.address == currentAddress) {
+      painter.fillRect(QRect(0, y - charHeight + lineOffset, viewport()->width(), charHeight), _addressAreaColor);
+    }
+
     addressColor = Qt::gray;
     textColor = viewport()->palette().color(QPalette::WindowText);
     opColor = QColor(0x00, 0x00, 0x88, 0xff);
@@ -559,6 +609,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassembl
               break;
 
             case DisassemblerParam::Address:
+              line.addressPosX = x;
               if (symbols) {
                 Symbol sym = symbols->getSymbol(param.address);
 
@@ -575,6 +626,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, const RenderableDisassembl
                 painter.setPen(paramAddressColor);
                 x += renderValue(painter, x, y, argType, argLength, param.value);
               }
+              line.addressSizeX = x - line.addressPosX;
               directComment += QString("[%1]").arg(param.address, 6, 16, QChar('0'));
               break;
 
@@ -661,7 +713,7 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
 
   int y = 0;
   for (uint32_t index=0; index<lines.size(); index++, y+=charHeight) {
-    const RenderableDisassemblerLine &line = lines[index];
+    RenderableDisassemblerLine &line = lines[index];
 
     switch (line.line.type) {
     case DisassemblerLine::Empty:

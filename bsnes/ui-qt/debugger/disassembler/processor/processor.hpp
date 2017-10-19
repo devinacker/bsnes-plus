@@ -3,6 +3,7 @@
 class DisasmProcessor {
 public:
   virtual uint32_t getBusSize() = 0;
+  virtual uint32_t getCurrentAddress() = 0;
 
   virtual class SymbolMap *getSymbols() = 0;
 

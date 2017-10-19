@@ -77,13 +77,13 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, const CPUAnalystState &_s
       break;
     }
 
-    if (op.isBraWithContinue()) {
+    if (op.isBraWithContinue() && !op.isIndirect()) {
       numRoutines += performAnalysis(cpu.decode(op.optype, op.opall(), address), state);
     }
 
     if (op.returns()) {
       break;
-    } else if (op.isBra()) {
+    } else if (op.isBra() && !op.isIndirect()) {
       address = cpu.decode(op.optype, op.opall(), address);
       numRoutines++;
     } else {

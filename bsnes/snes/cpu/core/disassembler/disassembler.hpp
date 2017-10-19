@@ -89,6 +89,22 @@ struct Opcode {
     }
   }
 
+  bool isIndirect() const {
+    switch (optype) {
+    case OPTYPE_IDP:
+    case OPTYPE_IDPX:
+    case OPTYPE_IDPY:
+    case OPTYPE_ILDP:
+    case OPTYPE_ILDPY:
+    case OPTYPE_IADDRX:
+    case OPTYPE_ILADDR:
+      return true;
+
+    default:
+      return false;
+    }
+  }
+
   inline bool isBra() const { return flags & FLAG_BRA; }
   inline bool isBraWithContinue() const { return flags & FLAG_BRA_CONTINUE; }
   inline bool resetsX() const { return flags & FLAG_RESET_X; }

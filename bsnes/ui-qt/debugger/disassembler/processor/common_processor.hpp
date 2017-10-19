@@ -15,6 +15,7 @@ public:
   virtual void findKnownRange(uint32_t currentAddress, uint32_t &startAddress, uint32_t &endAddress, uint32_t &currentAddressLine, uint32_t &numLines);
   virtual bool getLine(DisassemblerLine &result, uint32_t &address);
   virtual string getBreakpointBusName();
+  virtual uint32_t getCurrentAddress();
 
 private:
   Source source;

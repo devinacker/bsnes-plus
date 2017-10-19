@@ -18,6 +18,14 @@ string CpuDisasmProcessor::getBreakpointBusName() {
 }
 
 // ------------------------------------------------------------------------
+uint32_t CpuDisasmProcessor::getCurrentAddress() {
+  switch (source) {
+    case CPU: return SNES::cpu.opcode_pc;
+    case SA1: return SNES::sa1.opcode_pc;
+  }
+}
+
+// ------------------------------------------------------------------------
 SymbolMap *CpuDisasmProcessor::getSymbols() {
   return symbols;
 }

@@ -19,6 +19,8 @@ struct RenderableDisassemblerLine {
   uint8_t depth;
   uint8_t numStarts;
 
+  uint32_t addressPosX;
+  uint32_t addressSizeX;
 };
 
 class DisassemblerView : public QAbstractScrollArea {
@@ -30,6 +32,7 @@ class DisassemblerView : public QAbstractScrollArea {
     STATE_SET_COMMENT,
     STATE_RESIZE_COLUMN,
     STATE_RESIZING_COLUMN,
+    STATE_JUMP_TO_ADDRESS,
     STATE_LINE
   };
 
@@ -69,15 +72,18 @@ private slots:
   void toggleBreakpoint();
   void setComment();
   void setSymbol();
+  void jumpToPc();
+  void jumpToAddress();
 
 private:
   void paintHeader(QPainter &painter);
-  void paintOpcode(QPainter &painter, const RenderableDisassemblerLine &line, int y);
+  void paintOpcode(QPainter &painter, RenderableDisassemblerLine &line, int y);
   int renderValue(QPainter &painter, int x, int y, uint8_t type, uint8_t size, uint32_t value);
 
   DisasmProcessor *processor;
   bool hasValidAddress;
   uint32_t currentAddress;
+  uint32_t currentPcAddress;
   uint32_t lineOffset;
 
   uint32_t charWidth;

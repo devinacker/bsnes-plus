@@ -20,6 +20,16 @@ string CommonDisasmProcessor::getBreakpointBusName() {
 }
 
 // ------------------------------------------------------------------------
+uint32_t CommonDisasmProcessor::getCurrentAddress() {
+  switch (source) {
+    case CPU: return SNES::cpu.opcode_pc;
+    case SMP: return SNES::smp.opcode_pc;
+    case SFX: return SNES::superfx.opcode_pc;
+    case SA1: return SNES::sa1.opcode_pc;
+  }
+}
+
+// ------------------------------------------------------------------------
 void CommonDisasmProcessor::setSource(Source source) {
   this->source = source;
 
