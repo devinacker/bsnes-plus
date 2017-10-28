@@ -106,7 +106,7 @@ void TilemapRenderer::drawMap(QImage& image, unsigned mapAddr, unsigned startX, 
   const uint8_t *map = SNES::memory::vram.data() + mapAddr;
 
   for(unsigned ty = 0; ty < 32; ty++) {
-    uint32_t* imgBits = (uint32_t*)image.scanLine(startY + ty * ts) + startX;
+    QRgb* imgBits = (QRgb*)image.scanLine(startY + ty * ts) + startX;
 
     for(unsigned tx = 0; tx < 32; tx++) {
       drawMapTile(imgBits, wordsPerScanline, map);
@@ -116,7 +116,7 @@ void TilemapRenderer::drawMap(QImage& image, unsigned mapAddr, unsigned startX, 
   }
 }
 
-void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScanline, const uint8_t* map) {
+void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline, const uint8_t* map) {
   unsigned ts = tileSize ? 16 : 8;
   uint16_t tile = map[0] | (map[1] << 8);
 
@@ -144,7 +144,7 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
     unsigned c4 = c2 + 0x010;
     if (vFlip) { swap(c1, c3); swap(c2, c4); }
 
-    uint32_t* row2Bits = imgBits + wordsPerScanline * 8;
+    QRgb* row2Bits = imgBits + wordsPerScanline * 8;
     draw8pxTile(imgBits  + 0, wordsPerScanline, c1, pal, hFlip, vFlip);
     draw8pxTile(imgBits  + 8, wordsPerScanline, c2, pal, hFlip, vFlip);
     draw8pxTile(row2Bits + 0, wordsPerScanline, c3, pal, hFlip, vFlip);
@@ -152,7 +152,7 @@ void TilemapRenderer::drawMapTile(uint32_t* imgBits, const unsigned wordsPerScan
   }
 }
 
-void TilemapRenderer::draw8pxTile(uint32_t* imgBits, const unsigned wordsPerScanline, unsigned c, uint8_t pal, bool hFlip, bool vFlip) {
+void TilemapRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, uint8_t pal, bool hFlip, bool vFlip) {
   uint8_t data[8];
 
   unsigned addr = 0;
@@ -218,13 +218,13 @@ void TilemapRenderer::draw8pxTile(uint32_t* imgBits, const unsigned wordsPerScan
 QImage TilemapRenderer::drawMode7Tilemap() {
   QImage image(1024, 1024, QImage::Format_RGB32);
 
-  uint32_t* scanline = (uint32_t*)image.scanLine(0);
+  QRgb* scanline = (QRgb*)image.scanLine(0);
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
 
   const uint8_t *map = SNES::memory::vram.data();
 
   for(unsigned ty = 0; ty < 128; ty++) {
-    uint32_t* imgBits = scanline;
+    QRgb* imgBits = scanline;
     scanline += wordsPerScanline * 8;
 
     for(unsigned tx = 0; tx < 128; tx++) {
@@ -239,7 +239,7 @@ QImage TilemapRenderer::drawMode7Tilemap() {
   return image;
 }
 
-void TilemapRenderer::drawMode7Tile(uint32_t* imgBits, const unsigned wordsPerScanline, unsigned c) {
+void TilemapRenderer::drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c) {
   const uint8_t *tile = SNES::memory::vram.data() + c * 128 + 1;
 
   for(unsigned py = 0; py < 8; py++) {

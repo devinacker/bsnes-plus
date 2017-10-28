@@ -34,4 +34,4 @@ private:
   unsigned selectedHeight;
 };
 
-uint32_t rgbFromCgram(unsigned);
+QRgb rgbFromCgram(unsigned);

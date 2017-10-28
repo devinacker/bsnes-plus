@@ -210,7 +210,7 @@ void OamCanvas::refresh() {
 }
 
 void OamCanvas::refreshImage(const OamObject& obj) {
-  uint32_t palette[16];
+  QRgb palette[16];
   for(unsigned i = 0; i < 16; i++) {
     palette[i] = rgbFromCgram(128 + obj.palette * 16 + i);
   }
@@ -225,7 +225,7 @@ void OamCanvas::refreshImage(const OamObject& obj) {
       const uint8_t* tile = objTileset + cy * 512 + cx * 32;
 
       for(unsigned py = 0; py < 8; py++) {
-        uint32_t *dest = ((uint32_t*)buffer.scanLine(ty * 8 + py)) + tx * 8;
+        QRgb* dest = ((QRgb*)buffer.scanLine(ty * 8 + py)) + tx * 8;
 
         uint8_t d0 = tile[ 0];
         uint8_t d1 = tile[ 1];
