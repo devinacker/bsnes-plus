@@ -77,28 +77,38 @@ void TilemapRenderer::buildPalette() {
   }
 }
 
-QImage TilemapRenderer::drawTilemap() {
-  if(bitDepth == BitDepth::MODE7) return drawMode7Tilemap();
-  if(bitDepth == BitDepth::NONE) return QImage();
+void TilemapRenderer::setImageSize(unsigned width, unsigned height)
+{
+  if(image.width() != width || image.height() != height) {
+    image = QImage(width, height, QImage::Format_RGB32);
+  }
+}
+
+void TilemapRenderer::invalidateImage()
+{
+  image = QImage();
+}
+
+void TilemapRenderer::drawTilemap() {
+  if(bitDepth == BitDepth::MODE7) { drawMode7Tilemap(); return; }
+  if(bitDepth == BitDepth::NONE) { invalidateImage(); return; }
 
   unsigned mapSize = tileSize ? 512 : 256;
   unsigned width = mapSize * (screenSizeX + 1);
   unsigned height = mapSize * (screenSizeY + 1);
 
-  QImage image(width, height, QImage::Format_RGB32);
+  setImageSize(width, height);
 
   unsigned addr = screenAddr;
   for(unsigned y = 0; y < height; y += mapSize) {
     for(unsigned x = 0; x < width; x += mapSize) {
-      drawMap(image, addr, x, y);
+      drawMap(addr, x, y);
       addr += 0x800;
     }
   }
-
-  return image;
 }
 
-void TilemapRenderer::drawMap(QImage& image, unsigned mapAddr, unsigned startX, unsigned startY) {
+void TilemapRenderer::drawMap(unsigned mapAddr, unsigned startX, unsigned startY) {
   unsigned ts = tileSize ? 16 : 8;
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
 
@@ -215,8 +225,8 @@ void TilemapRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline
   }
 }
 
-QImage TilemapRenderer::drawMode7Tilemap() {
-  QImage image(1024, 1024, QImage::Format_RGB32);
+void TilemapRenderer::drawMode7Tilemap() {
+  setImageSize(1024, 1024);
 
   QRgb* scanline = (QRgb*)image.scanLine(0);
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
@@ -235,8 +245,6 @@ QImage TilemapRenderer::drawMode7Tilemap() {
       imgBits += 8;
     }
   }
-
-  return image;
 }
 
 void TilemapRenderer::drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c) {

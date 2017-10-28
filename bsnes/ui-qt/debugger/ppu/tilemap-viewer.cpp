@@ -152,8 +152,8 @@ void TilemapViewer::refresh() {
 
     renderer.buildPalette();
 
-    QImage image = renderer.drawTilemap();
-    imageGridWidget->setImage(image);
+    renderer.drawTilemap();
+    imageGridWidget->setImage(renderer.image);
     imageGridWidget->setGridSize(renderer.tileSizePx());
   }
 

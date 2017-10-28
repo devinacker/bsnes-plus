@@ -2,6 +2,7 @@ struct TilemapRenderer {
   enum BitDepth { BPP8, BPP4, BPP2, MODE7, NONE };
 
   QRgb palette[256];
+  QImage image;
 
   unsigned screenMode;
   unsigned layer;
@@ -26,13 +27,16 @@ public:
 
   void buildPalette();
 
-  QImage drawTilemap();
+  void drawTilemap();
 
 private:
-  void drawMap(QImage& image, unsigned mapAddr, unsigned startX, unsigned startY);
+  void setImageSize(unsigned width, unsigned height);
+  void invalidateImage();
+
+  void drawMap(unsigned mapAddr, unsigned startX, unsigned startY);
   void drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline, const uint8_t* map);
   void draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, uint8_t pal, bool hFlip, bool vFlip);
 
-  QImage drawMode7Tilemap();
+  void drawMode7Tilemap();
   void drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c);
 };
