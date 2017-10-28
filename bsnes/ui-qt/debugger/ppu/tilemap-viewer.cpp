@@ -43,8 +43,17 @@ TilemapViewer::TilemapViewer() {
   autoUpdateBox = new QCheckBox("Auto update");
   sidebarLayout->addRow("", autoUpdateBox);
 
+
+  buttonLayout = new QHBoxLayout;
+
+  exportButton = new QPushButton("Export");
+  buttonLayout->addWidget(exportButton);
+
   refreshButton = new QPushButton("Refresh");
-  sidebarLayout->addRow(refreshButton);
+  buttonLayout->addWidget(refreshButton);
+
+  sidebarLayout->addRow(buttonLayout);
+
 
   sidebarLayout->addRow(new QWidget);
 
@@ -114,6 +123,7 @@ TilemapViewer::TilemapViewer() {
   updateForm();
 
 
+  connect(exportButton,  SIGNAL(clicked(bool)), this, SLOT(onExportClicked()));
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(showGrid,      SIGNAL(clicked(bool)), imageGridWidget, SLOT(setShowGrid(bool)));
@@ -148,13 +158,14 @@ void TilemapViewer::refresh() {
 
   if(SNES::cartridge.loaded()) {
     updateRendererSettings();
-    updateForm();
 
     renderer.buildPalette();
 
     renderer.drawTilemap();
     imageGridWidget->setImage(renderer.image);
     imageGridWidget->setGridSize(renderer.tileSizePx());
+
+    updateForm();
   }
 
   updateTileInfo();
@@ -163,6 +174,26 @@ void TilemapViewer::refresh() {
 void TilemapViewer::onZoomChanged(int index) {
   unsigned z = zoomCombo->itemData(index).toUInt();
   imageGridWidget->setZoom(z);
+}
+
+void TilemapViewer::onExportClicked() {
+  if(renderer.image.isNull()) return;
+
+  QFileDialog saveDialog(this, "Export Tilemap");
+  saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+  saveDialog.setNameFilter("PNG Image (*.png)");
+  saveDialog.setDefaultSuffix("png");
+  saveDialog.exec();
+
+  QString filename = saveDialog.selectedFiles().first();
+
+  if(saveDialog.result() == QDialog::Accepted && !filename.isEmpty()) {
+    QImageWriter writer(filename, "PNG");
+    bool s = writer.write(renderer.image);
+    if(s == false) {
+      QMessageBox::critical(this, "ERROR", "Unable to export tilemap\n\n" + writer.errorString());
+    }
+  }
 }
 
 void TilemapViewer::updateRendererSettings() {
@@ -197,6 +228,8 @@ void TilemapViewer::updateRendererSettings() {
 
 void TilemapViewer::updateForm() {
   inUpdateFormCall = true;
+
+  exportButton->setEnabled(!renderer.image.isNull());
 
   bool csm = customScreenMode->isChecked();
   screenMode->setEnabled(csm);

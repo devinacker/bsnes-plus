@@ -11,6 +11,7 @@ public slots:
   void refresh();
 
   void onZoomChanged(int);
+  void onExportClicked();
 
 private:
   void updateRendererSettings();
@@ -24,9 +25,12 @@ private:
 
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
+  QHBoxLayout *buttonLayout;
   QHBoxLayout *bgLayout;
 
   QCheckBox *autoUpdateBox;
+
+  QPushButton *exportButton;
   QPushButton *refreshButton;
 
   QComboBox *zoomCombo;
