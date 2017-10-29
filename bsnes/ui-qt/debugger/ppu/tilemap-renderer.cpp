@@ -1,16 +1,14 @@
 
 TilemapRenderer::TilemapRenderer()
+    : BaseRenderer()
 {
-  customBackgroundColor = 0;
   screenMode = 0;
   layer = 0;
   tileAddr = 0;
   screenAddr = 0;
-  bitDepth = BitDepth::NONE;
   screenSizeX = false;
   screenSizeY = false;
   tileSize = false;
-  overrideBackgroundColor = false;
 }
 
 void TilemapRenderer::updateBitDepth() {
@@ -71,39 +69,9 @@ void TilemapRenderer::loadTilemapSettings() {
   }
 }
 
-void TilemapRenderer::buildPalette() {
-  if(SNES::cartridge.loaded()) {
-    for(unsigned i = 0; i < 256; i++) {
-      palette[i] = rgbFromCgram(i);
-    }
-  }
-}
-
-void TilemapRenderer::initImage(unsigned width, unsigned height)
-{
-  QImage::Format format = QImage::Format_RGB32;
-  if(overrideBackgroundColor) {
-    if(qAlpha(customBackgroundColor) != 0xff) format = QImage::Format_ARGB32;
-    if(customBackgroundColor == 0) format = QImage::Format_ARGB32_Premultiplied;
-  }
-
-  if(image.width() != width || image.height() != height || image.format() != format) {
-    image = QImage(width, height, format);
-  }
-
-  if(overrideBackgroundColor) {
-    image.fill(customBackgroundColor);
-  } else {
-    image.fill(palette[0]);
-  }
-}
-
-void TilemapRenderer::invalidateImage()
-{
-  image = QImage();
-}
-
 void TilemapRenderer::drawTilemap() {
+  buildPalette();
+
   if(bitDepth == BitDepth::MODE7) { drawMode7Tilemap(); return; }
   if(bitDepth == BitDepth::NONE) { invalidateImage(); return; }
 
@@ -156,7 +124,7 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
   }
 
   if(tileSize == false) {
-    draw8pxTile(imgBits, wordsPerScanline, c, pal, hFlip, vFlip);
+    drawMap8pxTile(imgBits, wordsPerScanline, c, pal, hFlip, vFlip);
 
   } else {
     // 16x16 tile
@@ -169,72 +137,24 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
     if (vFlip) { swap(c1, c3); swap(c2, c4); }
 
     QRgb* row2Bits = imgBits + wordsPerScanline * 8;
-    draw8pxTile(imgBits  + 0, wordsPerScanline, c1, pal, hFlip, vFlip);
-    draw8pxTile(imgBits  + 8, wordsPerScanline, c2, pal, hFlip, vFlip);
-    draw8pxTile(row2Bits + 0, wordsPerScanline, c3, pal, hFlip, vFlip);
-    draw8pxTile(row2Bits + 8, wordsPerScanline, c4, pal, hFlip, vFlip);
+    drawMap8pxTile(imgBits  + 0, wordsPerScanline, c1, pal, hFlip, vFlip);
+    drawMap8pxTile(imgBits  + 8, wordsPerScanline, c2, pal, hFlip, vFlip);
+    drawMap8pxTile(row2Bits + 0, wordsPerScanline, c3, pal, hFlip, vFlip);
+    drawMap8pxTile(row2Bits + 8, wordsPerScanline, c4, pal, hFlip, vFlip);
   }
 }
 
-void TilemapRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, uint8_t pal, bool hFlip, bool vFlip) {
-  uint8_t data[8];
-
+void TilemapRenderer::drawMap8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, unsigned palOffset, bool hFlip, bool vFlip) {
   unsigned addr = 0;
   switch(bitDepth) {
-    case BitDepth::BPP8: addr += (tileAddr + c * 64) & 0xffc0; break;
-    case BitDepth::BPP4: addr += (tileAddr + c * 32) & 0xffe0; break;
-    case BitDepth::BPP2: addr += (tileAddr + c * 16) & 0xfff0; break;
+    case BitDepth::BPP8: addr = (tileAddr + c * 64) & 0xffc0; break;
+    case BitDepth::BPP4: addr = (tileAddr + c * 32) & 0xffe0; break;
+    case BitDepth::BPP2: addr = (tileAddr + c * 16) & 0xfff0; break;
   }
 
   const uint8_t *tile = SNES::memory::vram.data() + addr;
 
-  for(unsigned py = 0; py < 8; py++) {
-    unsigned fpy = (vFlip == false) ? py : 7 - py;
-    const uint8_t *sliver = tile + fpy * 2;
-
-    switch(bitDepth) {
-    case BitDepth::BPP8:
-      data[4] = sliver[32];
-      data[5] = sliver[33];
-      data[6] = sliver[48];
-      data[7] = sliver[49];
-      //fall through
-    case BitDepth::BPP4:
-      data[2] = sliver[16];
-      data[3] = sliver[17];
-      //fall through
-    case BitDepth::BPP2:
-      data[0] = sliver[ 0];
-      data[1] = sliver[ 1];
-    }
-
-    for(unsigned px = 0; px < 8; px++) {
-      unsigned fpx = hFlip == false ? px : 7 - px;
-
-      uint8_t pixel = 0;
-      switch(bitDepth) {
-      case BitDepth::BPP8:
-        pixel |= (data[7] & (0x80 >> px)) ? 0x80 : 0;
-        pixel |= (data[6] & (0x80 >> px)) ? 0x40 : 0;
-        pixel |= (data[5] & (0x80 >> px)) ? 0x20 : 0;
-        pixel |= (data[4] & (0x80 >> px)) ? 0x10 : 0;
-        //fall through
-      case BitDepth::BPP4:
-        pixel |= (data[3] & (0x80 >> px)) ? 0x08 : 0;
-        pixel |= (data[2] & (0x80 >> px)) ? 0x04 : 0;
-        //fall through
-      case BitDepth::BPP2:
-        pixel |= (data[1] & (0x80 >> px)) ? 0x02 : 0;
-        pixel |= (data[0] & (0x80 >> px)) ? 0x01 : 0;
-      }
-
-      if (pixel != 0) {
-        imgBits[fpx] = palette[(pal + pixel) & 0xff];
-      }
-    }
-
-    imgBits += wordsPerScanline;
-  }
+  draw8pxTile(imgBits, wordsPerScanline, tile, palOffset, hFlip, vFlip);
 }
 
 void TilemapRenderer::drawMode7Tilemap() {
@@ -251,22 +171,12 @@ void TilemapRenderer::drawMode7Tilemap() {
 
     for(unsigned tx = 0; tx < 128; tx++) {
       unsigned c = *map;
-      map += 2;
+      const uint8_t *tile = SNES::memory::vram.data() + c * 128 + 1;
 
-      drawMode7Tile(imgBits, wordsPerScanline, c);
+      drawMode7Tile(imgBits, wordsPerScanline, tile);
+
+      map += 2;
       imgBits += 8;
     }
-  }
-}
-
-void TilemapRenderer::drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c) {
-  const uint8_t *tile = SNES::memory::vram.data() + c * 128 + 1;
-
-  for(unsigned py = 0; py < 8; py++) {
-    for(unsigned px = 0; px < 8; px++) {
-      if(*tile != 0) imgBits[px] = palette[*tile];
-      tile +=2;
-    }
-    imgBits += wordsPerScanline;
   }
 }

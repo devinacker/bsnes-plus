@@ -176,8 +176,6 @@ void TilemapViewer::refresh() {
   if(SNES::cartridge.loaded()) {
     updateRendererSettings();
 
-    renderer.buildPalette();
-
     renderer.drawTilemap();
     imageGridWidget->setImage(renderer.image);
     imageGridWidget->setGridSize(renderer.tileSizePx());

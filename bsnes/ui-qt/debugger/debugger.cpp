@@ -14,9 +14,11 @@ Debugger *debugger;
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
 
+#include "ppu/base-renderer.cpp"
+#include "ppu/tilemap-renderer.cpp"
+
 #include "ppu/cgram-widget.cpp"
 #include "ppu/image-grid-widget.cpp"
-#include "ppu/tilemap-renderer.cpp"
 
 #include "ppu/vram-viewer.cpp"
 #include "ppu/tilemap-viewer.cpp"
