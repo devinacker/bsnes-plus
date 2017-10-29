@@ -9,6 +9,7 @@ public:
   void setScale(unsigned);
 
   void setPaletteBpp(unsigned);
+  void setPaletteSize(unsigned);
 
   bool hasSelected() const;
   unsigned selectedPalette() const;

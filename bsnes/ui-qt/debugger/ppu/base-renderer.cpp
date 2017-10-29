@@ -6,6 +6,26 @@ BaseRenderer::BaseRenderer()
   overrideBackgroundColor = false;
 }
 
+unsigned BaseRenderer::bytesInbetweenTiles() const {
+  switch (bitDepth) {
+    case BitDepth::BPP8: return 64;
+    case BitDepth::BPP4: return 32;
+    case BitDepth::BPP2: return 16;
+    case BitDepth::MODE7: return 128;
+  }
+  return 0;
+}
+
+unsigned BaseRenderer::colorsPerTile() const {
+  switch (bitDepth) {
+    case BitDepth::BPP8: return 256;
+    case BitDepth::BPP4: return 16;
+    case BitDepth::BPP2: return 4;
+    case BitDepth::MODE7: return 256;
+  }
+  return 0;
+}
+
 void BaseRenderer::buildPalette() {
   if(SNES::cartridge.loaded()) {
     for(unsigned i = 0; i < 256; i++) {

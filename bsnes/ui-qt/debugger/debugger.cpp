@@ -15,12 +15,14 @@ Debugger *debugger;
 #include "tools/properties.cpp"
 
 #include "ppu/base-renderer.cpp"
+#include "ppu/tile-renderer.cpp"
 #include "ppu/tilemap-renderer.cpp"
 
 #include "ppu/cgram-widget.cpp"
 #include "ppu/image-grid-widget.cpp"
 
 #include "ppu/vram-viewer.cpp"
+#include "ppu/tile-viewer.cpp"
 #include "ppu/tilemap-viewer.cpp"
 #include "ppu/oam-viewer.cpp"
 #include "ppu/cgram-viewer.cpp"
@@ -49,6 +51,7 @@ Debugger::Debugger() {
 
   menu_ppu = menu->addMenu("S-PPU");
   menu_ppu_vramViewer = menu_ppu->addAction("Video RAM Viewer ...");
+  menu_ppu_tileViewer = menu_ppu->addAction("Tile Viewer ...");
   menu_ppu_tilemapViewer = menu_ppu->addAction("Tilemap Viewer ...");
   menu_ppu_oamViewer = menu_ppu->addAction("Sprite Viewer ...");
   menu_ppu_cgramViewer = menu_ppu->addAction("Palette Viewer ...");
@@ -159,6 +162,7 @@ Debugger::Debugger() {
   memoryEditor = new MemoryEditor;
   propertiesViewer = new PropertiesViewer;
   vramViewer = new VramViewer;
+  tileViewer = new TileViewer;
   tilemapViewer = new TilemapViewer;
   oamViewer = new OamViewer;
   cgramViewer = new CgramViewer;
@@ -170,6 +174,7 @@ Debugger::Debugger() {
   connect(menu_tools_propertiesViewer, SIGNAL(triggered()), propertiesViewer, SLOT(show()));
 
   connect(menu_ppu_vramViewer, SIGNAL(triggered()), vramViewer, SLOT(show()));
+  connect(menu_ppu_tileViewer, SIGNAL(triggered()), tileViewer, SLOT(show()));
   connect(menu_ppu_tilemapViewer, SIGNAL(triggered()), tilemapViewer, SLOT(show()));
   connect(menu_ppu_oamViewer, SIGNAL(triggered()), oamViewer, SLOT(show()));
   connect(menu_ppu_cgramViewer, SIGNAL(triggered()), cgramViewer, SLOT(show()));
@@ -494,6 +499,7 @@ void Debugger::autoUpdate() {
   memoryEditor->autoUpdate();
   propertiesViewer->autoUpdate();
   vramViewer->autoUpdate();
+  tileViewer->autoUpdate();
   tilemapViewer->autoUpdate();
   oamViewer->autoUpdate();
   cgramViewer->autoUpdate();

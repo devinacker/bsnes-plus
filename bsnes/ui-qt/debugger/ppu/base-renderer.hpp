@@ -12,6 +12,9 @@ struct BaseRenderer {
 public:
   BaseRenderer();
 
+  unsigned bytesInbetweenTiles() const;
+  unsigned colorsPerTile() const;
+
 protected:
   void buildPalette();
 

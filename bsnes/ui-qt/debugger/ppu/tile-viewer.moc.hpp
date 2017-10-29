@@ -1,32 +1,36 @@
 
-class TilemapViewer : public Window {
+class TileViewer : public Window {
   Q_OBJECT
 
+  const static unsigned N_VRAM_BASE_ITEMS = 6;
+  const static char* VramBaseText[N_VRAM_BASE_ITEMS];
+
 public:
-  TilemapViewer();
+  TileViewer();
   void autoUpdate();
 
 public slots:
   void show();
   void refresh();
+  void updateTileInfo();
 
   void onZoomChanged(int);
   void onExportClicked();
 
+  void onUseCgramPressed();
+  void onVramBaseButtonClicked(int);
+
 private:
   void updateRendererSettings();
   void updateForm();
-  void updateTileInfo();
-  void updateTileInfoNormal();
-  void updateTileInfoMode7();
 
 private:
-  TilemapRenderer renderer;
+  TileRenderer renderer;
 
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
   QHBoxLayout *buttonLayout;
-  QHBoxLayout *bgLayout;
+  QGridLayout *vramBaseLayout;
 
   QCheckBox *autoUpdateBox;
 
@@ -36,25 +40,24 @@ private:
   QComboBox *zoomCombo;
   QCheckBox *showGrid;
 
-  QCheckBox *customScreenMode;
-  QCheckBox *customTilemap;
-
-  QSpinBox  *screenMode;
-  QToolButton *bgButtons[4];
   QComboBox *bitDepth;
-  QComboBox *screenSize;
-  QComboBox *tileSize;
-  QLineEdit *tileAddr;
-  QLineEdit *screenAddr;
+  QSpinBox  *widthSpinBox;
 
   QCheckBox *overrideBackgroundColor;
   QComboBox *customBgColorCombo;
 
+  QCheckBox *useCgram;
+  CgramWidget *cgramWidget;
+
+  QButtonGroup *vramBaseButtonGroup;
+  QLineEdit *vramBaseAddress[N_VRAM_BASE_ITEMS];
+  QToolButton *vramBaseButton[N_VRAM_BASE_ITEMS];
+
   QLabel *tileInfo;
 
-  ImageGridWidget *imageGridWidget;
+  ImageGridWidget* imageGridWidget;
 
   bool inUpdateFormCall;
 };
 
-extern TilemapViewer *tilemapViewer;
+extern TileViewer *tileViewer;

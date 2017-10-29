@@ -10,6 +10,7 @@ public:
   QAction *menu_tools_propertiesViewer;
   QMenu *menu_ppu;
   QAction *menu_ppu_vramViewer;
+  QAction *menu_ppu_tileViewer;
   QAction *menu_ppu_tilemapViewer;
   QAction *menu_ppu_oamViewer;
   QAction *menu_ppu_cgramViewer;

@@ -17,8 +17,12 @@ void CgramWidget::setScale(unsigned s) {
 
 void CgramWidget::setPaletteBpp(unsigned bpp) {
   if(bpp > 8) bpp = 0;
+  setPaletteSize(1 << bpp);
+}
 
-  unsigned nColors = 1 << bpp;
+void CgramWidget::setPaletteSize(unsigned nColors) {
+  if(nColors < 1) nColors = 1;
+  if(nColors > 256) nColors = 256;
 
   selectedMask = 0xff - nColors + 1;
   selectedWidth = (nColors - 1) % 16 + 1;
