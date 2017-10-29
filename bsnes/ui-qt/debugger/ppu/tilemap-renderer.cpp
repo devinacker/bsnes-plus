@@ -1,6 +1,7 @@
 
 TilemapRenderer::TilemapRenderer()
 {
+  customBackgroundColor = 0;
   screenMode = 0;
   layer = 0;
   tileAddr = 0;
@@ -9,6 +10,7 @@ TilemapRenderer::TilemapRenderer()
   screenSizeX = false;
   screenSizeY = false;
   tileSize = false;
+  overrideBackgroundColor = false;
 }
 
 void TilemapRenderer::updateBitDepth() {
@@ -77,10 +79,22 @@ void TilemapRenderer::buildPalette() {
   }
 }
 
-void TilemapRenderer::setImageSize(unsigned width, unsigned height)
+void TilemapRenderer::initImage(unsigned width, unsigned height)
 {
-  if(image.width() != width || image.height() != height) {
-    image = QImage(width, height, QImage::Format_RGB32);
+  QImage::Format format = QImage::Format_RGB32;
+  if(overrideBackgroundColor) {
+    if(qAlpha(customBackgroundColor) != 0xff) format = QImage::Format_ARGB32;
+    if(customBackgroundColor == 0) format = QImage::Format_ARGB32_Premultiplied;
+  }
+
+  if(image.width() != width || image.height() != height || image.format() != format) {
+    image = QImage(width, height, format);
+  }
+
+  if(overrideBackgroundColor) {
+    image.fill(customBackgroundColor);
+  } else {
+    image.fill(palette[0]);
   }
 }
 
@@ -97,7 +111,7 @@ void TilemapRenderer::drawTilemap() {
   unsigned width = mapSize * (screenSizeX + 1);
   unsigned height = mapSize * (screenSizeY + 1);
 
-  setImageSize(width, height);
+  initImage(width, height);
 
   unsigned addr = screenAddr;
   for(unsigned y = 0; y < height; y += mapSize) {
@@ -216,8 +230,6 @@ void TilemapRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline
 
       if (pixel != 0) {
         imgBits[fpx] = palette[(pal + pixel) & 0xff];
-      } else {
-        imgBits[fpx] = palette[0];
       }
     }
 
@@ -226,7 +238,7 @@ void TilemapRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline
 }
 
 void TilemapRenderer::drawMode7Tilemap() {
-  setImageSize(1024, 1024);
+  initImage(1024, 1024);
 
   QRgb* scanline = (QRgb*)image.scanLine(0);
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
@@ -252,7 +264,7 @@ void TilemapRenderer::drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanli
 
   for(unsigned py = 0; py < 8; py++) {
     for(unsigned px = 0; px < 8; px++) {
-      imgBits[px] = palette[*tile];
+      if(*tile != 0) imgBits[px] = palette[*tile];
       tile +=2;
     }
     imgBits += wordsPerScanline;

@@ -111,6 +111,20 @@ TilemapViewer::TilemapViewer() {
   sidebarLayout->addRow(new QWidget);
 
 
+  overrideBackgroundColor = new QCheckBox("Override Background Color");
+  sidebarLayout->addRow(overrideBackgroundColor);
+
+  customBgColorCombo = new QComboBox;
+  customBgColorCombo->addItem("Transparent", QVariant(qRgba(0, 0, 0, 0)));
+  customBgColorCombo->addItem("Magenta",     QVariant(qRgb(255, 0, 255)));
+  customBgColorCombo->addItem("Cyan",        QVariant(qRgb(0, 255, 255)));
+  customBgColorCombo->addItem("White",       QVariant(qRgb(255, 255, 255)));
+  customBgColorCombo->addItem("Black",       QVariant(qRgb(0, 0, 0)));
+  sidebarLayout->addRow("BG Color:", customBgColorCombo);
+
+
+  sidebarLayout->addRow(new QWidget);
+
   tileInfo = new QLabel;
   sidebarLayout->addRow(tileInfo);
 
@@ -140,6 +154,9 @@ TilemapViewer::TilemapViewer() {
   connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
   connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
   connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
+
+  connect(overrideBackgroundColor, SIGNAL(clicked(bool)), this, SLOT(refresh()));
+  connect(customBgColorCombo,    SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
 
   connect(imageGridWidget, SIGNAL(selectedChanged()),         this, SLOT(refresh()));
 }
@@ -224,6 +241,10 @@ void TilemapViewer::updateRendererSettings() {
   } else {
     renderer.loadTilemapSettings();
   }
+
+  int i = customBgColorCombo->currentIndex();
+  renderer.overrideBackgroundColor = overrideBackgroundColor->isChecked();
+  renderer.customBackgroundColor = customBgColorCombo->itemData(i).toUInt();
 }
 
 void TilemapViewer::updateForm() {
@@ -265,6 +286,8 @@ void TilemapViewer::updateForm() {
     screenSize->setCurrentIndex(ss);
     tileSize->setCurrentIndex(renderer.tileSize);
   }
+
+  customBgColorCombo->setEnabled(overrideBackgroundColor->isChecked());
 
   inUpdateFormCall = false;
 }

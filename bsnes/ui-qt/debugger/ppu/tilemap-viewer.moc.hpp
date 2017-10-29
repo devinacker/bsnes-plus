@@ -47,6 +47,9 @@ private:
   QLineEdit *tileAddr;
   QLineEdit *screenAddr;
 
+  QCheckBox *overrideBackgroundColor;
+  QComboBox *customBgColorCombo;
+
   QLabel *tileInfo;
 
   ImageGridWidget* imageGridWidget;

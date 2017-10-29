@@ -4,6 +4,8 @@ struct TilemapRenderer {
   QRgb palette[256];
   QImage image;
 
+  QRgb customBackgroundColor;
+
   unsigned screenMode;
   unsigned layer;
 
@@ -14,6 +16,8 @@ struct TilemapRenderer {
   bool screenSizeX;
   bool screenSizeY;
   bool tileSize;
+
+  bool overrideBackgroundColor;
 
 public:
   TilemapRenderer();
@@ -30,7 +34,7 @@ public:
   void drawTilemap();
 
 private:
-  void setImageSize(unsigned width, unsigned height);
+  void initImage(unsigned width, unsigned height);
   void invalidateImage();
 
   void drawMap(unsigned mapAddr, unsigned startX, unsigned startY);
