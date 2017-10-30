@@ -2,6 +2,9 @@
 TileRenderer::TileRenderer()
     : BaseRenderer()
 {
+  source = VRAM;
+  cpuAddress = 0;
+
   bitDepth = BitDepth::BPP4;
   width = 16;
 
@@ -10,6 +13,8 @@ TileRenderer::TileRenderer()
 }
 
 unsigned TileRenderer::nTiles() const {
+  if(source != Source::VRAM) return int(255 / width + 1) * width;
+
   switch (bitDepth) {
     case BitDepth::BPP8: return 1024;
     case BitDepth::BPP4: return 2048;
@@ -59,7 +64,10 @@ void TileRenderer::draw() {
 
   if(bitDepth == BitDepth::MODE7) { drawMode7Tileset(); return; }
 
-  drawVramTileset();
+  if(source == Source::VRAM) { drawVramTileset(); return; }
+  if(source == Source::CPU_BUS) { drawCpuBusTiles(); return; }
+
+  invalidateImage();
 }
 
 void TileRenderer::drawVramTileset() {
@@ -90,6 +98,8 @@ void TileRenderer::drawVramTileset() {
 }
 
 void TileRenderer::drawMode7Tileset() {
+  source = Source::VRAM;
+
   const unsigned height = (256 + width - 1) / width;
 
   initImage(width * 8, height * 8);
@@ -113,4 +123,40 @@ void TileRenderer::drawMode7Tileset() {
       }
     }
   }
+}
+
+void TileRenderer::drawCpuBusTiles() {
+  typedef SNES::Debugger::MemorySource MemorySource;
+
+  const unsigned height = nTiles() / width;
+
+  initImage(width * 8, height * 8);
+
+  QRgb* scanline = (QRgb*)image.scanLine(0);
+  const unsigned wordsPerScanline = image.bytesPerLine() / 4;
+  const unsigned bytesPerTile = bytesInbetweenTiles();
+
+  unsigned addr = cpuAddress;
+  uint8_t tile[64];
+
+  if(bytesPerTile > 64) return;
+
+
+  SNES::debugger.bus_access = true;
+
+  for(unsigned y = 0; y < height; y++) {
+    QRgb* imgBits = scanline;
+    scanline += wordsPerScanline * 8;
+
+    for(unsigned x = 0; x < width; x++) {
+      for(unsigned i = 0; i < bytesPerTile; i++) {
+        tile[i] = SNES::debugger.read(MemorySource::CPUBus, addr);
+        addr++;
+      }
+      draw8pxTile(imgBits, wordsPerScanline, tile, 0, 0, 0);
+      imgBits += 8;
+    }
+  }
+
+  SNES::debugger.bus_access = false;
 }

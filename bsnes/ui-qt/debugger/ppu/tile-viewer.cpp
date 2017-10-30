@@ -62,6 +62,14 @@ TileViewer::TileViewer() {
 
   sidebarLayout->addRow(new QWidget);
 
+  source = new QComboBox;
+  source->addItem("VRAM", QVariant(TileRenderer::VRAM));
+  source->addItem("S-CPU Bus", QVariant(TileRenderer::CPU_BUS));
+  sidebarLayout->addRow("Source:", source);
+
+  cpuAddress = new QLineEdit;
+  sidebarLayout->addRow("Address:", cpuAddress);
+
   bitDepth = new QComboBox;
   bitDepth->addItem("2bpp", QVariant(TileRenderer::BPP2));
   bitDepth->addItem("4bpp", QVariant(TileRenderer::BPP4));
@@ -149,6 +157,8 @@ TileViewer::TileViewer() {
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(showGrid,      SIGNAL(clicked(bool)), imageGridWidget, SLOT(setShowGrid(bool)));
 
+  connect(source,        SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
+  connect(cpuAddress,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
   connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
   connect(widthSpinBox,  SIGNAL(valueChanged(int)),           this, SLOT(refresh()));
 
@@ -223,6 +233,10 @@ void TileViewer::onUseCgramPressed() {
 }
 
 void TileViewer::onVramBaseButtonClicked(int index) {
+  if(renderer.source != TileRenderer::VRAM) {
+    source->setCurrentIndex(source->findData(TileRenderer::VRAM));
+  }
+
   unsigned addr = hex(vramBaseAddress[index]->text().toUtf8().data());
 
   unsigned tileId = addr / renderer.bytesInbetweenTiles();
@@ -233,7 +247,13 @@ void TileViewer::onVramBaseButtonClicked(int index) {
 }
 
 void TileViewer::updateRendererSettings() {
+  typedef TileRenderer::Source Source;
   typedef TileRenderer::BitDepth Depth;
+
+  int si = source->currentIndex();
+  renderer.source = si >= 0 ? Source(source->itemData(si).toInt()) : Source::VRAM;
+
+  renderer.cpuAddress = hex(cpuAddress->text().toUtf8().data()) & 0xffffff;
 
   int bd = bitDepth->currentIndex();
   renderer.bitDepth = bd >= 0 ? Depth(bitDepth->itemData(bd).toInt()) : Depth::NONE;
@@ -256,6 +276,9 @@ void TileViewer::updateForm() {
   inUpdateFormCall = true;
 
   exportButton->setEnabled(!renderer.image.isNull());
+
+  source->setCurrentIndex(source->findData(renderer.source));
+  cpuAddress->setEnabled(renderer.source != TileRenderer::VRAM);
 
   bitDepth->setCurrentIndex(bitDepth->findData(renderer.bitDepth));
 
@@ -282,10 +305,13 @@ void TileViewer::updateTileInfo() {
 
   string text;
   if(tileId < renderer.nTiles()) {
-    unsigned tileAddr = tileId * renderer.bytesInbetweenTiles();
-
-    text = string("Selected Tile Address: ", hex<4>(tileAddr));
-
+    if(renderer.source == TileRenderer::VRAM) {
+      unsigned tileAddr = tileId * renderer.bytesInbetweenTiles();
+      text = string("Selected Tile Address: ", hex<4>(tileAddr));
+    } else {
+      unsigned tileAddr = renderer.cpuAddress + tileId * renderer.bytesInbetweenTiles();
+      text = string("Selected Tile Address: ", hex<6>(tileAddr & 0xffffff));
+    }
   } else {
     imageGridWidget->selectNone();
   }

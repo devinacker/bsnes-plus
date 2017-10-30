@@ -40,6 +40,9 @@ private:
   QComboBox *zoomCombo;
   QCheckBox *showGrid;
 
+  QComboBox *source;
+  QLineEdit *cpuAddress;
+
   QComboBox *bitDepth;
   QSpinBox  *widthSpinBox;
 
