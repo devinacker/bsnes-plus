@@ -158,13 +158,13 @@ TileViewer::TileViewer() {
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(showGrid,      SIGNAL(clicked(bool)), imageGridWidget, SLOT(setShowGrid(bool)));
 
-  connect(source,        SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
-  connect(cpuAddress,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
-  connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
-  connect(widthSpinBox,  SIGNAL(valueChanged(int)),           this, SLOT(refresh()));
+  connect(source,        SIGNAL(activated(int)),             this, SLOT(refresh()));
+  connect(cpuAddress,    SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
+  connect(bitDepth,      SIGNAL(activated(int)),             this, SLOT(refresh()));
+  connect(widthSpinBox,  SIGNAL(valueChanged(int)),          this, SLOT(refresh()));
 
-  connect(overrideBackgroundColor, SIGNAL(clicked(bool)), this, SLOT(refresh()));
-  connect(customBgColorCombo,      SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
+  connect(overrideBackgroundColor, SIGNAL(clicked(bool)),    this, SLOT(refresh()));
+  connect(customBgColorCombo,      SIGNAL(activated(int)),   this, SLOT(refresh()));
 
   connect(useCgram,    SIGNAL(clicked()), this, SLOT(onUseCgramPressed()));
   connect(cgramWidget, SIGNAL(selectedChanged()), this, SLOT(refresh()));

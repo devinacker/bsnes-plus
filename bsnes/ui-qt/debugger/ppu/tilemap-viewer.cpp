@@ -149,15 +149,15 @@ TilemapViewer::TilemapViewer() {
   for(int i = 0; i < 4; i++) {
     connect(bgButtons[i],SIGNAL(clicked(bool)),               this, SLOT(refresh()));
   }
-  connect(screenMode,    SIGNAL(valueChanged(int)),           this, SLOT(refresh()));
-  connect(bitDepth,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
-  connect(screenSize,    SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
-  connect(tileSize,      SIGNAL(currentIndexChanged(int)),    this, SLOT(refresh()));
-  connect(tileAddr,      SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
-  connect(screenAddr,    SIGNAL(textChanged(const QString&)), this, SLOT(refresh()));
+  connect(screenMode,    SIGNAL(valueChanged(int)),          this, SLOT(refresh()));
+  connect(bitDepth,      SIGNAL(activated(int)),             this, SLOT(refresh()));
+  connect(screenSize,    SIGNAL(activated(int)),             this, SLOT(refresh()));
+  connect(tileSize,      SIGNAL(activated(int)),             this, SLOT(refresh()));
+  connect(tileAddr,      SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
+  connect(screenAddr,    SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
 
-  connect(overrideBackgroundColor, SIGNAL(clicked(bool)), this, SLOT(refresh()));
-  connect(customBgColorCombo,    SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
+  connect(overrideBackgroundColor, SIGNAL(clicked(bool)),    this, SLOT(refresh()));
+  connect(customBgColorCombo,      SIGNAL(activated(int)),   this, SLOT(refresh()));
 
   connect(imageGridWidget, SIGNAL(selectedChanged()),         this, SLOT(refresh()));
 }
