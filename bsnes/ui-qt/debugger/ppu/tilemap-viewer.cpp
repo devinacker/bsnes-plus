@@ -9,6 +9,7 @@ TilemapViewer::TilemapViewer() {
   application.windowList.append(this);
 
   inUpdateFormCall = false;
+  inExportClickedCall = false;
 
   layout = new QHBoxLayout;
   layout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -171,7 +172,7 @@ void TilemapViewer::show() {
 }
 
 void TilemapViewer::refresh() {
-  if(inUpdateFormCall) return;
+  if(inUpdateFormCall || inExportClickedCall) return;
 
   if(SNES::cartridge.loaded()) {
     updateRendererSettings();
@@ -194,6 +195,8 @@ void TilemapViewer::onZoomChanged(int index) {
 void TilemapViewer::onExportClicked() {
   if(renderer.image.isNull()) return;
 
+  inExportClickedCall = true;
+
   QFileDialog saveDialog(this, "Export Tilemap");
   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
   saveDialog.setNameFilter("PNG Image (*.png)");
@@ -209,6 +212,8 @@ void TilemapViewer::onExportClicked() {
       QMessageBox::critical(this, "ERROR", "Unable to export tilemap\n\n" + writer.errorString());
     }
   }
+
+  inExportClickedCall = false;
 }
 
 void TilemapViewer::updateRendererSettings() {

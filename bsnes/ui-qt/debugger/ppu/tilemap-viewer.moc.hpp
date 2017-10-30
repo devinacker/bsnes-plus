@@ -55,6 +55,7 @@ private:
   ImageGridWidget *imageGridWidget;
 
   bool inUpdateFormCall;
+  bool inExportClickedCall;
 };
 
 extern TilemapViewer *tilemapViewer;

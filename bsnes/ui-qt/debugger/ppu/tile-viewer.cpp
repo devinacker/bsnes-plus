@@ -14,6 +14,7 @@ TileViewer::TileViewer() {
   application.windowList.append(this);
 
   inUpdateFormCall = false;
+  inExportClickedCall = false;
 
   layout = new QHBoxLayout;
   layout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -183,7 +184,7 @@ void TileViewer::show() {
 }
 
 void TileViewer::refresh() {
-  if(inUpdateFormCall) return;
+  if(inUpdateFormCall || inExportClickedCall) return;
 
   if(SNES::cartridge.loaded()) {
     cgramWidget->refresh();
@@ -207,6 +208,8 @@ void TileViewer::onZoomChanged(int index) {
 void TileViewer::onExportClicked() {
   if(renderer.image.isNull()) return;
 
+  inExportClickedCall = true;
+
   QFileDialog saveDialog(this, "Export Tiles");
   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
   saveDialog.setNameFilter("PNG Image (*.png)");
@@ -222,6 +225,8 @@ void TileViewer::onExportClicked() {
       QMessageBox::critical(this, "ERROR", "Unable to export tiles\n\n" + writer.errorString());
     }
   }
+
+  inExportClickedCall = false;
 }
 
 void TileViewer::onUseCgramPressed() {
