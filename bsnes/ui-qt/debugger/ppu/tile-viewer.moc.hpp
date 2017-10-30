@@ -20,9 +20,14 @@ public slots:
   void onUseCgramPressed();
   void onVramBaseButtonClicked(int);
 
+  void onPrevAddressButtonClicked();
+  void onNextAddressButtonClicked();
+
 private:
   void updateRendererSettings();
   void updateForm();
+
+  void stepAdddressField(bool forward);
 
   unsigned getVramBaseAddress(unsigned index);
 
@@ -32,6 +37,7 @@ private:
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
   QHBoxLayout *buttonLayout;
+  QHBoxLayout *addressLayout;
   QGridLayout *vramBaseLayout;
 
   QCheckBox *autoUpdateBox;
@@ -44,6 +50,8 @@ private:
 
   QComboBox *source;
   QLineEdit *address;
+  QToolButton *prevAddressButton;
+  QToolButton *nextAddressButton;
 
   QComboBox *bitDepth;
   QSpinBox  *widthSpinBox;

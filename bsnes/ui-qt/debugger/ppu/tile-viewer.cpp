@@ -68,8 +68,26 @@ TileViewer::TileViewer() {
   source->addItem("S-CPU Bus", QVariant(TileRenderer::CPU_BUS));
   sidebarLayout->addRow("Source:", source);
 
+
+  addressLayout = new QHBoxLayout;
+
+  prevAddressButton = new QToolButton;
+  prevAddressButton->setToolTip("Previous");
+  prevAddressButton->setIcon(QIcon(":16x16/mem-prev-unknown.png"));
+  addressLayout->addWidget(prevAddressButton);
+
   address = new QLineEdit;
-  sidebarLayout->addRow("Address:", address);
+  address->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  address->setMinimumWidth(7 * address->fontMetrics().width('0'));
+  addressLayout->addWidget(address, 1);
+
+  nextAddressButton = new QToolButton;
+  nextAddressButton->setToolTip("Next");
+  nextAddressButton->setIcon(QIcon(":16x16/mem-next-unknown.png"));
+  addressLayout->addWidget(nextAddressButton);
+
+  sidebarLayout->addRow("Address:", addressLayout);
+
 
   bitDepth = new QComboBox;
   bitDepth->addItem("2bpp", QVariant(TileRenderer::BPP2));
@@ -162,6 +180,9 @@ TileViewer::TileViewer() {
   connect(address,       SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
   connect(bitDepth,      SIGNAL(activated(int)),             this, SLOT(refresh()));
   connect(widthSpinBox,  SIGNAL(valueChanged(int)),          this, SLOT(refresh()));
+
+  connect(prevAddressButton, SIGNAL(clicked(bool)), this, SLOT(onPrevAddressButtonClicked()));
+  connect(nextAddressButton, SIGNAL(clicked(bool)), this, SLOT(onNextAddressButtonClicked()));
 
   connect(overrideBackgroundColor, SIGNAL(clicked(bool)),    this, SLOT(refresh()));
   connect(customBgColorCombo,      SIGNAL(activated(int)),   this, SLOT(refresh()));
@@ -262,6 +283,42 @@ void TileViewer::onVramBaseButtonClicked(int index) {
   QPoint cell(tileId % renderer.width, tileId / renderer.width);
   imageGridWidget->setSelected(cell);
   imageGridWidget->scrollToCell(cell);
+}
+
+void TileViewer::onPrevAddressButtonClicked() {
+  stepAdddressField(false);
+}
+
+void TileViewer::onNextAddressButtonClicked() {
+  stepAdddressField(true);
+}
+
+void TileViewer::stepAdddressField(bool forward) {
+  unsigned step = renderer.bytesInbetweenTiles();
+  if(renderer.source != TileRenderer::VRAM) step *= renderer.nTiles();
+
+  unsigned max = renderer.source == TileRenderer::VRAM ? 0x10000 : 0x1000000;
+
+  if(forward) {
+    unsigned a = renderer.address + step;
+    if(a >= max) a = max - step;
+    renderer.address = a;
+  } else {
+    if(renderer.address >= step) {
+      renderer.address -= step;
+    } else {
+      renderer.address = 0;
+    }
+  }
+  renderer.address &= renderer.addressMask();
+
+  if(renderer.source == TileRenderer::VRAM) {
+    address->setText(hex<4>(renderer.address));
+  } else {
+    address->setText(hex<6>(renderer.address));
+  }
+
+  refresh();
 }
 
 void TileViewer::updateRendererSettings() {
