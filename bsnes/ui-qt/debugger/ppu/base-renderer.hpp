@@ -15,6 +15,8 @@ public:
   unsigned bytesInbetweenTiles() const;
   unsigned colorsPerTile() const;
 
+  static BitDepth bitDepthForLayer(unsigned screenMode, unsigned layer);
+
 protected:
   void buildPalette();
 

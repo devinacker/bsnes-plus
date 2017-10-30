@@ -238,12 +238,26 @@ void TileViewer::onUseCgramPressed() {
 }
 
 void TileViewer::onVramBaseButtonClicked(int index) {
+  if(!SNES::cartridge.loaded()) return;
+
+  unsigned addr = getVramBaseAddress(index);
+
   if(renderer.source != TileRenderer::VRAM) {
     source->setCurrentIndex(source->findData(TileRenderer::VRAM));
   }
 
-  unsigned addr = hex(vramBaseAddress[index]->text().toUtf8().data());
+  TileRenderer::BitDepth bd = TileRenderer::BitDepth::NONE;
+  if(index < 4) {
+    unsigned screenMode = SNES::ppu.bg_mode() & 7;
+    if(screenMode < 7) bd = TileRenderer::bitDepthForLayer(screenMode, index);
+  }
+  if(index >= 4) bd = TileRenderer::BitDepth::BPP4;
 
+  if(bd != TileRenderer::BitDepth::NONE) {
+    bitDepth->setCurrentIndex(bitDepth->findData(bd));
+  }
+
+  refresh();
   unsigned tileId = addr / renderer.bytesInbetweenTiles();
 
   QPoint cell(tileId % renderer.width, tileId / renderer.width);
@@ -292,10 +306,7 @@ void TileViewer::updateForm() {
   customBgColorCombo->setEnabled(overrideBackgroundColor->isChecked());
 
   for(unsigned i = 0; i < N_VRAM_BASE_ITEMS; i++) {
-    unsigned a = 0;
-    if(i < 4) a = SNES::ppu.bg_tile_addr(i);
-    if(i >= 4 && i < 6) a = SNES::ppu.oam_tile_addr(i - 4);
-
+    unsigned a = getVramBaseAddress(i);
     vramBaseAddress[i]->setText(string("0x", hex<4>(a)));
   }
 
@@ -322,4 +333,10 @@ void TileViewer::updateTileInfo() {
   }
 
   tileInfo->setText(text);
+}
+
+unsigned TileViewer::getVramBaseAddress(unsigned index) {
+  if(index < 4) return SNES::ppu.bg_tile_addr(index);
+  if(index >= 4 && index < 6) return SNES::ppu.oam_tile_addr(index - 4);
+  return 0;
 }

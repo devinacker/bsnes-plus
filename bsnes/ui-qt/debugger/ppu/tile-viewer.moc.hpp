@@ -24,6 +24,8 @@ private:
   void updateRendererSettings();
   void updateForm();
 
+  unsigned getVramBaseAddress(unsigned index);
+
 private:
   TileRenderer renderer;
 

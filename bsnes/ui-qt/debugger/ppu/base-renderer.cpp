@@ -6,6 +6,21 @@ BaseRenderer::BaseRenderer()
   overrideBackgroundColor = false;
 }
 
+BaseRenderer::BitDepth BaseRenderer::bitDepthForLayer(unsigned screenMode, unsigned layer) {
+  static const BitDepth map[8][4] = {
+    { BPP2, BPP2, BPP2, BPP2},
+    { BPP4, BPP4, BPP2, NONE},
+    { BPP4, BPP4, NONE, NONE},
+    { BPP8, BPP4, NONE, NONE},
+    { BPP8, BPP2, NONE, NONE},
+    { BPP4, BPP2, NONE, NONE},
+    { BPP4, NONE, NONE, NONE},
+    { MODE7, MODE7, MODE7, MODE7}
+  };
+
+  return map[screenMode & 7][layer & 3];
+}
+
 unsigned BaseRenderer::bytesInbetweenTiles() const {
   switch (bitDepth) {
     case BitDepth::BPP8: return 64;

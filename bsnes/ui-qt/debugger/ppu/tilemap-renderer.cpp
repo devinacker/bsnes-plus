@@ -12,20 +12,9 @@ TilemapRenderer::TilemapRenderer()
 }
 
 void TilemapRenderer::updateBitDepth() {
-  static const BitDepth map[8][4] = {
-    { BPP2, BPP2, BPP2, BPP2},
-    { BPP4, BPP4, BPP2, NONE},
-    { BPP4, BPP4, NONE, NONE},
-    { BPP8, BPP4, NONE, NONE},
-    { BPP8, BPP2, NONE, NONE},
-    { BPP4, BPP2, NONE, NONE},
-    { BPP4, NONE, NONE, NONE},
-    { MODE7, MODE7, MODE7, MODE7}
-  };
-
   layer = layer & 3;
   screenMode = screenMode & 7;
-  bitDepth = map[screenMode][layer];
+  bitDepth = bitDepthForLayer(screenMode, layer);
 }
 
 unsigned TilemapRenderer::nLayersInMode() const {
