@@ -43,7 +43,7 @@ private:
   QCheckBox *showGrid;
 
   QComboBox *source;
-  QLineEdit *cpuAddress;
+  QLineEdit *address;
 
   QComboBox *bitDepth;
   QSpinBox  *widthSpinBox;

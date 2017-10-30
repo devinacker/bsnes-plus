@@ -3,7 +3,7 @@ TileRenderer::TileRenderer()
     : BaseRenderer()
 {
   source = VRAM;
-  cpuAddress = 0;
+  address = 0;
 
   bitDepth = BitDepth::BPP4;
   width = 16;
@@ -12,16 +12,25 @@ TileRenderer::TileRenderer()
   useCgramPalette = false;
 }
 
+unsigned TileRenderer::addressMask() const {
+  if(source != Source::VRAM) return 0xffffff;
+
+  switch (bitDepth) {
+    case BitDepth::BPP8: return 0xffc0;
+    case BitDepth::BPP4: return 0xffe0;
+    case BitDepth::BPP2: return 0xfff0;
+    case BitDepth::MODE7: return 0;
+  }
+  return 0;
+}
+
 unsigned TileRenderer::nTiles() const {
   if(source != Source::VRAM) return int(255 / width + 1) * width;
 
-  switch (bitDepth) {
-    case BitDepth::BPP8: return 1024;
-    case BitDepth::BPP4: return 2048;
-    case BitDepth::BPP2: return 4096;
-    case BitDepth::MODE7: return 256;
-  }
-  return 0;
+  if(bitDepth == BitDepth::MODE7) return 256;
+
+  unsigned a = address & addressMask();
+  return (0x10000 - a) / bytesInbetweenTiles();
 }
 
 void TileRenderer::buildCgramPalette() {
@@ -71,6 +80,9 @@ void TileRenderer::draw() {
 }
 
 void TileRenderer::drawVramTileset() {
+  source = Source::VRAM;
+  address &= addressMask();
+
   const unsigned height = (nTiles() + width - 1) / width;
 
   initImage(width * 8, height * 8);
@@ -79,8 +91,8 @@ void TileRenderer::drawVramTileset() {
   const unsigned wordsPerScanline = image.bytesPerLine() / 4;
   const unsigned bytesPerTile = bytesInbetweenTiles();
 
-  const uint8_t *tile = SNES::memory::vram.data();
-  const uint8_t *tileEnd = tile + SNES::memory::vram.size();
+  const uint8_t *tile = SNES::memory::vram.data() + address;
+  const uint8_t *tileEnd = SNES::memory::vram.data() + SNES::memory::vram.size();
 
   for(unsigned y = 0; y < height; y++) {
     QRgb* imgBits = scanline;
@@ -99,6 +111,7 @@ void TileRenderer::drawVramTileset() {
 
 void TileRenderer::drawMode7Tileset() {
   source = Source::VRAM;
+  address = 0;
 
   const unsigned height = (256 + width - 1) / width;
 
@@ -128,6 +141,9 @@ void TileRenderer::drawMode7Tileset() {
 void TileRenderer::drawCpuBusTiles() {
   typedef SNES::Debugger::MemorySource MemorySource;
 
+  source = Source::CPU_BUS;
+  address &= 0xffffff;
+
   const unsigned height = nTiles() / width;
 
   initImage(width * 8, height * 8);
@@ -136,7 +152,7 @@ void TileRenderer::drawCpuBusTiles() {
   const unsigned wordsPerScanline = image.bytesPerLine() / 4;
   const unsigned bytesPerTile = bytesInbetweenTiles();
 
-  unsigned addr = cpuAddress;
+  unsigned addr = address;
   uint8_t tile[64];
 
   if(bytesPerTile > 64) return;

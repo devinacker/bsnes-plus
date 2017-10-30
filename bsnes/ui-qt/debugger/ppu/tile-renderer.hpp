@@ -2,7 +2,7 @@ struct TileRenderer : public BaseRenderer {
   enum Source { VRAM, CPU_BUS };
 
   Source source;
-  unsigned cpuAddress;
+  unsigned address;
 
   unsigned width;
 
@@ -12,6 +12,7 @@ struct TileRenderer : public BaseRenderer {
 public:
   TileRenderer();
 
+  unsigned addressMask() const;
   unsigned nTiles() const;
 
   void draw();

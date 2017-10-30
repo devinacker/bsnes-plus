@@ -68,8 +68,8 @@ TileViewer::TileViewer() {
   source->addItem("S-CPU Bus", QVariant(TileRenderer::CPU_BUS));
   sidebarLayout->addRow("Source:", source);
 
-  cpuAddress = new QLineEdit;
-  sidebarLayout->addRow("Address:", cpuAddress);
+  address = new QLineEdit;
+  sidebarLayout->addRow("Address:", address);
 
   bitDepth = new QComboBox;
   bitDepth->addItem("2bpp", QVariant(TileRenderer::BPP2));
@@ -159,7 +159,7 @@ TileViewer::TileViewer() {
   connect(showGrid,      SIGNAL(clicked(bool)), imageGridWidget, SLOT(setShowGrid(bool)));
 
   connect(source,        SIGNAL(activated(int)),             this, SLOT(refresh()));
-  connect(cpuAddress,    SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
+  connect(address,       SIGNAL(textEdited(const QString&)), this, SLOT(refresh()));
   connect(bitDepth,      SIGNAL(activated(int)),             this, SLOT(refresh()));
   connect(widthSpinBox,  SIGNAL(valueChanged(int)),          this, SLOT(refresh()));
 
@@ -242,9 +242,8 @@ void TileViewer::onVramBaseButtonClicked(int index) {
 
   unsigned addr = getVramBaseAddress(index);
 
-  if(renderer.source != TileRenderer::VRAM) {
-    source->setCurrentIndex(source->findData(TileRenderer::VRAM));
-  }
+  source->setCurrentIndex(source->findData(TileRenderer::VRAM));
+  address->clear();
 
   TileRenderer::BitDepth bd = TileRenderer::BitDepth::NONE;
   if(index < 4) {
@@ -272,7 +271,7 @@ void TileViewer::updateRendererSettings() {
   int si = source->currentIndex();
   renderer.source = si >= 0 ? Source(source->itemData(si).toInt()) : Source::VRAM;
 
-  renderer.cpuAddress = hex(cpuAddress->text().toUtf8().data()) & 0xffffff;
+  renderer.address = hex(address->text().toUtf8().data());
 
   int bd = bitDepth->currentIndex();
   renderer.bitDepth = bd >= 0 ? Depth(bitDepth->itemData(bd).toInt()) : Depth::NONE;
@@ -297,7 +296,6 @@ void TileViewer::updateForm() {
   exportButton->setEnabled(!renderer.image.isNull());
 
   source->setCurrentIndex(source->findData(renderer.source));
-  cpuAddress->setEnabled(renderer.source != TileRenderer::VRAM);
 
   bitDepth->setCurrentIndex(bitDepth->findData(renderer.bitDepth));
 
@@ -321,11 +319,11 @@ void TileViewer::updateTileInfo() {
 
   string text;
   if(tileId < renderer.nTiles()) {
+    unsigned tileAddr = renderer.address + tileId * renderer.bytesInbetweenTiles();
+
     if(renderer.source == TileRenderer::VRAM) {
-      unsigned tileAddr = tileId * renderer.bytesInbetweenTiles();
-      text = string("Selected Tile Address: ", hex<4>(tileAddr));
+      text = string("Selected Tile Address: ", hex<4>(tileAddr & 0xffff));
     } else {
-      unsigned tileAddr = renderer.cpuAddress + tileId * renderer.bytesInbetweenTiles();
       text = string("Selected Tile Address: ", hex<6>(tileAddr & 0xffffff));
     }
   } else {
