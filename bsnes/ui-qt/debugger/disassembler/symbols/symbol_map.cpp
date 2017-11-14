@@ -1,4 +1,5 @@
 #include "symbol_map.moc"
+#include "symbol_file_adapters.cpp"
 
 // ------------------------------------------------------------------------
 Symbol Symbols::getSymbol() {
@@ -25,6 +26,7 @@ Symbol Symbols::getComment() {
 // ------------------------------------------------------------------------
 SymbolMap::SymbolMap() {
   isValid = false;
+  adapters = new SymbolFileAdapters();
 }
 
 // ------------------------------------------------------------------------
@@ -135,31 +137,25 @@ void SymbolMap::saveToFile(const string &baseName, const string &ext) {
     return;
   }
 
+  SymbolFileInterface *adapter = adapters->fetchAdapter(
+    SymbolFileInterface::Writable,
+    0
+    | SymbolFileInterface::Symbols
+    | SymbolFileInterface::Comments
+    | SymbolFileInterface::DebugInterface
+    | SymbolFileInterface::Files
+    | SymbolFileInterface::LineMap
+  );
+
   string fileName = baseName;
   fileName.append(ext);
 
   ::nall::file f;
-  uint32_t i;
-  Symbol s;
   if (!f.open((const char*)fileName, ::nall::file::mode::write)) {
     return;
   }
 
-  f.print("[labels]\n");
-  for (i=0; i<symbols.size(); i++) {
-    s = symbols[i].getSymbol();
-    if (!s.isInvalid()) {
-      f.print(hex<2,'0'>(s.address>>16), ":" , hex<4,'0'>(s.address&0xFFFF), " ", s.name, "\n");
-    }
-  }
-
-  f.print("\n[comments]\n");
-  for (i=0; i<symbols.size(); i++) {
-    s = symbols[i].getComment();
-    if (!s.isInvalid()) {
-      f.print(hex<2,'0'>(s.address>>16), ":" , hex<4,'0'>(s.address&0xFFFF), " ", s.name, "\n");
-    }
-  }
+  adapter->write(f, this);
 
   f.close();
 }
@@ -180,60 +176,14 @@ void SymbolMap::loadFromString(const string &file) {
   nall::lstring rows;
   rows.split("\n", file);
 
-  enum Section {
-    SECTION_UNKNOWN,
-    SECTION_LABELS,
-    SECTION_COMMENTS,
-  };
-
-  Section section = SECTION_LABELS;
-
-  for (int i=0; i<rows.size(); i++) {
-    string row = rows[i];
-    row.trim("\r");
-
-    optional<unsigned> comment = row.position(";");
-    if (comment) {
-      unsigned index = comment();
-      if (index == 0) {
-        continue;
-      }
-      row = nall::substr(row, 0, index);
-    }
-
-    row.trim(" ");
-    if (row.length() == 0) {
-      continue;
-    }
-
-    if (row[0] == '[') {
-      if (row == "[labels]") { section = SECTION_LABELS; }
-      else if (row == "[comments]") { section = SECTION_COMMENTS; }
-      else { section = SECTION_UNKNOWN; }
-      continue;
-    }
-
-    switch (section) {
-    case SECTION_LABELS:
-      addLocation(
-        (nall::hex(nall::substr(row, 0, 2)) << 16) | nall::hex(nall::substr(row, 3, 4)),
-        nall::substr(row, 8, row.length() - 8)
-      );
-      break;
-
-    case SECTION_COMMENTS:
-      addComment(
-        (nall::hex(nall::substr(row, 0, 2)) << 16) | nall::hex(nall::substr(row, 3, 4)),
-        nall::substr(row, 8, row.length() - 8)
-      );
-      break;
-
-    case SECTION_UNKNOWN:
-      break;
-    }
+  SymbolFileInterface *adapter = adapters->findBestAdapter(rows);
+  if (adapter == NULL) {
+    return;
   }
 
-  finishUpdates();
+  if (adapter->read(rows, this)) {
+    finishUpdates();
+  }
 }
 
 // ------------------------------------------------------------------------

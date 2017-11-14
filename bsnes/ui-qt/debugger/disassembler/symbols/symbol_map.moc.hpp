@@ -1,6 +1,8 @@
 #ifndef __SYMBOL_MAP__H__
 #define __SYMBOL_MAP__H__
 
+class SymbolFileAdapters;
+
 struct Symbol {
   enum Type { INVALID, LOCATION, COMMENT };
 
@@ -86,9 +88,11 @@ public:
 
   bool isValid;
   SymbolsLists symbols;
+  SymbolFileAdapters *adapters;
 
 signals:
   void updated();
+
 };
 
 #endif
