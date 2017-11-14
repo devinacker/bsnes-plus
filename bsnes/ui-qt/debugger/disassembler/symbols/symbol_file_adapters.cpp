@@ -2,11 +2,13 @@
 
 #include "adapters/fma_symbol_file.cpp"
 #include "adapters/wla_symbol_file.cpp"
+#include "adapters/vice_label_file.cpp"
 
 // ------------------------------------------------------------------------
 SymbolFileAdapters::SymbolFileAdapters() {
   registerAdapter(new FmaSymbolFile());
   registerAdapter(new WlaSymbolFile());
+  registerAdapter(new ViceLabelFile());
 }
 
 // ------------------------------------------------------------------------
