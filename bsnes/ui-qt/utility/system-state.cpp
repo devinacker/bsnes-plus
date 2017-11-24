@@ -115,5 +115,6 @@ void Utility::modifySystemState(system_state_t systemState) {
   #endif
   cheatEditorWindow->synchronize();
   cheatFinderWindow->synchronize();
+  manifestViewerWindow->synchronize();
   stateManagerWindow->reload();
 }

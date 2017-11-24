@@ -188,6 +188,8 @@ MainWindow::MainWindow() {
   if(!SNES::PPU::SupportsLayerEnable && !SNES::DSP::SupportsChannelEnable)
     tools_effectToggle->setVisible(false);
   
+  tools_manifestViewer = tools->addAction("&Manifest Viewer ...");
+  
   tools_soundViewer = tools->addAction("Sound &Viewer ...");
 
   tools_debugger = tools->addAction("&Debugger ...");
@@ -307,6 +309,7 @@ MainWindow::MainWindow() {
   connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
   connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
   connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
+  connect(tools_manifestViewer, SIGNAL(triggered()), this, SLOT(showManifestViewer()));
   connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
   connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
@@ -611,10 +614,11 @@ void MainWindow::saveState() {
   state.save(slot);
 }
 
-void MainWindow::showCheatEditor()  { toolsWindow->tab->setCurrentIndex(0); toolsWindow->show(); }
-void MainWindow::showCheatFinder()  { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
-void MainWindow::showStateManager() { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
-void MainWindow::showEffectToggle() { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
+void MainWindow::showCheatEditor()    { toolsWindow->tab->setCurrentIndex(0); toolsWindow->show(); }
+void MainWindow::showCheatFinder()    { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
+void MainWindow::showStateManager()   { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
+void MainWindow::showEffectToggle()   { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
+void MainWindow::showManifestViewer() { toolsWindow->tab->setCurrentIndex(4); toolsWindow->show(); }
 
 void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 

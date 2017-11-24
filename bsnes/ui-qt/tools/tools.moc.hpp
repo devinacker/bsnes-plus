@@ -8,6 +8,7 @@ public:
   QScrollArea *cheatFinderArea;
   QScrollArea *stateManagerArea;
   QScrollArea *effectToggleArea;
+  QScrollArea *manifestViewerArea;
 
   ToolsWindow();
 
