@@ -195,6 +195,27 @@ void Filter::render(
   }
 }
 
+QImage Filter::renderUnfilteredScreenshot(
+  const uint16_t *input, unsigned pitch, unsigned width, unsigned height
+) {
+  QImage image(width, height, QImage::Format_RGB32);
+  if(image.isNull()) return image;
+
+  pitch >>= 1;
+  unsigned outpitch = image.bytesPerLine() / sizeof(QRgb);
+  QRgb* output = (QRgb*)image.bits();
+
+  for(unsigned y = 0; y < height; y++) {
+    const uint16_t *in = input + y * pitch;
+    QRgb *out = output + y * outpitch;
+    for(unsigned x = 0; x < width; x++) {
+      *out++ = colortable[*in++];
+    }
+  }
+
+  return image;
+}
+
 QWidget* Filter::settings() {
   if(opened() && renderer > 0) {
     return dl_settings(renderer);

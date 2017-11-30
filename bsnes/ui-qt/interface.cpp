@@ -22,6 +22,8 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
     if(!overscan) data -= 7 * 1024;
   }
 
+  if(saveScreenshot == true) captureScreenshot(filter.renderUnfilteredScreenshot(data, pitch, width, height));
+
   //scale display.crop* values from percentage-based (0-100%) to exact pixel sizes (width, height)
   unsigned cropLeft = (double)display.cropLeft / 100.0 * width;
   unsigned cropTop = (double)display.cropTop / 100.0 * height;
@@ -40,7 +42,6 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
     filter.render(output, outpitch, data, pitch, width, height);
     video.unlock();
     video.refresh();
-    if(saveScreenshot == true) captureScreenshot(output, outpitch, outwidth, outheight);
   }
 
   state.frame();
@@ -76,9 +77,10 @@ void Interface::message(const string &text) {
   QMessageBox::information(mainWindow, "bsnes", QString::fromUtf8(text));
 }
 
-void Interface::captureScreenshot(uint32_t *data, unsigned pitch, unsigned width, unsigned height) {
+void Interface::captureScreenshot(const QImage& image) {
   saveScreenshot = false;
-  QImage image((const unsigned char*)data, width, height, pitch, QImage::Format_RGB32);
+
+  if(image.isNull()) return;
 
   string filename = nall::basename(cartridge.fileName);
   time_t systemTime = time(0);
