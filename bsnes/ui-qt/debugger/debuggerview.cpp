@@ -2,19 +2,34 @@
 #include "disassembler/disassemblerview.cpp"
 #include "debuggerview.moc"
 
-DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, bool step) : registers(registers) {
+DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, bool step) : registers(registers), processor(processor) {
+  addressOffset = 0;
+  cursorPosition = 0;
+
   layout = new QHBoxLayout;
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  consoleLayout = new QVBoxLayout;
-  consoleLayout->setSpacing(0);
-  layout->addLayout(consoleLayout);
+  consoleLayout = new QSplitter(Qt::Vertical);
+  consoleLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  layout->addWidget(consoleLayout);
 
   disassembler = new DisassemblerView(processor);
   disassembler->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   consoleLayout->addWidget(disassembler);
+
+  ramViewer = new QHexEdit;
+  ramViewer->reader = { &DebuggerView::reader, this };
+  ramViewer->writer = { &DebuggerView::writer, this };
+  ramViewer->usage  = { &DebuggerView::usage, this };
+  ramViewer->setAddressWidth(6);
+  ramViewer->setMinimumHeight(70);
+  ramViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  consoleLayout->addWidget(ramViewer);
+
+  consoleLayout->setStretchFactor(0, 8);
+  consoleLayout->setStretchFactor(1, 1);
 
   controlLayout = new QVBoxLayout;
   controlLayout->setSpacing(0);
@@ -51,14 +66,56 @@ DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, 
     connect(symbolsViewer, SIGNAL(released()), symbolsViewerDialog, SLOT(show()));
   }
 
+  connect(consoleLayout, SIGNAL(splitterMoved(int,int)), this, SLOT(synchronize()));
+
   synchronize();
 }
 
-void DebuggerView::refresh(uint32_t address) {
-  disassembler->refresh(address);
+// ------------------------------------------------------------------------
+uint8_t DebuggerView::reader(unsigned addr) {
+  return processor->read(addr + addressOffset);
 }
 
+// ------------------------------------------------------------------------
+void DebuggerView::writer(unsigned addr, uint8_t data) {
+  processor->write(addr + addressOffset, data);
+}
+
+// ------------------------------------------------------------------------
+uint8_t DebuggerView::usage(unsigned addr) {
+  return processor->usage(addr + addressOffset);
+}
+
+// ------------------------------------------------------------------------
+void DebuggerView::refresh(uint32_t address) {
+  disassembler->refresh(address);
+
+  uint32_t getAddress = address;
+  DisassemblerLine line;
+  processor->getLine(line, getAddress);
+
+  if (line.hasAddress() && !line.isBra()) {
+    for (uint32_t i=0; i<line.params.size(); i++) {
+      const DisassemblerParam &param = line.params[i];
+
+      if (param.type == DisassemblerParam::Address) {
+        cursorPosition = (param.address & 0xF) * 2;
+        addressOffset  = param.address & ~0xF;
+      }
+    }
+  }
+
+  ramViewer->setAddressOffset(addressOffset);
+  ramViewer->setCursorPosition(cursorPosition);
+  ramViewer->refresh(true);
+}
+
+// ------------------------------------------------------------------------
 void DebuggerView::synchronize() {
+  float h = ceil(ramViewer->height() / 0x10);
+  if (h < 1) { h = 1; }
+
+  ramViewer->setEditorSize((uint32_t)h * 0x10);
 
   emit synchronized();
 }

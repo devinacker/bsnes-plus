@@ -17,9 +17,14 @@ public:
   virtual string getBreakpointBusName();
   virtual uint32_t getCurrentAddress();
 
+  virtual uint8_t usage(uint32_t address);
+  virtual uint8_t read(uint32_t address);
+  virtual void write(uint32_t address, uint8_t data);
+
 private:
   Source source;
+  SNES::Debugger::MemorySource memorySource;
 
-  uint8_t *usage;
+  uint8_t *usagePointer;
   unsigned mask;
 };

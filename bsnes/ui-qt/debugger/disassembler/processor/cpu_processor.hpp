@@ -15,11 +15,15 @@ public:
   virtual string getBreakpointBusName();
   virtual uint32_t getCurrentAddress();
 
+  virtual uint8_t usage(uint32_t address);
+  virtual uint8_t read(uint32_t address);
+  virtual void write(uint32_t address, uint8_t data);
+
 private:
   Source source;
 
   SymbolMap *symbols;
-  uint8_t *usage;
+  uint8_t *usagePointer;
 
   uint32_t decode(uint32_t type, uint32_t address, uint32_t pc);
   void setOpcodeParams(DisassemblerLine &result, SNES::CPU::Opcode &opcode, uint32_t address);

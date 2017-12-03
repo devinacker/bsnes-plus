@@ -35,22 +35,26 @@ void CommonDisasmProcessor::setSource(Source source) {
 
   switch (source) {
   case CPU:
-    usage = SNES::cpu.usage;
+    usagePointer = SNES::cpu.usage;
+    memorySource = SNES::Debugger::MemorySource::CPUBus;
     mask = (1 << 24) - 1;
     break;
 
   case SMP:
-    usage = SNES::smp.usage;
+    usagePointer = SNES::smp.usage;
+    memorySource = SNES::Debugger::MemorySource::APUBus;
     mask = (1 << 16) - 1;
     break;
 
   case SA1:
-    usage = SNES::sa1.usage;
+    usagePointer = SNES::sa1.usage;
+    memorySource = SNES::Debugger::MemorySource::SA1Bus;
     mask = (1 << 24) - 1;
     break;
 
   case SFX:
-    usage = SNES::superfx.usage;
+    usagePointer = SNES::superfx.usage;
+    memorySource = SNES::Debugger::MemorySource::SFXBus;
     mask = (1 << 23) - 1;
     break;
   }
@@ -62,7 +66,7 @@ uint32_t CommonDisasmProcessor::findStartLineAddress(uint32_t currentAddress, ui
 
   for (line=0; line<linesBelow; line++) {
     for (i=1; i<=4; i++) {
-      if ((usage[(currentAddress + i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(currentAddress + i) & mask] & 0x10) == 0) {
         continue;
       }
 
@@ -110,7 +114,7 @@ bool CommonDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address)
   result.setOpcode(address, text);
 
   for (uint32_t i=1; i<=4; i++) {
-    if ((usage[(address + i) & mask] & 0x10) == 0) {
+    if ((usagePointer[(address + i) & mask] & 0x10) == 0) {
       continue;
     }
 
@@ -136,7 +140,7 @@ void CommonDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &st
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usage[(startAddress - i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(startAddress - i) & mask] & 0x10) == 0) {
         continue;
       }
 
@@ -157,7 +161,7 @@ void CommonDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &st
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usage[(endAddress + i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(endAddress + i) & mask] & 0x10) == 0) {
         continue;
       }
 
@@ -170,6 +174,32 @@ void CommonDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &st
     if (!result) {
       break;
     }
+  }
+}
+
+// ------------------------------------------------------------------------
+uint8_t CommonDisasmProcessor::usage(uint32_t address) {
+  return usagePointer[address & mask];
+}
+
+// ------------------------------------------------------------------------
+uint8_t CommonDisasmProcessor::read(uint32_t address) {
+  if (SNES::cartridge.loaded()) {
+    SNES::debugger.bus_access = true;
+    uint8_t data = SNES::debugger.read(memorySource, address & mask);
+    SNES::debugger.bus_access = false;
+    return data;
+  }
+
+  return 0;
+}
+
+// ------------------------------------------------------------------------
+void CommonDisasmProcessor::write(uint32_t address, uint8_t data) {
+  if (SNES::cartridge.loaded()) {
+    SNES::debugger.bus_access = true;
+    SNES::debugger.write(memorySource, address & mask, data);
+    SNES::debugger.bus_access = false;
   }
 }
 
