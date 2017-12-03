@@ -53,6 +53,7 @@ public slots:
   void stepAction();
   void stepOverAction();
   void stepOutAction();
+  void createMemoryEditor();
 
 private:
   inline void switchWindow();

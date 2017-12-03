@@ -39,7 +39,9 @@ public:
   uint8_t usage(unsigned addr);
 
   MemoryEditor();
-  
+
+  void closeEvent(QCloseEvent*);
+
 private:
   QByteArray searchStr;
   int searchPos;
@@ -70,4 +72,5 @@ public slots:
   void importMemory(SNES::Memory&, const string&) const;
 };
 
-extern MemoryEditor *memoryEditor;
+//extern MemoryEditor *memoryEditor;
+extern QVector <MemoryEditor*> memoryEditors;

@@ -5,7 +5,7 @@
 #include "qhexedit2/qhexedit.cpp"
 #include "qhexedit2/commands.cpp"
 
-MemoryEditor *memoryEditor;
+QVector <MemoryEditor*> memoryEditors;
 
 MemoryEditor::MemoryEditor() {
   setObjectName("memory-editor");
@@ -110,6 +110,14 @@ void MemoryEditor::autoUpdate() {
   }
 }
 
+void MemoryEditor::closeEvent(QCloseEvent*) {
+  int32_t index = memoryEditors.indexOf(this);
+
+  if (index >= 0) {
+    memoryEditors.remove(index);
+  }
+}
+
 void MemoryEditor::synchronize() {
   if(SNES::cartridge.loaded() == false) {
     source->setEnabled(false);
@@ -130,6 +138,9 @@ void MemoryEditor::synchronize() {
 
 void MemoryEditor::show() {
   Window::show();
+
+  memoryEditors.push_back(this);
+
   refresh();
 }
 
