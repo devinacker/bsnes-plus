@@ -152,7 +152,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       
       if(!Memory::debugger_access())
       {
-        if (regs.r218a <= 0)
+        if (regs.stream1_queue <= 0)
         {
           //Queue is empty
           regs.stream1_count++;
@@ -275,7 +275,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       
       if(!Memory::debugger_access())
       {
-        if (regs.r2190 <= 0)
+        if (regs.stream2_queue <= 0)
         {
           //Queue is empty
           regs.stream2_count++;
@@ -293,10 +293,9 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       if (regs.stream2_loaded)
       {
         if (regs.stream2_queue >= 128)
-          regs.r2190 = 0x7F;
+          return 0x7F;
         else
-          regs.r2190 = regs.stream2_queue;
-        return regs.r2190;
+          return regs.stream2_queue;
       }
       else
       {
