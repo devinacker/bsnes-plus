@@ -40,6 +40,7 @@ private:
     bool stream1_loaded, stream2_loaded;
     uint8 stream1_count, stream2_count;
     bool stream1_first, stream2_first;
+    uint16 stream1_queue, stream2_queue;
   } regs;
 };
 

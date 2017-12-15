@@ -36,7 +36,8 @@ void BSXBase::stream1_fileload(uint8 count)
     regs.stream1_loaded = true;
     regs.stream1_first = true;
     float QueueSize = SAT1.size() / 22.;
-    regs.r218a = (uint8)(ceil(QueueSize));
+    regs.stream1_queue = ceil(QueueSize);
+
     regs.stream1_first = true;
   }
   else
@@ -60,7 +61,8 @@ void BSXBase::stream2_fileload(uint8 count)
     regs.stream2_loaded = true;
     regs.stream2_first = true;
     float QueueSize = SAT1.size() / 22.;
-    regs.r2190 = (uint8)(ceil(QueueSize));
+    regs.stream2_queue = ceil(QueueSize);
+
     regs.stream2_first = true;
   }
   else
@@ -135,9 +137,10 @@ uint8 BSXBase::mmio_read(unsigned addr) {
     case 0x2189: return regs.r2189; //Logical Channel 2
 
     case 0x218a: {
-      //Prefix Data Count
+      //Prefix Count
       if (!regs.pf_latch1_enable || !regs.dt_latch1_enable)
       {
+        //Stream Not Enabled
         return 0;
       }
 
@@ -166,7 +169,11 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       
       if (regs.stream1_loaded)
       {
-        return regs.r218a;
+        //Lock max value at 0x7F for bigger packets
+        if (regs.stream1_queue >= 128)
+          return 0x7F;
+        else
+          return regs.stream1_queue;
       }
       else
       {
@@ -196,8 +203,8 @@ uint8 BSXBase::mmio_read(unsigned addr) {
               regs.stream1_first = false;
             }
 
-            regs.r218a--;
-            if (regs.r218a == 0)
+            regs.stream1_queue--;
+            if (regs.stream1_queue == 0)
             {
               //Last packet
               temp |= 0x80;
@@ -240,7 +247,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       }
     }
     case 0x218d: {
-      //Prefix Data OR
+      //Prefix Data OR Gate
       uint8 temp = regs.r218d;
       if(!Memory::debugger_access())
       {
@@ -285,6 +292,10 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       
       if (regs.stream2_loaded)
       {
+        if (regs.stream2_queue >= 128)
+          regs.r2190 = 0x7F;
+        else
+          regs.r2190 = regs.stream2_queue;
         return regs.r2190;
       }
       else
@@ -315,8 +326,8 @@ uint8 BSXBase::mmio_read(unsigned addr) {
               regs.stream2_first = false;
             }
 
-            regs.r2190--;
-            if (regs.r2190 == 0)
+            regs.stream2_queue--;
+            if (regs.stream2_queue == 0)
             {
               //Last packet
               temp |= 0x80;
