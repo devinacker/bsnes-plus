@@ -18,6 +18,10 @@ void BSXBase::reset() {
   
   local_time = config.sat.local_time;
   custom_time = config.sat.custom_time;
+
+  regs.r2196 = 0x10;
+  regs.r2197 = 0x80;
+
   time(&start_time);
 }
 
