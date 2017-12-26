@@ -188,9 +188,10 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map mode='linear' address='c0-ff:0000-ffff' offset='000000'/>\n";
     xml << "  </rom>\n";
 
-    if(ram_size > 0) {
+    if(ram_size > 0) {//compatibility improvement(for hack rom). no commerical game (only Tales of Phantasia is ExHiROM ?) get affected
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='80-bf:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
       xml << "  </ram>\n";
     }
   } else if(mapper == SuperFXROM) {

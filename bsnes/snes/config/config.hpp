@@ -4,6 +4,7 @@ struct Configuration {
   System::ExpansionPortDevice expansion_port;
   System::Region region;
   bool random;
+  bool blockInvalidVRAMAccess;
 
   struct CPU {
     unsigned version;

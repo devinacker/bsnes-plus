@@ -36,7 +36,7 @@ Reader::Reader() {
 
   if(opened()) {
     extensionList = string()
-    << " *.smc *.swc *.fig"
+    << " *.swc *.fig" // no need of snesreader to read *.smc? see line 17 and 18 for removing copier header  by komicakomica
     << " *.ufo *.gd3 *.gd7 *.dx2 *.mgd *.mgh"
     << " *.048 *.058 *.068 *.078 *.bin"
     << " *.usa *.eur *.jap *.aus *.bsx";
