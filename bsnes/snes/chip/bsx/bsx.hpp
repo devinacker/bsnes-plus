@@ -22,24 +22,32 @@ private:
   time_t custom_time, start_time;
 
   struct {
-    uint8 r2188, r2189, r218a, r218b;
-    uint8 r218c, r218d, r218e, r218f;
-    uint8 r2190, r2191, r2192, r2193;
-    uint8 r2194, r2195, r2196, r2197;
-    uint8 r2198, r2199, r219a, r219b;
-    uint8 r219c, r219d, r219e, r219f;
+    //Stream 1
+    uint8 r2188, r2189, r218b, r218c, r218d;
 
+    //Stream 2
+    uint8 r218e, r218f, r2191, r2192, r2193;
+
+    //Other
+    uint8 r2194, r2195, r2196, r2197;
+
+    //Serial
+    uint8 r2198, r2199;
+
+    //Time
     uint8 time_counter;
     uint8 time_hour, time_minute, time_second;
     uint8 time_weekday, time_day, time_month;
     uint8 time_yearL, time_yearH;
 
+    //Internal
     bool pf_latch1_enable, dt_latch1_enable;
     bool pf_latch2_enable, dt_latch2_enable;
 
     bool stream1_loaded, stream2_loaded;
     uint8 stream1_count, stream2_count;
     bool stream1_first, stream2_first;
+    uint16 stream1_queue, stream2_queue;
   } regs;
 };
 
