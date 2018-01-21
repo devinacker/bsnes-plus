@@ -115,6 +115,7 @@ bool FmaSymbolFile::read(const nall::lstring &rows, SymbolMap *map) const {
 
   for (int i=0; i<rows.size(); i++) {
     string row = filteredRow(rows[i]);
+
     if (row.length() == 0) {
       continue;
     }

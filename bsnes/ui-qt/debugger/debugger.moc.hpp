@@ -37,6 +37,7 @@ public:
 
   class SymbolMap *symbolsCPU;
   class SymbolMap *symbolsSA1;
+  class SymbolMap *symbolsSMP;
 
   void modifySystemState(unsigned);
   void echo(const char *message);

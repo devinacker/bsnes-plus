@@ -63,14 +63,36 @@ void SymbolMap::addComment(uint32_t address, const string &name) {
 }
 
 // ------------------------------------------------------------------------
+void SymbolMap::addNewSymbols(uint32_t address, const Symbols &s) {
+  int32_t left = 0;
+  int32_t right = symbols.size() - 1;
+
+  while (right >= left) {
+    uint32_t cur = ((right - left) >> 1) + left;
+    uint32_t curaddr = symbols[cur].address;
+
+    if (address < curaddr) {
+      right = cur - 1;
+    } else if (address > curaddr) {
+      left = cur + 1;
+    } else {
+      puts("[ERROR] Symbol already exists in list");
+      return;
+    }
+  }
+
+  symbols.insert(left, s);
+  isValid = false;
+}
+
+// ------------------------------------------------------------------------
 void SymbolMap::addSymbol(uint32_t address, const Symbol &name) {
   int32_t index = getSymbolIndex(address);
   if (index == -1) {
     Symbols s;
     s.address = address;
     s.symbols.append(Symbol(name));
-    symbols.append(s);
-    isValid = false;
+    addNewSymbols(address, s);
   } else {
     symbols[index].symbols.append(Symbol(name));
   }
