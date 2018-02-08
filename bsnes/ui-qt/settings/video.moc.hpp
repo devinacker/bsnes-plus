@@ -40,6 +40,8 @@ public:
   QLineEdit *shaderValue;
   QPushButton *shaderSelect;
   QPushButton *shaderDefault;
+  QLabel *miscellaneousLabel;
+  QCheckBox *unfilteredScreenshot;
 
   void synchronizePixelShaderSettings();
   void syncUi();
@@ -58,6 +60,7 @@ private slots:
   void cropBottomAdjust(int);
   void selectShader();
   void defaultShader();
+  void unfilteredScreenshotToggle(int);
 
 private:
   void assignShader(const string &filename);

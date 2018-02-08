@@ -52,6 +52,8 @@ public:
     unsigned cropRight;
     unsigned cropBottom;
 
+    bool unfilteredScreenshot;
+
     struct Context {
       bool correctAspectRatio;
       unsigned multiplier, region;

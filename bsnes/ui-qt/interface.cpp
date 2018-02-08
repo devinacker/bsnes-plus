@@ -22,7 +22,9 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
     if(!overscan) data -= 7 * 1024;
   }
 
-  if(saveScreenshot == true) captureScreenshot(filter.renderUnfilteredScreenshot(data, pitch, width, height));
+  if(saveScreenshot == true && config().video.unfilteredScreenshot == true) {
+    captureScreenshot(filter.renderUnfilteredScreenshot(data, pitch, width, height));
+  }
 
   //scale display.crop* values from percentage-based (0-100%) to exact pixel sizes (width, height)
   unsigned cropLeft = (double)display.cropLeft / 100.0 * width;
@@ -42,6 +44,10 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
     filter.render(output, outpitch, data, pitch, width, height);
     video.unlock();
     video.refresh();
+
+    if(saveScreenshot == true && config().video.unfilteredScreenshot == false) {
+      captureScreenshot(QImage((const unsigned char*)output, outwidth, outheight, outpitch, QImage::Format_RGB32));
+    }
   }
 
   state.frame();
