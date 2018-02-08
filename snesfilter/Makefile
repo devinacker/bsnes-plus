@@ -1,6 +1,6 @@
 include nall/Makefile
 
-qtlibs := QtCore QtGui
+qtlibs := QtCore QtGui QtWidgets
 include nall/qt/Makefile
 
 c     := $(compiler) -xc -std=gnu99

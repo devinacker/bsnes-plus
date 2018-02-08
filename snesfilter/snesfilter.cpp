@@ -11,7 +11,7 @@
 #include <string.h>
 
 #define QT_CORE_LIB
-#include <QtGui>
+#include <QtWidgets>
 
 #include <nall/config.hpp>
 #include <nall/detect.hpp>
