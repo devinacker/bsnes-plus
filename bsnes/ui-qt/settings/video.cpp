@@ -147,6 +147,13 @@ VideoSettingsWindow::VideoSettingsWindow() {
   shaderDefault = new QPushButton("Default");
   pixelShaderLayout->addWidget(shaderDefault, 0, 2);
 
+  miscellaneousLabel = new QLabel("<b>Miscellaneous</b>");
+  layout->addWidget(miscellaneousLabel);
+
+  unfilteredScreenshot = new QCheckBox("Save Unfiltered Screenshots");
+  layout->addWidget(unfilteredScreenshot);
+
+
   connect(autoHideFullscreenMenu, SIGNAL(stateChanged(int)), this, SLOT(autoHideFullscreenMenuToggle()));
   connect(contrastSlider, SIGNAL(valueChanged(int)), this, SLOT(contrastAdjust(int)));
   connect(brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessAdjust(int)));
@@ -159,6 +166,7 @@ VideoSettingsWindow::VideoSettingsWindow() {
   connect(cropBottomSlider, SIGNAL(valueChanged(int)), this, SLOT(cropBottomAdjust(int)));
   connect(shaderSelect, SIGNAL(released()), this, SLOT(selectShader()));
   connect(shaderDefault, SIGNAL(released()), this, SLOT(defaultShader()));
+  connect(unfilteredScreenshot, SIGNAL(stateChanged(int)), this, SLOT(unfilteredScreenshotToggle(int)));
 
   syncUi();
 }
@@ -212,6 +220,8 @@ void VideoSettingsWindow::syncUi() {
   cropBottomSlider->setSliderPosition(n);
 
   shaderValue->setText(config().path.shader);
+
+  unfilteredScreenshot->setChecked(config().video.unfilteredScreenshot);
 }
 
 void VideoSettingsWindow::autoHideFullscreenMenuToggle() {
@@ -291,4 +301,9 @@ void VideoSettingsWindow::assignShader(const string &filename) {
     syncUi();
     utility.updatePixelShader();
   }
+}
+
+void VideoSettingsWindow::unfilteredScreenshotToggle(int state) {
+  config().video.unfilteredScreenshot = (state == Qt::Checked);
+  syncUi();
 }

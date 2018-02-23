@@ -8,7 +8,7 @@ public:
   void message(const string &text);
 
   Interface();
-  void captureScreenshot(uint32_t*, unsigned, unsigned, unsigned);
+  void captureScreenshot(const QImage&);
   void captureSPC();
   bool saveScreenshot;
   bool framesUpdated;

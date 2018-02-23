@@ -195,6 +195,50 @@ void Filter::render(
   }
 }
 
+QImage Filter::renderUnfilteredScreenshot(
+  const uint16_t *input, unsigned pitch, unsigned width, unsigned height
+) {
+  unsigned outWidth = width;
+  unsigned outHeight = height;
+  bool doubleHeight = false;
+  bool doubleWidth = false;
+
+  if(width > 256 && height <= 240) {
+    outHeight *= 2;
+    doubleHeight = true;
+  }
+  else if(width <= 256 && height > 240) {
+    outWidth *= 2;
+    doubleWidth = true;
+  }
+
+  QImage image(outWidth, outHeight, QImage::Format_RGB32);
+  if(image.isNull()) return image;
+
+  pitch >>= 1;
+  unsigned wordsPerScanline = image.bytesPerLine() / sizeof(QRgb);
+  unsigned outpitch = doubleHeight ? wordsPerScanline * 2 : wordsPerScanline;
+
+  QRgb* output = (QRgb*)image.bits();
+
+  for(unsigned y = 0; y < height; y++) {
+    const uint16_t *in = input + y * pitch;
+    QRgb *scanline = output + y * outpitch;
+    QRgb *out = scanline;
+
+    for(unsigned x = 0; x < width; x++) {
+      if(doubleWidth) *out++ = colortable[*in];
+      *out++ = colortable[*in];
+      in++;
+    }
+    if(doubleHeight) {
+      memcpy(scanline + wordsPerScanline, scanline, wordsPerScanline * sizeof(QRgb));
+    }
+  }
+
+  return image;
+}
+
 QWidget* Filter::settings() {
   if(opened() && renderer > 0) {
     return dl_settings(renderer);
