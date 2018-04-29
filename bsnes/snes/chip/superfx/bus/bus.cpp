@@ -73,7 +73,7 @@ unsigned SuperFXCPUROM::size() const {
 }
 
 uint8 SuperFXCPUROM::read(unsigned addr) {
-  if(superfx.regs.sfr.g && superfx.regs.scmr.ron && !debugger_access()) {
+  if(superfx.regs.sfr.g && superfx.regs.scmr.ron) {
     static const uint8_t data[16] = {
       0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
       0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
