@@ -58,8 +58,12 @@ void Utility::unacquireMouse() {
 }
 
 void Utility::updateAvSync() {
-  video.set(Video::Synchronize, config().video.synchronize);
-  audio.set(Audio::Synchronize, config().audio.synchronize);
+  updateAvSync(config().video.synchronize, config().audio.synchronize);
+}
+
+void Utility::updateAvSync(bool syncVideo, bool syncAudio) {
+  video.set(Video::Synchronize, syncVideo);
+  audio.set(Audio::Synchronize, syncAudio);
 }
 
 void Utility::updateColorFilter() {
@@ -85,7 +89,11 @@ void Utility::updateSoftwareFilter() {
 }
 
 void Utility::updateEmulationSpeed() {
-  config().system.speed = max(0, min(4, (signed)config().system.speed));
+  updateEmulationSpeed(config().system.speed);
+}
+
+void Utility::updateEmulationSpeed(unsigned speed) {
+  speed = max(0, min(4, (signed)speed));
 
   double scale[] = {
     config().system.speedSlowest / 100.0,
@@ -95,7 +103,7 @@ void Utility::updateEmulationSpeed() {
     config().system.speedFastest / 100.0,
   };
   unsigned outfreq = config().audio.outputFrequency;
-  unsigned infreq  = config().audio.inputFrequency * scale[config().system.speed] + 0.5;
+  unsigned infreq  = config().audio.inputFrequency * scale[speed] + 0.5;
 
   audio.set(Audio::Resample, true);  //always resample (required for volume adjust + frequency scaler)
   audio.set(Audio::ResampleRatio, (double)infreq / (double)outfreq);

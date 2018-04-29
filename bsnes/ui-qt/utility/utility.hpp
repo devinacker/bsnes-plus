@@ -8,11 +8,13 @@ public:
   void unacquireMouse();
 
   void updateAvSync();
+  void updateAvSync(bool syncVideo, bool syncAudio);
   void updateColorFilter();
   void updatePixelShader();
   void updateHardwareFilter();
   void updateSoftwareFilter();
   void updateEmulationSpeed();
+  void updateEmulationSpeed(unsigned speed);
   void updateControllers();
 
   //system-state.cpp

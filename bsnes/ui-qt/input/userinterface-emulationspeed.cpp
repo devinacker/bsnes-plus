@@ -7,39 +7,14 @@ namespace UserInterfaceEmulationSpeed {
 //until the key is released.
 
 struct Slowdown : HotkeyInput {
-  bool syncVideo;
-  bool syncAudio;
-  unsigned speed;
-
   void pressed() {
-    speed = config().system.speed;
-    config().system.speed = 0;
-    utility.updateEmulationSpeed();
-    syncVideo = config().video.synchronize;
-    syncAudio = config().audio.synchronize;
-    if(syncVideo) {
-      config().video.synchronize = false;
-      utility.updateAvSync();
-    }
-    if(!syncAudio) {
-      config().audio.synchronize = true;
-      utility.updateAvSync();
-    }
-    mainWindow->syncUi();
+    utility.updateEmulationSpeed(0);
+    utility.updateAvSync(false, true);
   }
 
   void released() {
-    config().system.speed = speed;
     utility.updateEmulationSpeed();
-    if(syncVideo) {
-      config().video.synchronize = true;
-      utility.updateAvSync();
-    }
-    if(!syncAudio) {
-      config().audio.synchronize = false;
-      utility.updateAvSync();
-    }
-    mainWindow->syncUi();
+    utility.updateAvSync();
   }
 
   Slowdown() : HotkeyInput("Slowdown", "input.userInterface.emulationSpeed.slowdown") {
@@ -49,49 +24,22 @@ struct Slowdown : HotkeyInput {
 } slowdown;
 
 struct Speedup : HotkeyInput {
-  bool syncVideo;
-  bool syncAudio;
-  unsigned speed;
-  unsigned frameskip;
-
   void pressed() {
     if(SNES::PPU::SupportsFrameSkip) {
-      frameskip = SNES::ppu.get_frameskip();
       SNES::ppu.set_frameskip(9);
     }
     
-    speed = config().system.speed;
-    config().system.speed = 4;
-    utility.updateEmulationSpeed();
-    syncVideo = config().video.synchronize;
-    syncAudio = config().audio.synchronize;
-    if(syncVideo) {
-      config().video.synchronize = false;
-      utility.updateAvSync();
-    }
-    if(syncAudio) {
-      config().audio.synchronize = false;
-      utility.updateAvSync();
-    }
-    mainWindow->syncUi();
+    utility.updateEmulationSpeed(4);
+	utility.updateAvSync(false, false);
   }
 
   void released() {
     if(SNES::PPU::SupportsFrameSkip) {
-      SNES::ppu.set_frameskip(frameskip);
+      SNES::ppu.set_frameskip(0);
     }
     
-    config().system.speed = speed;
     utility.updateEmulationSpeed();
-    if(syncVideo) {
-      config().video.synchronize = true;
-      utility.updateAvSync();
-    }
-    if(syncAudio) {
-      config().audio.synchronize = true;
-      utility.updateAvSync();
-    }
-    mainWindow->syncUi();
+    utility.updateAvSync();
   }
 
   Speedup() : HotkeyInput("Speedup", "input.userInterface.emulationSpeed.speedup") {
