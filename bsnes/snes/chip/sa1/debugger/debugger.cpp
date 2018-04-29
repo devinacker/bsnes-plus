@@ -66,12 +66,15 @@ alwaysinline uint8_t SA1Debugger::op_readpc() {
 
 uint8 SA1Debugger::op_read(uint32 addr) {
   uint8 data = SA1::op_read(addr);
-  usage[addr] |= UsageRead;
+  // ignore dummy reads that can be caused by interrupts
+  if (!interrupt_pending()) {
+    usage[addr] |= UsageRead;
   
-  int offset = cartridge.rom_offset(addr);
-  if (offset >= 0) (*cart_usage)[offset] |= UsageRead;
+    int offset = cartridge.rom_offset(addr);
+    if (offset >= 0) (*cart_usage)[offset] |= UsageRead;
   
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::SA1Bus, Debugger::Breakpoint::Mode::Read, addr, data);
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::SA1Bus, Debugger::Breakpoint::Mode::Read, addr, data);
+  }
   return data;
 }
 

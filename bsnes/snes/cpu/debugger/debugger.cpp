@@ -74,12 +74,15 @@ alwaysinline uint8_t CPUDebugger::op_readpc() {
 
 uint8 CPUDebugger::op_read(uint32 addr) {
   uint8 data = CPU::op_read(addr);
-  usage[addr] |= UsageRead;
+  // ignore dummy reads that can be caused by interrupts
+  if (!interrupt_pending()) {
+    usage[addr] |= UsageRead;
   
-  int offset = cartridge.rom_offset(addr);
-  if (offset >= 0) cart_usage[offset] |= UsageRead;
+    int offset = cartridge.rom_offset(addr);
+    if (offset >= 0) cart_usage[offset] |= UsageRead;
   
-  debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, addr, data);
+    debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Read, addr, data);
+  }
   return data;
 }
 

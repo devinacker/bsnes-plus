@@ -95,13 +95,13 @@ void SMPcore::op_mov_dp_dp() {
 void SMPcore::op_mov_dp_const() {
   rd = op_readpc();
   dp = op_readpc();
-  op_readdp<false>(dp);
+  SMPcore::op_readdp(dp); // dummy read; don't use debugger's read method
   op_writedp(dp, rd);
 }
 
 void SMPcore::op_mov_ix_a() {
   op_io();
-  op_readdp<false>(regs.x);
+  SMPcore::op_readdp(regs.x); // dummy read; don't use debugger's read method
   op_writedp(regs.x, regs.a);
 }
 
@@ -113,7 +113,7 @@ void SMPcore::op_mov_ixinc_a() {
 
 template<int n> void SMPcore::op_mov_dp_reg() {
   dp = op_readpc();
-  op_readdp<false>(dp);
+  SMPcore::op_readdp(dp); // dummy read; don't use debugger's read method
   op_writedp(dp, regs.r[n]);
 }
 
@@ -121,14 +121,14 @@ template<int n, int i> void SMPcore::op_mov_dpr_reg() {
   dp  = op_readpc();
   op_io();
   dp += regs.r[i];
-  op_readdp<false>(dp);
+  SMPcore::op_readdp(dp); // dummy read; don't use debugger's read method
   op_writedp(dp, regs.r[n]);
 }
 
 template<int n> void SMPcore::op_mov_addr_reg() {
   dp  = op_readpc() << 0;
   dp |= op_readpc() << 8;
-  op_readaddr<false>(dp);
+  SMPcore::op_readaddr(dp); // dummy read; don't use debugger's read method
   op_writeaddr(dp, regs.r[n]);
 }
 
@@ -137,7 +137,7 @@ template<int i> void SMPcore::op_mov_addrr_a() {
   dp |= op_readpc() << 8;
   op_io();
   dp += regs.r[i];
-  op_readaddr<false>(dp);
+  SMPcore::op_readaddr(dp); // dummy read; don't use debugger's read method
   op_writeaddr(dp, regs.a);
 }
 
@@ -147,7 +147,7 @@ void SMPcore::op_mov_idpx_a() {
   sp += regs.x;
   dp  = op_readdp(sp + 0) << 0;
   dp |= op_readdp(sp + 1) << 8;
-  op_readaddr<false>(dp);
+  SMPcore::op_readaddr(dp); // dummy read; don't use debugger's read method
   op_writeaddr(dp, regs.a);
 }
 
@@ -157,7 +157,7 @@ void SMPcore::op_mov_idpy_a() {
   dp |= op_readdp(sp + 1) << 8;
   op_io();
   dp += regs.y;
-  op_readaddr<false>(dp);
+  SMPcore::op_readaddr(dp); // dummy read; don't use debugger's read method
   op_writeaddr(dp, regs.a);
 }
 
@@ -172,7 +172,7 @@ void SMPcore::op_movw_ya_dp() {
 
 void SMPcore::op_movw_dp_ya() {
   dp = op_readpc();
-  op_readdp<false>(dp);
+  SMPcore::op_readdp(dp); // dummy read; don't use debugger's read method
   op_writedp(dp + 0, regs.a);
   op_writedp(dp + 1, regs.y);
 }

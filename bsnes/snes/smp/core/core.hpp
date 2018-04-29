@@ -8,7 +8,6 @@ public:
   uint16 dp, sp, rd, wr, bit, ya;
 
   virtual void op_io() = 0;
-  virtual uint8 op_read_dummy(uint16 addr) = 0;
   virtual uint8 op_read(uint16 addr) = 0;
   virtual void op_write(uint16 addr, uint8 data) = 0;
 

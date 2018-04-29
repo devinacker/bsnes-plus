@@ -80,7 +80,7 @@ alwaysinline void CPU::op_step() {
 }
 
 void CPU::op_irq(uint16 vector) {
-  op_read(regs.pc.d);
+  CPU::op_read(regs.pc.d); // dummy read; don't use debugger's read method
   op_io();
   if(!regs.e) op_writestack(regs.pc.b);
   op_writestack(regs.pc.h);

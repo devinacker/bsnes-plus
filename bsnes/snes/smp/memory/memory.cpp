@@ -193,12 +193,6 @@ void SMP::op_io() {
   cycle_edge();
 }
 
-uint8 SMP::op_read_dummy(uint16 addr) {
-  // lame hack to always use the non-debugger version of op_read
-  // (for dummy reads in write instructions which shouldn't trigger read breakpoints)
-  return SMP::op_read(addr);
-}
-
 uint8 SMP::op_read(uint16 addr) {
   add_clocks(12);
   uint8 r = op_busread(addr);
