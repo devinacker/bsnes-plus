@@ -110,20 +110,18 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
   }
 
   // internal
-  item("SA-1 MDR", string("0x", hex<2>(regs.mdr)));
+  item("SA-1 open bus", string("0x", hex<2>(regs.mdr)));
   
   // $2200
   item("$2200", "");
-  item("SA-1 IRQ", mmio.sa1_irq);
   item("SA-1 Ready", mmio.sa1_rdyb);
   item("SA-1 Reset", mmio.sa1_resb);
-  item("SA-1 NMI", mmio.sa1_nmi);
   item("S-CPU to SA-1 Message", string("0x", hex<1>(mmio.smeg)));
   
   // $2201
   item("$2201", "");
-  item("S-CPU IRQ", mmio.cpu_irqen);
-  item("DMA IRQ", mmio.chdma_irqen);
+  item("S-CPU IRQ Enable", mmio.cpu_irqen);
+  item("Char DMA IRQ Enable", mmio.chdma_irqen);
   
   // $2203-2208
   item("$2203-$2204", "");
@@ -132,6 +130,19 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
   item("SA-1 NMI Vector", string("0x", hex<4>(mmio.cnv)));
   item("$2207-$2208", "");
   item("SA-1 IRQ Vector", string("0x", hex<4>(mmio.civ)));
+  
+  // $2209
+  item("$2209", "");
+  item("S-CPU IRQ Vector Enable", mmio.cpu_ivsw);
+  item("S-CPU NMI Vector Enable", mmio.cpu_nvsw);
+  item("SA-1 to S-CPU Message", string("0x", hex<1>(mmio.cmeg)));
+  
+  // $220a
+  item("$220a", "");
+  item("SA-1 IRQ Enable", mmio.sa1_irqen);
+  item("SA-1 Timer IRQ Enable", mmio.timer_irqen);
+  item("SA-1 DMA IRQ Enable", mmio.dma_irqen);
+  item("SA-1 NMI Enable", mmio.sa1_nmien);
   
   // $220c-220f
   item("$220c-$220d", "");
@@ -142,8 +153,16 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
   // $2210
   item("$2210", "");
   item("Timer Type", mmio.hvselb ? "Linear" : "H/V");
-  item("V-Count Enable", mmio.ven);
-  item("H-Count Enable", mmio.hen);
+  item("V-Count IRQ Enable", mmio.ven);
+  item("H-Count IRQ Enable", mmio.hen);
+  
+  // $2212-2213
+  item("$2212-$2213", "");
+  item("H-Count", string("0x", hex<4>(mmio.hcnt)));
+
+  // $2214-2215
+  item("$2214-$2215", "");
+  item("V-Count", string("0x", hex<4>(mmio.vcnt)));
   
   // $2220-2223
   item("$2220", "");
@@ -160,9 +179,133 @@ bool SA1Debugger::property(unsigned id, string &name, string &value) {
   
   item("$2223", "");
   item("Bank F Projection", mmio.fbmode);
-  item("Bank F ($a0-$bF)", string("0x", hex<1>(mmio.fb), " (0x", hex<6>(mmio.fb << 20), ")"));
+  item("Bank F ($A0-$BF)", string("0x", hex<1>(mmio.fb), " (0x", hex<6>(mmio.fb << 20), ")"));
   
-  // TODO: rest of these
+  // $2224-2225
+  item("$2224", "");
+  item("S-CPU BW-RAM Bank", string("0x", hex<1>(mmio.sbm), " (0x", hex<5>(mmio.sbm << 13), ")"));
+  
+  item("$2225", "");
+  item("SA-1 BW-RAM Bitmap", mmio.sw46);
+  item("SA-1 BW-RAM Bank", string("0x", hex<1>(mmio.cbm), " (0x", hex<5>(mmio.cbm << 13), ")"));
+  
+  // $2226-222a
+  item("$2226", "");
+  item("S-CPU BW-RAM Write Enable", mmio.swen);
+  
+  item("$2227", "");
+  item("SA-1 BW-RAM Write Enable", mmio.cwen);
+  
+  item("$2228", "");
+  item("BW-RAM Write Protect Size", string("0x", hex<3>(mmio.bwp << 8)));
+  
+  item("$2229", "");
+  for (unsigned i = 0; i < 8; i++) {
+    item(string("S-CPU IRAM Write Protect 0x", hex<4>(0x3000 + (i<<8))), (bool)((mmio.siwp>>i) & 1));
+  }
+  
+  item("$222a", "");
+  for (unsigned i = 0; i < 8; i++) {
+    item(string("SA-1 IRAM Write Protect 0x", hex<4>(0x3000 + (i<<8))), (bool)((mmio.ciwp>>i) & 1));
+  }
+  
+  // $2230-2231
+  item("$2230", "");
+  string sd;
+  
+  switch (mmio.sd) {
+  case 0: sd = "ROM"; break;
+  case 1: sd = "BW-RAM"; break;
+  case 2: sd = "IRAM"; break;
+  default: sd = "Invalid"; break;
+  }
+  
+  item("DMA Enable", mmio.dmaen);
+  item("DMA Priority", mmio.dprio);
+  item("DMA Char Conversion Enable", mmio.cden);
+  item("DMA Char Conversion Type", mmio.cdsel);
+  item("DMA Destination", mmio.dd ? "BW-RAM" : "IRAM");
+  item("DMA Source", sd);
+  
+  item("$2231", "")
+  string cb;
+  
+  switch (mmio.dmacb) {
+  case 0: cb = "8 bpp"; break;
+  case 1: cb = "4 bpp"; break;
+  case 2: cb = "2 bpp"; break;
+  default: cb = "Invalid"; break;
+  }
+  
+  item("DMA Size", string(1<<mmio.dmasize, " tile(s)"));
+  item("DMA Bit Depth", cb); 
+  
+  // $2232-2234
+  item("$2232-$2234", "");
+  item("DMA Source Address", string("0x", hex<6>(mmio.dsa)));
+  
+  // $2235-2237
+  item("$2235-$2237", "");
+  item("DMA Destination Address", string("0x", hex<6>(mmio.dda)));
+  
+  // $2238-2239
+  item("$2238-$2239", "");
+  item("DMA Terminal Counter", string("0x", hex<4>(mmio.dtc)));
+  
+  // $223f
+  item("$223f", "");
+  item("BW-RAM Bitmap Format", mmio.bbf ? "2 bpp" : "4 bpp");
+  
+  // $2250-2254
+  item("$2250", "");
+  item("Arithmetic Operation", mmio.acm ? "Cumulative sum" : (mmio.md ? "Division" : "Multiplication"));
+  
+  item("$2251-$2252", "");
+  item("Multiplicand / Dividend", string((int16)mmio.ma, " (0x", hex<4>(mmio.ma), ")"));
+  
+  item("$2253-$2254", "");
+  item("Multiplier", string((int16)mmio.mb, " (0x", hex<4>(mmio.mb), ")"));
+  item("Divisor", string(mmio.mb, " (0x", hex<4>(mmio.mb), ")"));
+  
+  // $2258
+  item("$2258", "");
+  item("Variable-Length Bit Auto Increment", mmio.hl);
+  item("Variable-Length Bit Length", (unsigned)mmio.vb);
+  
+  // $2259-225b
+  item("$2259-$225b", "");
+  item("Variable-Length Bit Start Address", mmio.va);
+  
+  // $2300
+  item("$2300", "");
+  item("S-CPU IRQ", mmio.cpu_irqfl);
+  item("Char DMA IRQ", mmio.chdma_irqfl);
+  
+  // $2301
+  item("$2301", "");
+  item("SA-1 IRQ", mmio.sa1_irqfl);
+  item("SA-1 Timer IRQ", mmio.timer_irqfl);
+  item("SA-1 DMA IRQ", mmio.dma_irqfl);
+  item("SA-1 NMI", mmio.sa1_nmifl);
+  
+  // $2302-2303
+  item("$2302-$2303", "");
+  item("H-Count Read", string("0x", hex<4>(mmio.hcr)));
+
+  // $2304-2305
+  item("$2304-$2305", "");
+  item("V-Count Read", string("0x", hex<4>(mmio.vcr)));
+  
+  // $2306-230b
+  item("$2306-$230b", "");
+  int32  mult = (int32)(uint32)mmio.mr;
+  int16  div  = (int16)(uint16)mmio.mr;
+  uint16 divr = (mmio.mr >> 16) & 0xffff;
+  item("Multiplication Result", string(mult, " (0x", hex<8>((uint32)mmio.mr), ")"));
+  item("Division Result", string(div, " (0x", hex<4>((uint16)mmio.mr), ")"));
+  item("Division Remainder", string(divr, " (0x", hex<4>(divr), ")"));
+  item("Cumulative Sum", string("0x", hex<10>(mmio.mr & ((1ULL << 40) - 1))));
+  item("Arithmetic Overflow", mmio.overflow);
   
   #undef item
   return false;

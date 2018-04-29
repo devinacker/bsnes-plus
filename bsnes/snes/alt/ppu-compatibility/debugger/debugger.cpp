@@ -102,8 +102,8 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   }
 
   //internal
-  item("S-PPU1 MDR", string("0x", hex<2>(regs.ppu1_mdr)));
-  item("S-PPU2 MDR", string("0x", hex<2>(regs.ppu2_mdr)));
+  item("S-PPU1 open bus", string("0x", hex<2>(regs.ppu1_mdr)));
+  item("S-PPU2 open bus", string("0x", hex<2>(regs.ppu2_mdr)));
 
   //$2100
   item("$2100", "");
