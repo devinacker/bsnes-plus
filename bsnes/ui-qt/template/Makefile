@@ -26,8 +26,14 @@ ifeq ($(rcc),)
 endif
 
 ifeq ($(platform),x)
-  qtinc := `pkg-config --cflags $(qtlibs)`
-  qtlib := `pkg-config --libs $(qtlibs)`
+  qtlibs := $(subst Qt,Qt5,$(qtlibs))
+  qtinc := $(shell pkg-config --cflags $(qtlibs))
+  qtlib := $(shell pkg-config --libs $(qtlibs))
+
+  ifneq ($(filter reduce_relocations, $(shell pkg-config --variable qt_config $(qtlibs))),)
+    qtinc += -fPIC
+    qtlib += -fPIC
+  endif
 else ifeq ($(platform),osx)
   ifeq ($(qtpath),)
     qtinc := $(foreach lib,$(qtlibs),-I/Library/Frameworks/$(lib).framework/Versions/5/Headers)
