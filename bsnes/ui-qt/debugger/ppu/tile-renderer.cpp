@@ -34,6 +34,19 @@ unsigned TileRenderer::nTiles() const {
   return (0x10000 - a) / bytesInbetweenTiles();
 }
 
+unsigned TileRenderer::maxAddress() const {
+  switch(source) {
+    case Source::VRAM:     return 64 * 1024;
+    case Source::CPU_BUS:  return 16 * 1024 * 1024;
+    case Source::CART_ROM: return SNES::memory::cartrom.size();
+    case Source::CART_RAM: return SNES::memory::cartram.size();
+    case Source::SA1_BUS:  return SNES::cartridge.has_sa1()    ? 16 * 1024 * 1024 : 0;
+    case Source::SFX_BUS:  return SNES::cartridge.has_superfx() ? 8 * 1024 * 1024 : 0;
+  }
+
+  return 0;
+}
+
 void TileRenderer::buildCgramPalette() {
   const unsigned nColors = colorsPerTile();
 
@@ -75,9 +88,8 @@ void TileRenderer::draw() {
   if(isMode7()) { drawMode7Tileset(); return; }
 
   if(source == Source::VRAM) { drawVramTileset(); return; }
-  if(source == Source::CPU_BUS) { drawCpuBusTiles(); return; }
 
-  invalidateImage();
+  drawMemorySourceTiles();
 }
 
 void TileRenderer::drawVramTileset() {
@@ -139,11 +151,20 @@ void TileRenderer::drawMode7Tileset() {
   }
 }
 
-void TileRenderer::drawCpuBusTiles() {
+void TileRenderer::drawMemorySourceTiles() {
   typedef SNES::Debugger::MemorySource MemorySource;
 
-  source = Source::CPU_BUS;
+  if(source == Source::VRAM) source = Source::CPU_BUS;
   address &= 0xffffff;
+
+  MemorySource memSource = MemorySource::CPUBus;
+  switch(source) {
+    case Source::CPU_BUS:  memSource = MemorySource::CPUBus;  break;
+    case Source::CART_ROM: memSource = MemorySource::CartROM; break;
+    case Source::CART_RAM: memSource = MemorySource::CartRAM; break;
+    case Source::SA1_BUS:  memSource = MemorySource::SA1Bus;  break;
+    case Source::SFX_BUS:  memSource = MemorySource::SFXBus;  break;
+  }
 
   const unsigned height = nTiles() / width;
 
@@ -167,7 +188,7 @@ void TileRenderer::drawCpuBusTiles() {
 
     for(unsigned x = 0; x < width; x++) {
       for(unsigned i = 0; i < bytesPerTile; i++) {
-        tile[i] = SNES::debugger.read(MemorySource::CPUBus, addr);
+        tile[i] = SNES::debugger.read(memSource, addr);
         addr++;
       }
       draw8pxTile(imgBits, wordsPerScanline, tile, 0, 0, 0);
