@@ -208,17 +208,16 @@ void TileViewer::show() {
 void TileViewer::refresh() {
   if(inUpdateFormCall || inExportClickedCall) return;
 
+  updateRendererSettings();
+
   if(SNES::cartridge.loaded()) {
     cgramWidget->refresh();
 
-    updateRendererSettings();
-
     renderer.draw();
     imageGridWidget->setImage(renderer.image);
-
-    updateForm();
   }
 
+  updateForm();
   updateTileInfo();
 }
 

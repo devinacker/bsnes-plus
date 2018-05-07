@@ -175,16 +175,15 @@ void TilemapViewer::show() {
 void TilemapViewer::refresh() {
   if(inUpdateFormCall || inExportClickedCall) return;
 
-  if(SNES::cartridge.loaded()) {
-    updateRendererSettings();
+  updateRendererSettings();
 
+  if(SNES::cartridge.loaded()) {
     renderer.drawTilemap();
     imageGridWidget->setImage(renderer.image);
     imageGridWidget->setGridSize(renderer.tileSizePx());
-
-    updateForm();
   }
 
+  updateForm();
   updateTileInfo();
 }
 
