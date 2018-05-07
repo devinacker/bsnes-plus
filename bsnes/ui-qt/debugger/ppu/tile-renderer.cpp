@@ -20,6 +20,7 @@ unsigned TileRenderer::addressMask() const {
     case BitDepth::BPP4: return 0xffe0;
     case BitDepth::BPP2: return 0xfff0;
     case BitDepth::MODE7: return 0;
+    case BitDepth::MODE7_EXTBG: return 0;
   }
   return 0;
 }
@@ -27,7 +28,7 @@ unsigned TileRenderer::addressMask() const {
 unsigned TileRenderer::nTiles() const {
   if(source != Source::VRAM) return int(255 / width + 1) * width;
 
-  if(bitDepth == BitDepth::MODE7) return 256;
+  if(isMode7()) return 256;
 
   unsigned a = address & addressMask();
   return (0x10000 - a) / bytesInbetweenTiles();
@@ -71,7 +72,7 @@ void TileRenderer::draw() {
   if(width < 8) width = 8;
   if(width > 64) width = 64;
 
-  if(bitDepth == BitDepth::MODE7) { drawMode7Tileset(); return; }
+  if(isMode7()) { drawMode7Tileset(); return; }
 
   if(source == Source::VRAM) { drawVramTileset(); return; }
   if(source == Source::CPU_BUS) { drawCpuBusTiles(); return; }

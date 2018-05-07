@@ -18,13 +18,13 @@ void TilemapRenderer::updateBitDepth() {
 }
 
 unsigned TilemapRenderer::nLayersInMode() const {
-  const static unsigned layers[8] = { 4, 3, 2, 2, 2, 2, 1, 1 };
+  const static unsigned layers[8] = { 4, 3, 2, 2, 2, 2, 1, 2 };
 
   return layers[screenMode & 7];
 }
 
 unsigned TilemapRenderer::tileSizePx() const {
-  if(bitDepth != BitDepth::MODE7) {
+  if(!isMode7()) {
     return tileSize ? 16 : 8;
   } else {
     return 8;
@@ -33,6 +33,9 @@ unsigned TilemapRenderer::tileSizePx() const {
 
 void TilemapRenderer::loadScreenMode() {
   screenMode = SNES::ppu.bg_mode() & 7;
+  if(screenMode == 7) {
+      layer = SNES::ppu.mode7_extbg();
+  }
 }
 
 void TilemapRenderer::loadTilemapSettings() {
@@ -61,7 +64,7 @@ void TilemapRenderer::loadTilemapSettings() {
 void TilemapRenderer::drawTilemap() {
   buildPalette();
 
-  if(bitDepth == BitDepth::MODE7) { drawMode7Tilemap(); return; }
+  if(isMode7()) { drawMode7Tilemap(); return; }
   if(bitDepth == BitDepth::NONE) { invalidateImage(); return; }
 
   unsigned mapSize = tileSize ? 512 : 256;

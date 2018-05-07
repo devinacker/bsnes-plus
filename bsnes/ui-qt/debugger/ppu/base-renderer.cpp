@@ -15,10 +15,14 @@ BaseRenderer::BitDepth BaseRenderer::bitDepthForLayer(unsigned screenMode, unsig
     { BPP8, BPP2, NONE, NONE},
     { BPP4, BPP2, NONE, NONE},
     { BPP4, NONE, NONE, NONE},
-    { MODE7, MODE7, MODE7, MODE7}
+    { MODE7, MODE7_EXTBG, NONE, NONE}
   };
 
   return map[screenMode & 7][layer & 3];
+}
+
+bool BaseRenderer::isMode7() const {
+    return bitDepth == BitDepth::MODE7 || bitDepth == BitDepth::MODE7_EXTBG;
 }
 
 unsigned BaseRenderer::bytesInbetweenTiles() const {
@@ -27,6 +31,7 @@ unsigned BaseRenderer::bytesInbetweenTiles() const {
     case BitDepth::BPP4: return 32;
     case BitDepth::BPP2: return 16;
     case BitDepth::MODE7: return 128;
+    case BitDepth::MODE7_EXTBG: return 128;
   }
   return 0;
 }
@@ -37,6 +42,7 @@ unsigned BaseRenderer::colorsPerTile() const {
     case BitDepth::BPP4: return 16;
     case BitDepth::BPP2: return 4;
     case BitDepth::MODE7: return 256;
+    case BitDepth::MODE7_EXTBG: return 256;
   }
   return 0;
 }
@@ -128,7 +134,10 @@ void BaseRenderer::draw8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, c
 void BaseRenderer::drawMode7Tile(QRgb* imgBits, const unsigned wordsPerScanline, const uint8_t* tile) {
   for(unsigned py = 0; py < 8; py++) {
     for(unsigned px = 0; px < 8; px++) {
-      if(*tile != 0) imgBits[px] = palette[*tile];
+      uint8_t pixel = *tile;
+      if(bitDepth == MODE7_EXTBG) pixel &= 0x7f;
+
+      if(pixel != 0) imgBits[px] = palette[pixel];
       tile +=2;
     }
     imgBits += wordsPerScanline;

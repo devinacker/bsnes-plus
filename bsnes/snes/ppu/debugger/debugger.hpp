@@ -16,5 +16,6 @@ public:
   uint8  bg_tile_size(unsigned index) const;
   uint16 oam_tile_addr(unsigned index) const;
   uint8  oam_base_size() const;
+  bool mode7_extbg() const;
   bool property(unsigned id, string &name, string &value);
 };

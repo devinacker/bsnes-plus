@@ -89,6 +89,7 @@ TilemapViewer::TilemapViewer() {
   bitDepth->addItem("4bpp", QVariant(TilemapRenderer::BPP4));
   bitDepth->addItem("8bpp", QVariant(TilemapRenderer::BPP8));
   bitDepth->addItem("Mode 7", QVariant(TilemapRenderer::MODE7));
+  bitDepth->addItem("Mode 7 EXTBG", QVariant(TileRenderer::MODE7_EXTBG));
   sidebarLayout->addRow("Bit Depth:", bitDepth);
 
   screenSize = new QComboBox;
@@ -263,14 +264,14 @@ void TilemapViewer::updateForm() {
   }
 
   unsigned nLayers = renderer.nLayersInMode();
-  if(renderer.screenMode == 7) nLayers = 0;
+  if(!csm && renderer.screenMode == 7) nLayers = 0;
   for(unsigned i = 0; i < 4; i++) {
     bgButtons[i]->setChecked(i == renderer.layer);
     bgButtons[i]->setEnabled(i < nLayers);
   }
 
   bool ct = customTilemap->isChecked();
-  bool mode7 = renderer.bitDepth == TilemapRenderer::MODE7;
+  bool mode7 = renderer.isMode7();
 
   bitDepth->setEnabled(ct);
   screenAddr->setEnabled(ct & !mode7);
@@ -297,7 +298,7 @@ void TilemapViewer::updateForm() {
 
 void TilemapViewer::updateTileInfo() {
   if(SNES::cartridge.loaded() && imageGridWidget->selectionValid()) {
-    if(renderer.bitDepth != TilemapRenderer::MODE7) {
+    if(!renderer.isMode7()) {
       updateTileInfoNormal();
     } else {
       updateTileInfoMode7();

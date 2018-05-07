@@ -94,6 +94,7 @@ TileViewer::TileViewer() {
   bitDepth->addItem("4bpp", QVariant(TileRenderer::BPP4));
   bitDepth->addItem("8bpp", QVariant(TileRenderer::BPP8));
   bitDepth->addItem("Mode 7", QVariant(TileRenderer::MODE7));
+  bitDepth->addItem("Mode 7 EXTBG", QVariant(TileRenderer::MODE7_EXTBG));
   sidebarLayout->addRow("Bit Depth:", bitDepth);
 
   widthSpinBox = new QSpinBox;

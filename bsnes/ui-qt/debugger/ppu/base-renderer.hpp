@@ -1,5 +1,5 @@
 struct BaseRenderer {
-  enum BitDepth { BPP8, BPP4, BPP2, MODE7, NONE };
+  enum BitDepth { BPP8, BPP4, BPP2, MODE7, MODE7_EXTBG, NONE };
 
   QRgb customBackgroundColor;
   QRgb palette[256];
@@ -11,6 +11,8 @@ struct BaseRenderer {
 
 public:
   BaseRenderer();
+
+  bool isMode7() const;
 
   unsigned bytesInbetweenTiles() const;
   unsigned colorsPerTile() const;
