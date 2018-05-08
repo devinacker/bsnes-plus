@@ -79,7 +79,7 @@ void Cx4::add_clocks(unsigned clocks) {
 
 void Cx4::nextpc() {
   regs.pc++;
-  if (regs.pc & 0xff == 0) {
+  if ((regs.pc & 0xff) == 0) {
     // continue to next page or stop
     if (!regs.cachePage) {
       regs.pc = regs.p << 8; // ?
