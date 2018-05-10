@@ -12,11 +12,13 @@ class Window : public QWidget {
 public:
   void setGeometryString(string *geometryString);
   void setCloseOnEscape(bool);
+  
+  Window();
+
+public slots:
   void show();
   void hide();
   void shrink();
-
-  Window();
 
 protected slots:
 
@@ -52,6 +54,7 @@ inline void Window::show() {
     delete[] data;
     restoreGeometry(array);
   }
+  setWindowState(windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
   QWidget::show();
   QApplication::processEvents();
   activateWindow();
