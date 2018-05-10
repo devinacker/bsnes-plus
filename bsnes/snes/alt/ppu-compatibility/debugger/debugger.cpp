@@ -91,6 +91,10 @@ uint8 PPUDebugger::oam_base_size() const {
   return regs.oam_basesize; 
 }
 
+bool PPUDebugger::mode7_extbg() const {
+  return regs.mode7_extbg;
+}
+
 bool PPUDebugger::property(unsigned id, string &name, string &value) {
   unsigned n = 0;
 

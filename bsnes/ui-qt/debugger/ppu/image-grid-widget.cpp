@@ -84,6 +84,13 @@ void ImageGridWidget::setSelected(const QPoint& cell) {
   }
 }
 
+void ImageGridWidget::scrollToCell(const QPoint& cell) {
+  QPoint p = matrix().map(cell * int(gridSize));
+
+  horizontalScrollBar()->setValue(p.x());
+  verticalScrollBar()->setValue(p.y());
+}
+
 void ImageGridWidget::mousePressEvent(QMouseEvent* event) {
   if(event->button() != Qt::LeftButton) return;
 

@@ -9,6 +9,7 @@ public:
   void setScale(unsigned);
 
   void setPaletteBpp(unsigned);
+  void setPaletteSize(unsigned);
 
   bool hasSelected() const;
   unsigned selectedPalette() const;
@@ -34,4 +35,4 @@ private:
   unsigned selectedHeight;
 };
 
-uint32_t rgbFromCgram(unsigned);
+QRgb rgbFromCgram(unsigned);

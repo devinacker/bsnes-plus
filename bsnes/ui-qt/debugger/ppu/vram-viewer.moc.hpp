@@ -41,7 +41,7 @@ private:
   unsigned selectedColor;
   bool useCgram;
 
-  uint32_t palette[256];
+  QRgb palette[256];
 };
 
 class VramAddrItem : public QWidget {

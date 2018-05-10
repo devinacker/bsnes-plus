@@ -11,6 +11,7 @@ public slots:
   void refresh();
 
   void onZoomChanged(int);
+  void onExportClicked();
 
 private:
   void updateRendererSettings();
@@ -24,9 +25,12 @@ private:
 
   QHBoxLayout *layout;
   QFormLayout *sidebarLayout;
+  QHBoxLayout *buttonLayout;
   QHBoxLayout *bgLayout;
 
   QCheckBox *autoUpdateBox;
+
+  QPushButton *exportButton;
   QPushButton *refreshButton;
 
   QComboBox *zoomCombo;
@@ -43,11 +47,15 @@ private:
   QLineEdit *tileAddr;
   QLineEdit *screenAddr;
 
+  QCheckBox *overrideBackgroundColor;
+  QComboBox *customBgColorCombo;
+
   QLabel *tileInfo;
 
-  ImageGridWidget* imageGridWidget;
+  ImageGridWidget *imageGridWidget;
 
   bool inUpdateFormCall;
+  bool inExportClickedCall;
 };
 
 extern TilemapViewer *tilemapViewer;

@@ -17,8 +17,12 @@ void CgramWidget::setScale(unsigned s) {
 
 void CgramWidget::setPaletteBpp(unsigned bpp) {
   if(bpp > 8) bpp = 0;
+  setPaletteSize(1 << bpp);
+}
 
-  unsigned nColors = 1 << bpp;
+void CgramWidget::setPaletteSize(unsigned nColors) {
+  if(nColors < 1) nColors = 1;
+  if(nColors > 256) nColors = 256;
 
   selectedMask = 0xff - nColors + 1;
   selectedWidth = (nColors - 1) % 16 + 1;
@@ -100,7 +104,7 @@ void CgramWidget::refresh() {
     return;
   }
 
-  uint32_t *buffer = (uint32_t*)image->bits();
+  QRgb* buffer = (QRgb*)image->bits();
 
   for(unsigned i = 0; i < 256; i++) {
     buffer[i] = rgbFromCgram(i);
@@ -109,7 +113,7 @@ void CgramWidget::refresh() {
   update();
 }
 
-uint32_t rgbFromCgram(unsigned i) {
+QRgb rgbFromCgram(unsigned i) {
   uint16_t color = SNES::memory::cgram[i * 2 + 0];
   color |= SNES::memory::cgram[i * 2 + 1] << 8;
 
@@ -121,5 +125,5 @@ uint32_t rgbFromCgram(unsigned i) {
   g = (g << 3) | (g >> 2);
   b = (b << 3) | (b >> 2);
 
-  return (r << 16) | (g << 8) | (b << 0);
+  return qRgb(r, g, b);
 }

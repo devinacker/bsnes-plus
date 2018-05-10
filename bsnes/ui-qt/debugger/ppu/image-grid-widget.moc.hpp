@@ -22,6 +22,8 @@ public slots:
   void selectNone();
   void setSelected(const QPoint& cell);
 
+  void scrollToCell(const QPoint& cell);
+
 signals:
   void selectedChanged();
 
