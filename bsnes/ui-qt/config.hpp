@@ -42,6 +42,7 @@ public:
     bool synchronize;
 
     bool autoHideFullscreenMenu;
+    bool blockInvalidVRAMAccess;
 
     signed contrastAdjust, brightnessAdjust, gammaAdjust, scanlineAdjust;
     bool enableGammaRamp;

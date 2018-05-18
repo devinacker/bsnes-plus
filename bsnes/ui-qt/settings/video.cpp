@@ -12,7 +12,9 @@ VideoSettingsWindow::VideoSettingsWindow() {
   layout->addWidget(displayLabel);
 
   autoHideFullscreenMenu = new QCheckBox("Auto-hide menus when entering fullscreen mode");
+  blockInvalidVRAMAccess = new QCheckBox("BlockInvalidVRAMAccess");                         
   layout->addWidget(autoHideFullscreenMenu);
+  layout->addWidget(blockInvalidVRAMAccess);
 
   colorLabel = new QLabel("<b>Color Adjustment</b>");
   layout->addWidget(colorLabel);
@@ -155,6 +157,7 @@ VideoSettingsWindow::VideoSettingsWindow() {
 
 
   connect(autoHideFullscreenMenu, SIGNAL(stateChanged(int)), this, SLOT(autoHideFullscreenMenuToggle()));
+  connect(blockInvalidVRAMAccess, SIGNAL(stateChanged(int)), this, SLOT(blockInvalidVRAMAccessToggle()));
   connect(contrastSlider, SIGNAL(valueChanged(int)), this, SLOT(contrastAdjust(int)));
   connect(brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessAdjust(int)));
   connect(gammaSlider, SIGNAL(valueChanged(int)), this, SLOT(gammaAdjust(int)));
@@ -184,6 +187,7 @@ void VideoSettingsWindow::syncUi() {
   int n;
 
   autoHideFullscreenMenu->setChecked(config().video.autoHideFullscreenMenu);
+  blockInvalidVRAMAccess->setChecked(config().video.blockInvalidVRAMAccess);
 
   n = config().video.contrastAdjust;
   contrastValue->setText(string() << (n > 0 ? "+" : "") << n << "%");
@@ -226,6 +230,12 @@ void VideoSettingsWindow::syncUi() {
 
 void VideoSettingsWindow::autoHideFullscreenMenuToggle() {
   config().video.autoHideFullscreenMenu = autoHideFullscreenMenu->isChecked();
+}
+
+//by komicakomica
+void VideoSettingsWindow::blockInvalidVRAMAccessToggle() {
+  config().video.blockInvalidVRAMAccess = blockInvalidVRAMAccess->isChecked();
+  SNES::config.blockInvalidVRAMAccess = blockInvalidVRAMAccess->isChecked();
 }
 
 void VideoSettingsWindow::contrastAdjust(int value) {

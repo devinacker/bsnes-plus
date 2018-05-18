@@ -38,7 +38,7 @@ uint8 PPU::vram_read(unsigned addr) {
 }
 
 void PPU::vram_write(unsigned addr, uint8 data) {
-  if(regs.display_disable || vcounter() >= (!regs.overscan ? 225 : 240)) {
+  if(!SNES::config.blockInvalidVRAMAccess || regs.display_disable || vcounter() >= (!regs.overscan ? 225 : 240)) {
     memory::vram[addr] = data;
   }
 }

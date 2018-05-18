@@ -77,6 +77,7 @@ Configuration::Configuration() {
   attach(video.synchronize  = false, "video.synchronize");
 
   attach(video.autoHideFullscreenMenu = false, "video.autoHideFullscreenMenu");
+  attach(video.blockInvalidVRAMAccess = true, "video.blockInvalidVRAMAccess");
 
   attach(video.contrastAdjust   = 0,    "video.contrastAdjust");
   attach(video.brightnessAdjust = 0,    "video.brightnessAdjust");

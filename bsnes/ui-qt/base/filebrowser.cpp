@@ -48,7 +48,7 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
     audio.clear();
     QString qfilename = QFileDialog::getOpenFileName(0,
       windowTitle(), defaultPath, string(
-        "SNES cartridges (*.sfc *.bs *.st *.gb *.sgb *.gbc", music.extensionList, reader.extensionList, reader.compressionList, ");;",
+        "SNES cartridges (*.sfc *.smc *.bs *.st *.gb *.sgb *.gbc", music.extensionList, reader.extensionList, reader.compressionList, ");;",
         "All files (*)"
       )
     );
@@ -63,7 +63,7 @@ void FileBrowser::loadCartridge(CartridgeMode mode, signed filterIndex) {
 
   setPath(defaultPath);
   setNameFilters(string()
-  << "SNES cartridges (*.sfc" << reader.extensionList << reader.compressionList << ")\n"
+  << "SNES cartridges (*.sfc *.smc" << reader.extensionList << reader.compressionList << ")\n"
   << "BS-X cartridges (*.bs" << reader.compressionList << ")\n"
   << "Sufami Turbo cartridges (*.st" << reader.compressionList << ")\n"
   << "Game Boy cartridges (*.gb *.sgb *.gbc" << reader.compressionList << ")\n"
@@ -131,6 +131,7 @@ string FileBrowser::resolveFilename(const string &path) {
   if(QDir(path).exists()) {
     string filter;
     if(striend(path, ".sfc")) filter = "*.sfc";
+    if(striend(path, ".smc")) filter = "*.smc";
     if(striend(path, ".bs" )) filter = "*.bs";
     if(striend(path, ".st" )) filter = "*.st";
     if(striend(path, ".gb" )) filter = "*.gb";
@@ -197,6 +198,7 @@ void FileBrowser::onAcceptCartridge(const string &path) {
       if(0);
       //file extension detection
       else if(striend(filename, ".sfc")) acceptNormal(filename);
+      else if(striend(filename, ".smc")) acceptNormal(filename);
       else if(striend(filename, ".bs"))  acceptBsx(filename);
       else if(striend(filename, ".st"))  acceptSufamiTurbo(filename);
       else if(striend(filename, ".gb"))  acceptSuperGameBoy(filename);

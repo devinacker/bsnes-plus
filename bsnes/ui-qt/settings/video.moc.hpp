@@ -5,6 +5,7 @@ public:
   QVBoxLayout *layout;
   QLabel *displayLabel;
   QCheckBox *autoHideFullscreenMenu;
+  QCheckBox *blockInvalidVRAMAccess;//by komicakomica
   QLabel *colorLabel;
   QGridLayout *colorLayout;
   QLabel *contrastLabel;
@@ -49,6 +50,7 @@ public:
 
 private slots:
   void autoHideFullscreenMenuToggle();
+  void blockInvalidVRAMAccessToggle();//by komicakomica
   void contrastAdjust(int);
   void brightnessAdjust(int);
   void gammaAdjust(int);

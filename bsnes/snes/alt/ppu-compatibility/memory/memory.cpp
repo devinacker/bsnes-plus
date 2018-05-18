@@ -29,8 +29,9 @@ uint8 PPU::vram_mmio_read(uint16 addr) {
   return 0;
 }
 
+
 void PPU::vram_mmio_write(uint16 addr, uint8 data) {
-  if(regs.display_disabled == true) {
+  if(!SNES::config.blockInvalidVRAMAccess || regs.display_disabled == true) {//compatibility improvement . many translated games and hack roms need this
     memory::vram[addr] = data;
   } else {
     uint16 v = cpu.vcounter_past(6);
