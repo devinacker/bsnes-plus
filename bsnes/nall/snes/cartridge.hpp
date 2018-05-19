@@ -61,7 +61,7 @@ public:
     BSCHiROM,
     BSXROM,
     STROM,
-	Cx4ROM,
+    Cx4ROM,
   };
 
   enum DSP1MemoryMapper {
@@ -146,13 +146,18 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
   if(mapper == SGBROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-7d:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='40-7d:0000-7fff'/>\n";
     xml << "    <map mode='linear' address='80-ff:8000-ffff'/>\n";
+    xml << "    <map mode='linear' address='c0-ff:0000-7fff'/>\n";
     xml << "  </rom>\n";
     const unsigned revision = (type == TypeSuperGameBoy2Bios) ? 2 : 1;
     xml << "  <supergameboy revision='" << revision << "'>\n";
-    xml << "    <map address='00-3f:6000-7fff'/>\n";
-    xml << "    <map address='80-bf:6000-7fff'/>\n";
+    xml << "    <map address='00-3f:6000-67ff'/>\n";
+    xml << "    <map address='00-3f:7000-7fff'/>\n";
+    xml << "    <map address='80-bf:6000-67ff'/>\n";
+    xml << "    <map address='80-bf:7000-7fff'/>\n";
     xml << "  </supergameboy>\n";
+    
   } else if(mapper == LoROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-7d:8000-ffff'/>\n";
@@ -166,6 +171,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
       xml << "    <map mode='linear' address='f0-ff:0000-" << hex(range) << "'/>\n";
       xml << "  </ram>\n";
     }
+    
   } else if(mapper == HiROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-3f:8000-ffff'/>\n";
@@ -180,6 +186,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
       xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
       xml << "  </ram>\n";
     }
+    
   } else if(mapper == ExHiROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-3f:8000-ffff' offset='400000'/>\n";
@@ -190,9 +197,12 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
 
     if(ram_size > 0) {
       xml << "  <ram size='" << hex(ram_size) << "'>\n";
-      xml << "    <map mode='linear' address='80-bf:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='20-3f:6000-7fff'/>\n";
+      xml << "    <map mode='linear' address='70-7d:0000-7fff'/>\n";
+      xml << "    <map mode='linear' address='a0-bf:6000-7fff'/>\n";
       xml << "  </ram>\n";
     }
+    
   } else if(mapper == SuperFXROM) {
     xml << "  <superfx revision='2'>\n";
     xml << "    <rom>\n";
@@ -211,10 +221,11 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
       xml << "    </ram>\n";
     }
     xml << "    <mmio>\n";
-    xml << "      <map address='00-3f:3000-32ff'/>\n";
-    xml << "      <map address='80-bf:3000-32ff'/>\n";
+    xml << "      <map address='00-3f:3000-34ff'/>\n";
+    xml << "      <map address='80-bf:3000-34ff'/>\n";
     xml << "    </mmio>\n";
     xml << "  </superfx>\n";
+    
   } else if(mapper == SA1ROM) {
     xml << "  <sa1>\n";
     xml << "    <rom>\n";
@@ -243,6 +254,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     if(has_bsx_slot) {
       xml << "  <bsx/>";  // Super MMC controls BS-X slot mapping
     }
+    
   } else if(mapper == SDD1ROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
@@ -265,6 +277,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='80-bf:4800-480f'/>\n";
     xml << "    </mmio>\n";
     xml << "  </sdd1>\n";
+    
   } else if(mapper == SPC7110ROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-0f:8000-ffff'/>\n";
@@ -279,8 +292,8 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
 
     if(ram_size > 0) {
       xml << "    <ram size='" << hex(ram_size) << "'>\n";
-      xml << "      <map mode='linear' address='00:6000-7fff'/>\n";
-      xml << "      <map mode='linear' address='30:6000-7fff'/>\n";
+      xml << "      <map mode='linear' address='00-3f:6000-7fff'/>\n";
+      xml << "      <map mode='linear' address='80-bf:6000-7fff'/>\n";
       xml << "    </ram>\n";
     }
     xml << "    <mmio>\n";
@@ -296,8 +309,10 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     }
     xml << "    <dcu>\n";
     xml << "      <map address='50:0000-ffff'/>\n";
+    xml << "      <map address='58:0000-ffff'/>\n";
     xml << "    </dcu>\n";
     xml << "  </spc7110>\n";
+    
   } else if(mapper == BSCLoROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-1f:8000-ffff' offset='000000'/>\n";
@@ -318,6 +333,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map mode='linear' address='c0-ef:8000-ffff'/>\n";
     xml << "    </slot>\n";
     xml << "  </bsx>\n";
+    
   } else if(mapper == BSCHiROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='shadow' address='00-1f:8000-ffff'/>\n";
@@ -340,6 +356,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map mode='linear' address='e0-ff:0000-ffff'/>\n";
     xml << "    </slot>\n";
     xml << "  </bsx>\n";
+    
   } else if(mapper == BSXROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-3f:8000-ffff'/>\n";
@@ -353,6 +370,7 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "      <map address='00-0f:5000-5fff'/>\n";
     xml << "    </mcc>\n";
     xml << "  </bsx>\n";
+    
   } else if(mapper == STROM) {
     xml << "  <rom>\n";
     xml << "    <map mode='linear' address='00-1f:8000-ffff'/>\n";
@@ -365,8 +383,8 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "        <map mode='linear' address='a0-bf:8000-ffff'/>\n";
     xml << "      </rom>\n";
     xml << "      <ram>\n";
-    xml << "        <map mode='linear' address='60-63:0000-ffff'/>\n";
-    xml << "        <map mode='linear' address='e0-e3:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='60-6f:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='e0-ef:0000-ffff'/>\n";
     xml << "      </ram>\n";
     xml << "    </slot>\n";
     xml << "    <slot id='B'>\n";
@@ -377,11 +395,12 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "        <map mode='linear' address='c0-df:8000-ffff'/>\n";
     xml << "      </rom>\n";
     xml << "      <ram>\n";
-    xml << "        <map mode='linear' address='70-73:0000-ffff'/>\n";
-    xml << "        <map mode='linear' address='f0-f3:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='70-7d:0000-ffff'/>\n";
+    xml << "        <map mode='linear' address='f0-ff:0000-ffff'/>\n";
     xml << "      </ram>\n";
     xml << "    </slot>\n";
     xml << "  </sufamiturbo>\n";
+    
   } else if(mapper == Cx4ROM) {
     xml << "  <cx4 frequency='20000000'>\n";
     xml << "    <rom>\n";
@@ -552,43 +571,43 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
           type = TypeBsx;
           //Check if FlashROM or MaskROM
           uint8_t i = 0;
-    	  for (i = 0; i < 20; i++)
-    	  {
-        	uint8_t checkbyte;
-        	switch(i)
-        	{
-            	case 0x00: checkbyte = 0x4D; break;
-            	case 0x02: checkbyte = 0x50; break;
-            	case 0x06: checkbyte = 0x70; break;
-            	default:   checkbyte = 0x00;
-        	}
+          for (i = 0; i < 20; i++)
+          {
+            uint8_t checkbyte;
+            switch(i)
+            {
+              case 0x00: checkbyte = 0x4D; break;
+              case 0x02: checkbyte = 0x50; break;
+              case 0x06: checkbyte = 0x70; break;
+              default:   checkbyte = 0x00;
+            }
 
-        	if (i != 0x06)
-        	{
-	            if (data[index - 0xC0 + i] != checkbyte)
-            	{
-	                break;
-            	}
-        	}
-        	else
-        	{
-	            //Only check 0xF0 for i = 6, only Memory Pack type matters
-            	if ((data[index - 0xC0 + i] & 0xF0) != checkbyte)
-            	{
-	                break;
-            	}
-        	}
-    	  }
+            if (i != 0x06)
+            {
+              if (data[index - 0xC0 + i] != checkbyte)
+              {
+                break;
+              }
+            }
+            else
+            {
+              //Only check 0xF0 for i = 6, only Memory Pack type matters
+              if ((data[index - 0xC0 + i] & 0xF0) != checkbyte)
+              {
+                break;
+              }
+            }
+          }
 
-    	  if (i == 20)
-    	  {
-	        //if i reaches 20, that means all the checks are successful
-        	bsxpack_type = MaskROM;
-    	  }
-    	  else
-    	  {
-    		bsxpack_type = FlashROM;
-    	  }
+          if (i == 20)
+          {
+            //if i reaches 20, that means all the checks are successful
+            bsxpack_type = MaskROM;
+          }
+          else
+          {
+            bsxpack_type = FlashROM;
+          }
           region = NTSC;  //BS-X only released in Japan
           return;
         }
