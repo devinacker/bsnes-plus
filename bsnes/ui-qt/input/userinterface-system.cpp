@@ -96,4 +96,16 @@ struct Pause : HotkeyInput {
   }
 } pause;
 
+struct FrameAdvance : HotkeyInput {
+  void pressed() {
+    application.pause = false;
+    application.frameAdvance = true;
+  }
+
+  FrameAdvance() : HotkeyInput("Frame Advance", "input.userInterface.system.frameAdvance") {
+    name = "KB0::Backslash";
+    userInterfaceSystem.attach(this);
+  }
+} frameAdvance;
+
 }

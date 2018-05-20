@@ -28,6 +28,7 @@ public:
   bool terminate;  //set to true to terminate main() loop and exit emulator
   bool power;
   bool pause;
+  bool frameAdvance;
   bool autopause;
   bool debug;      //debugger sets this to true when entered to suspend emulation
   bool debugrun;   //debugger sets this to true to run emulation to a debug event

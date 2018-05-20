@@ -154,8 +154,15 @@ void Application::run() {
       SNES::debugger.break_event = SNES::Debugger::BreakEvent::None;
     }
     #endif
+    if(frameAdvance && SNES::scheduler.exit_reason() == SNES::Scheduler::ExitReason::FrameEvent) {
+      pause = true;
+    }
   } else {
     usleep(20 * 1000);
+    if (frameAdvance) {
+	  audio.clear();
+      frameAdvance = false;
+	}
   }
 
   clock_t currentTime = clock();
@@ -177,12 +184,13 @@ void Application::run() {
 }
 
 Application::Application() : timer(0) {
-  terminate = false;
-  power     = false;
-  pause     = false;
-  autopause = false;
-  debug     = false;
-  debugrun  = false;
+  terminate    = false;
+  power        = false;
+  frameAdvance = false;
+  pause        = false;
+  autopause    = false;
+  debug        = false;
+  debugrun     = false;
 
   clockTime       = clock();
   autosaveTime    = 0;
