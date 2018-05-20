@@ -2,8 +2,11 @@
 void Application::parseArguments() {
   const QStringList argv = app->arguments();
 
-  string fileName = "";
+  string fileName  = "";
+  string slotAName = "";
+  string slotBName = "";
   bool processSwitches = true;
+  loadType = SNES::Cartridge::Mode::Normal;
 
   for(unsigned i = 1; i < argv.size(); i++) {
     const string arg = argv.at(i).toUtf8().data();
@@ -16,18 +19,46 @@ void Application::parseArguments() {
       bool usesParam = parseArgumentSwitch(arg, param);
       if (usesParam) { i++; continue; }
     } else {
-      if(fileName == "") fileName = arg;
+      if     (fileName == "")  fileName = arg;
+      else if(slotAName == "") slotAName = arg;
+      else if(slotBName == "") slotBName = arg;
     }
   }
 
   if(fileName != "") {
-    cartridge.loadNormal(fileName);
+    switch(loadType) {
+    default: 
+      loadCartridge(fileName); 
+      break;
+    case SNES::Cartridge::Mode::BsxSlotted:
+      cartridge.loadBsxSlotted(fileName, slotAName);
+      break;
+    case SNES::Cartridge::Mode::Bsx:
+      cartridge.loadBsx(fileName, slotAName);
+      break;
+    case SNES::Cartridge::Mode::SufamiTurbo:
+      cartridge.loadSufamiTurbo(fileName, slotAName, slotBName);
+      break;
+    case SNES::Cartridge::Mode::SuperGameBoy:
+      cartridge.loadSuperGameBoy(fileName, slotAName);
+      break;
+    }
   }
 }
 
 // returns true if argument uses parameter
 bool Application::parseArgumentSwitch(const string& arg, const string& parameter) {
-  if(arg == "--help" || arg == "-h") { printArguments(); return false; }
+  if(arg == "--help" || arg == "-h") 
+    { printArguments(); return false; }
+  
+  if(arg == "--bs-x" || arg == "-bs") 
+    { loadType = SNES::Cartridge::Mode::Bsx; return false; }
+  if(arg == "--bs-x-slotted" || arg == "-bss") 
+    { loadType = SNES::Cartridge::Mode::BsxSlotted; return false; }
+  if(arg == "--sufami-turbo" || arg == "-st") 
+    { loadType = SNES::Cartridge::Mode::SufamiTurbo; return false; }
+  if(arg == "--super-game-boy" || arg == "-sgb") 
+    { loadType = SNES::Cartridge::Mode::SuperGameBoy; return false; }
 
   #if defined(DEBUGGER)
   if(arg == "--show-debugger") { debugger->show(); return false; }
@@ -47,10 +78,18 @@ bool Application::parseArgumentSwitch(const string& arg, const string& parameter
 void Application::printArguments() {
   string filepath = app->applicationFilePath().toUtf8().data();
 
-  puts(string("Usage: ", notdir(filepath), " [options] filename\n"));
-  puts("  -h / --help                       show help");
+  puts(string("Usage: ", notdir(filepath), " [options] filename(s)\n"));
+  puts("  -h / --help                       show help\n"
+       "  -bs / --bs-x                      load BS-X cartridge\n"
+       "  -bss / --bs-x-slotted             load BS-X slotted cartridge\n"
+       "  -st / --sufami-turbo              load Sufami Turbo cartridge\n"
+       "  -sgb / --super-game-boy           load Super Game Boy cartridge\n"
+       "\n"
+       "For the above special cartridge types, specify the base cartridge "
+       "followed by the (optional) slot cartridge(s).");
   #if defined(DEBUGGER)
-  puts("  --show-debugger                   open debugger window on startup\n"
+  puts("\n"
+       "  --show-debugger                   open debugger window on startup\n"
        "  -b / --breakpoint <breakpoint>    add breakpoint\n"
        "\n"
        "Breakpoint format: <addr>[-<addr end>][=<value>][:<rwx>[:<source>]]\n"

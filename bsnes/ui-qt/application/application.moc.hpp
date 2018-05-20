@@ -42,11 +42,14 @@ public:
   string cheatsFilename;
   string currentRom;
 
+  SNES::Cartridge::Mode loadType; // used for command-line loading
+
   array<QWidget*> windowList;
 
   int main(int &argc, char **argv);
   bool singleUserMode();
   void locateFile(string &filename, bool createDataDirectory = false);
+  void loadCartridge(const string& filename); // used for command-line loading
   void initPaths(const char *basename);
   void init();
 

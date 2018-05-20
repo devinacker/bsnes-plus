@@ -68,6 +68,40 @@ void Application::locateFile(string &filename, bool createDataDirectory) {
   filename = temp;
 }
 
+void Application::loadCartridge(const string &filename) {
+    if(striend(filename, ".bs")) {
+      if(config().path.bsx == "") {
+        loaderWindow->loadBsxCartridge("", filename);
+      } else {
+        cartridge.loadBsx(config().path.bsx, filename);
+      }
+      
+    } else if(striend(filename, ".st")) { 
+      if(config().path.st == "") {
+        loaderWindow->loadSufamiTurboCartridge("", filename, "");
+      } else {
+        cartridge.loadSufamiTurbo(config().path.st, filename, "");
+      }
+      
+    } else if(striend(filename, ".gb") || striend(filename, ".sgb") || striend(filename, ".gbc")) {
+      if(config().path.sgb == "") {
+        loaderWindow->loadSuperGameBoyCartridge("", filename);
+      } else {
+        cartridge.loadSuperGameBoy(config().path.sgb, filename);
+      }
+      
+    } else if(striend(filename, ".spc")) {
+      cartridge.loadSpc(filename);
+      
+    } else if(striend(filename, ".snsf") || striend(filename, ".minisnsf"))  {
+      cartridge.loadSnsf(filename);
+      
+    } else {
+      cartridge.loadNormal(filename);
+      
+    }
+}
+
 int Application::main(int &argc, char **argv) {
   app = new App(argc, argv);
   #if !defined(PLATFORM_WIN)
@@ -160,9 +194,9 @@ void Application::run() {
   } else {
     usleep(20 * 1000);
     if (frameAdvance) {
-	  audio.clear();
+      audio.clear();
       frameAdvance = false;
-	}
+    }
   }
 
   clock_t currentTime = clock();
@@ -195,6 +229,8 @@ Application::Application() : timer(0) {
   clockTime       = clock();
   autosaveTime    = 0;
   screensaverTime = 0;
+  
+  loadType = SNES::Cartridge::Mode::Normal;
 }
 
 Application::~Application() {
