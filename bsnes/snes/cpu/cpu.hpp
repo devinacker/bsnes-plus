@@ -26,12 +26,14 @@ private:
   #include "timing/timing.hpp"
 
   uint8 cpu_version;
+  unsigned clock_counter;
 
   struct Status {
     bool interrupt_pending;
     uint16 interrupt_vector;
 
     unsigned clock_count;
+    unsigned lineclocks;
 
     //timing
     bool irq_lock;
@@ -61,7 +63,6 @@ private:
 
     //DMA
     bool dma_active;
-    unsigned dma_counter;
     unsigned dma_clocks;
     bool dma_pending;
     bool hdma_pending;
@@ -99,15 +100,20 @@ private:
     //$420d
     unsigned rom_speed;
 
+    //$4212
+    bool auto_joypad_active;
+    bool auto_joypad_latch;
+    unsigned auto_joypad_counter;
+
     //$4214-$4217
     uint16 rddiv;
     uint16 rdmpy;
 
     //$4218-$421f
-    uint8 joy1l, joy1h;
-    uint8 joy2l, joy2h;
-    uint8 joy3l, joy3h;
-    uint8 joy4l, joy4h;
+    uint16 joy1;
+    uint16 joy2;
+    uint16 joy3;
+    uint16 joy4;
   } status;
 
   struct ALU {

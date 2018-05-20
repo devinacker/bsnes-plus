@@ -5,11 +5,13 @@ void CPU::serialize(serializer &s) {
   CPUcore::core_serialize(s);
   PPUcounter::serialize(s);
   s.integer(cpu_version);
+  s.integer(clock_counter);
 
   s.integer(status.interrupt_pending);
   s.integer(status.interrupt_vector);
 
   s.integer(status.clock_count);
+  s.integer(status.lineclocks);
 
   s.integer(status.irq_lock);
 
@@ -37,7 +39,6 @@ void CPU::serialize(serializer &s) {
   s.integer(status.reset_pending);
 
   s.integer(status.dma_active);
-  s.integer(status.dma_counter);
   s.integer(status.dma_clocks);
   s.integer(status.dma_pending);
   s.integer(status.hdma_pending);
@@ -67,17 +68,17 @@ void CPU::serialize(serializer &s) {
 
   s.integer(status.rom_speed);
 
+  s.integer(status.auto_joypad_active);
+  s.integer(status.auto_joypad_latch);
+  s.integer(status.auto_joypad_counter);
+
   s.integer(status.rddiv);
   s.integer(status.rdmpy);
 
-  s.integer(status.joy1l);
-  s.integer(status.joy1h);
-  s.integer(status.joy2l);
-  s.integer(status.joy2h);
-  s.integer(status.joy3l);
-  s.integer(status.joy3h);
-  s.integer(status.joy4l);
-  s.integer(status.joy4h);
+  s.integer(status.joy1);
+  s.integer(status.joy2);
+  s.integer(status.joy3);
+  s.integer(status.joy4);
 
   s.integer(alu.mpyctr);
   s.integer(alu.divctr);

@@ -1,5 +1,6 @@
 //timing.cpp
 unsigned dma_counter();
+unsigned joypad_counter();
 
 void add_clocks(unsigned clocks);
 void scanline();
@@ -21,4 +22,4 @@ alwaysinline bool nmi_test();
 alwaysinline bool irq_test();
 
 //joypad.cpp
-void run_auto_joypad_poll();
+void joypad_edge();

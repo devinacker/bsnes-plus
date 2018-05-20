@@ -266,10 +266,10 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   item("Product / Remainder", string((unsigned)status.rdmpy, " (0x", hex<4>(status.rdmpy), ")"));
   
   item("$4218-$421f", "");
-  item("Controller 1 Data", string("0x", hex<4>((status.joy1h << 8) | status.joy1l)));
-  item("Controller 2 Data", string("0x", hex<4>((status.joy2h << 8) | status.joy2l)));
-  item("Controller 3 Data", string("0x", hex<4>((status.joy3h << 8) | status.joy3l)));
-  item("Controller 4 Data", string("0x", hex<4>((status.joy4h << 8) | status.joy4l)));
+  item("Controller 1 Data", string("0x", hex<4>(status.joy1)));
+  item("Controller 2 Data", string("0x", hex<4>(status.joy2)));
+  item("Controller 3 Data", string("0x", hex<4>(status.joy3)));
+  item("Controller 4 Data", string("0x", hex<4>(status.joy4)));
   
   for(unsigned i = 0; i < 8; i++) {
     item(string("DMA Channel ", i), "");

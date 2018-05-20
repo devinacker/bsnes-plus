@@ -4,7 +4,11 @@
 #include "joypad.cpp"
 
 unsigned CPU::dma_counter() {
-  return (status.dma_counter + hcounter()) & 7;
+  return clock_counter & 7;
+}
+
+unsigned CPU::joypad_counter() {
+  return clock_counter & 255;
 }
 
 void CPU::add_clocks(unsigned clocks) {
@@ -15,6 +19,9 @@ void CPU::add_clocks(unsigned clocks) {
     if(hcounter() & 2) {
       input.tick();
       poll_interrupts();
+    }
+    if(joypad_counter() == 0) {
+      joypad_edge();
     }
   }
 
@@ -28,7 +35,7 @@ void CPU::add_clocks(unsigned clocks) {
 
 //called by ppu.tick() when Hcounter=0
 void CPU::scanline() {
-  status.dma_counter = (status.dma_counter + prev_lineclocks()) & 7;
+  status.lineclocks = lineclocks();
 
   //forcefully sync S-CPU to other processors, in case chips are not communicating
   synchronize_ppu();
@@ -40,6 +47,8 @@ void CPU::scanline() {
     //HDMA init triggers once every frame
     status.hdma_init_position = (cpu_version == 1 ? 12 + 8 - dma_counter() : 12 + dma_counter());
     status.hdma_init_triggered = false;
+    
+    status.auto_joypad_counter = 0;
   }
 
   //DRAM refresh occurs once every scanline
@@ -50,11 +59,6 @@ void CPU::scanline() {
   if(vcounter() <= (ppu.overscan() == false ? 224 : 239)) {
     status.hdma_position = 1104;
     status.hdma_triggered = false;
-  }
-
-  if(status.auto_joypad_poll == true && vcounter() == (ppu.overscan() == false ? 227 : 242)) {
-    input.poll();
-    run_auto_joypad_poll();
   }
 }
 
@@ -154,7 +158,10 @@ void CPU::timing_power() {
 }
 
 void CPU::timing_reset() {
+  clock_counter = 0;
+
   status.clock_count = 0;
+  status.lineclocks = lineclocks();
 
   status.irq_lock = false;
   status.dram_refresh_position = (cpu_version == 1 ? 530 : 538);
@@ -183,11 +190,14 @@ void CPU::timing_reset() {
   status.interrupt_vector  = 0xfffc;  //reset vector address
 
   status.dma_active   = false;
-  status.dma_counter  = 0;
   status.dma_clocks   = 0;
   status.dma_pending  = false;
   status.hdma_pending = false;
   status.hdma_mode    = 0;
+  
+  status.auto_joypad_active = false;
+  status.auto_joypad_latch = false;
+  status.auto_joypad_counter = 0;
 }
 
 #endif
