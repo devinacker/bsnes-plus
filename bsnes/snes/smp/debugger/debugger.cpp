@@ -85,7 +85,8 @@ bool SMPDebugger::property(unsigned id, string &name, string &value) {
 
   //$00f0
   item("$00f0", "");
-  item("Clock Speed", (unsigned)status.clock_speed);
+  item("Internal Speed", (unsigned)status.internal_speed);
+  item("External Speed", (unsigned)status.external_speed);
   item("Timers Enable", status.timers_enabled);
   item("RAM Disable", status.ram_disabled);
   item("RAM Writable", status.ram_writable);

@@ -87,14 +87,12 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
       case 0xf0: {  //TEST
         if(regs.p.p) break;  //writes only valid when P flag is clear
 
-        status.clock_speed     = (data >> 6) & 3;
-        status.timer_speed     = (data >> 4) & 3;
+        status.internal_speed  = (data >> 6) & 3;
+        status.external_speed  = (data >> 4) & 3;
         status.timers_enabled  = data & 0x08;
         status.ram_disabled    = data & 0x04;
         status.ram_writable    = data & 0x02;
         status.timers_disabled = data & 0x01;
-
-        status.timer_step = (1 << status.clock_speed) + (2 << status.timer_speed);
 
         t0.sync_stage1();
         t1.sync_stage1();
@@ -189,22 +187,17 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
 }
 
 void SMP::op_io() {
-  add_clocks(24);
-  cycle_edge();
+  wait(0x00f0); // idle cycles use same timing as I/O registers
 }
 
 uint8 SMP::op_read(uint16 addr) {
-  add_clocks(12);
-  uint8 r = op_busread(addr);
-  add_clocks(12);
-  cycle_edge();
-  return r;
+  wait(addr);
+  return op_busread(addr);
 }
 
 void SMP::op_write(uint16 addr, uint8 data) {
-  add_clocks(24);
+  wait(addr);
   op_buswrite(addr, data);
-  cycle_edge();
 }
 
 #endif

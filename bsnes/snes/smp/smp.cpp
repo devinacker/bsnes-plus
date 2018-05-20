@@ -76,13 +76,9 @@ void SMP::reset() {
     memory::apuram.write(i, random(0));
   }
 
-  status.clock_counter = 0;
-  status.dsp_counter = 0;
-  status.timer_step = 3;
-
   //$00f0
-  status.clock_speed = 0;
-  status.timer_speed = 0;
+  status.internal_speed = 0;
+  status.external_speed = 0;
   status.timers_enabled = true;
   status.ram_disabled = false;
   status.ram_writable = true;

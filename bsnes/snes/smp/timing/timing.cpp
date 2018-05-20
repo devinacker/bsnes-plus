@@ -1,5 +1,27 @@
 #ifdef SMP_CPP
 
+//DSP clock (~24576khz) / 12 (~2048khz) is fed into the SMP
+//from here, the wait states value is really a clock divider of {2, 4, 8, 16}
+//due to an unknown hardware issue, clock dividers of 8 and 16 are glitchy
+//the SMP ends up consuming 10 and 20 clocks per opcode cycle instead
+//this causes unpredictable behavior on real hardware
+//sometimes the SMP will run far slower than expected
+//other times (and more likely), the SMP will deadlock until the system is reset
+//the timers are not affected by this and advance by their expected values
+void SMP::wait(uint16 addr) {
+  static const unsigned cycleWaitStates[4] = {2, 4, 10, 20};
+  static const unsigned timerWaitStates[4] = {2, 4,  8, 16};
+
+  unsigned waitStates = status.external_speed;
+  if((addr & 0xfff0) == 0x00f0) 
+    waitStates = status.internal_speed;  //IO registers + idle cycles
+  else if(addr >= 0xffc0 && status.iplrom_enabled) 
+    waitStates = status.internal_speed;  //IPLROM
+
+  add_clocks(12 * cycleWaitStates[waitStates]);
+  step_timers(timerWaitStates[waitStates]);
+}
+
 void SMP::add_clocks(unsigned clocks) {
   step(clocks);
   synchronize_dsp();
@@ -9,25 +31,16 @@ void SMP::add_clocks(unsigned clocks) {
   if(clock > +(768 * 24 * (int64)24000000)) synchronize_cpu();
 }
 
-void SMP::cycle_edge() {
-  t0.tick();
-  t1.tick();
-  t2.tick();
-
-  //TEST register S-SMP speed control
-  //24 clocks have already been added for this cycle at this point
-  switch(status.clock_speed) {
-    case 0: break;                       //100% speed
-    case 1: add_clocks(24); break;       // 50% speed
-    case 2: while(true) add_clocks(24);  //  0% speed -- locks S-SMP
-    case 3: add_clocks(24 * 9); break;   // 10% speed
-  }
+void SMP::step_timers(unsigned clocks) {
+  t0.step(clocks);
+  t1.step(clocks);
+  t2.step(clocks);
 }
 
 template<unsigned timer_frequency>
-void SMP::sSMPTimer<timer_frequency>::tick() {
+void SMP::sSMPTimer<timer_frequency>::step(unsigned clocks) {
   //stage 0 increment
-  stage0_ticks += smp.status.timer_step;
+  stage0_ticks += clocks;
   if(stage0_ticks < timer_frequency) return;
   stage0_ticks -= timer_frequency;
 

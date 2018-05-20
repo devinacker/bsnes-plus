@@ -9,13 +9,14 @@ public:
   bool enabled;
   uint8 target;
 
-  void tick();
+  void step(unsigned clocks);
   void sync_stage1();
 };
 
-sSMPTimer<192> t0;
-sSMPTimer<192> t1;
-sSMPTimer< 24> t2;
+sSMPTimer<128> t0;
+sSMPTimer<128> t1;
+sSMPTimer< 16> t2;
 
+alwaysinline void wait(uint16 addr);
 alwaysinline void add_clocks(unsigned clocks);
-alwaysinline void cycle_edge();
+alwaysinline void step_timers(unsigned clocks);

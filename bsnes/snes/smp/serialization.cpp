@@ -4,12 +4,8 @@ void SMP::serialize(serializer &s) {
   Processor::serialize(s);
   SMPcore::core_serialize(s);
 
-  s.integer(status.clock_counter);
-  s.integer(status.dsp_counter);
-  s.integer(status.timer_step);
-
-  s.integer(status.clock_speed);
-  s.integer(status.timer_speed);
+  s.integer(status.internal_speed);
+  s.integer(status.external_speed);
   s.integer(status.timers_enabled);
   s.integer(status.ram_disabled);
   s.integer(status.ram_writable);
