@@ -101,6 +101,8 @@ void Utility::modifySystemState(system_state_t systemState) {
     } break;
   }
 
+  if(!application.power) unacquireMouse();
+
   // don't let widget updates temporarily draw a parent widget over an external rendering contex
   // (only applies when the system is powered on)
   mainWindow->canvas->setUpdatesEnabled(!application.power || video.cap("QWidget"));

@@ -132,5 +132,6 @@ void Utility::updateControllers() {
     case ControllerPort2::Justifiers: mapper().port2 = &Controllers::justifiers; break;
   }
 
+  unacquireMouse();
   mainWindow->syncUi();
 }
