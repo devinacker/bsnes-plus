@@ -35,6 +35,7 @@ public:
   QRadioButton *focusAllow;
 
   QLabel *miscTitle;
+  QCheckBox *autoSaveEnable;
   QCheckBox *rewindEnable;
   QCheckBox *allowInvalidInput;
   QCheckBox *useCommonDialogs;
@@ -54,6 +55,7 @@ public slots:
   void pauseWithoutFocus();
   void ignoreInputWithoutFocus();
   void allowInputWithoutFocus();
+  void toggleAutoSaveEnable();
   void toggleRewindEnable();
   void toggleAllowInvalidInput();
   void toggleUseCommonDialogs();

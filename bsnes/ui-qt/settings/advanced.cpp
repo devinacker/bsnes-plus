@@ -109,13 +109,16 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   miscTitle = new QLabel("Miscellaneous:");
   layout->addWidget(miscTitle);
 
-  rewindEnable = new QCheckBox("Enable Rewind Support");
+  autoSaveEnable = new QCheckBox("Auto-save SRAM once every minute");
+  layout->addWidget(autoSaveEnable);
+  
+  rewindEnable = new QCheckBox("Enable rewind support");
   layout->addWidget(rewindEnable);
 
   allowInvalidInput = new QCheckBox("Allow up+down / left+right combinations");
   layout->addWidget(allowInvalidInput);
 
-  useCommonDialogs = new QCheckBox("Use Native OS File Dialogs");
+  useCommonDialogs = new QCheckBox("Use native OS file dialogs");
   layout->addWidget(useCommonDialogs);
 
   initializeUi();
@@ -131,6 +134,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   connect(focusPause, SIGNAL(pressed()), this, SLOT(pauseWithoutFocus()));
   connect(focusIgnore, SIGNAL(pressed()), this, SLOT(ignoreInputWithoutFocus()));
   connect(focusAllow, SIGNAL(pressed()), this, SLOT(allowInputWithoutFocus()));
+  connect(autoSaveEnable, SIGNAL(stateChanged(int)), this, SLOT(toggleAutoSaveEnable()));
   connect(rewindEnable, SIGNAL(stateChanged(int)), this, SLOT(toggleRewindEnable()));
   connect(allowInvalidInput, SIGNAL(stateChanged(int)), this, SLOT(toggleAllowInvalidInput()));
   connect(useCommonDialogs, SIGNAL(stateChanged(int)), this, SLOT(toggleUseCommonDialogs()));
@@ -168,6 +172,7 @@ void AdvancedSettingsWindow::initializeUi() {
   focusIgnore->setChecked(config().input.focusPolicy == Configuration::Input::FocusPolicyIgnoreInput);
   focusAllow->setChecked (config().input.focusPolicy == Configuration::Input::FocusPolicyAllowInput);
 
+  autoSaveEnable->setChecked(config().system.autoSaveMemory);
   rewindEnable->setChecked(config().system.rewindEnabled);
   allowInvalidInput->setChecked(config().input.allowInvalidInput);
   useCommonDialogs->setChecked(config().diskBrowser.useCommonDialogs);
@@ -195,6 +200,10 @@ void AdvancedSettingsWindow::setPortNone()        { SNES::config.expansion_port 
 void AdvancedSettingsWindow::pauseWithoutFocus()       { config().input.focusPolicy = Configuration::Input::FocusPolicyPauseEmulation; }
 void AdvancedSettingsWindow::ignoreInputWithoutFocus() { config().input.focusPolicy = Configuration::Input::FocusPolicyIgnoreInput; }
 void AdvancedSettingsWindow::allowInputWithoutFocus()  { config().input.focusPolicy = Configuration::Input::FocusPolicyAllowInput; }
+
+void AdvancedSettingsWindow::toggleAutoSaveEnable() {
+  config().system.autoSaveMemory = autoSaveEnable->isChecked();
+}
 
 void AdvancedSettingsWindow::toggleRewindEnable() {
   config().system.rewindEnabled = rewindEnable->isChecked();
