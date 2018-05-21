@@ -54,6 +54,19 @@ struct LoadSuperGameBoyCartridge : HotkeyInput {
   }
 } loadSuperGameBoyCartridge;
 
+struct PowerToggle : HotkeyInput {
+  void pressed() {
+    if (application.power)
+	  utility.modifySystemState(Utility::PowerOff);	
+	else 
+	  utility.modifySystemState(Utility::PowerOn);
+  }
+
+  PowerToggle() : HotkeyInput("Power On/Off", "input.userInterface.system.powerToggle") {
+    userInterfaceSystem.attach(this);
+  }
+} powerToggle;
+
 struct PowerCycle : HotkeyInput {
   void pressed() {
     utility.modifySystemState(Utility::PowerCycle);
