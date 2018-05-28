@@ -248,6 +248,11 @@ MainWindow::MainWindow() {
   layout->addWidget(statusBar);
   setLayout(layout);
 
+  //cursor hide timer
+  cursorTimer = new QTimer(this);
+  cursorTimer->setSingleShot(true);
+  cursorTimer->setInterval(5*1000);
+
   //slots
   connect(system_load, SIGNAL(triggered()), this, SLOT(loadCartridge()));
   connect(system_reload, SIGNAL(triggered()), this, SLOT(reloadCartridge()));
@@ -647,6 +652,11 @@ void MainWindow::showAbout() {
   aboutWindow->show();
 }
 
+void MainWindow::hideCursor() {
+  canvasContainer->setCursor(Qt::BlankCursor);
+  canvas->setCursor(Qt::BlankCursor);
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event) {
   Window::resizeEvent(event);
   QApplication::processEvents();
@@ -685,6 +695,14 @@ void CanvasObject::keyPressEvent(QKeyEvent *event) {
 }
 
 void CanvasObject::keyReleaseEvent(QKeyEvent *event) {
+}
+
+//unhide fullscreen cursor on mouse move and restart timer
+
+void CanvasObject::mouseMoveEvent(QMouseEvent *event) {
+  unsetCursor();
+  mainWindow->cursorTimer->start();
+  event->ignore();
 }
 
 //===========

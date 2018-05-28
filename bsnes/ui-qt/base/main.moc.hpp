@@ -4,6 +4,7 @@ public:
   void dropEvent(QDropEvent*);
   void keyPressEvent(QKeyEvent*);
   void keyReleaseEvent(QKeyEvent*);
+  void mouseMoveEvent(QMouseEvent*);
 };
 
 class CanvasWidget : public CanvasObject {
@@ -101,6 +102,7 @@ public:
   QVBoxLayout *canvasLayout;
   CanvasWidget *canvas;
   QLabel *systemState;
+  QTimer *cursorTimer;
 
   void syncUi();
   bool isActive();
@@ -173,6 +175,7 @@ public slots:
   void showDocumentation();
   void showLicense();
   void showAbout();
+  void hideCursor();
 };
 
 extern MainWindow *mainWindow;

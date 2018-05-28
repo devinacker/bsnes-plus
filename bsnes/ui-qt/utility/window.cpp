@@ -6,11 +6,22 @@ void Utility::updateFullscreenState() {
     mainWindow->showNormal();
     mainWindow->menuBar->setVisible(true);
     mainWindow->statusBar->setVisible(true);
+    
+    mainWindow->canvasContainer->setMouseTracking(false);
+    mainWindow->canvasContainer->unsetCursor();
+    mainWindow->canvas->setMouseTracking(false);
+    mainWindow->canvas->unsetCursor();
+    mainWindow->cursorTimer->disconnect();
   } else {
     config().video.context = &config().video.fullscreen;
     mainWindow->showFullScreen();
     mainWindow->menuBar->setVisible(config().video.autoHideFullscreenMenu == false);
     mainWindow->statusBar->setVisible(config().video.autoHideFullscreenMenu == false);
+    
+    mainWindow->canvasContainer->setMouseTracking(true);
+    mainWindow->canvas->setMouseTracking(true);
+	mainWindow->cursorTimer->start();
+    mainWindow->connect(mainWindow->cursorTimer, SIGNAL(timeout()), SLOT(hideCursor()), Qt::UniqueConnection);
   }
 
   QApplication::processEvents();
@@ -114,11 +125,11 @@ void Utility::resizeMainWindow() {
   }
 
   //workaround for Qt/Xlib bug:
-  //if window resize occurs with cursor over it, Qt shows Qt::Size*DiagCursor;
-  //so force it to show Qt::ArrowCursor, as expected
-  mainWindow->setCursor(Qt::ArrowCursor);
-  mainWindow->canvasContainer->setCursor(Qt::ArrowCursor);
-  mainWindow->canvas->setCursor(Qt::ArrowCursor);
+  //if window resize occurs with cursor over it, Qt shows Qt::Size*DiagCursor
+  // TODO: is this still an issue?
+  mainWindow->setCursor(mainWindow->cursor());
+  mainWindow->canvasContainer->setCursor(mainWindow->canvasContainer->cursor());
+  mainWindow->canvas->setCursor(mainWindow->canvas->cursor());
 
   //workaround for DirectSound(?) bug:
   //window resizing sometimes breaks audio sync, this call re-initializes it
