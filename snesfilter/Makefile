@@ -26,7 +26,7 @@ else ifeq ($(platform),osx)
 #TODO: openmp not currently supported in Apple clang
 #  flags += -fopenmp
 #  link += -fopenmp -lgomp
-else ifeq ($(platform),win)
+else ifeq ($(platform),$(filter $(platform),win msys))
   flags := -fopenmp $(flags)
   link += -fopenmp -lpthread
 endif
@@ -79,7 +79,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
 	ar rcs libsnesfilter.a $(objects)
 	$(cpp) $(link) -o libsnesfilter.dylib -shared -dynamiclib $(objects) $(qtlib)
-else ifeq ($(platform),win)
+else ifeq ($(platform),$(filter $(platform),win msys))
 	$(cpp) $(link) -o snesfilter.dll -shared -Wl,--out-implib,libsnesfilter.a $(objects) $(qtlib)
 endif
 

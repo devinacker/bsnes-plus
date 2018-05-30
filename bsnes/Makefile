@@ -45,7 +45,7 @@ else ifeq ($(platform),osx)
   osxbundle := ../bsnes+.app
   flags += -march=native -mmacosx-version-min=10.10
   link += -F/usr/local/lib -mmacosx-version-min=10.10
-else ifeq ($(platform),win)
+else ifeq ($(platform),$(filter $(platform),win msys))
   link += -mwindows
 # link += -mconsole
   link += -mthreads -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32

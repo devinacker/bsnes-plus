@@ -25,7 +25,7 @@ ifeq ($(rcc),)
   endif
 endif
 
-ifeq ($(platform),x)
+ifeq ($(platform),$(filter $(platform),x msys))
   qtinc := `pkg-config --cflags $(qtlibs)`
   qtlib := `pkg-config --libs $(qtlibs)`
 else ifeq ($(platform),osx)

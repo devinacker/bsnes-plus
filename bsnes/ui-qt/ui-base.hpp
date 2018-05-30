@@ -1,6 +1,8 @@
 #define UNICODE
 #define QT_NO_DEBUG
+#ifndef QT_THREAD_SUPPORT
 #define QT_THREAD_SUPPORT
+#endif
 
 #include <QApplication>
 #include <QtGui>

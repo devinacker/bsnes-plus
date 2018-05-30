@@ -72,7 +72,7 @@ obj/zutil.o   : zlib/zutil.c zlib/*
 ###############
 
 build: $(objects)
-ifeq ($(platform),win)
+ifeq ($(platform),$(filter $(platform),win msys))
 	$(cpp) $(link) -o snesmusic.dll -shared -Wl,--out-implib,libsnesmusic.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
 	ar rcs libsnesmusic.a $(objects)

@@ -3,7 +3,7 @@ include $(ui)/template/Makefile
 
 ui_objects := ui-main ui-base ui-cartridge ui-debugger ui-input ui-movie ui-settings ui-state ui-tools
 ui_objects += ruby
-ui_objects += $(if $(call streq,$(platform),win),resource)
+ui_objects += $(if $(call streq,$(platform),$(filter $(platform),win msys)),resource)
 link += $(qtlib)
 
 headers := $(call rwildcard,$(ui)/,%.hpp)
@@ -24,7 +24,7 @@ else ifeq ($(platform),osx)
   ruby += input.macos
 
   link += $(if $(findstring audio.openal,$(ruby)),-framework OpenAL)
-else ifeq ($(platform),win)
+else ifeq ($(platform),$(filter $(platform),win msys))
   ruby := video.direct3d video.wgl video.directdraw video.gdi video.qtraster
   ruby += audio.directsound audio.xaudio2
   ruby += input.rawinput input.directinput

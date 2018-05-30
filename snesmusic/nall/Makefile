@@ -16,12 +16,15 @@
 
 ifeq ($(platform),)
   uname := $(shell uname -a)
-  ifeq ($(OS),Windows_NT)
-    platform := win
-    delete = del $(subst /,\,$1)
+  ifneq ($(findstring Msys,$(uname)),)
+    platform := msys
+    delete = rm -f $1
   else ifneq ($(findstring Darwin,$(uname)),)
     platform := osx
     delete = rm -f $1
+  else ifeq ($(OS),Windows_NT)
+    platform := win
+    delete = del $(subst /,\,$1)
   else
     platform := x
     delete = rm -f $1

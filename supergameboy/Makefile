@@ -100,7 +100,7 @@ obj/file.o: libgambatte/src/file/file.cpp $(call rwildcard,common/) $(call rwild
 ###############
 
 build: $(objects)
-ifeq ($(platform),win)
+ifeq ($(platform),$(filter $(platform),win msys))
 	$(cpp) $(link) -o supergameboy.dll -shared -Wl,--out-implib,libsupergameboy.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
 	ar rcs libsupergameboy.a $(objects)

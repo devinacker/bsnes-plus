@@ -178,7 +178,7 @@ ifeq ($(platform),x)
 else ifeq ($(platform),osx)
 	ar rcs libsnesreader.a $(objects)
 	$(cpp) $(link) -o libsnesreader.dylib -shared -dynamiclib $(objects) $(qtlib)
-else ifeq ($(platform),win)
+else ifeq ($(platform),$(filter $(platform),win msys))
 	$(cpp) $(link) -o snesreader.dll -shared -Wl,--out-implib,libsnesreader.a $(objects) $(qtlib)
 endif
 
