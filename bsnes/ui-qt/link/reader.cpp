@@ -14,9 +14,6 @@ bool Reader::direct_load(string &filename, uint8_t *&data, unsigned &size) {
   fp.read(data, size);
   fp.close();
 
-  //remove copier header, if it exists
-  if((size & 0x7fff) == 512) memmove(data, data + 512, size -= 512);
-
   return true;
 }
 
