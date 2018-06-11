@@ -25,13 +25,6 @@ Non-debugging features:
 - IPS and BPS soft patching
 - Multiple emulation improvements backported from bsnes/higan (mostly via bsnes-classic)
 
-## Coming soon
-
-- On-the-fly ROM saving and reloading from the memory editor for quick hacking and testing
-- More keyboard shortcuts for menus, etc.
-- Automatic saving/loading breakpoints between sessions
-- Similar addressing improvements for cheats
-
 ## Building on Windows
 
 - Get mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download)

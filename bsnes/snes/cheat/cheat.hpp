@@ -14,10 +14,10 @@ public:
   bool enabled() const;
   void enable(bool);
   void synchronize();
-  bool read(unsigned, uint8&) const;
+  bool read(unsigned, uint8&, Bus&) const;
 
   inline bool active() const;
-  inline bool exists(unsigned addr) const;
+  inline bool exists(uint16 addr) const;
 
   Cheat();
 
@@ -25,11 +25,10 @@ public:
   static bool encode(string&, unsigned, uint8, Type);
 
 private:
-  uint8 bitmask[0x200000];
+  uint8 bitmask[0x2000];
   bool system_enabled;
   bool code_enabled;
   bool cheat_enabled;
-  unsigned mirror(unsigned) const;
 };
 
 extern Cheat cheat;

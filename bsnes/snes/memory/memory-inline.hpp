@@ -63,7 +63,7 @@ uint8 Bus::read(uint24 addr) {
   #if defined(CHEAT_SYSTEM)
   if(cheat.active() && cheat.exists(addr)) {
     uint8 r;
-    if(cheat.read(addr, r)) return r;
+    if(cheat.read(addr, r, *this)) return r;
   }
   #endif
   Page &p = page[addr >> 8];
