@@ -11,25 +11,29 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
     
     if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
     
-    // don't account for address mirroring when using a range of addresses
-    // (because the range might span multiple memory sources and it's easier to not deal with that)
-    if (breakpoint[i].addr_end > 0) {
-      if (addr < breakpoint[i].addr) continue;
-      if (addr > breakpoint[i].addr_end) continue;
-      
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
-    } else if (source == Debugger::Breakpoint::Source::CPUBus) {
-      if (!bus.is_mirror(breakpoint[i].addr, addr)) continue;
-      
-    } else if (source == Debugger::Breakpoint::Source::SA1Bus) {
-      if (!sa1bus.is_mirror(breakpoint[i].addr, addr)) continue;
-      
-    } else if (source == Debugger::Breakpoint::Source::SFXBus) {
-      if (!superfxbus.is_mirror(breakpoint[i].addr, addr)) continue;
-      
-    } else {
-      if (breakpoint[i].addr != addr) continue;
+    // (with 64kb granularity for ranged breakpoints)
+    unsigned addr_start = (breakpoint[i].addr & 0xff0000) | (addr & 0xffff);
+    if (addr_start < breakpoint[i].addr) {
+      addr_start += 1<<16;
     }
+    unsigned addr_end = breakpoint[i].addr;
+    if (breakpoint[i].addr_end > breakpoint[i].addr) {
+      addr_end = breakpoint[i].addr_end;
+    }
+    
+    for (; addr_start <= addr_end; addr_start += 1<<16) {
+      if (source == Debugger::Breakpoint::Source::CPUBus) {
+        if (bus.is_mirror(addr_start, addr)) break;
+      } else if (source == Debugger::Breakpoint::Source::SA1Bus) {
+        if (sa1bus.is_mirror(addr_start, addr)) break;
+      } else if (source == Debugger::Breakpoint::Source::SFXBus) {
+        if (superfxbus.is_mirror(addr_start, addr)) break;
+      } else {
+        if (addr_start == addr) break;
+      }
+    }
+    if (addr_start > addr_end) continue;
     
     breakpoint[i].counter++;
     breakpoint_hit = i;
