@@ -8,7 +8,7 @@ ifeq ($(ui),)
 endif
 
 # build version
-version := v073+3a
+version := v04
 
 # compiler
 c       := $(compiler) -xc -std=gnu99
