@@ -1,8 +1,11 @@
-include nall/Makefile
+common := ../common
+nall   := $(common)/nall
+zlib   := $(common)/zlib
+include $(nall)/Makefile
 
 c     := $(compiler) -x c -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -I.
+flags := -I. -I$(common)
 link  :=
 
 ifeq ($(DEBUG), 1)
@@ -60,12 +63,12 @@ obj/bitmap_font.o: bitmap_font.cpp
 ### zlib ###
 ############
 
-obj/adler32.o : zlib/adler32.c zlib/*
-obj/crc32.o   : zlib/crc32.c zlib/*
-obj/inffast.o : zlib/inffast.c zlib/*
-obj/inflate.o : zlib/inflate.c zlib/*
-obj/inftrees.o: zlib/inftrees.c zlib/*
-obj/zutil.o   : zlib/zutil.c zlib/*
+obj/adler32.o : $(zlib)/adler32.c $(zlib)/*
+obj/crc32.o   : $(zlib)/crc32.c $(zlib)/*
+obj/inffast.o : $(zlib)/inffast.c $(zlib)/*
+obj/inflate.o : $(zlib)/inflate.c $(zlib)/*
+obj/inftrees.o: $(zlib)/inftrees.c $(zlib)/*
+obj/zutil.o   : $(zlib)/zutil.c $(zlib)/*
 
 ###############
 ### targets ###

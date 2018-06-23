@@ -1,4 +1,6 @@
-include nall/Makefile
+common := ../common
+nall   := $(common)/nall
+include $(nall)/Makefile
 snes := snes
 ifeq ($(profile),)
   profile := compatibility
@@ -13,7 +15,7 @@ version := v04
 # compiler
 c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
-flags   := -I. -I$(snes)
+flags   := -I. -I$(common) -I$(snes)
 link    :=
 objects :=
 
@@ -155,6 +157,6 @@ plugins_clean:
 	@$(MAKE) clean -C ../supergameboy
 
 archive-all:
-	tar -cjf bsnes.tar.bz2 data launcher libco nall obj out phoenix ruby snes ui-phoenix ui-qt Makefile cc.bat clean.bat sync.sh
+	tar -cjf bsnes.tar.bz2 data launcher libco obj out ruby snes ui-qt Makefile cc.bat clean.bat sync.sh uname.bat
 
 help:;

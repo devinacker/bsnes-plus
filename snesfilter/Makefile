@@ -1,11 +1,13 @@
-include nall/Makefile
+common := ../common
+nall   := $(common)/nall
+include $(nall)/Makefile
 
 qtlibs := QtCore QtGui
-include nall/qt/Makefile
+include $(nall)/qt/Makefile
 
 c     := $(compiler) -xc -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -I. -Iobj $(qtinc)
+flags := -I. -I$(common) -Iobj $(qtinc)
 link  :=
 
 ifeq ($(DEBUG), 1)

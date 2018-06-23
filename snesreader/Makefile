@@ -1,11 +1,14 @@
-include nall/Makefile
+common := ../common
+nall   := $(common)/nall
+zlib   := $(common)/zlib
+include $(nall)/Makefile
 
 qtlibs := QtCore QtGui
-include nall/qt/Makefile
+include $(nall)/qt/Makefile
 
 c     := $(compiler) -xc -std=gnu99
 cpp   := $(compiler) -std=gnu++0x
-flags := -I. -Iobj
+flags := -I. -I$(common) -Iobj
 link  :=
 
 ifeq ($(DEBUG), 1)
@@ -97,12 +100,12 @@ obj/Zlib_Inflater.o   : fex/Zlib_Inflater.cpp fex/*
 ### zlib ###
 ############
 
-obj/adler32.o : zlib/adler32.c zlib/*
-obj/crc32.o   : zlib/crc32.c zlib/*
-obj/inffast.o : zlib/inffast.c zlib/*
-obj/inflate.o : zlib/inflate.c zlib/*
-obj/inftrees.o: zlib/inftrees.c zlib/*
-obj/zutil.o   : zlib/zutil.c zlib/*
+obj/adler32.o : $(zlib)/adler32.c $(zlib)/*
+obj/crc32.o   : $(zlib)/crc32.c $(zlib)/*
+obj/inffast.o : $(zlib)/inffast.c $(zlib)/*
+obj/inflate.o : $(zlib)/inflate.c $(zlib)/*
+obj/inftrees.o: $(zlib)/inftrees.c $(zlib)/*
+obj/zutil.o   : $(zlib)/zutil.c $(zlib)/*
 
 #############
 ### 7-zip ###

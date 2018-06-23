@@ -23,7 +23,7 @@ bsnesexport const char* snesreader_supported() {
 
 bool snesreader_load_normal(const char *filename, uint8_t *&data, unsigned &size) {
   file fp;
-  if(fp.open(filename, file::mode_read) == false) return false;
+  if(fp.open(filename, file::mode::read) == false) return false;
   size = fp.size();
   data = new uint8_t[size];
   fp.read(data, size);
@@ -69,8 +69,8 @@ bool snesreader_load_fex(string &filename, uint8_t *&data, unsigned &size) {
       fex_close(fex);
 
       if(fileChooser->list.size() > 1) {
-        strtr(name, "\\", "/");
-        strtr(filename, "\\", "/");
+        name.transform("\\", "/");
+        filename.transform("\\", "/");
 
         //retain only path from filename, "/foo/bar.7z" -> "/foo/"
         for(signed i = filename.length() - 1; i >= 0; i--) {

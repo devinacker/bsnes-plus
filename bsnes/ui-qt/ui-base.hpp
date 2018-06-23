@@ -16,11 +16,11 @@
 #include <nall/input.hpp>
 #include <nall/ups.hpp>
 #include <nall/snes/cartridge.hpp>
-#include "template/concept.hpp"
-#include "template/check-action.moc.hpp"
-#include "template/file-dialog.moc.hpp"
-#include "template/radio-action.moc.hpp"
-#include "template/window.moc.hpp"
+#include <nall/qt/concept.hpp>
+#include <nall/qt/check-action.moc.hpp>
+#include <nall/qt/file-dialog.moc.hpp>
+#include <nall/qt/radio-action.moc.hpp>
+#include <nall/qt/window.moc.hpp>
 using namespace nall;
 
 #include <ruby/ruby.hpp>
