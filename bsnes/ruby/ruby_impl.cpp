@@ -2,7 +2,7 @@
 
 #if defined(VIDEO_QTOPENGL) || defined(VIDEO_QTRASTER)
   #include <QApplication>
-  #include <QtGui>
+  #include <QtWidgets>
 #endif
 
 #if defined(VIDEO_QTOPENGL)
