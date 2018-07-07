@@ -17,7 +17,7 @@ void BSXFlash::reset() {
   regs.vendor_info = false;
   regs.writebyte = false;
 
-  memory::bsxpack.write_protect(!regs.writebyte);
+  memory::bsxpack.write_protect(true);
 }
 
 unsigned BSXFlash::size() const {
@@ -77,7 +77,7 @@ void BSXFlash::write(unsigned addr, uint8 data) {
   {
     regs.writebyte = false;
     memory::bsxpack.write(addr, memory::bsxpack.read(addr) & data);	//AND byte
-    return memory::bsxpack.write_protect(!regs.writebyte);
+    return memory::bsxpack.write_protect(true);
   }
 
   //Commands

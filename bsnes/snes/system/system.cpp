@@ -211,6 +211,7 @@ void System::reset() {
 }
 
 void System::unload() {
+  if(expansion() == ExpansionPortDevice::BSX) bsxbase.unload();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.unload();
   
   if(cartridge.has_msu1()) msu1.unload();
