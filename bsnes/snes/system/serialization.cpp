@@ -23,6 +23,8 @@ bool System::unserialize(serializer &s) {
   unsigned signature, version, crc32;
   char profile[16], description[512];
 
+  if(s.capacity() != serialize_size) return false;
+
   s.integer(signature);
   s.integer(version);
   s.integer(crc32);
@@ -58,6 +60,11 @@ void System::serialize_all(serializer &s) {
   ppu.serialize(s);
   dsp.serialize(s);
 
+  // always include expansion port device(s) in savestate size
+  bsxbase.serialize(s);
+  
+  if(cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.serialize(s);
+  if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.serialize(s);
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.serialize(s);
   if(cartridge.has_superfx()) superfx.serialize(s);
   if(cartridge.has_sa1()) sa1.serialize(s);

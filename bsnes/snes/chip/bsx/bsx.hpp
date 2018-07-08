@@ -8,6 +8,8 @@ public:
   void reset();
   void unload();
 
+  void serialize(serializer&);
+
   uint8 mmio_read(unsigned addr);
   void mmio_write(unsigned addr, uint8 data);
 
@@ -21,6 +23,9 @@ private:
     
     // broadcast data packet (from bsxdat)
     file packets;
+	int offset;
+	uint14 loaded_channel;
+	uint8 loaded_count;
     
     // internal state
     bool pf_latch, dt_latch;
@@ -46,7 +51,7 @@ private:
     uint16 time_year;
   } regs;
   
-  void stream_fileload(BSXStream &stream);
+  bool stream_fileload(BSXStream &stream);
   uint8 get_time();
 
   bool local_time;
@@ -60,6 +65,8 @@ public:
   void power();
   void reset();
 
+  void serialize(serializer&);
+
   uint8 read(unsigned addr);
   void write(unsigned addr, uint8 data);
 
@@ -69,6 +76,7 @@ public:
 private:
   struct {
     uint8 r[16];
+    uint8 rtemp[16];
     bool dirty;
   } regs;
 
@@ -81,6 +89,8 @@ public:
   void enable();
   void power();
   void reset();
+
+  void serialize(serializer&);
 
   unsigned size() const;
   uint8 read(unsigned addr);

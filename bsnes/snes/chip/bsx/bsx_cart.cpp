@@ -20,6 +20,7 @@ void BSXCart::reset() {
   regs.r[0x0c] = 0x00;
   regs.r[0x0d] = 0x00;
   regs.dirty = false;
+  memcpy(regs.rtemp, regs.r, sizeof(regs.r));
 
   update_memory_map();
 }
@@ -128,23 +129,23 @@ void BSXCart::update_memory_map() {
 
 uint8 BSXCart::read(unsigned addr) {
   uint8 n = (addr >> 16) & 15;
-  return regs.r[n];
+  return regs.rtemp[n];
 }
 
 void BSXCart::write(unsigned addr, uint8 data) {
   uint8 n = (addr >> 16) & 15;
-  
+  regs.rtemp[n] = data;
+	
   // certain games (Treasure Conflix) write these registers way too frequently,
   // causing extremely excessive calls to bus.map() which makes emulation unplayably slow,
   // unless we avoid unnecessarily updating the memory map
   if(n != 0x0e && regs.r[n] != data) {
     regs.dirty = true;
   } else if(n == 0x0e && regs.dirty) {
+    memcpy(regs.r, regs.rtemp, sizeof(regs.r));
     update_memory_map();
     regs.dirty = false;
   }
-  
-  regs.r[n] = data;
 }
 
 BSXCart::BSXCart() {

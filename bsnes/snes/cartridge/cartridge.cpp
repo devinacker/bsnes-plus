@@ -39,7 +39,7 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   spc7110_data_rom_offset = 0x100000;
   st_A_ram_size = 0;
   st_B_ram_size = 0;
-  bsxpack_type = BSXPackType::FlashROM;
+  bsxpack_type = BSXPackType::Unknown;
   supergameboy_version = SuperGameBoyVersion::Version1;
   supergameboy_ram_size = 0;
   supergameboy_rtc_size = 0;

@@ -34,7 +34,7 @@ void Movie::play(const string &filename) {
     uint8_t *data = new uint8_t[size];
     fp.read(data, size);
     serializer state(data, size);
-    SNES::system.unserialize(state);
+    if(!SNES::system.unserialize(state)) goto corrupt;
 
     Movie::state = Playback;
     mainWindow->syncUi();

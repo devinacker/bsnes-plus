@@ -30,7 +30,7 @@ void BSXBase::unload() {
   regs.stream[1].packets.close();
 }
 
-void BSXBase::stream_fileload(BSXStream &stream)
+bool BSXBase::stream_fileload(BSXStream &stream)
 {
   //Make sure to close the file first
   stream.packets.close();
@@ -43,14 +43,16 @@ void BSXBase::stream_fileload(BSXStream &stream)
   if (stream.packets.open(filepath, file::mode::read))
   {
     stream.first = true;
-    stream.count++;
+    stream.loaded_channel = stream.channel;
+    stream.loaded_count = stream.count;
     stream.queue = ceil(stream.packets.size() / 22.);
   }
-  else if (stream.count > 0)
+  else
   {
-    stream.count = 0;
-    stream_fileload(stream);
+    stream.loaded_channel = 0;
   }
+  
+  return stream.packets.open();
 }
 
 uint8 BSXBase::get_time()
@@ -135,7 +137,13 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       else if (stream.queue == 0 && !Memory::debugger_access())
       {
         //Queue is empty
-        stream_fileload(stream);
+        stream.offset = 0;
+        if (!stream_fileload(stream) && stream.count > 0) 
+        {
+          stream.count = 0;
+          stream_fileload(stream);
+        }
+        stream.count++;
       }
       
       //Lock max value at 0x7F for bigger packets
@@ -200,6 +208,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
           {
             //Get packet data
             stream.data = stream.packets.read();
+            stream.offset++;
           }
         }
         return stream.data;

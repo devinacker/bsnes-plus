@@ -117,8 +117,8 @@ void System::power() {
   memory::mmio.map(0x4300, 0x437f, cpu);
 
   audio.coprocessor_enable(false);
-  if(expansion() == ExpansionPortDevice::BSX) bsxbase.enable();
-  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.enable();
+  if(expansion == ExpansionPortDevice::BSX) bsxbase.enable();
+  if(cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.enable();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.enable();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.enable();
 
@@ -139,8 +139,10 @@ void System::power() {
   dsp.power();
   ppu.power();
 
-  if(expansion() == ExpansionPortDevice::BSX) bsxbase.power();
-  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.power();
+  // always initialize expansion port device(s) so they are handled correctly in savestates
+  bsxbase.power();
+  
+  if(cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.power();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.power();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.power();
 
@@ -177,8 +179,10 @@ void System::reset() {
   dsp.reset();
   ppu.reset();
 
-  if(expansion() == ExpansionPortDevice::BSX) bsxbase.reset();
-  if(memory::bsxpack.data() && cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.reset();
+  // always initialize expansion port device(s) so they are handled correctly in savestates
+  bsxbase.reset();
+  
+  if(cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.reset();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.reset();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.reset();
 
@@ -211,7 +215,7 @@ void System::reset() {
 }
 
 void System::unload() {
-  if(expansion() == ExpansionPortDevice::BSX) bsxbase.unload();
+  bsxbase.unload();
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) supergameboy.unload();
   
   if(cartridge.has_msu1()) msu1.unload();

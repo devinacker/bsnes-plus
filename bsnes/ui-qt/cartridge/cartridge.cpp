@@ -92,9 +92,6 @@ bool Cartridge::information(const char *filename, Cartridge::Information &info) 
 }
 
 bool Cartridge::saveStatesSupported() {
-  if(SNES::cartridge.mode() == SNES::Cartridge::Mode::Bsx) return false;
-  if(SNES::cartridge.mode() == SNES::Cartridge::Mode::BsxSlotted) return false;
-
   if(SNES::cartridge.has_st0018()) return false;
   if(SNES::cartridge.has_serial()) return false;
 

@@ -56,6 +56,8 @@ void Cartridge::parse_xml_cartridge(const char *data) {
 void Cartridge::parse_xml_bsx(const char *data) {
   xml_element document = xml_parse(data);
   if(document.element.size() == 0) return;
+  
+  bsxpack_type = BSXPackType::FlashROM;
 
   foreach(head, document.element) {
     if(head.name == "cartridge") {
