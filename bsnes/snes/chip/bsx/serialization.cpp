@@ -1,6 +1,8 @@
 #ifdef BSX_CPP
 
 void BSXBase::serialize(serializer &s) {
+	Processor::serialize(s);
+
 	for (auto &stream : regs.stream) {
 		s.integer(stream.offset);
 		s.integer(stream.loaded_channel);
@@ -23,6 +25,8 @@ void BSXBase::serialize(serializer &s) {
 		s.integer(stream.count);
 		s.integer(stream.first);
 		s.integer(stream.queue);
+		s.integer(stream.pf_queue);
+		s.integer(stream.dt_queue);
 	}
 	
 	s.integer(regs.r2194);

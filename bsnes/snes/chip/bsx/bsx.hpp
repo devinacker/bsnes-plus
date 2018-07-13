@@ -1,7 +1,9 @@
 #include <nall/file.hpp>
 
-class BSXBase : public MMIO {
+class BSXBase : public Coprocessor, public MMIO {
 public:
+  static void Enter();
+  void enter();
   void init();
   void enable();
   void power();
@@ -23,15 +25,17 @@ private:
     
     // broadcast data packet (from bsxdat)
     file packets;
-	int offset;
-	uint14 loaded_channel;
-	uint8 loaded_count;
+    int offset;
+    uint14 loaded_channel;
+    uint8 loaded_count;
     
     // internal state
     bool pf_latch, dt_latch;
     uint8 count;
     bool first;
-    uint16 queue;
+    uint16 queue; // number of remaining unbuffered packets
+    uint16 pf_queue; // number of buffered prefix bytes
+    uint16 dt_queue; // number of buffered packets
   };
   
   struct {

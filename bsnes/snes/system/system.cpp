@@ -158,6 +158,7 @@ void System::power() {
   if(cartridge.has_msu1()) msu1.power();
   if(cartridge.has_serial()) serial.power();
 
+  if(expansion == ExpansionPortDevice::BSX) cpu.coprocessors.append(&bsxbase);
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) cpu.coprocessors.append(&supergameboy);
   if(cartridge.has_superfx()) cpu.coprocessors.append(&superfx);
   if(cartridge.has_sa1()) cpu.coprocessors.append(&sa1);
@@ -198,6 +199,7 @@ void System::reset() {
   if(cartridge.has_msu1()) msu1.reset();
   if(cartridge.has_serial()) serial.reset();
 
+  if(expansion == ExpansionPortDevice::BSX) cpu.coprocessors.append(&bsxbase);
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) cpu.coprocessors.append(&supergameboy);
   if(cartridge.has_superfx()) cpu.coprocessors.append(&superfx);
   if(cartridge.has_sa1()) cpu.coprocessors.append(&sa1);

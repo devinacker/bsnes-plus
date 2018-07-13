@@ -2,6 +2,33 @@
 
 BSXBase bsxbase;
 
+void BSXBase::Enter() { bsxbase.enter(); }
+
+void BSXBase::enter() {
+  while(true) {
+    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
+      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
+    }
+
+    // buffer a packet for currently open streams
+    for(auto &stream : regs.stream) {
+      if(stream.queue) {
+        stream.queue--;
+        if(stream.pf_latch && stream.pf_queue < 0x80) stream.pf_queue++;
+        if(stream.dt_latch && stream.dt_queue < 0x80) stream.dt_queue++;
+      }
+    }
+
+    // simulate an estimated number of bits to buffer a full packet for two channels:
+    // 30 bit header + 176 bit payload + 82 bit error correction/CRC per frame
+    // right now, act as if there are only ever two total channels in the broadcast,
+    // but in reality, there could be any arbitrary number of channels being
+    // broadcast asynchronously with each other in the same satellite data stream
+    step(288*2);
+    synchronize_cpu();
+  }
+}
+
 void BSXBase::init() {
 }
 
@@ -14,6 +41,8 @@ void BSXBase::power() {
 }
 
 void BSXBase::reset() {
+  create(BSXBase::Enter, 224*1024);
+
   memset(&regs, 0x00, sizeof regs);
   
   local_time = config.sat.local_time;
@@ -108,6 +137,9 @@ uint8 BSXBase::get_time()
 }
 
 uint8 BSXBase::mmio_read(unsigned addr) {
+  if(!Memory::debugger_access())
+    cpu.synchronize_coprocessor();
+
   unsigned streamnum = addr >= 0x218e ? 1 : 0;
   BSXStream &stream = regs.stream[streamnum];
 
@@ -134,7 +166,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
         //Time Channel, one packet
         return 0x01;
       }
-      else if (stream.queue == 0 && !Memory::debugger_access())
+      else if (!stream.pf_queue && !stream.dt_queue && !Memory::debugger_access())
       {
         //Queue is empty
         stream.offset = 0;
@@ -146,8 +178,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
         stream.count++;
       }
       
-      //Lock max value at 0x7F for bigger packets
-      return min(stream.queue, 0x7f);
+      return stream.pf_queue;
     }
     
     case 0x218b:
@@ -161,7 +192,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
           //Time Channel, only one packet, both start and end
           stream.prefix = 0x90;
         }
-        else if(stream.packets.open() && !Memory::debugger_access())
+        else if(stream.pf_queue && !Memory::debugger_access())
         {
           stream.prefix = 0;
           if (stream.first)
@@ -171,18 +202,16 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             stream.first = false;
           }
 
-          if (stream.queue > 0)
-          {
-            stream.queue--;
-          }
-          if (stream.queue == 0)
+          stream.pf_queue--;
+          if (stream.queue == 0 && stream.pf_queue == 0)
           {
             //Last packet
             stream.prefix |= 0x80;
           }
         }
 
-        stream.prefix_or |= stream.prefix;
+        if(!Memory::debugger_access())
+          stream.prefix_or |= stream.prefix;
         return stream.prefix;
       }
       else
@@ -204,11 +233,17 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             //Return Time
             stream.data = get_time();
           }
-          else if (stream.packets.open())
+          else if (stream.dt_queue && stream.packets.open())
           {
             //Get packet data
             stream.data = stream.packets.read();
             stream.offset++;
+
+            if(stream.offset % 22 == 0)
+            {
+              //finished reading current packet
+              stream.dt_queue--;
+            }
           }
         }
         return stream.data;
@@ -243,6 +278,9 @@ uint8 BSXBase::mmio_read(unsigned addr) {
 }
 
 void BSXBase::mmio_write(unsigned addr, uint8 data) {
+  if(!Memory::debugger_access())
+    cpu.synchronize_coprocessor();
+
   unsigned streamnum = addr >= 0x218e ? 1 : 0;
   BSXStream &stream = regs.stream[streamnum];
 
