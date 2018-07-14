@@ -84,14 +84,9 @@ bool BSXBase::stream_fileload(BSXStream &stream)
   return stream.packets.open();
 }
 
-uint8 BSXBase::get_time()
+uint8 BSXBase::get_time(BSXStream &stream)
 {
-  unsigned counter = regs.time_counter;
-  regs.time_counter++;
-  if (regs.time_counter >= 22)
-    regs.time_counter = 0;
-
-  if (counter == 0) {
+  if (stream.offset == 0) {
     time_t rawtime;
     tm *t;
     
@@ -104,16 +99,15 @@ uint8 BSXBase::get_time()
       t = gmtime(&rawtime);
     }
 
-    regs.time_hour   = t->tm_hour;
-    regs.time_minute = t->tm_min;
-    regs.time_second = t->tm_sec;
-    regs.time_weekday = (t->tm_wday) + 1;
-    regs.time_day = t->tm_mday;
-    regs.time_month = (t->tm_mon) + 1;
-    regs.time_year = (t->tm_year) + 1900;
+    // adjust time to BS-X value ranges
+    t->tm_wday++;
+    t->tm_mon++;
+    t->tm_year += 1900;
+    // store time for current stream
+    stream.time = *t;
   }
 
-  switch(counter) {
+  switch(stream.offset) {
     case  0: return 0x00;  //Data Group ID / Repetition
     case  1: return 0x00;  //Data Group Link / Continuity
     case  2: return 0x00;  //Data Group Size (24-bit)
@@ -124,14 +118,14 @@ uint8 BSXBase::get_time()
     case  7: return 0x00;  //Offset (24-bit)
     case  8: return 0x00;
     case  9: return 0x00;
-    case 10: return regs.time_second;
-    case 11: return regs.time_minute;
-    case 12: return regs.time_hour;
-    case 13: return regs.time_weekday;
-    case 14: return regs.time_day;
-    case 15: return regs.time_month;
-    case 16: return regs.time_year >> 0;
-    case 17: return regs.time_year >> 8;
+    case 10: return stream.time.tm_sec;
+    case 11: return stream.time.tm_min;
+    case 12: return stream.time.tm_hour;
+    case 13: return stream.time.tm_wday;
+    case 14: return stream.time.tm_mday;
+    case 15: return stream.time.tm_mon;
+    case 16: return stream.time.tm_year >> 0;
+    case 17: return stream.time.tm_year >> 8;
     default: return 0x00;
   }
 }
@@ -161,16 +155,18 @@ uint8 BSXBase::mmio_read(unsigned addr) {
         return 0;
       }
 
-      if (stream.channel == 0)
-      {
-        //Time Channel, one packet
-        return 0x01;
-      }
-      else if (!stream.pf_queue && !stream.dt_queue && !Memory::debugger_access())
+      if (!stream.pf_queue && !stream.dt_queue && !Memory::debugger_access())
       {
         //Queue is empty
         stream.offset = 0;
-        if (!stream_fileload(stream) && stream.count > 0) 
+        if (stream.channel == 0)
+        {
+          //Time Channel, one packet
+          stream.first = true;
+          stream.loaded_channel = 0;
+          stream.queue = 1;
+        }
+        else if (!stream_fileload(stream) && stream.count > 0) 
         {
           stream.count = 0;
           stream_fileload(stream);
@@ -187,12 +183,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       if (stream.pf_latch)
       {
         //Latch enabled
-        if (stream.channel == 0)
-        {
-          //Time Channel, only one packet, both start and end
-          stream.prefix = 0x90;
-        }
-        else if(stream.pf_queue && !Memory::debugger_access())
+        if(stream.pf_queue && !Memory::debugger_access())
         {
           stream.prefix = 0;
           if (stream.first)
@@ -226,26 +217,27 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       //Data Latch
       if (stream.dt_latch)
       {
-        if(!Memory::debugger_access())
+        if(stream.dt_queue && !Memory::debugger_access())
         {
           if (stream.channel == 0)
           {
             //Return Time
-            stream.data = get_time();
+            stream.data = get_time(stream);
           }
-          else if (stream.dt_queue && stream.packets.open())
+          else if (stream.packets.open())
           {
             //Get packet data
             stream.data = stream.packets.read();
-            stream.offset++;
+          }
 
-            if(stream.offset % 22 == 0)
-            {
-              //finished reading current packet
-              stream.dt_queue--;
-            }
+          stream.offset++;
+          if(stream.offset % 22 == 0)
+          {
+            //finished reading current packet
+            stream.dt_queue--;
           }
         }
+        
         return stream.data;
       }
       else
@@ -311,11 +303,6 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
     case 0x218c:
     case 0x2192: {
       //Data Latch
-      if (stream.channel == 0 && !Memory::debugger_access())
-      {
-        //Hardcoded Time Channel
-        regs.time_counter = 0;
-      }
       stream.dt_latch = (data != 0);
     } break;
 

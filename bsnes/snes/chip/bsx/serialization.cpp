@@ -27,6 +27,13 @@ void BSXBase::serialize(serializer &s) {
 		s.integer(stream.queue);
 		s.integer(stream.pf_queue);
 		s.integer(stream.dt_queue);
+		
+		s.integer(stream.time.tm_hour);
+		s.integer(stream.time.tm_min);
+		s.integer(stream.time.tm_sec);
+		s.integer(stream.time.tm_wday);
+		s.integer(stream.time.tm_mday);
+		s.integer(stream.time.tm_mon);
 	}
 	
 	s.integer(regs.r2194);
@@ -35,14 +42,6 @@ void BSXBase::serialize(serializer &s) {
 	s.integer(regs.r2197);
 	s.integer(regs.r2198);
 	s.integer(regs.r2199);
-	
-	s.integer(regs.time_counter);
-	s.integer(regs.time_hour);
-	s.integer(regs.time_minute);
-	s.integer(regs.time_second);
-	s.integer(regs.time_weekday);
-	s.integer(regs.time_day);
-	s.integer(regs.time_month);
 	
 	s.integer(local_time);
 	s.integer(custom_time);

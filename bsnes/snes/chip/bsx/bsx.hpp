@@ -36,6 +36,9 @@ private:
     uint16 queue; // number of remaining unbuffered packets
     uint16 pf_queue; // number of buffered prefix bytes
     uint16 dt_queue; // number of buffered packets
+    
+    // Time Channel data
+    struct tm time;
   };
   
   struct {
@@ -47,16 +50,10 @@ private:
 
     //Serial
     uint8 r2198, r2199;
-
-    //Time
-    uint8 time_counter;
-    uint8 time_hour, time_minute, time_second;
-    uint8 time_weekday, time_day, time_month;
-    uint16 time_year;
   } regs;
   
   bool stream_fileload(BSXStream &stream);
-  uint8 get_time();
+  uint8 get_time(BSXStream &stream);
 
   bool local_time;
   time_t custom_time, start_time;
