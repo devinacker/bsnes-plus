@@ -121,7 +121,8 @@ bool Cartridge::loadNormal(const char *base) {
 bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false)
+    loadEmptyMemoryPack(cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted,
@@ -141,7 +142,8 @@ bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
 bool Cartridge::loadBsx(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false)
+    loadEmptyMemoryPack(cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,
@@ -539,11 +541,17 @@ bool Cartridge::saveMemory(const char *filename, const char *extension, SNES::Ma
   return true;
 }
 
-bool Cartridge::loadEmptyMemoryPack(SNES::MappedRAM &memory) {
+bool Cartridge::loadEmptyMemoryPack(string &xml, SNES::MappedRAM &memory) {
   uint8_t *emptydata = new uint8_t[0x100000];
   memset(emptydata, 0xFF, 0x100000);
   memory.copy(emptydata, 0x100000);
   delete[] emptydata;
+  
+  xml = "\
+  <?xml version='1.0' encoding='UTF-8'?>\
+  <cartridge type='FlashROM' />\
+  ";
+  
   return true;
 }
 
