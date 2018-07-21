@@ -21,7 +21,7 @@ private:
     uint14 channel;  // $2188-2189, $218e-218f
     uint8 prefix;    // $218b, $2191
     uint8 data;      // $218c, $2192
-    uint8 prefix_or; // $218d, $2193
+    uint8 status;    // $218d, $2193
     
     // broadcast data packet (from bsxdat)
     file packets;

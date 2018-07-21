@@ -18,7 +18,7 @@ void BSXBase::serialize(serializer &s) {
 		s.integer(stream.channel);
 		s.integer(stream.prefix);
 		s.integer(stream.data);
-		s.integer(stream.prefix_or);
+		s.integer(stream.status);
 		
 		s.integer(stream.pf_latch);
 		s.integer(stream.dt_latch);
