@@ -98,8 +98,6 @@ void Cx4::instruction() {
     //loop
     if (regs.rwbustime > 1) {
       add_clocks(regs.rwbustime - 1);
-      synchronize_cpu();
-      regs.rwbustime = 1;
     }
   }
 

@@ -8,7 +8,6 @@ void Cx4::serialize(serializer &s) {
 
   s.integer(regs.halt);
   s.integer(regs.cachePage);
-  s.integer(regs.irq);
   s.integer(regs.irqPending);
   
   s.integer(regs.rwbusaddr);

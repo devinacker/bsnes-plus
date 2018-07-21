@@ -52,7 +52,6 @@ protected:
   struct Registers {
     bool halt;
     uint8 cachePage;
-	bool irq;
 	bool irqPending;
 	
     uint24 rwbusaddr;

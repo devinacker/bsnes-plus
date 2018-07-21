@@ -46,7 +46,7 @@ void Cx4::enter() {
       instruction();
     }
     
-    regs.irqPending = wasBusy && !busy() && !mmio.irqDisable;
+    regs.irqPending |= wasBusy && !busy();
     add_clocks(1);
   }
 }
@@ -61,10 +61,7 @@ void Cx4::add_clocks(unsigned clocks) {
         regs.busdata = cx4bus.read(regs.rwbusaddr);
     }
   }
-
-  regs.irq |= regs.irqPending;
-  cpu.regs.irq |= regs.irq;
-
+  
   step(clocks);
   synchronize_cpu();
   
@@ -74,6 +71,10 @@ void Cx4::add_clocks(unsigned clocks) {
     
     if (mmio.suspendCycles && !--mmio.suspendCycles)
       mmio.suspend = false;
+  }
+  
+  if (regs.irqPending && !mmio.irqDisable) {
+    cpu.regs.irq = 1;
   }
 }
 
@@ -142,7 +143,6 @@ void Cx4::reset() {
   
   regs.halt = true;
   regs.cachePage = 0;
-  regs.irq = false;
   regs.irqPending = false;
   regs.rwbustime = 0;
 
@@ -150,7 +150,6 @@ void Cx4::reset() {
   regs.z = 0;
   regs.c = 0;
   
-  mmio.dma = false;
   mmio.suspend = false;
   mmio.cacheLoading = false;
 

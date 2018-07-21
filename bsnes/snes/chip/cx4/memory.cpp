@@ -149,7 +149,10 @@ void Cx4::dsp_write(unsigned addr, uint8 data) {
   case 0x7f51: 
     mmio.irqDisable = data & 0x01;
     if (mmio.irqDisable) {
-      regs.irq = regs.irqPending = false;
+      regs.irqPending = false;
+      cpu.regs.irq = 0;
+    } else if (regs.irqPending) {
+      cpu.regs.irq = 1;
     }
     return;
   case 0x7f52: mmio.r1f52 = data & 0x01; return;
