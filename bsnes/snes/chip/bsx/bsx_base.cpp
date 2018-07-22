@@ -19,11 +19,13 @@ void BSXBase::enter() {
       }
     }
 
-    // simulate an estimated number of bits to buffer a full packet for two channels:
-    // 30 bit header + 176 bit payload + 82 bit error correction/CRC per frame
+    // time step based on BT.1126 layer 2
+    // simulate an estimated number of bits to buffer full link-layer packets:
+    // 30 bit header + 176 bit payload + 82 bit error correction/CRC per packet
     // right now, act as if there are only ever two total channels in the broadcast,
-    // but in reality, there could be any arbitrary number of channels being
-    // broadcast asynchronously with each other in the same satellite data stream
+	// and that they're both using equal bandwidth, but in reality, there could be any
+	// arbitrary number of channels being broadcast asynchronously with each other in 
+	// the same satellite data stream
     step(288*2);
     synchronize_cpu();
   }
@@ -41,7 +43,10 @@ void BSXBase::power() {
 }
 
 void BSXBase::reset() {
-  create(BSXBase::Enter, 224*1024);
+  // data clock based on BT.1126 layer 1 (for NTSC mode B)
+  // 224 data bits and 48 16-bit stereo samples per (physical) frame
+  // 1000 frames per sec = 224kbit/s data and 48kHz audio
+  create(BSXBase::Enter, 224*1000);
 
   memset(&regs, 0x00, sizeof regs);
   
