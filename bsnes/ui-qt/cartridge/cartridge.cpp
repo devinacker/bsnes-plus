@@ -344,7 +344,7 @@ void Cartridge::saveMemoryPack() {
 
   fp.write(SNES::memory::bsxpack.data(), SNES::memory::bsxpack.size());
   fp.close();
-  utility.showMessage(string(filename, " saved."));
+  utility.showMessage(string(nall::notdir(fullpath), " saved."));
 }
 
 void Cartridge::unload() {
