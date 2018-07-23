@@ -103,6 +103,7 @@ private:
     bool csr, esr;
     bool vendor_info;
     bool writebyte;
+    uint8 flash_size;
   } regs;
 };
 
