@@ -32,6 +32,7 @@ Configuration::Configuration() {
   attach(SNES::config.sat.path = "./bsxdat/", "bsx.satdata");
   attach(SNES::config.sat.local_time = true, "bsx.localTime");
   attach((signed&)(SNES::config.sat.custom_time = 798653040) /* 1995-04-23 16:04 */, "bsx.customTime");
+  attach((unsigned&)(SNES::config.sat.default_size = 2) /* 8 Mbit */, "bsx.defaultSize", "Default Memory Pack size, 0..4 = 2..32 Mbit");
 
   //TODO: add superfx frequency
 

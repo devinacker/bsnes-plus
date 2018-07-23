@@ -29,12 +29,31 @@ BSXSettingsWindow::BSXSettingsWindow() {
   
   timeNoteLabel = new QLabel("Note: A system reset is required for a time change to take effect.");
   layout->addWidget(timeNoteLabel);
+  layout->addSpacing(Style::WidgetSpacing);
+  
+  sizeLayout = new QHBoxLayout;
+  sizeLayout->setSpacing(Style::WidgetSpacing);
+  layout->addLayout(sizeLayout);
+  layout->addSpacing(Style::WidgetSpacing);
+  
+  sizeLabel = new QLabel("Default Memory Pack size:");
+  sizeLayout->addWidget(sizeLabel);
+  
+  sizeCombo = new QComboBox;
+  sizeCombo->addItem("2 Mbit");
+  sizeCombo->addItem("4 Mbit");
+  sizeCombo->addItem("8 Mbit");
+  sizeCombo->addItem("16 Mbit");
+  sizeCombo->addItem("32 Mbit");
+  sizeLayout->addWidget(sizeCombo);
+  sizeLayout->addStretch();
   
   initializeUi();
 
   connect(useLocalTime,  SIGNAL(toggled(bool)), this, SLOT(timeSettingToggled()));
   connect(useCustomTime, SIGNAL(toggled(bool)), this, SLOT(timeSettingToggled()));
   connect(dateTime,      SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(customTimeSet()));
+  connect(sizeCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(defaultSizeSet()));
 }
 
 void BSXSettingsWindow::initializeUi() {
@@ -48,6 +67,8 @@ void BSXSettingsWindow::initializeUi() {
   dateTime->setCalendarPopup(true);
   dateTime->setTimeSpec(Qt::UTC);
   dateTime->setDateTime(QDateTime::fromTime_t(SNES::config.sat.custom_time).toTimeSpec(Qt::UTC));
+  
+  sizeCombo->setCurrentIndex(SNES::config.sat.default_size);
 }
 
 void BSXSettingsWindow::timeSettingToggled() {
@@ -58,4 +79,8 @@ void BSXSettingsWindow::timeSettingToggled() {
 
 void BSXSettingsWindow::customTimeSet() {
   SNES::config.sat.custom_time = dateTime->dateTime().toTime_t();
+}
+
+void BSXSettingsWindow::defaultSizeSet() {
+  SNES::config.sat.default_size = sizeCombo->currentIndex();
 }
