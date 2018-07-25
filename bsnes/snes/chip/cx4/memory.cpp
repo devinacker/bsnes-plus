@@ -1,61 +1,98 @@
 #ifdef CX4_CPP
 
-unsigned Cx4::speed(unsigned addr) {
-  if ((addr & 0xf08000) == 0x700000) { // cart RAM
-    return mmio.ramSpeed;
+// Cx4->cart access
+
+uint8 Cx4::op_read(unsigned addr) {
+  if((addr & 0x408c00) < 0x0c00) {  // internal RAM
+    return dataRAM[addr & 0xfff];
+  } else if ((addr & 0xf08000) == 0x700000) { // cart RAM
+    add_clocks(mmio.ramSpeed);
+    return cx4bus.read(addr);
   } else if ((addr & 0x408000) == 0x008000) { // cart ROM
-    return mmio.romSpeed;
+    add_clocks(mmio.romSpeed);
+    return cx4bus.read(addr);
   }
   
-  // internal / unmapped
-  return 0;
+  return 0x00;
+}
+
+void Cx4::op_write(unsigned addr, uint8 data) {
+  if((addr & 0x408c00) < 0x0c00) {  // internal RAM
+    dataRAM[addr & 0xfff] = data;
+  } else if ((addr & 0xf08000) == 0x700000) { // cart RAM
+    add_clocks(mmio.ramSpeed);
+    cx4bus.write(addr, data);
+  } else if ((addr & 0x408000) == 0x008000) { // cart ROM
+    add_clocks(mmio.romSpeed);
+    cx4bus.write(addr, data);
+  }
+}
+
+// SNES->cart access
+
+uint8 Cx4::rom_read(unsigned addr) {
+  if (!Memory::debugger_access())
+    cpu.synchronize_coprocessor();
+
+  if (mmio.suspend || !bus_access()) {
+    return memory::cartrom.read(addr);
+  }
+  
+  // interrupt vectors available while Cx4 is running 
+  // along with other read-only MMIO apparently (???)
+  if ((addr & 0xffffc0) == 0x007fc0) return dsp_read(addr & 0x037f);
+  return 0; // not open bus
+}
+
+uint8 Cx4::ram_read(unsigned addr) {
+  if (memory::cartram.size()) {
+    if (!Memory::debugger_access())
+      cpu.synchronize_coprocessor();
+
+    if (mmio.suspend || !bus_access())
+      return memory::cartrom.read(addr);
+  }
+  return 0; // not open bus
+}
+
+void Cx4::ram_write(unsigned addr, uint8 data) {
+  if (memory::cartram.size()) {
+    if (!Memory::debugger_access())
+      cpu.synchronize_coprocessor();
+
+    if (mmio.suspend || !bus_access())
+      memory::cartram.write(addr, data);  
+  }
 }
 
 uint8 Cx4::read(unsigned addr) {
   if (!Memory::debugger_access())
-    active() ? synchronize_cpu() : cpu.synchronize_coprocessor();
+    cpu.synchronize_coprocessor();
 
-  if((addr & 0x1c00) == 0x1c00) {  //$00-3f,80-bf:7c00-7cff
+  if((mmio.dma || !regs.halt) && (addr & 0x1fc0) < 0x1f40)
+    return 0xff;
+
+  else if((addr & 0x1fc0) >= 0x1f40) //$00-3f,80-bf:7f40-7fff
     return dsp_read(addr);
-  }
-  if((addr & 0x0c00) < 0x0c00) {  //$00-3f,80-bf:6000-6bff,7000-7bff
-    return dram_read(addr);
-  }
+
+  else if((addr & 0x0c00) < 0x0c00) //$00-3f,80-bf:6000-6bff,7000-7bff
+    return dataRAM[addr & 0xfff];
   
-  return 0;
+  return cpu.regs.mdr; // ?
 }
 
 void Cx4::write(unsigned addr, uint8 data) {
   if (!Memory::debugger_access())
-    active() ? synchronize_cpu() : cpu.synchronize_coprocessor();
+    cpu.synchronize_coprocessor();
 
-  if((addr & 0x1c00) == 0x1c00) {  //$00-3f,80-bf:7c00-7cff
-    return dsp_write(addr, data);
-  }
-  if((addr & 0x0c00) < 0x0c00) {  //$00-3f,80-bf:6000-6bff,7000-7bff
-    return dram_write(addr, data);
-  }
-}
+  if((mmio.dma || !regs.halt)  && (addr & 0x1fc0) < 0x1f40) 
+    return;
 
-uint8 Cx4::rom_read(unsigned addr) {
-  if (active() || mmio.suspend || !bus_access()) {
-    return memory::cartrom.read(addr);
-  }
-  
-  if ((addr & 0xffffe0) == 0x007fe0) return mmio.vector[addr & 0x1f];
-  return 0; // not open bus
-}
+  else if((addr & 0x1fc0) >= 0x1f40) //$00-3f,80-bf:7f40-7fff
+    dsp_write(addr, data);
 
-uint8 Cx4::dram_read(unsigned addr) {
-  addr &= 0xfff;
-  if(addr >= 0xc00) return 0;
-  return dataRAM[addr];
-}
-
-void Cx4::dram_write(unsigned addr, uint8 data) {
-  addr &= 0xfff;
-  if(addr >= 0xc00) return;
-  dataRAM[addr] = data;
+  else if((addr & 0x0c00) < 0x0c00) //$00-3f,80-bf:6000-6bff,7000-7bff
+    dataRAM[addr & 0xfff] = data;
 }
 
 uint8 Cx4::dsp_read(unsigned addr) {
@@ -97,6 +134,9 @@ uint8 Cx4::dsp_read(unsigned addr) {
   if((addr >= 0x7f80 && addr <= 0x7faf) || (addr >= 0x7fc0 && addr <= 0x7fef)) {
     unsigned index = (addr & 0x3f) / 3;        //0..15
     unsigned shift = ((addr & 0x3f) % 3) * 8;  //0, 8, 16
+    
+    if(!regs.halt && !mmio.suspend)
+      return regs.mdr >> shift;
     return regs.gpr[index] >> shift;
   }
 
@@ -174,6 +214,8 @@ void Cx4::dsp_write(unsigned addr, uint8 data) {
 
   //GPRs
   if((addr >= 0x7f80 && addr <= 0x7faf) || (addr >= 0x7fc0 && addr <= 0x7fef)) {
+    if (!regs.halt && !mmio.suspend) return;
+	
     unsigned index = (addr & 0x3f) / 3;
     switch((addr & 0x3f) % 3) {
     case 0: regs.gpr[index] = (regs.gpr[index] & 0xffff00) | (data <<  0); return;
