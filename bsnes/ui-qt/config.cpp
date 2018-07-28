@@ -138,6 +138,7 @@ Configuration::Configuration() {
   attach(geometry.settingsWindow    = "", "geometry.settingsWindow");
   attach(geometry.toolsWindow       = "", "geometry.toolsWindow");
   attach(geometry.cheatImportWindow = "", "geometry.cheatImportWindow");
+  attach(geometry.soundViewerWindow = "", "geometry.soundViewerWindow");
 
   attach(geometry.debugger         = "", "geometry.debugger");
   attach(geometry.disassembler     = "", "geometry.disassembler");

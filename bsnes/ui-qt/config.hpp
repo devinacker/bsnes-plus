@@ -93,6 +93,7 @@ public:
     string settingsWindow;
     string toolsWindow;
     string cheatImportWindow;
+	string soundViewerWindow;
 
     string debugger;
     string disassembler;
