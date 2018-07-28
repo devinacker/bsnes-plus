@@ -40,7 +40,7 @@ uint8 BSXFlash::read(unsigned addr) {
   if(regs.csr)
   {
     //Read Compatible Status Register
-	if(!Memory::debugger_access())
+    if(!Memory::debugger_access())
       regs.csr = false;
     return 0x80;
   }

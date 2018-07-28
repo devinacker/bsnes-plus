@@ -554,8 +554,7 @@ bool Cartridge::loadEmptyMemoryPack(string &xml, SNES::MappedRAM &memory) {
 
   uint8_t *emptydata = new uint8_t[size];
   memset(emptydata, 0xFF, size);
-  memory.copy(emptydata, size);
-  delete[] emptydata;
+  memory.map(emptydata, size);
   
   xml = "\
   <?xml version='1.0' encoding='UTF-8'?>\

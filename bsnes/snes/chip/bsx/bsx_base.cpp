@@ -23,9 +23,9 @@ void BSXBase::enter() {
     // simulate an estimated number of bits to buffer full link-layer packets:
     // 30 bit header + 176 bit payload + 82 bit error correction/CRC per packet
     // right now, act as if there are only ever two total channels in the broadcast,
-	// and that they're both using equal bandwidth, but in reality, there could be any
-	// arbitrary number of channels being broadcast asynchronously with each other in 
-	// the same satellite data stream
+    // and that they're both using equal bandwidth, but in reality, there could be any
+    // arbitrary number of channels being broadcast asynchronously with each other in 
+    // the same satellite data stream
     step(288*2);
     synchronize_cpu();
   }
