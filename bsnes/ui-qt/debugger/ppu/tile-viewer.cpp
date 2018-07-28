@@ -235,20 +235,15 @@ void TileViewer::onExportClicked() {
 
   inExportClickedCall = true;
 
-  QFileDialog saveDialog(this, "Export Tiles");
-  saveDialog.setAcceptMode(QFileDialog::AcceptSave);
-  saveDialog.setNameFilter("PNG Image (*.png)");
-  saveDialog.setDefaultSuffix("png");
-  saveDialog.exec();
-
-  QStringList selectedFiles = saveDialog.selectedFiles();
-
-  if(saveDialog.result() == QDialog::Accepted && selectedFiles.size() == 1) {
-    QImageWriter writer(selectedFiles.first(), "PNG");
-    bool s = writer.write(renderer.image);
-    if(s == false) {
-      QMessageBox::critical(this, "ERROR", "Unable to export tiles\n\n" + writer.errorString());
+  QString selectedFile = QFileDialog::getSaveFileName(
+    this, "Export Tiles", config().path.current.exportVRAM, "PNG Image (*.png)");
+    
+  if(!selectedFile.isEmpty()) {
+    QImageWriter writer(selectedFile, "PNG");
+    if(!writer.write(renderer.image)) {
+      QMessageBox::critical(this, "Export Tiles", "Unable to export tiles:\n\n" + writer.errorString());
     }
+    config().path.current.exportVRAM = selectedFile;
   }
 
   inExportClickedCall = false;

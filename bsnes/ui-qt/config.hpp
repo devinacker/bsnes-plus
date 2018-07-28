@@ -32,7 +32,7 @@ public:
     string shader;
 
     struct Current {
-      string folder, movie, shader, cartridge;
+      string folder, movie, shader, cartridge, exportVRAM;
       unsigned filter;  //current active filter for "Load Cartridge"
     } current;
   } path;

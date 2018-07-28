@@ -71,6 +71,7 @@ Configuration::Configuration() {
   attach(path.current.movie     = "", "path.current.movie");
   attach(path.current.shader    = "", "path.current.shader");
   attach(path.current.cartridge = "", "path.current.cartridge");
+  attach(path.current.exportVRAM = "", "path.current.exportVRAM");
   attach(path.current.filter    = 0,  "path.current.filter");
 
   video.context = &video.windowed;

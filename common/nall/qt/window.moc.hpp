@@ -84,7 +84,7 @@ inline void Window::shrink() {
 
 inline void Window::keyReleaseEvent(QKeyEvent *event) {
   if(closeOnEscape && (event->key() == Qt::Key_Escape)) close();
-  QWidget::keyReleaseEvent(event);
+  else QWidget::keyReleaseEvent(event);
 }
 
 inline void Window::closeEvent(QCloseEvent *event) {
