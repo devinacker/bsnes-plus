@@ -194,21 +194,30 @@ void Cx4::instruction() {
     //0110 1.00 .... ....
     //rdraml
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) regs.ramdata = (regs.ramdata & 0xffff00) | (dataRAM[target] <<  0);
+    if(target < 0xc00) {
+      regs.ramdata = (regs.ramdata & 0xffff00) | (dataRAM[target] <<  0);
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xfb00) == 0x6900) {
     //0110 1.01 .... ....
     //rdramh
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) regs.ramdata = (regs.ramdata & 0xff00ff) | (dataRAM[target] <<  8);
+    if(target < 0xc00) {
+      regs.ramdata = (regs.ramdata & 0xff00ff) | (dataRAM[target] <<  8);
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xfb00) == 0x6a00) {
     //0110 1.10 .... ....
     //rdramb
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) regs.ramdata = (regs.ramdata & 0x00ffff) | (dataRAM[target] << 16);
+    if(target < 0xc00) {
+      regs.ramdata = (regs.ramdata & 0x00ffff) | (dataRAM[target] << 16);
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xffff) == 0x7000) {
@@ -344,21 +353,30 @@ void Cx4::instruction() {
     //1110 1.00 .... ....
     //wrraml
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) dataRAM[target] = regs.ramdata >>  0;
+    if(target < 0xc00) {
+      dataRAM[target] = regs.ramdata >>  0;
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xfb00) == 0xe900) {
     //1110 1.01 .... ....
     //wrramh
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) dataRAM[target] = regs.ramdata >>  8;
+    if(target < 0xc00) {
+      dataRAM[target] = regs.ramdata >>  8;
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xfb00) == 0xea00) {
     //1110 1.10 .... ....
     //wrramb
     uint24 target = ri() + (opcode & 0x0400 ? regs.ramaddr : (uint24)0);
-    if(target < 0xc00) dataRAM[target] = regs.ramdata >> 16;
+    if(target < 0xc00) {
+      dataRAM[target] = regs.ramdata >> 16;
+      regs.mdr = regs.ramdata;
+    }
   }
 
   else if((opcode & 0xff00) == 0xf000) {
@@ -380,6 +398,8 @@ void Cx4::instruction() {
     // unknown opcode
     regs.halt = true;
   }
+
+  add_clocks(1);
 }
 
 #endif

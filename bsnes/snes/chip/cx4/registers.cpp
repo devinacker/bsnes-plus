@@ -1,59 +1,63 @@
 #ifdef CX4_CPP
 
 uint24 Cx4::register_read(uint8 addr) {
+  uint24 data = 0x000000;
+
   switch(addr & 0x7f) {
-  case 0x00: return regs.a;
-  case 0x01: return regs.acch;
-  case 0x02: return regs.accl;
-  case 0x03: return regs.busdata;
-  case 0x08: return regs.romdata;
-  case 0x0c: return regs.ramdata;
-  case 0x13: return regs.busaddr;
-  case 0x1c: return regs.ramaddr;
-  case 0x20: return regs.pc & 0xff; // already incremented to next instruction before access
-  case 0x28: return 0x2e; // ?
+  case 0x00: data = regs.a; break;
+  case 0x01: data = regs.acch; break;
+  case 0x02: data = regs.accl; break;
+  case 0x03: data = regs.busdata; break;
+  case 0x08: data = regs.romdata; break;
+  case 0x0c: data = regs.ramdata; break;
+  case 0x13: data = regs.busaddr; break;
+  case 0x1c: data = regs.ramaddr; break;
+  case 0x20: data = regs.pc & 0xff; // already incremented to next instruction before access
+  case 0x28: data =  0x2e; break; // ?
   case 0x2e: case 0x2f:
     regs.rwbusaddr = regs.busaddr;
     regs.rwbustime = ((addr & 1) ? mmio.ramSpeed : mmio.romSpeed) + 1; //includes current cycle
     regs.writebus = false;
-    return 0;
-  case 0x50: return 0x000000;
-  case 0x51: return 0xffffff;
-  case 0x52: return 0x00ff00;
-  case 0x53: return 0xff0000;
-  case 0x54: return 0x00ffff;
-  case 0x55: return 0xffff00;
-  case 0x56: return 0x800000;
-  case 0x57: return 0x7fffff;
-  case 0x58: return 0x008000;
-  case 0x59: return 0x007fff;
-  case 0x5a: return 0xff7fff;
-  case 0x5b: return 0xffff7f;
-  case 0x5c: return 0x010000;
-  case 0x5d: return 0xfeffff;
-  case 0x5e: return 0x000100;
-  case 0x5f: return 0x00feff;
-  case 0x60: case 0x70: return regs.gpr[ 0];
-  case 0x61: case 0x71: return regs.gpr[ 1];
-  case 0x62: case 0x72: return regs.gpr[ 2];
-  case 0x63: case 0x73: return regs.gpr[ 3];
-  case 0x64: case 0x74: return regs.gpr[ 4];
-  case 0x65: case 0x75: return regs.gpr[ 5];
-  case 0x66: case 0x76: return regs.gpr[ 6];
-  case 0x67: case 0x77: return regs.gpr[ 7];
-  case 0x68: case 0x78: return regs.gpr[ 8];
-  case 0x69: case 0x79: return regs.gpr[ 9];
-  case 0x6a: case 0x7a: return regs.gpr[10];
-  case 0x6b: case 0x7b: return regs.gpr[11];
-  case 0x6c: case 0x7c: return regs.gpr[12];
-  case 0x6d: case 0x7d: return regs.gpr[13];
-  case 0x6e: case 0x7e: return regs.gpr[14];
-  case 0x6f: case 0x7f: return regs.gpr[15];
+    break;
+  case 0x50: data = 0x000000; break;
+  case 0x51: data = 0xffffff; break;
+  case 0x52: data = 0x00ff00; break;
+  case 0x53: data = 0xff0000; break;
+  case 0x54: data = 0x00ffff; break;
+  case 0x55: data = 0xffff00; break;
+  case 0x56: data = 0x800000; break;
+  case 0x57: data = 0x7fffff; break;
+  case 0x58: data = 0x008000; break;
+  case 0x59: data = 0x007fff; break;
+  case 0x5a: data = 0xff7fff; break;
+  case 0x5b: data = 0xffff7f; break;
+  case 0x5c: data = 0x010000; break;
+  case 0x5d: data = 0xfeffff; break;
+  case 0x5e: data = 0x000100; break;
+  case 0x5f: data = 0x00feff; break;
+  case 0x60: case 0x70: data = regs.gpr[ 0]; break;
+  case 0x61: case 0x71: data = regs.gpr[ 1]; break;
+  case 0x62: case 0x72: data = regs.gpr[ 2]; break;
+  case 0x63: case 0x73: data = regs.gpr[ 3]; break;
+  case 0x64: case 0x74: data = regs.gpr[ 4]; break;
+  case 0x65: case 0x75: data = regs.gpr[ 5]; break;
+  case 0x66: case 0x76: data = regs.gpr[ 6]; break;
+  case 0x67: case 0x77: data = regs.gpr[ 7]; break;
+  case 0x68: case 0x78: data = regs.gpr[ 8]; break;
+  case 0x69: case 0x79: data = regs.gpr[ 9]; break;
+  case 0x6a: case 0x7a: data = regs.gpr[10]; break;
+  case 0x6b: case 0x7b: data = regs.gpr[11]; break;
+  case 0x6c: case 0x7c: data = regs.gpr[12]; break;
+  case 0x6d: case 0x7d: data = regs.gpr[13]; break;
+  case 0x6e: case 0x7e: data = regs.gpr[14]; break;
+  case 0x6f: case 0x7f: data = regs.gpr[15]; break;
   }
-  return 0x000000;
+  return regs.mdr = data;
 }
 
 void Cx4::register_write(uint8 addr, uint24 data) {
+  regs.mdr = data;
+  
   switch(addr & 0x7f) {
   case 0x00: regs.a = data; return;
   case 0x01: regs.acch = data; return;
