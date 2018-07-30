@@ -156,6 +156,7 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
     fileName = slotAName;
   else
     fileName = baseName;
+  application.currentRom = fileName;
   
   name = *slot
   ? notdir(nall::basename(slotAName))
@@ -183,6 +184,7 @@ bool Cartridge::loadSufamiTurbo(const char *base, const char *slotA, const char 
   else if(!*slotB) name = notdir(nall::basename(slotAName));
   else if(!*slotA) name = notdir(nall::basename(slotBName));
   else name = notdir(nall::basename(slotAName)) << " + " << notdir(nall::basename(slotBName));
+  application.currentRom = fileName;
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
@@ -204,6 +206,7 @@ bool Cartridge::loadSuperGameBoy(const char *base, const char *slot) {
   name = *slot
   ? notdir(nall::basename(slotAName))
   : notdir(nall::basename(baseName));
+  application.currentRom = fileName;
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;

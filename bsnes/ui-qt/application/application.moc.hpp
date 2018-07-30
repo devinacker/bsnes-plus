@@ -50,6 +50,7 @@ public:
   bool singleUserMode();
   void locateFile(string &filename, bool createDataDirectory = false);
   void loadCartridge(const string& filename); // used for command-line loading
+  void reloadCartridge();
   void initPaths(const char *basename);
   void init();
 

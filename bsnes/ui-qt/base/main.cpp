@@ -684,7 +684,7 @@ void CanvasObject::dragEnterEvent(QDragEnterEvent *event) {
 void CanvasObject::dropEvent(QDropEvent *event) {
   if(event->mimeData()->hasUrls()) {
     QList<QUrl> list = event->mimeData()->urls();
-    if(list.count() == 1) cartridge.loadNormal(list.at(0).toLocalFile().toUtf8().constData());
+    if(list.count() == 1) application.loadCartridge(list.at(0).toLocalFile().toUtf8().constData());
   }
 }
 
