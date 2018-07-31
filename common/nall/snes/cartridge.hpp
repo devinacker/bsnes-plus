@@ -693,7 +693,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
     if(ram_size == 1024) ram_size = 0;
   }
 
-  if(mapperid == 0x23 && (rom_type == 0x32 || rom_type == 0x34 || rom_type == 0x35)) {
+  if(mapperid == 0x23 && (rom_type == 0x32 || rom_type == 0x34 || rom_type == 0x35 || rom_type == 0x36)) {
     mapper = SA1ROM;
   }
 
