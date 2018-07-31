@@ -51,6 +51,9 @@ void Cx4::enter() {
     }
     
     regs.irqPending |= wasBusy && !busy();
+    if (regs.irqPending && !mmio.irqDisable) {
+      cpu.regs.irq = 1;
+    }
   }
 }
 
@@ -76,10 +79,6 @@ void Cx4::add_clocks(unsigned clocks) {
 
       if (mmio.suspendCycles && !--mmio.suspendCycles)
         mmio.suspend = false;
-    }
-  
-    if (regs.irqPending && !mmio.irqDisable) {
-      cpu.regs.irq = 1;
     }
   }
 }
