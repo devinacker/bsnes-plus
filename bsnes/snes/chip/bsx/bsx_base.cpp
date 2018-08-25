@@ -54,7 +54,10 @@ void BSXBase::reset() {
   custom_time = config.sat.custom_time;
 
   regs.r2196 = 0x10;
-  regs.r2197 = 0x80;
+  regs.r2197 = 0xFF;
+  regs.r2198 = 0x80;
+  regs.r2199 = 0x01;
+  regs.r219a = 0x10;
 
   time(&start_time);
 }
@@ -84,6 +87,7 @@ bool BSXBase::stream_fileload(BSXStream &stream)
   else
   {
     stream.loaded_channel = 0;
+    stream.prefix |= 0x0f;
   }
   
   return stream.packets.open();
@@ -204,9 +208,10 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             //Last packet
             stream.prefix |= 0x80;
           }
-
-          stream.status |= stream.prefix;
         }
+
+        if(!Memory::debugger_access())
+          stream.status |= stream.prefix;
 
         return stream.prefix;
       }
@@ -266,12 +271,13 @@ uint8 BSXBase::mmio_read(unsigned addr) {
     case 0x2194: return regs.r2194; //Satellaview LED and Stream register
     case 0x2195: return regs.r2195; //Unknown
     case 0x2196: return regs.r2196; //Satellaview Status
-    case 0x2197: return regs.r2197; //Soundlink
+    case 0x2197: return regs.r2197; //Soundlink / EXT output
     case 0x2198: return regs.r2198; //Serial I/O - Serial Number
     case 0x2199: return regs.r2199; //Serial I/O - ???
+    case 0x219a: return regs.r219a; //Unknown
   }
 
-  return cpu.regs.mdr;
+  return 0x00;
 }
 
 void BSXBase::mmio_write(unsigned addr, uint8 data) {
@@ -317,11 +323,11 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
     //Other
     case 0x2194: {
       //Satellaview LED and Stream enable (4bit)
-      regs.r2194 = data & 0x0F;
+      regs.r2194 = data;
     } break;
 
     case 0x2197: {
-      //Soundlink
+      //Soundlink / EXT output
       regs.r2197 = data;
     } break;
   }

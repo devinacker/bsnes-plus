@@ -46,10 +46,14 @@ private:
     BSXStream stream[2];
     
     //Other
-    uint8 r2194, r2195, r2196, r2197;
+    uint4 r2194;
+    uint8 r2195, r2196, r2197;
 
     //Serial
     uint8 r2198, r2199;
+	
+	//Unknown
+	uint8 r219a;
   } regs;
   
   bool stream_fileload(BSXStream &stream);
@@ -78,7 +82,10 @@ private:
   struct {
     uint8 r[16];
     uint8 rtemp[16];
+    uint8 hidden[8];
+    bool irq, irq_en;
     bool dirty;
+    bool use_hidden;
   } regs;
 
   void update_memory_map();

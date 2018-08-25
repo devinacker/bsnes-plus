@@ -42,6 +42,7 @@ void BSXBase::serialize(serializer &s) {
 	s.integer(regs.r2197);
 	s.integer(regs.r2198);
 	s.integer(regs.r2199);
+	s.integer(regs.r219a);
 	
 	s.integer(local_time);
 	s.integer(custom_time);
@@ -61,7 +62,11 @@ void BSXBase::serialize(serializer &s) {
 void BSXCart::serialize(serializer &s) {
 	s.array(regs.r);
 	s.array(regs.rtemp);
+	s.array(regs.hidden);
+	s.integer(regs.irq);
+	s.integer(regs.irq_en);
 	s.integer(regs.dirty);
+	s.integer(regs.use_hidden);
 	
 	if (s.mode() == serializer::Load)
 		update_memory_map();
