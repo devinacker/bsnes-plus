@@ -50,7 +50,7 @@ uint8 Cx4::ram_read(unsigned addr) {
       cpu.synchronize_coprocessor();
 
     if (mmio.suspend || !bus_access())
-      return memory::cartrom.read(addr);
+      return memory::cartram.read(addr);
   }
   return 0; // not open bus
 }
