@@ -267,7 +267,7 @@ bool Cartridge::loadSnsf(const char *base) {
   bool status = music.load_snsf(baseName = base, data, size);
   
   if (status) {
-    SNES::memory::cartrom.copy(data, size);
+    SNES::memory::cartrom.map(data, size);
     cartridge.baseXml = SNESCartridge(data, size).xmlMemoryMap;
     
     SNES::cartridge.basename = nall::basename(baseName);
@@ -279,8 +279,6 @@ bool Cartridge::loadSnsf(const char *base) {
     application.currentRom = base;
 
     utility.modifySystemState(Utility::LoadCartridge);
-  
-    delete[] data;
   }
   
   return status;
@@ -511,9 +509,8 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
     //generate XML mapping from data via heuristics
     xml = SNESCartridge(data, size).xmlMemoryMap;
   }
-
-  memory.copy(data, size);
-  delete[] data;
+  
+  memory.map(data, size);
   return true;
 }
 
@@ -532,8 +529,7 @@ bool Cartridge::loadMemory(const char *filename, const char *extension, SNES::Ma
   fp.read(data, size);
   fp.close();
 
-  memory.copy(data, size);
-  delete[] data;
+  memory.map(data, size);
   return true;
 }
 
