@@ -26,8 +26,6 @@ Debugger *debugger;
 #include "ppu/oam-viewer.cpp"
 #include "ppu/cgram-viewer.cpp"
 
-#include "misc/debugger-options.cpp"
-
 Debugger::Debugger() {
   setObjectName("debugger");
   setWindowTitle("Debugger");
@@ -56,7 +54,16 @@ Debugger::Debugger() {
 
   menu_misc = menu->addMenu("Misc");
   menu_misc_clear = menu_misc->addAction("Clear Console");
-  menu_misc_options = menu_misc->addAction("Options ...");
+  menu_misc->addSeparator();
+  menu_misc_cacheUsage = menu_misc->addAction("Cache memory usage table to disk");
+  menu_misc_cacheUsage->setCheckable(true);
+  menu_misc_cacheUsage->setChecked(config().debugger.cacheUsageToDisk);
+  menu_misc_saveBreakpoints = menu_misc->addAction("Save breakpoints to disk between sessions");
+  menu_misc_saveBreakpoints->setCheckable(true);
+  menu_misc_saveBreakpoints->setChecked(config().debugger.saveBreakpoints);
+  menu_misc_showHClocks = menu_misc->addAction("Show H-position in clocks instead of dots");
+  menu_misc_showHClocks->setCheckable(true);
+  menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
   consoleLayout = new QVBoxLayout;
   consoleLayout->setSpacing(0);
@@ -163,7 +170,6 @@ Debugger::Debugger() {
   tilemapViewer = new TilemapViewer;
   oamViewer = new OamViewer;
   cgramViewer = new CgramViewer;
-  debuggerOptions = new DebuggerOptions;
 
   connect(menu_tools_disassembler, SIGNAL(triggered()), disassembler, SLOT(show()));
   connect(menu_tools_breakpoint, SIGNAL(triggered()), breakpointEditor, SLOT(show()));
@@ -176,7 +182,9 @@ Debugger::Debugger() {
   connect(menu_ppu_cgramViewer, SIGNAL(triggered()), cgramViewer, SLOT(show()));
 
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
-  connect(menu_misc_options, SIGNAL(triggered()), debuggerOptions, SLOT(show()));
+  connect(menu_misc_cacheUsage, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_saveBreakpoints, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
   
@@ -287,6 +295,10 @@ void Debugger::synchronize() {
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
+  
+  config().debugger.cacheUsageToDisk = menu_misc_cacheUsage->isChecked();
+  config().debugger.saveBreakpoints = menu_misc_saveBreakpoints->isChecked();
+  config().debugger.showHClocks = menu_misc_showHClocks->isChecked();
   
   // todo: factor in whether or not cartridge actually contains SA1/SuperFX
   SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();

@@ -363,6 +363,11 @@ void QHexEdit::undo()
 // ********************************************************************** Handle events
 void QHexEdit::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Escape)
+    {
+        event->ignore();
+        return;
+    }
     // Cursor movements
     if (event->matches(QKeySequence::MoveToNextChar))
     {

@@ -102,6 +102,30 @@ void Application::loadCartridge(const string &filename) {
     }
 }
 
+void Application::reloadCartridge() {
+  switch (SNES::cartridge.mode()) {
+  case SNES::Cartridge::Mode::Normal:
+    loadCartridge(cartridge.baseName);
+    break;
+  
+  case SNES::Cartridge::Mode::BsxSlotted:
+    cartridge.loadBsxSlotted(cartridge.baseName, cartridge.slotAName);
+    break;
+  
+  case SNES::Cartridge::Mode::Bsx:
+    cartridge.loadBsx(cartridge.baseName, cartridge.slotAName);
+    break;
+  
+  case SNES::Cartridge::Mode::SufamiTurbo:
+    cartridge.loadSufamiTurbo(cartridge.baseName, cartridge.slotAName, cartridge.slotBName);
+    break;
+  
+  case SNES::Cartridge::Mode::SuperGameBoy:
+    cartridge.loadSuperGameBoy(cartridge.baseName, cartridge.slotAName);
+    break;
+  }
+}
+
 int Application::main(int &argc, char **argv) {
   app = new App(argc, argv);
   #if !defined(PLATFORM_WIN)

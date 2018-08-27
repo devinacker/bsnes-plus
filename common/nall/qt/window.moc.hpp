@@ -25,7 +25,7 @@ protected slots:
 protected:
   string *geometryString;
   bool closeOnEscape;
-  void keyReleaseEvent(QKeyEvent *event);
+  void keyPressEvent(QKeyEvent *event);
   void closeEvent(QCloseEvent *event);
 };
 
@@ -82,9 +82,9 @@ inline void Window::shrink() {
   }
 }
 
-inline void Window::keyReleaseEvent(QKeyEvent *event) {
+inline void Window::keyPressEvent(QKeyEvent *event) {
   if(closeOnEscape && (event->key() == Qt::Key_Escape)) close();
-  QWidget::keyReleaseEvent(event);
+  else QWidget::keyPressEvent(event);
 }
 
 inline void Window::closeEvent(QCloseEvent *event) {

@@ -10,7 +10,10 @@ public:
   //memory.cpp
   uint8 read(unsigned addr);
   void write(unsigned addr, uint8 data);
+  
   uint8 rom_read(unsigned addr);
+  uint8 ram_read(unsigned addr);
+  void ram_write(unsigned addr, uint8 data);
   
   void init();
   void enable();
@@ -25,10 +28,8 @@ protected:
   void add_clocks(unsigned);
   
   //memory.cpp
-  unsigned speed(unsigned addr);
-  
-  uint8 dram_read(unsigned addr);
-  void dram_write(unsigned addr, uint8 data);
+  uint8 op_read(unsigned addr);
+  void op_write(unsigned addr, uint8 data);
   
   uint8 dsp_read(unsigned addr);
   void dsp_write(unsigned addr, uint8 data);
@@ -52,9 +53,8 @@ protected:
   struct Registers {
     bool halt;
     uint8 cachePage;
-	bool irq;
-	bool irqPending;
-	
+    bool irqPending;
+    
     uint24 rwbusaddr;
     uint8 rwbustime;
     bool writebus;
@@ -75,6 +75,8 @@ protected:
     uint24 busaddr;
     uint24 ramaddr;
     uint24 gpr[16];
+    
+    uint24 mdr;
   } regs;
 
   uint24 stack[8];

@@ -92,9 +92,6 @@ bool Cartridge::information(const char *filename, Cartridge::Information &info) 
 }
 
 bool Cartridge::saveStatesSupported() {
-  if(SNES::cartridge.mode() == SNES::Cartridge::Mode::Bsx) return false;
-  if(SNES::cartridge.mode() == SNES::Cartridge::Mode::BsxSlotted) return false;
-
   if(SNES::cartridge.has_st0018()) return false;
   if(SNES::cartridge.has_serial()) return false;
 
@@ -124,7 +121,8 @@ bool Cartridge::loadNormal(const char *base) {
 bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false)
+    loadEmptyMemoryPack(cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::BsxSlotted,
@@ -144,7 +142,8 @@ bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
 bool Cartridge::loadBsx(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
-  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false) loadEmptyMemoryPack(SNES::memory::bsxpack);
+  if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false)
+    loadEmptyMemoryPack(cartridge.slotAXml, SNES::memory::bsxpack);
   SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,
@@ -157,6 +156,7 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
     fileName = slotAName;
   else
     fileName = baseName;
+  application.currentRom = fileName;
   
   name = *slot
   ? notdir(nall::basename(slotAName))
@@ -184,6 +184,7 @@ bool Cartridge::loadSufamiTurbo(const char *base, const char *slotA, const char 
   else if(!*slotB) name = notdir(nall::basename(slotAName));
   else if(!*slotA) name = notdir(nall::basename(slotBName));
   else name = notdir(nall::basename(slotAName)) << " + " << notdir(nall::basename(slotBName));
+  application.currentRom = fileName;
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
@@ -205,6 +206,7 @@ bool Cartridge::loadSuperGameBoy(const char *base, const char *slot) {
   name = *slot
   ? notdir(nall::basename(slotAName))
   : notdir(nall::basename(baseName));
+  application.currentRom = fileName;
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
@@ -265,7 +267,7 @@ bool Cartridge::loadSnsf(const char *base) {
   bool status = music.load_snsf(baseName = base, data, size);
   
   if (status) {
-    SNES::memory::cartrom.copy(data, size);
+    SNES::memory::cartrom.map(data, size);
     cartridge.baseXml = SNESCartridge(data, size).xmlMemoryMap;
     
     SNES::cartridge.basename = nall::basename(baseName);
@@ -277,8 +279,6 @@ bool Cartridge::loadSnsf(const char *base) {
     application.currentRom = base;
 
     utility.modifySystemState(Utility::LoadCartridge);
-  
-    delete[] data;
   }
   
   return status;
@@ -315,18 +315,26 @@ void Cartridge::saveMemoryPack() {
   if(SNES::cartridge.loaded() == false) return;
   if(SNES::cartridge.has_bsx_slot() == false) return;
 
-  string filename = nall::basename(cartridge.fileName);
-  string fullpath = config().path.save;
+  string filename = nall::basename(cartridge.slotAName);
   
-  time_t systemTime = time(0);
-  tm *currentTime = localtime(&systemTime);
-  char t[512];
-  sprintf(t, "%.4u%.2u%.2u-%.2u%.2u%.2u",
-    1900 + currentTime->tm_year, 1 + currentTime->tm_mon, currentTime->tm_mday,
-    currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec
-  );
-  filename << "-" << t << ".bs";
-  fullpath << filename;
+  if(filename == "")
+  {
+    filename = nall::basename(cartridge.baseName);
+    time_t systemTime = time(0);
+    tm *currentTime = localtime(&systemTime);
+    char t[512];
+    sprintf(t, "-%.4u%.2u%.2u-%.2u%.2u%.2u",
+      1900 + currentTime->tm_year, 1 + currentTime->tm_mon, currentTime->tm_mday,
+      currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec
+    );
+    filename << t;
+  }
+  filename << ".bs";
+  
+  string fullpath = filepath(filename, config().path.save);
+  fullpath = QFileDialog::getSaveFileName(mainWindow, 
+    "Save Memory Pack", fullpath, "BS-X Memory Pack (*.bs)").toUtf8().data();
+  if (fullpath == "") return;
 
   file fp;
   if(fp.open(fullpath, file::mode::write) == false)
@@ -337,7 +345,7 @@ void Cartridge::saveMemoryPack() {
 
   fp.write(SNES::memory::bsxpack.data(), SNES::memory::bsxpack.size());
   fp.close();
-  utility.showMessage(string(filename, " saved."));
+  utility.showMessage(string(nall::notdir(fullpath), " saved."));
 }
 
 void Cartridge::unload() {
@@ -501,9 +509,8 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
     //generate XML mapping from data via heuristics
     xml = SNESCartridge(data, size).xmlMemoryMap;
   }
-
-  memory.copy(data, size);
-  delete[] data;
+  
+  memory.map(data, size);
   return true;
 }
 
@@ -522,8 +529,7 @@ bool Cartridge::loadMemory(const char *filename, const char *extension, SNES::Ma
   fp.read(data, size);
   fp.close();
 
-  memory.copy(data, size);
-  delete[] data;
+  memory.map(data, size);
   return true;
 }
 
@@ -542,11 +548,18 @@ bool Cartridge::saveMemory(const char *filename, const char *extension, SNES::Ma
   return true;
 }
 
-bool Cartridge::loadEmptyMemoryPack(SNES::MappedRAM &memory) {
-  uint8_t *emptydata = new uint8_t[0x100000];
-  memset(emptydata, 0xFF, 0x100000);
-  memory.copy(emptydata, 0x100000);
-  delete[] emptydata;
+bool Cartridge::loadEmptyMemoryPack(string &xml, SNES::MappedRAM &memory) {
+  size_t size = 0x40000 << min(4, SNES::config.sat.default_size);
+
+  uint8_t *emptydata = new uint8_t[size];
+  memset(emptydata, 0xFF, size);
+  memory.map(emptydata, size);
+  
+  xml = "\
+  <?xml version='1.0' encoding='UTF-8'?>\
+  <cartridge type='FlashROM' />\
+  ";
+  
   return true;
 }
 

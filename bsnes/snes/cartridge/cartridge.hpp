@@ -14,6 +14,7 @@ public:
   };
 
   enum class BSXPackType : unsigned {
+    Unknown,
     FlashROM,
     MaskROM,
   };

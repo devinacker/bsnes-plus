@@ -11,12 +11,17 @@ public:
   QDateTimeEdit *dateTime;
   QLabel *timeNoteLabel;
 
+  QHBoxLayout *sizeLayout;
+  QLabel *sizeLabel;
+  QComboBox *sizeCombo;
+
   void initializeUi();
   BSXSettingsWindow();
 
 public slots:
   void timeSettingToggled();
   void customTimeSet();
+  void defaultSizeSet();
 };
 
 extern BSXSettingsWindow *bsxSettingsWindow;

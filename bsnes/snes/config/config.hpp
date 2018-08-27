@@ -29,6 +29,7 @@ struct Configuration {
     string path;
     bool local_time;
     time_t custom_time;
+    unsigned default_size;
   } sat;
 
   Configuration();

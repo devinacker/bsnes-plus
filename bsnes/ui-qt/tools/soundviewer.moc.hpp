@@ -20,7 +20,7 @@ private:
 	QRect keyRect[12];
 };
 
-class SoundViewerWindow : public QWidget {
+class SoundViewerWindow : public Window {
 	Q_OBJECT
 
 public:

@@ -16,6 +16,7 @@ void BSXFlash::reset() {
   regs.esr = false;
   regs.vendor_info = false;
   regs.writebyte = false;
+  regs.flash_size = min(0xC, (unsigned)log2(size() >> 10));
 
   memory::bsxpack.write_protect(true);
 }
@@ -39,7 +40,8 @@ uint8 BSXFlash::read(unsigned addr) {
   if(regs.csr)
   {
     //Read Compatible Status Register
-    regs.csr = false;
+    if(!Memory::debugger_access())
+      regs.csr = false;
     return 0x80;
   }
 
@@ -52,7 +54,7 @@ uint8 BSXFlash::read(unsigned addr) {
       case 0x03: return 0x00;
       case 0x04: return 0x00;
       case 0x05: return 0x00;
-      case 0x06: return 0x1a;  //Memory Pack Type 1, 8M
+      case 0x06: return 0x10 | regs.flash_size; //Memory Pack Type 1
       case 0x07: return 0x00;
       default:   return 0x00;
     }

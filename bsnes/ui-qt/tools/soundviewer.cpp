@@ -126,6 +126,11 @@ void SoundViewerWidget::paintEvent(QPaintEvent *event) {
 }
 
 SoundViewerWindow::SoundViewerWindow() {
+	setObjectName("sound-viewer");
+	setWindowTitle("Sound Viewer");
+	setGeometryString(&config().geometry.soundViewerWindow);
+	application.windowList.append(this);
+  
 	layout = new QVBoxLayout;
 	layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	layout->setMargin(Style::WindowMargin);
@@ -139,8 +144,6 @@ SoundViewerWindow::SoundViewerWindow() {
 		viewer[i] = new SoundViewerWidget(i);
 		layout->addWidget(viewer[i]);
 	}
-	
-	setWindowTitle("Sound Viewer");
 }
 
 void SoundViewerWindow::updateValues() {

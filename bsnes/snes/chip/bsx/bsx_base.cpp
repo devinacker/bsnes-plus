@@ -2,6 +2,35 @@
 
 BSXBase bsxbase;
 
+void BSXBase::Enter() { bsxbase.enter(); }
+
+void BSXBase::enter() {
+  while(true) {
+    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
+      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
+    }
+
+    // buffer a packet for currently open streams
+    for(auto &stream : regs.stream) {
+      if(stream.queue) {
+        stream.queue--;
+        if(stream.pf_latch && stream.pf_queue < 0x80) stream.pf_queue++;
+        if(stream.dt_latch && stream.dt_queue < 0x80) stream.dt_queue++;
+      }
+    }
+
+    // time step based on BT.1126 layer 2
+    // simulate an estimated number of bits to buffer full link-layer packets:
+    // 30 bit header + 176 bit payload + 82 bit error correction/CRC per packet
+    // right now, act as if there are only ever two total channels in the broadcast,
+    // and that they're both using equal bandwidth, but in reality, there could be any
+    // arbitrary number of channels being broadcast asynchronously with each other in 
+    // the same satellite data stream
+    step(288*2);
+    synchronize_cpu();
+  }
+}
+
 void BSXBase::init() {
 }
 
@@ -14,13 +43,21 @@ void BSXBase::power() {
 }
 
 void BSXBase::reset() {
+  // data clock based on BT.1126 layer 1 (for NTSC mode B)
+  // 224 data bits and 48 16-bit stereo samples per (physical) frame
+  // 1000 frames per sec = 224kbit/s data and 48kHz audio
+  create(BSXBase::Enter, 224*1000);
+
   memset(&regs, 0x00, sizeof regs);
   
   local_time = config.sat.local_time;
   custom_time = config.sat.custom_time;
 
   regs.r2196 = 0x10;
-  regs.r2197 = 0x80;
+  regs.r2197 = 0xFF;
+  regs.r2198 = 0x80;
+  regs.r2199 = 0x01;
+  regs.r219a = 0x10;
 
   time(&start_time);
 }
@@ -30,7 +67,7 @@ void BSXBase::unload() {
   regs.stream[1].packets.close();
 }
 
-void BSXBase::stream_fileload(BSXStream &stream)
+bool BSXBase::stream_fileload(BSXStream &stream)
 {
   //Make sure to close the file first
   stream.packets.close();
@@ -43,24 +80,22 @@ void BSXBase::stream_fileload(BSXStream &stream)
   if (stream.packets.open(filepath, file::mode::read))
   {
     stream.first = true;
-    stream.count++;
+    stream.loaded_channel = stream.channel;
+    stream.loaded_count = stream.count;
     stream.queue = ceil(stream.packets.size() / 22.);
   }
-  else if (stream.count > 0)
+  else
   {
-    stream.count = 0;
-    stream_fileload(stream);
+    stream.loaded_channel = 0;
+    stream.prefix |= 0x0f;
   }
+  
+  return stream.packets.open();
 }
 
-uint8 BSXBase::get_time()
+uint8 BSXBase::get_time(BSXStream &stream)
 {
-  unsigned counter = regs.time_counter;
-  regs.time_counter++;
-  if (regs.time_counter >= 22)
-    regs.time_counter = 0;
-
-  if (counter == 0) {
+  if (stream.offset == 0) {
     time_t rawtime;
     tm *t;
     
@@ -73,16 +108,15 @@ uint8 BSXBase::get_time()
       t = gmtime(&rawtime);
     }
 
-    regs.time_hour   = t->tm_hour;
-    regs.time_minute = t->tm_min;
-    regs.time_second = t->tm_sec;
-    regs.time_weekday = (t->tm_wday) + 1;
-    regs.time_day = t->tm_mday;
-    regs.time_month = (t->tm_mon) + 1;
-    regs.time_year = (t->tm_year) + 1900;
+    // adjust time to BS-X value ranges
+    t->tm_wday++;
+    t->tm_mon++;
+    t->tm_year += 1900;
+    // store time for current stream
+    stream.time = *t;
   }
 
-  switch(counter) {
+  switch(stream.offset) {
     case  0: return 0x00;  //Data Group ID / Repetition
     case  1: return 0x00;  //Data Group Link / Continuity
     case  2: return 0x00;  //Data Group Size (24-bit)
@@ -93,19 +127,22 @@ uint8 BSXBase::get_time()
     case  7: return 0x00;  //Offset (24-bit)
     case  8: return 0x00;
     case  9: return 0x00;
-    case 10: return regs.time_second;
-    case 11: return regs.time_minute;
-    case 12: return regs.time_hour;
-    case 13: return regs.time_weekday;
-    case 14: return regs.time_day;
-    case 15: return regs.time_month;
-    case 16: return regs.time_year >> 0;
-    case 17: return regs.time_year >> 8;
+    case 10: return stream.time.tm_sec;
+    case 11: return stream.time.tm_min;
+    case 12: return stream.time.tm_hour;
+    case 13: return stream.time.tm_wday;
+    case 14: return stream.time.tm_mday;
+    case 15: return stream.time.tm_mon;
+    case 16: return stream.time.tm_year >> 0;
+    case 17: return stream.time.tm_year >> 8;
     default: return 0x00;
   }
 }
 
 uint8 BSXBase::mmio_read(unsigned addr) {
+  if(!Memory::debugger_access())
+    cpu.synchronize_coprocessor();
+
   unsigned streamnum = addr >= 0x218e ? 1 : 0;
   BSXStream &stream = regs.stream[streamnum];
 
@@ -127,19 +164,26 @@ uint8 BSXBase::mmio_read(unsigned addr) {
         return 0;
       }
 
-      if (stream.channel == 0)
-      {
-        //Time Channel, one packet
-        return 0x01;
-      }
-      else if (stream.queue == 0 && !Memory::debugger_access())
+      if (!stream.pf_queue && !stream.dt_queue && !Memory::debugger_access())
       {
         //Queue is empty
-        stream_fileload(stream);
+        stream.offset = 0;
+        if (stream.channel == 0)
+        {
+          //Time Channel, one packet
+          stream.first = true;
+          stream.loaded_channel = 0;
+          stream.queue = 1;
+        }
+        else if (!stream_fileload(stream) && stream.count > 0) 
+        {
+          stream.count = 0;
+          stream_fileload(stream);
+        }
+        stream.count++;
       }
       
-      //Lock max value at 0x7F for bigger packets
-      return min(stream.queue, 0x7f);
+      return stream.pf_queue;
     }
     
     case 0x218b:
@@ -148,12 +192,7 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       if (stream.pf_latch)
       {
         //Latch enabled
-        if (stream.channel == 0)
-        {
-          //Time Channel, only one packet, both start and end
-          stream.prefix = 0x90;
-        }
-        else if(stream.packets.open() && !Memory::debugger_access())
+        if(stream.pf_queue && !Memory::debugger_access())
         {
           stream.prefix = 0;
           if (stream.first)
@@ -163,18 +202,17 @@ uint8 BSXBase::mmio_read(unsigned addr) {
             stream.first = false;
           }
 
-          if (stream.queue > 0)
-          {
-            stream.queue--;
-          }
-          if (stream.queue == 0)
+          stream.pf_queue--;
+          if (stream.queue == 0 && stream.pf_queue == 0)
           {
             //Last packet
             stream.prefix |= 0x80;
           }
         }
 
-        stream.prefix_or |= stream.prefix;
+        if(!Memory::debugger_access())
+          stream.status |= stream.prefix;
+
         return stream.prefix;
       }
       else
@@ -189,19 +227,27 @@ uint8 BSXBase::mmio_read(unsigned addr) {
       //Data Latch
       if (stream.dt_latch)
       {
-        if(!Memory::debugger_access())
+        if(stream.dt_queue && !Memory::debugger_access())
         {
           if (stream.channel == 0)
           {
             //Return Time
-            stream.data = get_time();
+            stream.data = get_time(stream);
           }
           else if (stream.packets.open())
           {
             //Get packet data
             stream.data = stream.packets.read();
           }
+
+          stream.offset++;
+          if(stream.offset % 22 == 0)
+          {
+            //finished reading current packet
+            stream.dt_queue--;
+          }
         }
+        
         return stream.data;
       }
       else
@@ -213,10 +259,10 @@ uint8 BSXBase::mmio_read(unsigned addr) {
     case 0x218d:
     case 0x2193: {
       //Prefix Data OR Gate
-      uint8 temp = stream.prefix_or;
+      uint8 temp = stream.status;
       if((regs.r2194 & 1) && !Memory::debugger_access())
       {
-        stream.prefix_or = 0;
+        stream.status = 0;
       }
       return temp; 
     }
@@ -225,15 +271,19 @@ uint8 BSXBase::mmio_read(unsigned addr) {
     case 0x2194: return regs.r2194; //Satellaview LED and Stream register
     case 0x2195: return regs.r2195; //Unknown
     case 0x2196: return regs.r2196; //Satellaview Status
-    case 0x2197: return regs.r2197; //Soundlink
+    case 0x2197: return regs.r2197; //Soundlink / EXT output
     case 0x2198: return regs.r2198; //Serial I/O - Serial Number
     case 0x2199: return regs.r2199; //Serial I/O - ???
+    case 0x219a: return regs.r219a; //Unknown
   }
 
-  return cpu.regs.mdr;
+  return 0x00;
 }
 
 void BSXBase::mmio_write(unsigned addr, uint8 data) {
+  if(!Memory::debugger_access())
+    cpu.synchronize_coprocessor();
+
   unsigned streamnum = addr >= 0x218e ? 1 : 0;
   BSXStream &stream = regs.stream[streamnum];
 
@@ -259,28 +309,25 @@ void BSXBase::mmio_write(unsigned addr, uint8 data) {
     case 0x2191: {
       //Prefix Data Latch
       stream.pf_latch = (data != 0);
+      stream.pf_queue = 0;
     } break;
 
     case 0x218c:
     case 0x2192: {
       //Data Latch
-      if (stream.channel == 0 && !Memory::debugger_access())
-      {
-        //Hardcoded Time Channel
-        regs.time_counter = 0;
-      }
       stream.dt_latch = (data != 0);
+      stream.dt_queue = 0;
     } break;
 
 
     //Other
     case 0x2194: {
       //Satellaview LED and Stream enable (4bit)
-      regs.r2194 = data & 0x0F;
+      regs.r2194 = data;
     } break;
 
     case 0x2197: {
-      //Soundlink
+      //Soundlink / EXT output
       regs.r2197 = data;
     } break;
   }

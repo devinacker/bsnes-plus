@@ -35,7 +35,7 @@ void CPU::poll_interrupts() {
   if(irq_valid) {
     if((status.virq_enabled && vcounter_past(10) != (status.virq_pos))
     || (status.hirq_enabled && hcounter_past(10) != (status.hirq_pos + 1) * 4)
-    || (status.virq_pos && vcounter_past(6) == 0)  //IRQs cannot trigger on last dot of field
+    || (hcounter_past(6) == 0 && vcounter_past(6) == 0)  //IRQs cannot trigger on last dot of field
     ) irq_valid = false;
   }
   if(!status.irq_valid && irq_valid) {

@@ -8,7 +8,6 @@ void Cx4::serialize(serializer &s) {
 
   s.integer(regs.halt);
   s.integer(regs.cachePage);
-  s.integer(regs.irq);
   s.integer(regs.irqPending);
   
   s.integer(regs.rwbusaddr);
@@ -31,6 +30,7 @@ void Cx4::serialize(serializer &s) {
   s.integer(regs.busaddr);
   s.integer(regs.ramaddr);
   for(auto& n : regs.gpr) s.integer(n);
+  s.integer(regs.mdr);
 
   s.integer(mmio.dma);
   s.integer(mmio.suspend);

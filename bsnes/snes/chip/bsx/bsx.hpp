@@ -1,12 +1,16 @@
 #include <nall/file.hpp>
 
-class BSXBase : public MMIO {
+class BSXBase : public Coprocessor, public MMIO {
 public:
+  static void Enter();
+  void enter();
   void init();
   void enable();
   void power();
   void reset();
   void unload();
+
+  void serialize(serializer&);
 
   uint8 mmio_read(unsigned addr);
   void mmio_write(unsigned addr, uint8 data);
@@ -17,16 +21,24 @@ private:
     uint14 channel;  // $2188-2189, $218e-218f
     uint8 prefix;    // $218b, $2191
     uint8 data;      // $218c, $2192
-    uint8 prefix_or; // $218d, $2193
+    uint8 status;    // $218d, $2193
     
     // broadcast data packet (from bsxdat)
     file packets;
+    int offset;
+    uint14 loaded_channel;
+    uint8 loaded_count;
     
     // internal state
     bool pf_latch, dt_latch;
     uint8 count;
     bool first;
-    uint16 queue;
+    uint16 queue; // number of remaining unbuffered packets
+    uint16 pf_queue; // number of buffered prefix bytes
+    uint16 dt_queue; // number of buffered packets
+    
+    // Time Channel data
+    struct tm time;
   };
   
   struct {
@@ -34,20 +46,18 @@ private:
     BSXStream stream[2];
     
     //Other
-    uint8 r2194, r2195, r2196, r2197;
+    uint4 r2194;
+    uint8 r2195, r2196, r2197;
 
     //Serial
     uint8 r2198, r2199;
-
-    //Time
-    uint8 time_counter;
-    uint8 time_hour, time_minute, time_second;
-    uint8 time_weekday, time_day, time_month;
-    uint16 time_year;
+	
+	//Unknown
+	uint8 r219a;
   } regs;
   
-  void stream_fileload(BSXStream &stream);
-  uint8 get_time();
+  bool stream_fileload(BSXStream &stream);
+  uint8 get_time(BSXStream &stream);
 
   bool local_time;
   time_t custom_time, start_time;
@@ -60,6 +70,8 @@ public:
   void power();
   void reset();
 
+  void serialize(serializer&);
+
   uint8 read(unsigned addr);
   void write(unsigned addr, uint8 data);
 
@@ -69,7 +81,11 @@ public:
 private:
   struct {
     uint8 r[16];
+    uint8 rtemp[16];
+    uint8 hidden[8];
+    bool irq, irq_en;
     bool dirty;
+    bool use_hidden;
   } regs;
 
   void update_memory_map();
@@ -82,6 +98,8 @@ public:
   void power();
   void reset();
 
+  void serialize(serializer&);
+
   unsigned size() const;
   uint8 read(unsigned addr);
   void write(unsigned addr, uint8 data);
@@ -92,6 +110,7 @@ private:
     bool csr, esr;
     bool vendor_info;
     bool writebyte;
+    uint8 flash_size;
   } regs;
 };
 

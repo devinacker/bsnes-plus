@@ -15,6 +15,9 @@ public:
   QAction *menu_ppu_cgramViewer;
   QMenu *menu_misc;
   QAction *menu_misc_clear;
+  QAction *menu_misc_cacheUsage;
+  QAction *menu_misc_saveBreakpoints;
+  QAction *menu_misc_showHClocks;
   QAction *menu_misc_options;
 
   QHBoxLayout *layout;

@@ -21,21 +21,21 @@ void Cx4::enter() {
     }
 
     bool wasBusy = busy();
-
+    // currently performing DMA
     if (mmio.dma) {
       for (unsigned n = 0; n < mmio.dmaLength; n++) {
-        uint8 data = cx4bus.read(mmio.dmaSource + n);
-        add_clocks(2 + speed(mmio.dmaSource + n) + speed(mmio.dmaTarget + n));
-        cx4bus.write(mmio.dmaTarget + n, data);
+        uint8 data = op_read(mmio.dmaSource + n);
+        op_write(mmio.dmaTarget + n, data);
+        add_clocks(1);
       }
       mmio.dma = false;
     }
-
-    if (mmio.cacheLoading) {
+    // currently performing cache preload
+    else if (mmio.cacheLoading) {
       load_page(mmio.cachePreload, mmio.pageNumber);
     }
-    
-    if (!regs.halt) {
+    // currently executing code
+    else if (!regs.halt) {
       if (cache[regs.cachePage].pageNumber != regs.pc >> 8) {
         // cache new program page
         load_page(regs.cachePage, regs.pc >> 8);
@@ -45,35 +45,41 @@ void Cx4::enter() {
       nextpc();
       instruction();
     }
+    // currently idle
+    else {
+      add_clocks(1);
+    }
     
-    regs.irqPending = wasBusy && !busy() && !mmio.irqDisable;
-    add_clocks(1);
+    regs.irqPending |= wasBusy && !busy();
+    if (regs.irqPending && !mmio.irqDisable) {
+      cpu.regs.irq = 1;
+    }
   }
 }
 
 void Cx4::add_clocks(unsigned clocks) {
-  if(regs.rwbustime) {
-    regs.rwbustime -= min(clocks, regs.rwbustime);
-    if(regs.rwbustime == 0) {
-      if (regs.writebus)
-        cx4bus.write(regs.rwbusaddr, regs.writebusdata);
-      else
-        regs.busdata = cx4bus.read(regs.rwbusaddr);
-    }
-  }
 
-  regs.irq |= regs.irqPending;
-  cpu.regs.irq |= regs.irq;
-
-  step(clocks);
-  synchronize_cpu();
-  
-  while (mmio.suspend) {
+  while (clocks--) {
     step(1);
     synchronize_cpu();
-    
-    if (mmio.suspendCycles && !--mmio.suspendCycles)
-      mmio.suspend = false;
+
+    if(regs.rwbustime && --regs.rwbustime) {
+      if (regs.writebus) {
+        regs.mdr = regs.writebusdata;
+        cx4bus.write(regs.rwbusaddr, regs.writebusdata);
+      } else {
+        regs.busdata = cx4bus.read(regs.rwbusaddr);
+        regs.mdr = regs.busdata;
+      }
+    }
+
+    while (mmio.suspend) {
+      step(1);
+      synchronize_cpu();
+
+      if (mmio.suspendCycles && !--mmio.suspendCycles)
+        mmio.suspend = false;
+    }
   }
 }
 
@@ -102,7 +108,7 @@ void Cx4::change_page() {
     regs.cachePage = otherPage;
   }
   // if both pages are locked (and invalid), halt
-  else if (cache[regs.cachePage].lock && cache[regs.cachePage].pageNumber != programPage) {
+  else if (cache[regs.cachePage].lock) {
     regs.halt = true;
   }
 }
@@ -114,10 +120,9 @@ void Cx4::load_page(uint8 cachePage, uint16 programPage) {
   mmio.cacheLoading = true;
   
   for (unsigned i = 0; i < 256; i++) {
-    cache[cachePage].data[i] = cx4bus.read(addr); // | (cx4bus.read(addr++) << 8);
-    add_clocks(1 + speed(addr++));
-    cache[cachePage].data[i] |= (cx4bus.read(addr) << 8);
-    add_clocks(1 + speed(addr++));
+    cache[cachePage].data[i] = op_read(addr++);
+    cache[cachePage].data[i] |= (op_read(addr++) << 8);
+    add_clocks(1);
   }
   
   cache[cachePage].pageNumber = programPage;
@@ -142,15 +147,15 @@ void Cx4::reset() {
   
   regs.halt = true;
   regs.cachePage = 0;
-  regs.irq = false;
   regs.irqPending = false;
   regs.rwbustime = 0;
+
+  regs.mdr = 0;
 
   regs.n = 0;
   regs.z = 0;
   regs.c = 0;
   
-  mmio.dma = false;
   mmio.suspend = false;
   mmio.cacheLoading = false;
 
