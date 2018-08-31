@@ -41,6 +41,7 @@ public:
     bool isFullscreen;
     bool synchronize;
 
+    bool showMenubar, showStatusbar;
     bool autoHideFullscreenMenu;
 
     signed contrastAdjust, brightnessAdjust, gammaAdjust, scanlineAdjust;

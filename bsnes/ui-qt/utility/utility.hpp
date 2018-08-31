@@ -33,8 +33,8 @@ public:
   void toggleAspectCorrection();
   void setScale(unsigned);
   void toggleFullscreen();
-  void toggleMenubar();
-  void toggleStatusbar();
+  void updateMenubar();
+  void updateStatusbar();
 };
 
 extern Utility utility;

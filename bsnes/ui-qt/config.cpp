@@ -78,6 +78,8 @@ Configuration::Configuration() {
   attach(video.isFullscreen = false, "video.isFullscreen");
   attach(video.synchronize  = false, "video.synchronize");
 
+  attach(video.showMenubar   = true, "video.showMenubar");
+  attach(video.showStatusbar = true, "video.showStatusbar");
   attach(video.autoHideFullscreenMenu = false, "video.autoHideFullscreenMenu");
 
   attach(video.contrastAdjust   = 0,    "video.contrastAdjust");
