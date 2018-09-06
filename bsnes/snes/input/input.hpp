@@ -8,6 +8,7 @@ public:
     SuperScope,
     Justifier,
     Justifiers,
+    NTTDataKeypad,
   };
 
   enum class JoypadID : unsigned {
