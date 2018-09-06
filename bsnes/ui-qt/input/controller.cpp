@@ -365,23 +365,38 @@ int16_t NTTDataKeypad::status(unsigned index, unsigned id) const {
     //block up+down and left+right combinations:
     //a real gamepad has a pivot in the D-pad that makes this impossible;
     //some software titles will crash if up+down or left+right are detected
-    if(id == (unsigned)SNES::Input::JoypadID::Down && up.cachedState) return 0;
-    if(id == (unsigned)SNES::Input::JoypadID::Right && left.cachedState) return 0;
+    if(id == (unsigned)SNES::Input::NTTDataKeypadID::Down && up.cachedState) return 0;
+    if(id == (unsigned)SNES::Input::NTTDataKeypadID::Right && left.cachedState) return 0;
   }
 
-  switch((SNES::Input::JoypadID)id) {
-    case SNES::Input::JoypadID::Up: return up.cachedState;
-    case SNES::Input::JoypadID::Down: return down.cachedState;
-    case SNES::Input::JoypadID::Left: return left.cachedState;
-    case SNES::Input::JoypadID::Right: return right.cachedState;
-    case SNES::Input::JoypadID::A: return a.cachedState | turboA.cachedState;
-    case SNES::Input::JoypadID::B: return b.cachedState | turboB.cachedState;
-    case SNES::Input::JoypadID::X: return x.cachedState | turboX.cachedState;
-    case SNES::Input::JoypadID::Y: return y.cachedState | turboY.cachedState;
-    case SNES::Input::JoypadID::L: return l.cachedState | turboL.cachedState;
-    case SNES::Input::JoypadID::R: return r.cachedState | turboR.cachedState;
-    case SNES::Input::JoypadID::Select: return select.cachedState;
-    case SNES::Input::JoypadID::Start: return start.cachedState;
+  switch((SNES::Input::NTTDataKeypadID)id) {
+    case SNES::Input::NTTDataKeypadID::Up: return up.cachedState;
+    case SNES::Input::NTTDataKeypadID::Down: return down.cachedState;
+    case SNES::Input::NTTDataKeypadID::Left: return left.cachedState;
+    case SNES::Input::NTTDataKeypadID::Right: return right.cachedState;
+    case SNES::Input::NTTDataKeypadID::A: return a.cachedState | turboA.cachedState;
+    case SNES::Input::NTTDataKeypadID::B: return b.cachedState | turboB.cachedState;
+    case SNES::Input::NTTDataKeypadID::X: return x.cachedState | turboX.cachedState;
+    case SNES::Input::NTTDataKeypadID::Y: return y.cachedState | turboY.cachedState;
+    case SNES::Input::NTTDataKeypadID::L: return l.cachedState | turboL.cachedState;
+    case SNES::Input::NTTDataKeypadID::R: return r.cachedState | turboR.cachedState;
+    case SNES::Input::NTTDataKeypadID::Select: return select.cachedState;
+    case SNES::Input::NTTDataKeypadID::Start: return start.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit0: return digit0.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit1: return digit1.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit2: return digit2.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit3: return digit3.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit4: return digit4.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit5: return digit5.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit6: return digit6.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit7: return digit7.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit8: return digit8.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit9: return digit9.cachedState;
+    case SNES::Input::NTTDataKeypadID::Star: return star.cachedState;
+    case SNES::Input::NTTDataKeypadID::Hash: return hash.cachedState;
+    case SNES::Input::NTTDataKeypadID::Period: return period.cachedState;
+    case SNES::Input::NTTDataKeypadID::C: return c.cachedState;
+    case SNES::Input::NTTDataKeypadID::Hangup: return hangup.cachedState;
   }
   return 0;
 }
