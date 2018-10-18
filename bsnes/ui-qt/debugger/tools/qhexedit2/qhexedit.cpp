@@ -328,7 +328,7 @@ void QHexEdit::redo()
 QString QHexEdit::selectionToReadableString()
 {
     QByteArray ba;
-    for (qint64 i = getSelectionBegin(); i <= getSelectionEnd(); i++)
+    for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
         ba.append(reader ? reader(i) : 0);
     return toReadable(ba);
 }
@@ -491,11 +491,12 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
     if (!_readOnly)
     {
         if ((QApplication::keyboardModifiers() == Qt::NoModifier) ||
+                (QApplication::keyboardModifiers() == Qt::ShiftModifier) ||
                 (QApplication::keyboardModifiers() == Qt::KeypadModifier))
         {
             /* Hex input */
             int key = int(event->text()[0].toLatin1());
-            if ((key>='0' && key<='9') || (key>='a' && key <= 'f'))
+            if ((key>='0' && key<='9') || (key>='a' && key <= 'f') || (key>='A' && key <= 'F'))
             {
                 if (getSelectionBegin() != getSelectionEnd())
                 {
@@ -528,7 +529,7 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
         if (event->matches(QKeySequence::Cut))
         {
             QByteArray bytes;
-            for (qint64 i = getSelectionBegin(); i <= getSelectionEnd(); i++)
+            for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
                 bytes.append(reader ? reader(i) : 0);
             
             QByteArray ba = bytes.toHex();
@@ -612,7 +613,7 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
     if (event->matches(QKeySequence::Copy))
     {
         QByteArray bytes;
-        for (qint64 i = getSelectionBegin(); i <= getSelectionEnd(); i++)
+        for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
             bytes.append(reader ? reader(i) : 0);
         
         QByteArray ba = bytes.toHex();
