@@ -62,11 +62,9 @@ void BSXBase::serialize(serializer &s) {
 void BSXCart::serialize(serializer &s) {
 	s.array(regs.r);
 	s.array(regs.rtemp);
-	s.array(regs.hidden);
 	s.integer(regs.irq);
 	s.integer(regs.irq_en);
 	s.integer(regs.dirty);
-	s.integer(regs.use_hidden);
 	
 	if (s.mode() == serializer::Load)
 		update_memory_map();

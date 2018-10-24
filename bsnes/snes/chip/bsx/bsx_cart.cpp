@@ -10,9 +10,6 @@ void BSXCart::enable() {
 
 void BSXCart::power() {
   reset();
-  for(unsigned i = 0; i < 6; i++) regs.hidden[i] = true;
-  regs.hidden[6] = false;
-  regs.hidden[7] = false;
 }
 
 void BSXCart::reset() {
@@ -24,7 +21,6 @@ void BSXCart::reset() {
   regs.r[0x0c] = false;
   regs.r[0x0d] = false;
   regs.dirty   = false;
-  regs.use_hidden = false;
   memcpy(regs.rtemp, regs.r, sizeof(regs.r));
 
   update_memory_map();
@@ -126,14 +122,12 @@ uint8 BSXCart::read(unsigned addr) {
   uint8 n = (addr >> 16) & 15;
   bool data = false;
   
-  if(regs.use_hidden) {
-    data = regs.hidden[n & 7];
-  } else switch(n) {
-    case 0x00: data = regs.irq; break;
-    case 0x01: data = regs.irq_en; break;
-    default:   data = regs.r[n]; break;
-    case 0x0e: // 14 & 15 are write only
-    case 0x0f: data = false; break;
+  switch(n) {
+  case 0x00: data = regs.irq; break;
+  case 0x01: data = regs.irq_en; break;
+  default:   data = regs.r[n]; break;
+  case 0x0e: // 14 & 15 are write only
+  case 0x0f: data = false; break;
   }
   
   return (data << 7) | (cpu.regs.mdr &= 0x7f);
@@ -142,10 +136,6 @@ uint8 BSXCart::read(unsigned addr) {
 void BSXCart::write(unsigned addr, uint8 data) {
   uint8 n = (addr >> 16) & 15;
   data >>= 7;
-  
-  if(regs.use_hidden) {
-    regs.hidden[n & 7] = data;
-  }
   
   switch(n) {
   case 0x00:
@@ -168,9 +158,6 @@ void BSXCart::write(unsigned addr, uint8 data) {
       update_memory_map();
       regs.dirty = false;
     }
-    break;
-  case 0x0f:
-    regs.use_hidden = data;
     break;
   }
 }

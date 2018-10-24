@@ -82,10 +82,8 @@ private:
   struct {
     uint8 r[16];
     uint8 rtemp[16];
-    uint8 hidden[8];
     bool irq, irq_en;
     bool dirty;
-    bool use_hidden;
   } regs;
 
   void update_memory_map();
