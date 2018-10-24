@@ -23,7 +23,7 @@ void Interface::video_refresh(const uint16_t *data, unsigned width, unsigned hei
   }
 
   if(saveScreenshot == true && config().video.unfilteredScreenshot == true) {
-    captureScreenshot(filter.renderUnfilteredScreenshot(data, pitch, width, height));
+    captureScreenshot(filter.render_unfiltered(data, pitch, width, height));
   }
 
   //scale display.crop* values from percentage-based (0-100%) to exact pixel sizes (width, height)

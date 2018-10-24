@@ -95,14 +95,18 @@ uint8_t Filter::gamma_adjust(uint8_t input) {
   return max(0, min(255, result));
 }
 
+unsigned Filter::color_convert(unsigned color) {
+  //rgb555->rgb888 conversion
+  return ((color & 0x7c00) << 9) + ((color & 0x7000) << 4)
+       + ((color & 0x03e0) << 6) + ((color & 0x0380) << 1)
+       + ((color & 0x001f) << 3) + ((color & 0x001c) >> 2);
+}
+
 void Filter::colortable_update() {
   double kr = 0.2126, kb = 0.0722, kg = (1.0 - kr - kb);  //luminance weights
 
   for(unsigned i = 0; i < 32768; i++) {
-    unsigned color  //rgb555->rgb888 conversion
-    = ((i & 0x7c00) << 9) + ((i & 0x7000) << 4)
-    + ((i & 0x03e0) << 6) + ((i & 0x0380) << 1)
-    + ((i & 0x001f) << 3) + ((i & 0x001c) >> 2);
+    unsigned color = color_convert(i);
 
     signed l;
     signed r = (color >> 16) & 0xff;
@@ -195,7 +199,7 @@ void Filter::render(
   }
 }
 
-QImage Filter::renderUnfilteredScreenshot(
+QImage Filter::render_unfiltered(
   const uint16_t *input, unsigned pitch, unsigned width, unsigned height
 ) {
   unsigned outWidth = width;
@@ -227,9 +231,9 @@ QImage Filter::renderUnfilteredScreenshot(
     QRgb *out = scanline;
 
     for(unsigned x = 0; x < width; x++) {
-      if(doubleWidth) *out++ = colortable[*in];
-      *out++ = colortable[*in];
-      in++;
+      unsigned color = color_convert(*in++);
+      if(doubleWidth) *out++ = color;
+      *out++ = color;
     }
     if(doubleHeight) {
       memcpy(scanline + wordsPerScanline, scanline, wordsPerScanline * sizeof(QRgb));
