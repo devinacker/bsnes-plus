@@ -1,42 +1,6 @@
 #include "oam-viewer.moc"
 OamViewer *oamViewer;
 
-OamObject OamObject::getObject(unsigned i) {
-  OamObject obj;
-
-  uint8_t d0 = SNES::memory::oam[(i << 2) + 0];
-  uint8_t d1 = SNES::memory::oam[(i << 2) + 1];
-  uint8_t d2 = SNES::memory::oam[(i << 2) + 2];
-  uint8_t d3 = SNES::memory::oam[(i << 2) + 3];
-  uint8_t d4 = SNES::memory::oam[512 + (i >> 2)];
-  bool x    = d4 & (1 << ((i & 3) << 1));
-  bool size = d4 & (2 << ((i & 3) << 1));
-
-  switch(SNES::ppu.oam_base_size()) { default:
-    case 0: obj.width = !size ?  8 : 16; obj.height = !size ?  8 : 16; break;
-    case 1: obj.width = !size ?  8 : 32; obj.height = !size ?  8 : 32; break;
-    case 2: obj.width = !size ?  8 : 64; obj.height = !size ?  8 : 64; break;
-    case 3: obj.width = !size ? 16 : 32; obj.height = !size ? 16 : 32; break;
-    case 4: obj.width = !size ? 16 : 64; obj.height = !size ? 16 : 64; break;
-    case 5: obj.width = !size ? 32 : 64; obj.height = !size ? 32 : 64; break;
-    case 6: obj.width = !size ? 16 : 32; obj.height = !size ? 32 : 64; break;
-    case 7: obj.width = !size ? 16 : 32; obj.height = !size ? 32 : 32; break;
-  }
-
-  obj.xpos = (x << 8) + d0;
-  if(obj.xpos > 256) obj.xpos = sclip<9>(obj.xpos);
-
-  obj.ypos = d1;
-  obj.character = d2;
-  obj.priority = (d3 >> 4) & 3;
-  obj.palette = (d3 >> 1) & 7;
-  obj.hFlip = d3 & 0x80;
-  obj.vFlip = d3 & 0x40;
-  obj.table = d3 & 0x01;
-
-  return obj;
-}
-
 OamViewer::OamViewer() {
   setObjectName("oam-viewer");
   setWindowTitle("Sprite Viewer");
@@ -45,49 +9,39 @@ OamViewer::OamViewer() {
 
   inRefreshCall = false;
 
+  dataModel = new OamDataModel(this);
+
+  proxyModel = new QSortFilterProxyModel(this);
+  proxyModel->setSourceModel(dataModel);
+  proxyModel->setSortRole(OamDataModel::SortRole);
+  proxyModel->setDynamicSortFilter(true);
+
   layout = new QHBoxLayout;
   layout->setAlignment(Qt::AlignLeft);
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  list = new QTreeWidget;
-  list->setColumnCount(8);
-  list->setHeaderLabels(QStringList() << "#" << "Size" << "X" << "Y" << "Char" << "Pri" << "Pal" << "Flags");
-  list->setAllColumnsShowFocus(true);
-  list->setAlternatingRowColors(true);
-  list->setRootIsDecorated(false);
-  list->setUniformRowHeights(true);
-  list->setSortingEnabled(false);
-  layout->addWidget(list);
+  treeView = new QTreeView;
+  treeView->setModel(proxyModel);
+  treeView->setAllColumnsShowFocus(true);
+  treeView->setAlternatingRowColors(true);
+  treeView->setRootIsDecorated(false);
+  treeView->setUniformRowHeights(true);
+  layout->addWidget(treeView);
 
-  unsigned dw = list->fontMetrics().width('0');
-  list->setColumnWidth(0, dw * 4);
-  list->setColumnWidth(1, dw * 8);
-  list->setColumnWidth(2, dw * 6);
-  list->setColumnWidth(3, dw * 6);
-  list->setColumnWidth(4, dw * 6);
-  list->setColumnWidth(5, dw * 6);
-  list->setColumnWidth(6, dw * 6);
-  list->setColumnWidth(7, dw * 6);
+  unsigned dw = treeView->fontMetrics().width('0');
+  treeView->setColumnWidth(0, dw * 4);
+  treeView->setColumnWidth(1, dw * 8);
+  treeView->setColumnWidth(2, dw * 6);
+  treeView->setColumnWidth(3, dw * 6);
+  treeView->setColumnWidth(4, dw * 6);
+  treeView->setColumnWidth(5, dw * 6);
+  treeView->setColumnWidth(6, dw * 6);
+  treeView->setColumnWidth(7, dw * 6);
 
-  for(unsigned i = 0; i < 128; i++) {
-    QTreeWidgetItem *item = new QTreeWidgetItem(list);
-    item->setData(0, Qt::DisplayRole, i);
-    item->setData(0, Qt::UserRole, QVariant(i));
-    item->setTextAlignment(0, Qt::AlignRight);
-    item->setTextAlignment(1, Qt::AlignHCenter);
-    item->setTextAlignment(2, Qt::AlignRight);
-    item->setTextAlignment(3, Qt::AlignRight);
-    item->setTextAlignment(4, Qt::AlignRight);
-    item->setTextAlignment(5, Qt::AlignRight);
-    item->setTextAlignment(6, Qt::AlignRight);
-    item->setTextAlignment(7, Qt::AlignLeft);
-  }
-  list->setCurrentItem(NULL);
-
-  list->sortItems(0, Qt::AscendingOrder);
-  list->setSortingEnabled(true);
+  treeView->setSortingEnabled(true);
+  treeView->sortByColumn(OamDataModel::Columns::ID, Qt::AscendingOrder);
 
 
   controlLayout = new QVBoxLayout;
@@ -96,7 +50,7 @@ OamViewer::OamViewer() {
   layout->addLayout(controlLayout);
 
 
-  canvas = new OamCanvas;
+  canvas = new OamCanvas(dataModel, this);
   controlLayout->addWidget(canvas);
 
   autoUpdateBox = new QCheckBox("Auto update");
@@ -107,7 +61,7 @@ OamViewer::OamViewer() {
 
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
-  connect(list, SIGNAL(itemSelectionChanged()), this, SLOT(onSelectedChanged()));
+  connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onSelectionChanged()));
 }
 
 void OamViewer::show() {
@@ -124,51 +78,24 @@ void OamViewer::refresh() {
   if(inRefreshCall) return;
   inRefreshCall = true;
 
-  int selectedRow = -1;
-  if (list->currentItem()) selectedRow = list->currentIndex().row();
-
-  list->setSortingEnabled(false);
-
-  for(unsigned r = 0; r < list->topLevelItemCount(); r++) {
-    QTreeWidgetItem *item = list->topLevelItem(r);
-    unsigned i = item->data(0, Qt::UserRole).toUInt();
-
-    OamObject obj = OamObject::getObject(i);
-
-    string flags;
-    if(obj.hFlip) flags << "V";
-    if(obj.vFlip) flags << "H";
-
-    item->setText(1, string() << obj.width << "x" << obj.height);
-    item->setData(2, Qt::DisplayRole, obj.xpos);
-    item->setData(3, Qt::DisplayRole, obj.ypos);
-    item->setData(4, Qt::DisplayRole, obj.character + (obj.table << 8));
-    item->setData(5, Qt::DisplayRole, obj.priority);
-    item->setData(6, Qt::DisplayRole, obj.palette);
-    item->setText(7, flags);
-  }
-
-  list->setSortingEnabled(true);
-
-  if(selectedRow >= 0 && selectedRow < list->topLevelItemCount()) {
-    list->setCurrentItem(list->topLevelItem(selectedRow));
-  }
+  dataModel->refresh();
   canvas->refresh();
 
   inRefreshCall = false;
 }
 
-void OamViewer::onSelectedChanged() {
-  QTreeWidgetItem *item = list->currentItem();
-
-  int s = -1;
-  if (item) s = item->data(0, Qt::UserRole).toUInt();
+void OamViewer::onSelectionChanged() {
+  QModelIndex index = proxyModel->mapToSource(treeView->currentIndex());
+  int s = dataModel->objectId(index);
 
   canvas->setSelected(s);
   refresh();
 }
 
-OamCanvas::OamCanvas() {
+OamCanvas::OamCanvas(OamDataModel* dataModel, QWidget *parent)
+  : QFrame(parent)
+  , dataModel(dataModel)
+{
   setFrameStyle(QFrame::Shape::Panel | QFrame::Sunken);
   setLineWidth(2);
 
@@ -201,7 +128,7 @@ void OamCanvas::setSelected(int s) {
 
 void OamCanvas::refresh() {
   if(SNES::cartridge.loaded() && selected >= 0 && selected < 128) {
-    refreshImage(OamObject::getObject(selected));
+    refreshImage(dataModel->oamObject(selected));
   } else {
     image = QImage();
   }
@@ -215,11 +142,13 @@ void OamCanvas::refreshImage(const OamObject& obj) {
     palette[i] = rgbFromCgram(128 + obj.palette * 16 + i);
   }
 
-  QImage buffer(obj.width, obj.height, QImage::Format_RGB32);
+  const QSize objSize = dataModel->sizeOfObject(obj);
+
+  QImage buffer(objSize, QImage::Format_RGB32);
   const uint8_t *objTileset = SNES::memory::vram.data() + SNES::ppu.oam_tile_addr(obj.table);
 
-  for(unsigned ty = 0; ty < obj.height / 8; ty++) {
-    for(unsigned tx = 0; tx < obj.width / 8; tx++) {
+  for(unsigned ty = 0; ty < objSize.height() / 8; ty++) {
+    for(unsigned tx = 0; tx < objSize.width() / 8; tx++) {
       unsigned cx = (obj.character + tx) & 0x00f;
       unsigned cy = (obj.character / 16) + ty;
       const uint8_t* tile = objTileset + cy * 512 + cx * 32;

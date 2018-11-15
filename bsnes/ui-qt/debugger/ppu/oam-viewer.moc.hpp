@@ -1,23 +1,9 @@
-struct OamObject {
-  unsigned width;
-  unsigned height;
-  signed   xpos;
-  unsigned ypos;
-  unsigned character;
-  unsigned priority;
-  unsigned palette;
-  bool hFlip;
-  bool vFlip;
-  bool table;
-
-  static OamObject getObject(unsigned);
-};
 
 class OamCanvas : public QFrame {
   Q_OBJECT
 
 public:
-  OamCanvas();
+  OamCanvas(OamDataModel* dataModel, QWidget* parent);
   void paintEvent(QPaintEvent*);
 
 public slots:
@@ -30,6 +16,7 @@ private:
   unsigned maximumOamBaseSize();
 
 private:
+  OamDataModel *dataModel;
   int selected;
   unsigned imageSize;
   QImage image;
@@ -46,11 +33,14 @@ public slots:
   void show();
   void refresh();
 
-  void onSelectedChanged();
+  void onSelectionChanged();
 
 private:
+  OamDataModel *dataModel;
+  QSortFilterProxyModel* proxyModel;
+
   QHBoxLayout *layout;
-  QTreeWidget *list;
+  QTreeView *treeView;
   QVBoxLayout *controlLayout;
   OamCanvas *canvas;
   QCheckBox *autoUpdateBox;
