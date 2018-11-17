@@ -63,27 +63,47 @@ OamViewer::OamViewer() {
   treeView->sortByColumn(OamDataModel::Columns::ID, Qt::AscendingOrder);
 
 
-  controlLayout = new QVBoxLayout;
-  controlLayout->setAlignment(Qt::AlignTop);
-  controlLayout->setSpacing(0);
-  layout->addLayout(controlLayout);
-
+  sidebarLayout = new QFormLayout;
+  sidebarLayout->setSizeConstraint(QLayout::SetMinimumSize);
+  sidebarLayout->setRowWrapPolicy(QFormLayout::DontWrapRows);
+  sidebarLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+  sidebarLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+  sidebarLayout->setLabelAlignment(Qt::AlignLeft);
+  layout->addLayout(sidebarLayout);
 
   canvas = new OamCanvas(dataModel, graphicsScene, this);
-  controlLayout->addWidget(canvas);
+  sidebarLayout->addRow(canvas);
+
+  zoomCombo = new QComboBox;
+  zoomCombo->addItem("1x", QVariant(1));
+  zoomCombo->addItem("2x", QVariant(2));
+  zoomCombo->addItem("3x", QVariant(3));
+  zoomCombo->addItem("4x", QVariant(4));
+  zoomCombo->addItem("5x", QVariant(5));
+  zoomCombo->addItem("6x", QVariant(6));
+  zoomCombo->addItem("7x", QVariant(7));
+  zoomCombo->addItem("8x", QVariant(8));
+  zoomCombo->addItem("9x", QVariant(9));
+  sidebarLayout->addRow("Zoom:", zoomCombo);
 
   autoUpdateBox = new QCheckBox("Auto update");
-  controlLayout->addWidget(autoUpdateBox);
+  sidebarLayout->addRow(autoUpdateBox);
 
   refreshButton = new QPushButton("Refresh");
-  controlLayout->addWidget(refreshButton);
+  sidebarLayout->addRow(refreshButton);
+
 
   splitter->setSizes({ INT_MAX / 100 * 2, INT_MAX / 100 * 1 });
   splitter->setStretchFactor(0, 2);
   splitter->setStretchFactor(1, 1);
 
 
+  zoomCombo->setCurrentIndex(0);
+  onZoomChanged(0);
+
+
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
+  connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onSelectionChanged()));
 }
 
@@ -106,6 +126,12 @@ void OamViewer::refresh() {
   canvas->refresh();
 
   inRefreshCall = false;
+}
+
+void OamViewer::onZoomChanged(int index)
+{
+  unsigned z = zoomCombo->itemData(index).toUInt();
+  graphicsView->setTransform(QTransform::fromScale(z, z));
 }
 
 void OamViewer::onSelectionChanged() {

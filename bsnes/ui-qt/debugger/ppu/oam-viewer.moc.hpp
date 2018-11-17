@@ -34,6 +34,8 @@ public slots:
   void show();
   void refresh();
 
+  void onZoomChanged(int index);
+
   void onSelectionChanged();
 
 private:
@@ -49,8 +51,10 @@ private:
   QWidget* bottomWidget;
   QHBoxLayout *layout;
   QTreeView *treeView;
-  QVBoxLayout *controlLayout;
+
+  QFormLayout *sidebarLayout;
   OamCanvas *canvas;
+  QComboBox *zoomCombo;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
 
