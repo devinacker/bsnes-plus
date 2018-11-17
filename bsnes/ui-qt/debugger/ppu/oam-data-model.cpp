@@ -59,8 +59,8 @@ void OamDataModel::refresh() {
     obj.priority = (d3 >> 4) & 3;
     obj.palette = (d3 >> 1) & 7;
     obj.size = size;
-    obj.hFlip = d3 & 0x80;
-    obj.vFlip = d3 & 0x40;
+    obj.vFlip = d3 & 0x80;
+    obj.hFlip = d3 & 0x40;
     obj.table = d3 & 0x01;
   }
 

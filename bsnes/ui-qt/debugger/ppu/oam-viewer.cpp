@@ -174,8 +174,8 @@ void OamCanvas::refreshImage(const OamObject& obj) {
   }
 
   int zoom = imageSize / maximumOamBaseSize();
-  int xScale = obj.vFlip ? -zoom : zoom;
-  int yScale = obj.hFlip ? -zoom : zoom;
+  int xScale = obj.hFlip ? -zoom : zoom;
+  int yScale = obj.vFlip ? -zoom : zoom;
 
   image = buffer.transformed(QTransform::fromScale(xScale, yScale), Qt::FastTransformation);
 }
