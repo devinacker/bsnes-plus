@@ -18,6 +18,8 @@ private:
   QRgb spritePalette[N_PALETTES * 16];
   QRgb backgroundColors[N_PALETTES];
 
+  // items 0 - 127 are the main objects (always shown)
+  // items 128 - 255 are the Y axis wrapped objects (sometimes shown)
   QList<QGraphicsPixmapItem*> objects;
 
 public:

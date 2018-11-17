@@ -10,15 +10,17 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
 {
   const QString toolTipStr = QString::fromLatin1("Sprite %1");
 
-  objects.reserve(N_OBJECTS);
+  objects.reserve(N_OBJECTS * 2);
 
-  for(int i = 0; i < N_OBJECTS; i++) {
+  for(int i = 0; i < N_OBJECTS * 2; i++) {
+    int objectId = i % N_OBJECTS;
+
     QGraphicsPixmapItem* item = new QGraphicsPixmapItem;
 
-    item->setData(IdRole, i);
-    item->setToolTip(toolTipStr.arg(i));
+    item->setData(IdRole, objectId);
+    item->setToolTip(toolTipStr.arg(objectId));
 
-    item->setZValue(N_OBJECTS - i);
+    item->setZValue(N_OBJECTS - objectId);
 
     this->addItem(item);
 
@@ -59,6 +61,18 @@ void OamGraphicsScene::refresh() {
     else {
       drawObject(largeImageBuffer, obj);
       item->setPixmap(QPixmap::fromImage(largeImageBuffer));
+    }
+
+    QGraphicsPixmapItem* yWrapedItem = objects.at(N_OBJECTS + id);
+    const QSize objSize = dataModel->sizeOfObject(obj);
+    if(obj.ypos + objSize.height() > 256) {
+        yWrapedItem->setPixmap(item->pixmap());
+        yWrapedItem->setPos(obj.xpos, int(obj.ypos) - 256);
+        yWrapedItem->setVisible(true);
+    }
+    else {
+        yWrapedItem->setPixmap(QPixmap());
+        yWrapedItem->setVisible(false);
     }
   }
 }
