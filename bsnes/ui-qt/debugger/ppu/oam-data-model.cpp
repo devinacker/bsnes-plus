@@ -19,14 +19,14 @@ const QStringList OamDataModel::FLIP_STRINGS = {
 };
 
 const QVector<OamDataModel::ObjectSizes> OamDataModel::OBJECT_SIZE_TABLE = {
-  { QSize(8, 8),    QSize(16, 16),  QString::fromLatin1("8x8"),   QString::fromLatin1("16x16") },
-  { QSize(8, 8),    QSize(32, 32),  QString::fromLatin1("8x8"),   QString::fromLatin1("32x32") },
-  { QSize(8, 8),    QSize(64, 64),  QString::fromLatin1("8x8"),   QString::fromLatin1("64x64") },
-  { QSize(16, 16),  QSize(32, 32),  QString::fromLatin1("16x16"), QString::fromLatin1("32x32") },
-  { QSize(16, 16),  QSize(64, 64),  QString::fromLatin1("16x16"), QString::fromLatin1("64x64") },
-  { QSize(32, 32),  QSize(64, 64),  QString::fromLatin1("32x32"), QString::fromLatin1("64x64") },
-  { QSize(16, 32),  QSize(32, 64),  QString::fromLatin1("16x32"), QString::fromLatin1("32x64") },
-  { QSize(16, 32),  QSize(32, 32),  QString::fromLatin1("16x32"), QString::fromLatin1("32x32") },
+  { QSize(8, 8),    QSize(16, 16),  QString::fromLatin1("8x8"),   QString::fromLatin1("16x16"), 16 },
+  { QSize(8, 8),    QSize(32, 32),  QString::fromLatin1("8x8"),   QString::fromLatin1("32x32"), 32 },
+  { QSize(8, 8),    QSize(64, 64),  QString::fromLatin1("8x8"),   QString::fromLatin1("64x64"), 64 },
+  { QSize(16, 16),  QSize(32, 32),  QString::fromLatin1("16x16"), QString::fromLatin1("32x32"), 32 },
+  { QSize(16, 16),  QSize(64, 64),  QString::fromLatin1("16x16"), QString::fromLatin1("64x64"), 64 },
+  { QSize(32, 32),  QSize(64, 64),  QString::fromLatin1("32x32"), QString::fromLatin1("64x64"), 64 },
+  { QSize(16, 32),  QSize(32, 64),  QString::fromLatin1("16x32"), QString::fromLatin1("32x64"), 64 },
+  { QSize(16, 32),  QSize(32, 32),  QString::fromLatin1("16x32"), QString::fromLatin1("32x32"), 32 },
 };
 
 OamDataModel::OamDataModel(QObject* parent)

@@ -3,7 +3,7 @@ class OamCanvas : public QFrame {
   Q_OBJECT
 
 public:
-  OamCanvas(OamDataModel* dataModel, QWidget* parent);
+  OamCanvas(OamDataModel* dataModel, OamGraphicsScene* graphicsScene, QWidget* parent);
   void paintEvent(QPaintEvent*);
 
 public slots:
@@ -12,14 +12,15 @@ public slots:
   void setScale(unsigned);
 
 private:
-  void refreshImage(const OamObject& obj);
-  unsigned maximumOamBaseSize();
-
-private:
   OamDataModel *dataModel;
+  OamGraphicsScene *graphicsScene;
+
   int selected;
   unsigned imageSize;
-  QImage image;
+
+  QColor backgroundColor;
+  QPixmap pixmap;
+  int pixmapScale;
 };
 
 class OamViewer : public Window {
@@ -39,6 +40,13 @@ private:
   OamDataModel *dataModel;
   QSortFilterProxyModel* proxyModel;
 
+  OamGraphicsScene *graphicsScene;
+
+  QVBoxLayout *outerLayout;
+  QSplitter *splitter;
+  QGraphicsView* graphicsView;
+
+  QWidget* bottomWidget;
   QHBoxLayout *layout;
   QTreeView *treeView;
   QVBoxLayout *controlLayout;

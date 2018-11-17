@@ -36,6 +36,7 @@ public:
     const QSize large;
     const QString smallString;
     const QString largeString;
+    const unsigned maximumSize;
   };
   static const int N_OAM_BASE_SIZES = 8;
   static const QVector<ObjectSizes> OBJECT_SIZE_TABLE;
