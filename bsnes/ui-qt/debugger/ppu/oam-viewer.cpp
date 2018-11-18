@@ -92,6 +92,27 @@ OamViewer::OamViewer() {
   refreshButton = new QPushButton("Refresh");
   sidebarLayout->addRow(refreshButton);
 
+  showScreenOutlineBox = new QCheckBox("Show Screen Outline");
+  showScreenOutlineBox->setChecked(true);
+  sidebarLayout->addRow(showScreenOutlineBox);
+
+  backgroundCombo = new QComboBox;
+  backgroundCombo->addItem("Transparent",      OamGraphicsScene::BackgroundType::TRANSPARENT);
+  backgroundCombo->addItem("Screen BG",        OamGraphicsScene::BackgroundType::SCREEN_BG);
+  backgroundCombo->addItem("Sprite Palette 0", OamGraphicsScene::BackgroundType::PALETTE_0_BG);
+  backgroundCombo->addItem("Sprite Palette 1", OamGraphicsScene::BackgroundType::PALETTE_1_BG);
+  backgroundCombo->addItem("Sprite Palette 2", OamGraphicsScene::BackgroundType::PALETTE_2_BG);
+  backgroundCombo->addItem("Sprite Palette 3", OamGraphicsScene::BackgroundType::PALETTE_3_BG);
+  backgroundCombo->addItem("Sprite Palette 4", OamGraphicsScene::BackgroundType::PALETTE_4_BG);
+  backgroundCombo->addItem("Sprite Palette 5", OamGraphicsScene::BackgroundType::PALETTE_5_BG);
+  backgroundCombo->addItem("Sprite Palette 6", OamGraphicsScene::BackgroundType::PALETTE_6_BG);
+  backgroundCombo->addItem("Sprite Palette 7", OamGraphicsScene::BackgroundType::PALETTE_7_BG);
+  backgroundCombo->addItem("Magenta",          OamGraphicsScene::BackgroundType::MAGENTA);
+  backgroundCombo->addItem("Cyan",             OamGraphicsScene::BackgroundType::CYAN);
+  backgroundCombo->addItem("White",            OamGraphicsScene::BackgroundType::WHITE);
+  backgroundCombo->addItem("Black",            OamGraphicsScene::BackgroundType::BLACK);
+  sidebarLayout->addRow("Background:", backgroundCombo);
+
 
   splitter->setSizes({ INT_MAX / 100 * 2, INT_MAX / 100 * 1 });
   splitter->setStretchFactor(0, 2);
@@ -104,6 +125,8 @@ OamViewer::OamViewer() {
 
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
+  connect(showScreenOutlineBox, SIGNAL(clicked(bool)), graphicsScene, SLOT(setShowScreenOutline(bool)));
+  connect(backgroundCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onBackgroundChanged(int)));
   connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onSelectionChanged()));
 }
 
@@ -132,6 +155,12 @@ void OamViewer::onZoomChanged(int index)
 {
   unsigned z = zoomCombo->itemData(index).toUInt();
   graphicsView->setTransform(QTransform::fromScale(z, z));
+}
+
+void OamViewer::onBackgroundChanged(int index)
+{
+  int t = backgroundCombo->itemData(index).toInt();
+  graphicsScene->setBackrgoundType(static_cast<OamGraphicsScene::BackgroundType>(t));
 }
 
 void OamViewer::onSelectionChanged() {

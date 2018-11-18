@@ -35,6 +35,7 @@ public slots:
   void refresh();
 
   void onZoomChanged(int index);
+  void onBackgroundChanged(int index);
 
   void onSelectionChanged();
 
@@ -57,6 +58,8 @@ private:
   QComboBox *zoomCombo;
   QCheckBox *autoUpdateBox;
   QPushButton *refreshButton;
+  QCheckBox *showScreenOutlineBox;
+  QComboBox *backgroundCombo;
 
   bool inRefreshCall;
 };

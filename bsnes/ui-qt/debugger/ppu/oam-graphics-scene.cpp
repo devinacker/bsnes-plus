@@ -7,6 +7,8 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
   , largeImageBuffer()
   , spritePalette()
   , objects()
+  , backgroundType(BackgroundType::TRANSPARENT)
+  , showScreenOutline(true)
 {
   const QString toolTipStr = QString::fromLatin1("Sprite %1");
 
@@ -26,6 +28,30 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
 
     objects.append(item);
   }
+
+  backgroundRectItem = new QGraphicsRectItem;
+  backgroundRectItem->setPen(Qt::NoPen);
+  backgroundRectItem->setZValue(-20);
+  this->addItem(backgroundRectItem);
+
+  screenOutlineRectItem = new QGraphicsRectItem;
+  screenOutlineRectItem->setBrush(Qt::NoBrush);
+  screenOutlineRectItem->setZValue(-10);
+  this->addItem(screenOutlineRectItem);
+
+  updateBackgroundColors();
+  refreshRectItemColors();
+}
+
+void OamGraphicsScene::setBackrgoundType(BackgroundType type) {
+  if(backgroundType != type) {
+    backgroundType = type;
+    refreshRectItemColors();
+  }
+}
+
+void OamGraphicsScene::setShowScreenOutline(bool s) {
+  screenOutlineRectItem->setVisible(s);
 }
 
 QRgb OamGraphicsScene::backgroundColorForObject(int id) {
@@ -45,8 +71,10 @@ void OamGraphicsScene::refresh() {
   updateSpritePalette();
   updateBackgroundColors();
 
-  resizeImageBuffer(smallImageBuffer, dataModel->objectSizes().small);
-  resizeImageBuffer(largeImageBuffer, dataModel->objectSizes().large);
+  const OamDataModel::ObjectSizes& objectSizes = dataModel->objectSizes();
+
+  resizeImageBuffer(smallImageBuffer, objectSizes.small);
+  resizeImageBuffer(largeImageBuffer, objectSizes.large);
 
   for(int id = 0; id < N_OBJECTS; id++) {
     QGraphicsPixmapItem* item = objects.at(id);
@@ -75,6 +103,51 @@ void OamGraphicsScene::refresh() {
         yWrapedItem->setVisible(false);
     }
   }
+
+  const int lHeight = objectSizes.large.height();
+  const int lWidth = objectSizes.large.width();
+  QRectF bRect(-256, -lHeight + 1, 256 * 2 + lWidth - 1, 256 + lHeight * 2 - 2);
+  this->setSceneRect(bRect);
+  backgroundRectItem->setRect(bRect);
+
+  // ::TODO get screen height::
+  const int screenHeight = 224;
+  screenOutlineRectItem->setRect(0, 0, 256, screenHeight);
+
+  refreshRectItemColors();
+}
+
+void OamGraphicsScene::refreshRectItemColors()
+{
+  if(backgroundType == BackgroundType::TRANSPARENT) {
+    backgroundRectItem->setBrush(Qt::NoBrush);
+    screenOutlineRectItem->setPen(QPen(Qt::black, 0));
+    return;
+  }
+
+  QRgb bg = qRgb(0, 0, 0);
+
+  switch(backgroundType) {
+    case BackgroundType::SCREEN_BG:     bg = screenBackgroundColor; break;
+    case BackgroundType::PALETTE_0_BG:  bg = backgroundColors[0];   break;
+    case BackgroundType::PALETTE_1_BG:  bg = backgroundColors[1];   break;
+    case BackgroundType::PALETTE_2_BG:  bg = backgroundColors[2];   break;
+    case BackgroundType::PALETTE_3_BG:  bg = backgroundColors[3];   break;
+    case BackgroundType::PALETTE_4_BG:  bg = backgroundColors[4];   break;
+    case BackgroundType::PALETTE_5_BG:  bg = backgroundColors[5];   break;
+    case BackgroundType::PALETTE_6_BG:  bg = backgroundColors[6];   break;
+    case BackgroundType::PALETTE_7_BG:  bg = backgroundColors[7];   break;
+    case BackgroundType::MAGENTA:       bg = qRgb(255, 0, 255);     break;
+    case BackgroundType::CYAN:          bg = qRgb(0, 255, 255);     break;
+    case BackgroundType::WHITE:         bg = qRgb(255, 255, 255);   break;
+    case BackgroundType::BLACK:         bg = qRgb(0, 0, 0);         break;
+  }
+  QColor bgColor(bg);
+
+  backgroundRectItem->setBrush(bgColor);
+
+  QColor screenRectPenColor = bgColor.lightness() > 127 ? Qt::black : Qt::white;
+  screenOutlineRectItem->setPen(QPen(screenRectPenColor, 0));
 }
 
 void OamGraphicsScene::updateSpritePalette() {
@@ -87,6 +160,8 @@ void OamGraphicsScene::updateSpritePalette() {
 }
 
 void OamGraphicsScene::updateBackgroundColors() {
+  screenBackgroundColor = rgbFromCgram(0);
+
   for(int p = 0; p < N_PALETTES; p++) {
     backgroundColors[p] = rgbFromCgram(128 + p * 16);
   }
