@@ -43,6 +43,18 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
   refreshRectItemColors();
 }
 
+QImage OamGraphicsScene::renderToImage() {
+  QImage::Format format = backgroundType == BackgroundType::TRANSPARENT ? QImage::Format_ARGB32 : QImage::Format_RGB32;
+
+  QImage image(sceneRect().size().toSize(), format);
+  image.fill(0);
+
+  QPainter painter(&image);
+  render(&painter);
+
+  return image;
+}
+
 void OamGraphicsScene::setBackrgoundType(BackgroundType type) {
   if(backgroundType != type) {
     backgroundType = type;

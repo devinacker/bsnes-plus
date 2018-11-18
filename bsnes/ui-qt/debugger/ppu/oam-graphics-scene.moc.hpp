@@ -53,6 +53,8 @@ public:
   QRgb backgroundColorForObject(int id);
   QPixmap pixmapForObject(int id);
 
+  QImage renderToImage();
+
   void setBackrgoundType(BackgroundType type);
 
 public slots:

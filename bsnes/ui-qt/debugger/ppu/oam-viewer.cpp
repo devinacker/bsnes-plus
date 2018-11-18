@@ -89,8 +89,17 @@ OamViewer::OamViewer() {
   autoUpdateBox = new QCheckBox("Auto update");
   sidebarLayout->addRow(autoUpdateBox);
 
+
+  buttonLayout = new QHBoxLayout;
+
+  exportButton = new QPushButton("Export");
+  buttonLayout->addWidget(exportButton);
+
   refreshButton = new QPushButton("Refresh");
-  sidebarLayout->addRow(refreshButton);
+  buttonLayout->addWidget(refreshButton);
+
+  sidebarLayout->addRow(buttonLayout);
+
 
   showScreenOutlineBox = new QCheckBox("Show Screen Outline");
   showScreenOutlineBox->setChecked(true);
@@ -123,6 +132,7 @@ OamViewer::OamViewer() {
   onZoomChanged(0);
 
 
+  connect(exportButton,  SIGNAL(clicked()),  this, SLOT(onExportClicked()));
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(showScreenOutlineBox, SIGNAL(clicked(bool)), graphicsScene, SLOT(setShowScreenOutline(bool)));
@@ -149,6 +159,23 @@ void OamViewer::refresh() {
   canvas->refresh();
 
   inRefreshCall = false;
+}
+
+void OamViewer::onExportClicked() {
+  QImage image = graphicsScene->renderToImage();
+
+  if(image.isNull()) return;
+
+  QString selectedFile = QFileDialog::getSaveFileName(
+    this, "Export Sprites", config().path.current.exportVRAM, "PNG Image (*.png)");
+
+  if(!selectedFile.isEmpty()) {
+    QImageWriter writer(selectedFile, "PNG");
+    if(!writer.write(image)) {
+      QMessageBox::critical(this, "Export Sprites", "Unable to export sprites:\n\n" + writer.errorString());
+    }
+    config().path.current.exportVRAM = selectedFile;
+  }
 }
 
 void OamViewer::onZoomChanged(int index)

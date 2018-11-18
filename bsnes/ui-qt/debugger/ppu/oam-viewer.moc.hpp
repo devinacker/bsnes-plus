@@ -34,6 +34,8 @@ public slots:
   void show();
   void refresh();
 
+  void onExportClicked();
+
   void onZoomChanged(int index);
   void onBackgroundChanged(int index);
 
@@ -51,12 +53,14 @@ private:
 
   QWidget* bottomWidget;
   QHBoxLayout *layout;
+  QHBoxLayout *buttonLayout;
   QTreeView *treeView;
 
   QFormLayout *sidebarLayout;
   OamCanvas *canvas;
   QComboBox *zoomCombo;
   QCheckBox *autoUpdateBox;
+  QPushButton *exportButton;
   QPushButton *refreshButton;
   QCheckBox *showScreenOutlineBox;
   QComboBox *backgroundCombo;
