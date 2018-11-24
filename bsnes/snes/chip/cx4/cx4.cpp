@@ -154,6 +154,7 @@ void Cx4::reset() {
 
   regs.n = 0;
   regs.z = 0;
+  regs.v = 0;
   regs.c = 0;
   
   mmio.suspend = false;

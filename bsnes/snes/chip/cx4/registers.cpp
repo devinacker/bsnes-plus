@@ -13,7 +13,7 @@ uint24 Cx4::register_read(uint8 addr) {
   case 0x13: data = regs.busaddr; break;
   case 0x1c: data = regs.ramaddr; break;
   case 0x20: data = regs.pc & 0xff; // already incremented to next instruction before access
-  case 0x28: data =  0x2e; break; // ?
+  case 0x28: data = regs.p; break;
   case 0x2e: case 0x2f:
     regs.rwbusaddr = regs.busaddr;
     regs.rwbustime = ((addr & 1) ? mmio.ramSpeed : mmio.romSpeed) + 1; //includes current cycle
