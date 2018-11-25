@@ -35,10 +35,11 @@ public:
   bool grayscale;
   bool invert;
 
+  unsigned color_convert(unsigned color);
   void colortable_update();
   void size(unsigned&, unsigned&, unsigned, unsigned);
   void render(uint32_t*, unsigned, const uint16_t*, unsigned, unsigned, unsigned);
-  QImage renderUnfilteredScreenshot(const uint16_t*, unsigned, unsigned, unsigned);
+  QImage render_unfiltered(const uint16_t*, unsigned, unsigned, unsigned);
   QWidget* settings();
 
   Filter();

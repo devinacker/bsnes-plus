@@ -4,7 +4,8 @@ namespace UserInterfaceGeneral {
 
 struct ToggleMenubar : HotkeyInput {
   void pressed() {
-    utility.toggleMenubar();
+    config().video.showMenubar ^= true;
+    utility.updateMenubar();
   }
 
   ToggleMenubar() : HotkeyInput("Toggle Menubar", "input.userInterface.general.toggleMenubar") {
@@ -15,7 +16,8 @@ struct ToggleMenubar : HotkeyInput {
 
 struct ToggleStatusbar : HotkeyInput {
   void pressed() {
-    utility.toggleStatusbar();
+    config().video.showStatusbar ^= true;
+    utility.updateStatusbar();
   }
 
   ToggleStatusbar() : HotkeyInput("Toggle Statusbar", "input.userInterface.general.toggleStatusbar") {

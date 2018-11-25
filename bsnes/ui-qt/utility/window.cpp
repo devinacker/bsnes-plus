@@ -4,9 +4,9 @@ void Utility::updateFullscreenState() {
   if(config().video.isFullscreen == false) {
     config().video.context = &config().video.windowed;
     mainWindow->showNormal();
-    mainWindow->menuBar->setVisible(true);
-    mainWindow->statusBar->setVisible(true);
-    
+    updateMenubar();
+    updateStatusbar();
+	
     mainWindow->canvasContainer->setMouseTracking(false);
     mainWindow->canvasContainer->unsetCursor();
     mainWindow->canvas->setMouseTracking(false);
@@ -190,14 +190,14 @@ void Utility::toggleFullscreen() {
   mainWindow->syncUi();
 }
 
-void Utility::toggleMenubar() {
-  mainWindow->menuBar->setVisible(!mainWindow->menuBar->isVisibleTo(mainWindow));
+void Utility::updateMenubar() {
+  mainWindow->menuBar->setVisible(config().video.showMenubar);
   resizeMainWindow();
   mainWindow->shrink();
 }
 
-void Utility::toggleStatusbar() {
-  mainWindow->statusBar->setVisible(!mainWindow->statusBar->isVisibleTo(mainWindow));
+void Utility::updateStatusbar() {
+  mainWindow->statusBar->setVisible(config().video.showStatusbar);
   resizeMainWindow();
   mainWindow->shrink();
 }

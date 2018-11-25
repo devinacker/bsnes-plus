@@ -5,7 +5,6 @@ void CPU::serialize(serializer &s) {
   CPUcore::core_serialize(s);
   PPUcounter::serialize(s);
   s.integer(cpu_version);
-  s.integer(clock_counter);
 
   s.integer(status.interrupt_pending);
   s.integer(status.interrupt_vector);
@@ -16,7 +15,7 @@ void CPU::serialize(serializer &s) {
   s.integer(status.irq_lock);
 
   s.integer(status.dram_refresh_position);
-  s.integer(status.dram_refreshed);
+  s.integer(status.dram_refresh);
 
   s.integer(status.hdma_init_position);
   s.integer(status.hdma_init_triggered);
@@ -39,7 +38,6 @@ void CPU::serialize(serializer &s) {
   s.integer(status.reset_pending);
 
   s.integer(status.dma_active);
-  s.integer(status.dma_clocks);
   s.integer(status.dma_pending);
   s.integer(status.hdma_pending);
   s.integer(status.hdma_mode);
@@ -105,9 +103,8 @@ void CPU::serialize(serializer &s) {
     s.integer(channel[i].hdma_do_transfer);
   }
 
-  s.integer(pipe.valid);
-  s.integer(pipe.addr);
-  s.integer(pipe.data);
+  s.integer(counter.cpu);
+  s.integer(counter.dma);
 }
 
 #endif

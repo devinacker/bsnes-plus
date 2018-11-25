@@ -10,6 +10,7 @@ public:
   uint8 pio();
   bool joylatch();
   alwaysinline bool interrupt_pending() { return status.interrupt_pending; }
+  alwaysinline bool refresh() { return status.dram_refresh == 1; }
 
   void enter();
   void power();
@@ -26,7 +27,6 @@ private:
   #include "timing/timing.hpp"
 
   uint8 cpu_version;
-  unsigned clock_counter;
 
   struct Status {
     bool interrupt_pending;
@@ -39,7 +39,7 @@ private:
     bool irq_lock;
 
     unsigned dram_refresh_position;
-    bool dram_refreshed;
+    unsigned dram_refresh;  //0 = not refreshed; 1 = refresh active; 2 = refresh inactive
 
     unsigned hdma_init_position;
     bool hdma_init_triggered;
@@ -63,7 +63,6 @@ private:
 
     //DMA
     bool dma_active;
-    unsigned dma_clocks;
     bool dma_pending;
     bool hdma_pending;
     bool hdma_mode;  //0 = init, 1 = run

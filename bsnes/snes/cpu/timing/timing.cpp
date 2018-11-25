@@ -3,18 +3,27 @@
 #include "irq.cpp"
 #include "joypad.cpp"
 
+unsigned CPU::dma_clocks() {
+  if(counter.cpu >= counter.dma) {
+    return counter.cpu - counter.dma;
+  } else {
+    return 0 - counter.cpu + counter.dma;
+  }
+}
+
 unsigned CPU::dma_counter() {
-  return clock_counter & 7;
+  return counter.cpu & 7;
 }
 
 unsigned CPU::joypad_counter() {
-  return clock_counter & 255;
+  return counter.cpu & 255;
 }
 
 void CPU::add_clocks(unsigned clocks) {
   status.irq_lock = false;
   unsigned ticks = clocks >> 1;
   while(ticks--) {
+    counter.cpu += 2;
     tick();
     if(hcounter() & 2) {
       input.tick();
@@ -27,9 +36,14 @@ void CPU::add_clocks(unsigned clocks) {
 
   step(clocks);
 
-  if(status.dram_refreshed == false && hcounter() >= status.dram_refresh_position) {
-    status.dram_refreshed = true;
-    add_clocks(40);
+  if(!status.dram_refresh && hcounter() >= status.dram_refresh_position) {
+    for(int i = 0; i < 5; i++) {
+      status.dram_refresh = 1;
+      add_clocks(6);
+      status.dram_refresh = 2;
+      add_clocks(2);
+      alu_edge();
+    }
   }
 }
 
@@ -53,7 +67,7 @@ void CPU::scanline() {
 
   //DRAM refresh occurs once every scanline
   if(cpu_version == 2) status.dram_refresh_position = 530 + 8 - dma_counter();
-  status.dram_refreshed = false;
+  status.dram_refresh = 0;
 
   //HDMA triggers once every visible scanline
   if(vcounter() <= (ppu.overscan() == false ? 224 : 239)) {
@@ -95,11 +109,12 @@ void CPU::dma_edge() {
       status.hdma_pending = false;
       if(hdma_enabled_channels()) {
         if(!dma_enabled_channels()) {
-          dma_add_clocks(8 - dma_counter());
+          counter.dma = counter.cpu;
+          add_clocks(8 - dma_counter());
         }
         status.hdma_mode == 0 ? hdma_init() : hdma_run();
         if(!dma_enabled_channels()) {
-          add_clocks(status.clock_count - (status.dma_clocks % status.clock_count));
+          add_clocks(status.clock_count - (dma_clocks() % status.clock_count));
           status.dma_active = false;
         }
       }
@@ -108,9 +123,10 @@ void CPU::dma_edge() {
     if(status.dma_pending) {
       status.dma_pending = false;
       if(dma_enabled_channels()) {
-        dma_add_clocks(8 - dma_counter());
+        counter.dma = counter.cpu;
+        add_clocks(8 - dma_counter());
         dma_run();
-        add_clocks(status.clock_count - (status.dma_clocks % status.clock_count));
+        add_clocks(status.clock_count - (dma_clocks() % status.clock_count));
         status.dma_active = false;
       }
     }
@@ -135,7 +151,6 @@ void CPU::dma_edge() {
 
   if(status.dma_active == false) {
     if(status.dma_pending || status.hdma_pending) {
-      status.dma_clocks = 0;
       status.dma_active = true;
     }
   }
@@ -158,14 +173,12 @@ void CPU::timing_power() {
 }
 
 void CPU::timing_reset() {
-  clock_counter = 0;
-
   status.clock_count = 0;
   status.lineclocks = lineclocks();
 
   status.irq_lock = false;
   status.dram_refresh_position = (cpu_version == 1 ? 530 : 538);
-  status.dram_refreshed = false;
+  status.dram_refresh = 0;
 
   status.hdma_init_position = (cpu_version == 1 ? 12 + 8 - dma_counter() : 12 + dma_counter());
   status.hdma_init_triggered = false;
@@ -190,7 +203,6 @@ void CPU::timing_reset() {
   status.interrupt_vector  = 0xfffc;  //reset vector address
 
   status.dma_active   = false;
-  status.dma_clocks   = 0;
   status.dma_pending  = false;
   status.hdma_pending = false;
   status.hdma_mode    = 0;

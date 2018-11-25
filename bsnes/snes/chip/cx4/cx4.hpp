@@ -60,10 +60,11 @@ protected:
     bool writebus;
     uint24 writebusdata;
 
-    uint24 pc;
-    uint16 p;
+    uint23 pc;
+    uint15 p;
     bool n;
     bool z;
+    bool v;
     bool c;
 
     uint24 a;
@@ -79,7 +80,7 @@ protected:
     uint24 mdr;
   } regs;
 
-  uint24 stack[8];
+  uint23 stack[8];
   uint16 opcode;
 
   struct MMIO {
@@ -104,7 +105,7 @@ protected:
 
   struct CachePage {
     bool lock;
-    uint16 pageNumber;
+    uint15 pageNumber;
     uint16 data[256];
   } cache[2];
 

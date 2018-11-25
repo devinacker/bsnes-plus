@@ -46,8 +46,8 @@ unsigned Cx4::np() {
 }
 
 void Cx4::instruction() {
-  if((opcode & 0xffff) == 0x0000) {
-    //0000 0000 0000 0000
+  if((opcode & 0xfc00) == 0x0000) {
+    //0000 00.. .... ....
     //nop
   }
 
@@ -93,16 +93,36 @@ void Cx4::instruction() {
     }
   }
 
-  else if((opcode & 0xffff) == 0x1c00) {
-    //0001 1100 0000 0000
+  else if((opcode & 0xdd00) == 0x1800) {
+    //00.1 10.0 .... ....
+    //jumpvs i
+    if(regs.v) {
+      if(opcode & 0x2000) push();
+      regs.pc = np();
+      change_page();
+      add_clocks(2);
+    }
+  }
+
+  else if((opcode & 0xfc00) == 0x1c00) {
+    //0001 11.. .... ....
     //loop
     if (regs.rwbustime > 1) {
       add_clocks(regs.rwbustime - 1);
     }
   }
 
-  else if((opcode & 0xfffe) == 0x2500) {
-    //0010 0101 0000 000.
+  else if((opcode & 0xff00) == 0x2400) {
+    //0010 0100 .... ....
+    //skipvc/skipvs
+    if(regs.v == (opcode & 1)) {
+      nextpc();
+      add_clocks(1);
+    }
+  }
+
+  else if((opcode & 0xff00) == 0x2500) {
+    //0010 0101 .... ....
     //skiplt/skipge
     if(regs.c == (opcode & 1)) {
       nextpc();
@@ -110,8 +130,8 @@ void Cx4::instruction() {
     }
   }
 
-  else if((opcode & 0xfffe) == 0x2600) {
-    //0010 0110 0000 000.
+  else if((opcode & 0xff00) == 0x2600) {
+    //0010 0110 .... ....
     //skipne/skipeq
     if(regs.z == (opcode & 1)) {
       nextpc();
@@ -119,8 +139,8 @@ void Cx4::instruction() {
     }
   }
 
-  else if((opcode & 0xfffe) == 0x2700) {
-    //0010 0111 0000 000.
+  else if((opcode & 0xff00) == 0x2700) {
+    //0010 0111 .... ....
     //skipmi/skippl
     if(regs.n == (opcode & 1)) {
       nextpc();
@@ -128,16 +148,16 @@ void Cx4::instruction() {
     }
   }
 
-  else if((opcode & 0xffff) == 0x3c00) {
-    //0011 1100 0000 0000
+  else if((opcode & 0xfc00) == 0x3c00) {
+    //0011 11.. .... ....
     //ret
     pull();
     change_page();
     add_clocks(2);
   }
 
-  else if((opcode & 0xffff) == 0x4000) {
-    //0100 0000 0000 0000
+  else if((opcode & 0xfc00) == 0x4000) {
+    //0100 00.. .... ....
     //inc
     regs.busaddr++;
   }
@@ -241,31 +261,40 @@ void Cx4::instruction() {
   else if((opcode & 0xf800) == 0x8000) {
     //1000 0... .... ....
     //add a<<n,ri
-    int result = sa() + ri();
+    int x = sa();
+    int y = ri();
+    int result = x + y;
     regs.a = result;
     regs.n = regs.a & 0x800000;
     regs.z = regs.a == 0;
     regs.c = result > 0xffffff;
+    regs.v = ~(x & y) & (x ^ result) & (1 << 23);
   }
 
   else if((opcode & 0xf800) == 0x8800) {
     //1000 1... .... ....
     //subr a<<n,ri
-    int result = ri() - sa();
+    int x = ri();
+    int y = sa();
+    int result = x - y;
     regs.a = result;
     regs.n = regs.a & 0x800000;
     regs.z = regs.a == 0;
     regs.c = result >= 0;
+    regs.v = ~(x & y) & (x ^ result) & (1 << 23);
   }
 
   else if((opcode & 0xf800) == 0x9000) {
     //1001 0... .... ....
     //sub a<<n,ri
-    int result = sa() - ri();
+    int x = sa();
+    int y = ri();
+    int result = x - y;
     regs.a = result;
     regs.n = regs.a & 0x800000;
     regs.z = regs.a == 0;
     regs.c = result >= 0;
+    regs.v = ~(x & y) & (x ^ result) & (1 << 23);
   }
 
   else if((opcode & 0xfb00) == 0x9800) {
@@ -379,8 +408,8 @@ void Cx4::instruction() {
     }
   }
 
-  else if((opcode & 0xff00) == 0xf000) {
-    //1111 0000 .... ....
+  else if((opcode & 0xfc00) == 0xf000) {
+    //1111 00.. .... ....
     //swap a,r
     uint24 source = register_read(opcode & 0xff);
     uint24 target = regs.a;
@@ -388,8 +417,17 @@ void Cx4::instruction() {
     register_write(opcode & 0xff, target);
   }
 
-  else if((opcode & 0xffff) == 0xfc00) {
-    //1111 1100 0000 0000
+  else if((opcode & 0xfc00) == 0xf800) {
+    //1111 10.. .... ....
+    //clear
+    regs.a = 0;
+    regs.p = 0;
+    regs.ramdata = 0;
+    regs.ramaddr = 0;
+  }
+
+  else if((opcode & 0xfc00) == 0xfc00) {
+    //1111 11.. .... ....
     //halt
     regs.halt = true;
   }

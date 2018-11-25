@@ -19,6 +19,7 @@ void Cx4::serialize(serializer &s) {
   s.integer(regs.p);
   s.integer(regs.n);
   s.integer(regs.z);
+  s.integer(regs.v);
   s.integer(regs.c);
 
   s.integer(regs.a);
