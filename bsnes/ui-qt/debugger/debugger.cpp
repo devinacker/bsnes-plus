@@ -71,6 +71,15 @@ Debugger::Debugger() {
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
+  tracer = new Tracer;
+  breakpointEditor = new BreakpointEditor;
+  memoryEditor = new MemoryEditor;
+  propertiesViewer = new PropertiesViewer;
+  tileViewer = new TileViewer;
+  tilemapViewer = new TilemapViewer;
+  oamViewer = new OamViewer;
+  cgramViewer = new CgramViewer;
+
   registerEditCPU = new RegisterEditCPU(SNES::cpu);
   registerEditSMP = new RegisterEditSMP;
   registerEditSA1 = new RegisterEditCPU(SNES::sa1);
@@ -143,15 +152,6 @@ Debugger::Debugger() {
   traceMask->setDefaultAction(new QAction("Enable trace mask", this));
   traceMask->defaultAction()->setCheckable(true);
   toolBar->addWidget(traceMask);
-
-  tracer = new Tracer;
-  breakpointEditor = new BreakpointEditor;
-  memoryEditor = new MemoryEditor;
-  propertiesViewer = new PropertiesViewer;
-  tileViewer = new TileViewer;
-  tilemapViewer = new TilemapViewer;
-  oamViewer = new OamViewer;
-  cgramViewer = new CgramViewer;
 
   connect(menu_tools_breakpoint, SIGNAL(triggered()), breakpointEditor, SLOT(show()));
   connect(menu_tools_memory, SIGNAL(triggered()), memoryEditor, SLOT(show()));
