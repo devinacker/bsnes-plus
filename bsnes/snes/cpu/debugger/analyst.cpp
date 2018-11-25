@@ -30,11 +30,13 @@ void CPUAnalyst::performFullAnalysis() {
 
 // ------------------------------------------------------------------------
 void CPUAnalyst::performAnalysisForVector(uint32_t address, bool emulation) {
-  CPUAnalystState state(emulation);
+  uint16_t vectorAddr = bus.read(address) | bus.read(address + 1) << 8;
+  if (vectorAddr >= 0x8000) {
+    CPUAnalystState state(emulation);
+    uint32_t numRoutines = performAnalysis(vectorAddr, state);
 
-  uint32_t numRoutines = performAnalysis(bus.read(address) | bus.read(address + 1) << 8, state);
-
-  //puts(string("Found ", numRoutines, " new symbols at vector $", hex<6,'0'>(address)));
+    //puts(string("Found ", numRoutines, " new symbols at vector $", hex<6,'0'>(address)));
+  }
 }
 
 // ------------------------------------------------------------------------
