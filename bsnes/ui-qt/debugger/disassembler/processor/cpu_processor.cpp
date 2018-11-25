@@ -227,7 +227,7 @@ bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
 
   // Advance to next
   for (uint32_t i=1; i<=4; i++) {
-    if ((usage[(address + i) & 0xFFFFFF] & 0x10) == 0) {
+    if ((usage[(address + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
       continue;
     }
 

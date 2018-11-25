@@ -55,7 +55,7 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, const CPUAnalystState &_s
       break;
     }
 
-    cpu.usage[address] |= CPUDebugger::UsageExec | CPUDebugger::UsageOpcode | state.mask();
+    cpu.usage[address] |= CPUDebugger::UsageOpcode | state.mask();
     cpu.disassemble_opcode_ex(op, address, state.e, state.m, state.x);
 
     if (op.setsX()) { state.x = true; }
