@@ -17,11 +17,9 @@ void CPUAnalyst::performFullAnalysis() {
   performAnalysisForVector(0xFFE6);
   performAnalysisForVector(0xFFE8);
   performAnalysisForVector(0xFFEA);
-  performAnalysisForVector(0xFFEC);
   performAnalysisForVector(0xFFEE);
 
   performAnalysisForVector(0xFFF4, true);
-  performAnalysisForVector(0xFFF6, true);
   performAnalysisForVector(0xFFF8, true);
   performAnalysisForVector(0xFFFA, true);
   performAnalysisForVector(0xFFFC, true);
