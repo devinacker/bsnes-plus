@@ -16,6 +16,7 @@ public:
   QAction *menu_misc_clear;
   QAction *menu_misc_cacheUsage;
   QAction *menu_misc_saveBreakpoints;
+  QAction *menu_misc_saveSymbols;
   QAction *menu_misc_showHClocks;
   QAction *menu_misc_options;
 

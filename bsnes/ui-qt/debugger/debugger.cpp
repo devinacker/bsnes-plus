@@ -67,6 +67,9 @@ Debugger::Debugger() {
   menu_misc_saveBreakpoints = menu_misc->addAction("Save breakpoints to disk between sessions");
   menu_misc_saveBreakpoints->setCheckable(true);
   menu_misc_saveBreakpoints->setChecked(config().debugger.saveBreakpoints);
+  menu_misc_saveSymbols = menu_misc->addAction("Save symbols to disk between sessions");
+  menu_misc_saveSymbols->setCheckable(true);
+  menu_misc_saveSymbols->setChecked(config().debugger.saveSymbols);
   menu_misc_showHClocks = menu_misc->addAction("Show H-position in clocks instead of dots");
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
@@ -165,6 +168,7 @@ Debugger::Debugger() {
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
   connect(menu_misc_cacheUsage, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_saveBreakpoints, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_saveSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
@@ -290,6 +294,7 @@ void Debugger::synchronize() {
   
   config().debugger.cacheUsageToDisk = menu_misc_cacheUsage->isChecked();
   config().debugger.saveBreakpoints = menu_misc_saveBreakpoints->isChecked();
+  config().debugger.saveSymbols = menu_misc_saveSymbols->isChecked();
   config().debugger.showHClocks = menu_misc_showHClocks->isChecked();
   
   // todo: factor in whether or not cartridge actually contains SA1/SuperFX
