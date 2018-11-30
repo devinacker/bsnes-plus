@@ -165,11 +165,6 @@ public slots:
   void saveSPC();
   void loadState();
   void saveState();
-  void showCheatEditor();
-  void showCheatFinder();
-  void showStateManager();
-  void showEffectToggle();
-  void showManifestViewer();
   void showSoundViewer();
   void showDebugger();
   void showDocumentation();

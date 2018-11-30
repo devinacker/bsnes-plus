@@ -310,11 +310,11 @@ MainWindow::MainWindow() {
   connect(tools_movies_recordFromHere, SIGNAL(triggered()), this, SLOT(recordMovieFromHere()));
   connect(tools_captureScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
   connect(tools_captureSPC, SIGNAL(triggered()), this, SLOT(saveSPC()));
-  connect(tools_cheatEditor, SIGNAL(triggered()), this, SLOT(showCheatEditor()));
-  connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
-  connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
-  connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
-  connect(tools_manifestViewer, SIGNAL(triggered()), this, SLOT(showManifestViewer()));
+  connect(tools_cheatEditor, SIGNAL(triggered()), toolsWindow, SLOT(showCheatEditor()));
+  connect(tools_cheatFinder, SIGNAL(triggered()), toolsWindow, SLOT(showCheatFinder()));
+  connect(tools_stateManager, SIGNAL(triggered()), toolsWindow, SLOT(showStateManager()));
+  connect(tools_effectToggle, SIGNAL(triggered()), toolsWindow, SLOT(showEffectToggle()));
+  connect(tools_manifestViewer, SIGNAL(triggered()), toolsWindow, SLOT(showManifestViewer()));
   connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
   connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
@@ -618,12 +618,6 @@ void MainWindow::saveState() {
   unsigned slot = action->data().toUInt();
   state.save(slot);
 }
-
-void MainWindow::showCheatEditor()    { toolsWindow->tab->setCurrentIndex(0); toolsWindow->show(); }
-void MainWindow::showCheatFinder()    { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
-void MainWindow::showStateManager()   { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
-void MainWindow::showEffectToggle()   { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
-void MainWindow::showManifestViewer() { toolsWindow->tab->setCurrentIndex(4); toolsWindow->show(); }
 
 void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 

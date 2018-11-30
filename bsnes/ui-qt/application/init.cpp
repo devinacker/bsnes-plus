@@ -27,18 +27,11 @@ void Application::init() {
   if(config().system.audio == "") config().system.audio = audio.default_driver();
   if(config().system.input == "") config().system.input = input.default_driver();
 
-  mainWindow = new MainWindow;
   loaderWindow = new LoaderWindow;
   htmlViewerWindow = new HtmlViewerWindow;
   aboutWindow = new AboutWindow;
   fileBrowser = new FileBrowser;
   stateSelectWindow = new StateSelectWindow;
-
-  //window must be onscreen and visible before initializing video interface
-  utility.updateSystemState();
-  utility.resizeMainWindow();
-  utility.updateFullscreenState();
-  QApplication::processEvents();
 
   #if defined(DEBUGGER)
   debugger = new Debugger;
@@ -46,6 +39,13 @@ void Application::init() {
   settingsWindow = new SettingsWindow;
   toolsWindow = new ToolsWindow;
   soundViewerWindow = new SoundViewerWindow;
+
+  //window must be onscreen and visible before initializing video interface
+  mainWindow = new MainWindow;
+  utility.updateSystemState();
+  utility.resizeMainWindow();
+  utility.updateFullscreenState();
+  QApplication::processEvents();
 
   //if emulator crashes while initializing drivers, next run will disable them all.
   //this will allow user to choose different driver settings.
