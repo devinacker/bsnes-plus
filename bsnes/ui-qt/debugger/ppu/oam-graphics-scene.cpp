@@ -22,6 +22,9 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
     item->setData(IdRole, objectId);
     item->setToolTip(toolTipStr.arg(objectId));
 
+    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
+
     item->setZValue(N_OBJECTS - objectId);
 
     this->addItem(item);
@@ -41,9 +44,62 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
 
   updateBackgroundColors();
   refreshRectItemColors();
+
+  connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+}
+
+void OamGraphicsScene::onSelectionChanged() {
+  // Don't emit selectionChanged inside this call
+  bool oldState = this->blockSignals(true);
+
+  QList<QGraphicsItem*> selected = selectedItems();
+
+  selectedIds_.clear();
+  selectedIds_.reserve(selected.size() + 1);
+
+  for(const QGraphicsItem* item : selected) {
+    int id = item->data(IdRole).toInt();
+    if(id >= 0 && id < N_OBJECTS) {
+      selectedIds_.insert(id);
+
+      objects.at(id)->setSelected(true);
+      objects.at(id + N_OBJECTS)->setSelected(true);
+    }
+  }
+
+  this->blockSignals(oldState);
+
+  emit selectedIdsEdited();
+}
+
+void OamGraphicsScene::setSelectedIds(const QSet<int>& selectedIds) {
+  selectedIds_ = selectedIds;
+
+  updateSelectedItems();
+}
+
+void OamGraphicsScene::updateSelectedItems() {
+  // Don't emit selectionChanged inside this call
+  bool oldState = this->blockSignals(true);
+
+  clearSelection();
+
+  for(const int id : selectedIds_) {
+    if(id >= 0 && id < N_OBJECTS) {
+      objects.at(id)->setSelected(true);
+      objects.at(id + N_OBJECTS)->setSelected(true);
+    }
+  }
+
+  this->blockSignals(oldState);
 }
 
 QImage OamGraphicsScene::renderToImage() {
+  // Don't emit selectionChanged inside this call
+  bool oldState = this->blockSignals(true);
+
+  clearSelection();
+
   QImage::Format format = backgroundType == BackgroundType::TRANSPARENT ? QImage::Format_ARGB32 : QImage::Format_RGB32;
 
   QImage image(sceneRect().size().toSize(), format);
@@ -51,6 +107,10 @@ QImage OamGraphicsScene::renderToImage() {
 
   QPainter painter(&image);
   render(&painter);
+
+  updateSelectedItems();
+
+  this->blockSignals(oldState);
 
   return image;
 }
@@ -109,6 +169,7 @@ void OamGraphicsScene::refresh() {
         yWrapedItem->setPixmap(item->pixmap());
         yWrapedItem->setPos(obj.xpos, int(obj.ypos) - 256);
         yWrapedItem->setVisible(true);
+        yWrapedItem->setSelected(selectedIds_.contains(id));
     }
     else {
         yWrapedItem->setPixmap(QPixmap());

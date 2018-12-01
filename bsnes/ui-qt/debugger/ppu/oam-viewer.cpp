@@ -29,6 +29,7 @@ OamViewer::OamViewer() {
   graphicsView = new QGraphicsView;
   graphicsView->setMinimumSize(256, 256);
   graphicsView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
   graphicsView->setScene(graphicsScene);
   splitter->addWidget(graphicsView);
 
@@ -47,6 +48,7 @@ OamViewer::OamViewer() {
   treeView->setAlternatingRowColors(true);
   treeView->setRootIsDecorated(false);
   treeView->setUniformRowHeights(true);
+  treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   layout->addWidget(treeView);
 
   unsigned dw = treeView->fontMetrics().width('0');
@@ -137,7 +139,8 @@ OamViewer::OamViewer() {
   connect(zoomCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onZoomChanged(int)));
   connect(showScreenOutlineBox, SIGNAL(clicked(bool)), graphicsScene, SLOT(setShowScreenOutline(bool)));
   connect(backgroundCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onBackgroundChanged(int)));
-  connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onSelectionChanged()));
+  connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onTreeViewSelectionChanged()));
+  connect(graphicsScene, SIGNAL(selectedIdsEdited()), this, SLOT(onGraphicsSceneSelectedIdsEdited()));
 }
 
 void OamViewer::show() {
@@ -190,11 +193,41 @@ void OamViewer::onBackgroundChanged(int index)
   graphicsScene->setBackrgoundType(static_cast<OamGraphicsScene::BackgroundType>(t));
 }
 
-void OamViewer::onSelectionChanged() {
-  QModelIndex index = proxyModel->mapToSource(treeView->currentIndex());
-  int s = dataModel->objectId(index);
+void OamViewer::onTreeViewSelectionChanged() {
+  const QModelIndexList proxySelectedRows = treeView->selectionModel()->selectedRows();
 
-  canvas->setSelected(s);
+  QSet<int> selectedIds;
+  selectedIds.reserve(proxySelectedRows.size() + 1);
+  for(const QModelIndex& proxyIndex : proxySelectedRows) {
+    const QModelIndex index = proxyModel->mapToSource(proxyIndex);
+    selectedIds.insert(dataModel->objectId(index));
+  }
+
+  graphicsScene->setSelectedIds(selectedIds);
+
+  if(selectedIds.size() == 1) {
+    canvas->setSelected(*selectedIds.begin());
+  }
+  else {
+    canvas->setSelected(-1);
+  }
+}
+
+void OamViewer::onGraphicsSceneSelectedIdsEdited() {
+  const QSet<int>& selectedIds = graphicsScene->selectedIds();
+
+  QItemSelection sel;
+  for(const int id : selectedIds) {
+    QModelIndex pIndex = proxyModel->mapFromSource(dataModel->objectIdToIndex(id));
+    sel.select(pIndex, pIndex);
+  }
+  treeView->selectionModel()->select(sel, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+
+  if(selectedIds.size() == 1) {
+    int id = *selectedIds.begin();
+    QModelIndex pIndex = proxyModel->mapFromSource(dataModel->objectIdToIndex(id));
+    treeView->scrollTo(pIndex);
+  }
 }
 
 OamCanvas::OamCanvas(OamDataModel* dataModel, OamGraphicsScene* graphicsScene, QWidget *parent)

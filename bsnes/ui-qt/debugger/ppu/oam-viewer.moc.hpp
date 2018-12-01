@@ -39,7 +39,8 @@ public slots:
   void onZoomChanged(int index);
   void onBackgroundChanged(int index);
 
-  void onSelectionChanged();
+  void onTreeViewSelectionChanged();
+  void onGraphicsSceneSelectedIdsEdited();
 
 private:
   OamDataModel *dataModel;

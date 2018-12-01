@@ -43,12 +43,18 @@ private:
   QGraphicsRectItem* backgroundRectItem;
   QGraphicsRectItem* screenOutlineRectItem;
 
+  QSet<int> selectedIds_;
+
   BackgroundType backgroundType;
   bool showScreenOutline;
 
 
 public:
   OamGraphicsScene(OamDataModel* dataModel, QObject* parent);
+
+  // setSelectedId DOES NOT emit selectedIdsEdited
+  void setSelectedIds(const QSet<int>& selectedIds);
+  const QSet<int>& selectedIds() const { return selectedIds_; }
 
   QRgb backgroundColorForObject(int id);
   QPixmap pixmapForObject(int id);
@@ -57,12 +63,20 @@ public:
 
   void setBackrgoundType(BackgroundType type);
 
+signals:
+  // emitted when the user selects an object manually
+  void selectedIdsEdited();
+
 public slots:
+  void onSelectionChanged();
+
   void setShowScreenOutline(bool s);
 
   void refresh();
 
 private:
+  void updateSelectedItems();
+
   void refreshRectItemColors();
 
   void updateSpritePalette();

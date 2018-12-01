@@ -98,6 +98,11 @@ int OamDataModel::objectId(const QModelIndex& index) const {
   return index.row();
 }
 
+QModelIndex OamDataModel::objectIdToIndex(int id) const {
+  if(id < 0 || id >= N_OBJECTS) return QModelIndex();
+  return createIndex(id, 0);
+}
+
 bool OamDataModel::hasChildren(const QModelIndex& parent) const {
   return parent.isValid() == false;
 }

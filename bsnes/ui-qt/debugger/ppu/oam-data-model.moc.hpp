@@ -64,6 +64,8 @@ public:
   // returns -1 if the index is invalid
   int objectId(const QModelIndex& index) const;
 
+  QModelIndex objectIdToIndex(int id) const;
+
   virtual bool hasChildren(const QModelIndex& parent) const override;
   virtual int rowCount(const QModelIndex& parent) const override;
   virtual int columnCount(const QModelIndex& parent) const override;
