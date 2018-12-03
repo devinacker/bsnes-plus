@@ -31,6 +31,7 @@ OamViewer::OamViewer() {
   graphicsView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
   graphicsView->setScene(graphicsScene);
+  graphicsView->setContextMenuPolicy(Qt::ActionsContextMenu);
   splitter->addWidget(graphicsView);
 
   bottomWidget = new QWidget;
@@ -49,10 +50,11 @@ OamViewer::OamViewer() {
   treeView->setRootIsDecorated(false);
   treeView->setUniformRowHeights(true);
   treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
   layout->addWidget(treeView);
 
   unsigned dw = treeView->fontMetrics().width('0');
-  treeView->setColumnWidth(0, dw * 4);
+  treeView->setColumnWidth(0, dw * 6);
   treeView->setColumnWidth(1, dw * 8);
   treeView->setColumnWidth(2, dw * 6);
   treeView->setColumnWidth(3, dw * 6);
@@ -130,6 +132,19 @@ OamViewer::OamViewer() {
   splitter->setStretchFactor(1, 1);
 
 
+  toggleVisibility = new QAction("Toggle Visibility", this);
+  showOnlySelectedObjects = new QAction("Show Only Selected Objects", this);
+  showAllObjects = new QAction("Show All Objects", this);
+
+  graphicsView->addAction(toggleVisibility);
+  graphicsView->addAction(showOnlySelectedObjects);
+  graphicsView->addAction(showAllObjects);
+
+  treeView->addAction(toggleVisibility);
+  treeView->addAction(showOnlySelectedObjects);
+  treeView->addAction(showAllObjects);
+
+
   zoomCombo->setCurrentIndex(0);
   onZoomChanged(0);
 
@@ -141,6 +156,10 @@ OamViewer::OamViewer() {
   connect(backgroundCombo,     SIGNAL(currentIndexChanged(int)), this, SLOT(onBackgroundChanged(int)));
   connect(treeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onTreeViewSelectionChanged()));
   connect(graphicsScene, SIGNAL(selectedIdsEdited()), this, SLOT(onGraphicsSceneSelectedIdsEdited()));
+
+  connect(showAllObjects,          SIGNAL(triggered(bool)), dataModel, SLOT(showAllObjects()));
+  connect(toggleVisibility,        SIGNAL(triggered(bool)), this,      SLOT(onToggleVisibility()));
+  connect(showOnlySelectedObjects, SIGNAL(triggered(bool)), this,      SLOT(onShowOnlySelectedObjects()));
 }
 
 void OamViewer::show() {
@@ -211,6 +230,8 @@ void OamViewer::onTreeViewSelectionChanged() {
   else {
     canvas->setSelected(-1);
   }
+
+  updateActions();
 }
 
 void OamViewer::onGraphicsSceneSelectedIdsEdited() {
@@ -228,6 +249,23 @@ void OamViewer::onGraphicsSceneSelectedIdsEdited() {
     QModelIndex pIndex = proxyModel->mapFromSource(dataModel->objectIdToIndex(id));
     treeView->scrollTo(pIndex);
   }
+
+  updateActions();
+}
+
+void OamViewer::updateActions() {
+  bool objSelected = graphicsScene->selectedIds().isEmpty() == false;
+
+  toggleVisibility->setEnabled(objSelected);
+  showOnlySelectedObjects->setEnabled(objSelected);
+}
+
+void OamViewer::onToggleVisibility() {
+  dataModel->toggleVisibility(graphicsScene->selectedIds());
+}
+
+void OamViewer::onShowOnlySelectedObjects() {
+  dataModel->showOnlySelectedObjects(graphicsScene->selectedIds());
 }
 
 OamCanvas::OamCanvas(OamDataModel* dataModel, OamGraphicsScene* graphicsScene, QWidget *parent)

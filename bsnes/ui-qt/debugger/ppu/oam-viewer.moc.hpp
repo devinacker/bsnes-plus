@@ -42,6 +42,12 @@ public slots:
   void onTreeViewSelectionChanged();
   void onGraphicsSceneSelectedIdsEdited();
 
+  void onToggleVisibility();
+  void onShowOnlySelectedObjects();
+
+private:
+  void updateActions();
+
 private:
   OamDataModel *dataModel;
   QSortFilterProxyModel* proxyModel;
@@ -65,6 +71,10 @@ private:
   QPushButton *refreshButton;
   QCheckBox *showScreenOutlineBox;
   QComboBox *backgroundCombo;
+
+  QAction* toggleVisibility;
+  QAction* showOnlySelectedObjects;
+  QAction* showAllObjects;
 
   bool inRefreshCall;
 };

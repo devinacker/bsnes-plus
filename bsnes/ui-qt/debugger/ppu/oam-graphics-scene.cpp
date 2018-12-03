@@ -46,6 +46,7 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
   refreshRectItemColors();
 
   connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  connect(dataModel, SIGNAL(visibilityChanged()), this, SLOT(onModelVisibilityChanged()));
 }
 
 void OamGraphicsScene::onSelectionChanged() {
@@ -90,6 +91,24 @@ void OamGraphicsScene::updateSelectedItems() {
       objects.at(id + N_OBJECTS)->setSelected(true);
     }
   }
+
+  this->blockSignals(oldState);
+}
+
+void OamGraphicsScene::onModelVisibilityChanged() {
+  // Don't emit selectionChanged inside this call
+  bool oldState = this->blockSignals(true);
+
+  for(int id = 0; id < N_OBJECTS; id++) {
+    const bool visible = dataModel->oamObject(id).visible;
+    QGraphicsPixmapItem* item = objects.at(id);
+    QGraphicsPixmapItem* yWrapedItem = objects.at(N_OBJECTS + id);
+
+    item->setVisible(visible);
+    yWrapedItem->setVisible(visible & yWrapedItem->pos().y() < 0);
+  }
+
+  updateSelectedItems();
 
   this->blockSignals(oldState);
 }
@@ -168,10 +187,11 @@ void OamGraphicsScene::refresh() {
     if(obj.ypos + objSize.height() > 256) {
         yWrapedItem->setPixmap(item->pixmap());
         yWrapedItem->setPos(obj.xpos, int(obj.ypos) - 256);
-        yWrapedItem->setVisible(true);
+        yWrapedItem->setVisible(obj.visible);
         yWrapedItem->setSelected(selectedIds_.contains(id));
     }
     else {
+        yWrapedItem->setPos(8192, 8192);
         yWrapedItem->setPixmap(QPixmap());
         yWrapedItem->setVisible(false);
     }
@@ -238,6 +258,16 @@ void OamGraphicsScene::updateBackgroundColors() {
   for(int p = 0; p < N_PALETTES; p++) {
     backgroundColors[p] = rgbFromCgram(128 + p * 16);
   }
+}
+
+void OamGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+  // Do not deselect items when right mouse button is pressed
+  if(event->button() == Qt::RightButton) {
+    event->accept();
+    return;
+  }
+
+  QGraphicsScene::mousePressEvent(event);
 }
 
 void OamGraphicsScene::resizeImageBuffer(QImage& imageBuffer, const QSize& size) {

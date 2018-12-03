@@ -63,12 +63,16 @@ public:
 
   void setBackrgoundType(BackgroundType type);
 
+protected:
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+
 signals:
   // emitted when the user selects an object manually
   void selectedIdsEdited();
 
 public slots:
   void onSelectionChanged();
+  void onModelVisibilityChanged();
 
   void setShowScreenOutline(bool s);
 

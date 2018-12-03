@@ -9,6 +9,8 @@ struct OamObject {
   bool hFlip;
   bool vFlip;
   bool table;
+
+  bool visible;
 };
 
 class OamDataModel : public QAbstractItemModel {
@@ -73,7 +75,19 @@ public:
   virtual QModelIndex index(int row, int column, const QModelIndex& parent) const override;
   virtual QModelIndex parent(const QModelIndex & index) const override;
 
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   virtual QVariant data(const QModelIndex& index, int role) const override;
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
+  void toggleVisibility(const QSet<int>& objectIds);
+  void showOnlySelectedObjects(const QSet<int>& objectIds);
+
+public slots:
+  void showAllObjects();
+
+signals:
+  void visibilityChanged();
 };
 

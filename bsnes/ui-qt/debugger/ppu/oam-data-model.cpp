@@ -37,6 +37,10 @@ OamDataModel::OamDataModel(QObject* parent)
   assert(COLUMN_STRINGS.size() == N_COLUMNS);
   assert(FLIP_STRINGS.size() == 4);
   assert(OBJECT_SIZE_TABLE == N_OAM_BASE_SIZES);
+
+  for(OamObject& obj : mOamObjects) {
+    obj.visible = true;
+  }
 }
 
 void OamDataModel::refresh() {
@@ -132,6 +136,17 @@ QModelIndex OamDataModel::parent(const QModelIndex & index) const {
   return QModelIndex();
 }
 
+Qt::ItemFlags OamDataModel::flags(const QModelIndex & index) const {
+  if(isIndexValid(index) == false) return 0;
+
+  if(index.column() == ID) {
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+  }
+  else {
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  }
+}
+
 QVariant OamDataModel::headerData(int section, Qt::Orientation orientation, int role) const {
   if(orientation != Qt::Horizontal
     || section < 0 || section >= N_COLUMNS
@@ -158,6 +173,12 @@ QVariant OamDataModel::data(const QModelIndex& index, int role) const {
       case PRIORITY:  return obj.priority;
       case PALETTE:   return obj.palette;
       case FLIP:      return FLIP_STRINGS.at(obj.hFlip | (obj.vFlip << 1));
+    }
+  }
+  else if(role == Qt::CheckStateRole) {
+    if(index.column() == ID) {
+      const OamObject& obj = oamObject(index.row());
+      return obj.visible ? Qt::Checked : Qt::Unchecked;
     }
   }
   else if(role == SortRole) {
@@ -189,3 +210,49 @@ QVariant OamDataModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
+bool OamDataModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if(isIndexValid(index) == false) return false;
+
+  if(role == Qt::CheckStateRole) {
+    if(index.column() == ID) {
+      unsigned id = index.row();
+      mOamObjects[id % N_OBJECTS].visible = (value == Qt::Checked);
+
+      emit dataChanged(index, index);
+      emit visibilityChanged();
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void OamDataModel::showAllObjects() {
+  for(OamObject& obj : mOamObjects) {
+    obj.visible = true;
+  }
+
+  emit dataChanged(createIndex(0, ID), createIndex(N_OBJECTS-1, ID));
+  emit visibilityChanged();
+}
+
+void OamDataModel::toggleVisibility(const QSet<int>& objectIds) {
+  for(int id : objectIds) {
+    if(id >= 0 && id < N_OBJECTS) {
+      mOamObjects[id].visible = !mOamObjects[id].visible;
+    }
+  }
+
+  emit dataChanged(createIndex(0, ID), createIndex(N_OBJECTS-1, ID));
+  emit visibilityChanged();
+}
+
+void OamDataModel::showOnlySelectedObjects(const QSet<int>& objectIds) {
+  for(int id = 0; id < N_OBJECTS; id++) {
+    mOamObjects[id].visible = objectIds.contains(id);
+  }
+
+  emit dataChanged(createIndex(0, ID), createIndex(N_OBJECTS-1, ID));
+  emit visibilityChanged();
+}
