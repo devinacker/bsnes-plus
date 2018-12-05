@@ -203,8 +203,7 @@ void OamGraphicsScene::refresh() {
   this->setSceneRect(bRect);
   backgroundRectItem->setRect(bRect);
 
-  // ::TODO get screen height::
-  const int screenHeight = 224;
+  const int screenHeight = SNES::ppu.overscan() == false ? 224 : 239;
   screenOutlineRectItem->setRect(0, 0, 256, screenHeight);
 
   refreshRectItemColors();
