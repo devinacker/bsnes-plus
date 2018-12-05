@@ -21,18 +21,21 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     setHighlightingColor(QColor(0xff, 0xff, 0x99, 0xff));
     setSelectionColor(this->palette().highlight().color());
 
-    connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
-    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
-    connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
-
     _cursorTimer.setInterval(500);
     _cursorTimer.start();
 
-    setAddressWidth(4);
-    setAddressArea(true);
-    setAsciiArea(true);
-    setHighlighting(true);
-    setReadOnly(false);
+    _editorSize = 0;
+	_lastEventSize = 0;
+    _asciiArea = true;
+    _addressArea = true;
+    _addressWidth = 4;
+    _highlighting = true;
+    _readOnly = false;
+	_cursorPosition = 0;
+    
+    connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
+    connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
 
     init();
 

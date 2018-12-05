@@ -68,11 +68,10 @@ void SymbolMap::addSymbol(uint32_t address, const Symbol &name) {
     s.address = address;
     s.symbols.append(Symbol(name));
     symbols.append(s);
+    isValid = false;
   } else {
     symbols[index].symbols.append(Symbol(name));
   }
-
-  isValid = false;
 }
 
 // ------------------------------------------------------------------------
@@ -82,26 +81,10 @@ void SymbolMap::finishUpdates() {
 
 // ------------------------------------------------------------------------
 void SymbolMap::revalidate() {
-  if (isValid) {
-    return;
+  if (!isValid) {
+    symbols.sort();
+    isValid = true;
   }
-
-  // Don't know how to do this with pure nall stuff :(
-  int numSymbols = symbols.size();
-  Symbols *temp = new Symbols[numSymbols];
-  for (int i=0; i<numSymbols; i++) {
-    temp[i] = symbols[i];
-  }
-
-  nall::sort(temp, numSymbols);
-
-  symbols.reset();
-  symbols.reserve(numSymbols);
-  for (int i=0; i<numSymbols; i++) {
-    symbols.append(temp[i]);
-  }
-
-  isValid = true;
 }
 
 // ------------------------------------------------------------------------
@@ -141,7 +124,6 @@ void SymbolMap::removeSymbol(uint32_t address, Symbol::Type type) {
 
   if (s.symbols.size() == 0) {
     symbols.remove(index);
-    isValid = false;
   }
 }
 
@@ -187,20 +169,10 @@ void SymbolMap::loadFromFile(const string &baseName, const string &ext) {
   string fileName = baseName;
   fileName.append(ext);
 
-  ::nall::file f;
-  if (!f.open((const char*)fileName, ::nall::file::mode::read)) {
-    return;
+  string buffer;
+  if (buffer.readfile(fileName)) {
+    loadFromString(buffer);
   }
-
-  int size = f.size();
-  char *buffer = new char[size + 1];
-  buffer[size] = 0;
-  f.read((uint8_t*)buffer, f.size());
-  loadFromString(buffer);
-
-  delete[] buffer;
-
-  f.close();
 }
 
 // ------------------------------------------------------------------------
