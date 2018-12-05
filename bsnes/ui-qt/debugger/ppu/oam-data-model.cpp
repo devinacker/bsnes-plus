@@ -45,6 +45,7 @@ OamDataModel::OamDataModel(QObject* parent)
 
 void OamDataModel::refresh() {
   mSizeBase = SNES::ppu.oam_base_size();
+  mFirstSprite = SNES::ppu.oam_first_sprite();
 
   for(unsigned i=0; i < N_OBJECTS; i++) {
     uint8_t d0 = SNES::memory::oam[(i << 2) + 0];

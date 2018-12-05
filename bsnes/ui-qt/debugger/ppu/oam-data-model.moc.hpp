@@ -47,6 +47,7 @@ public:
 
 private:
   unsigned mSizeBase;
+  unsigned mFirstSprite;
   OamObject mOamObjects[N_OBJECTS];
 
 public:
@@ -57,6 +58,8 @@ public:
   const ObjectSizes& objectSizes() const { return OBJECT_SIZE_TABLE.at(mSizeBase % N_OAM_BASE_SIZES); }
   QSize sizeOfObject(const OamObject& obj) const;
   const QString& sizeStringOfObject(const OamObject& obj) const;
+
+  unsigned firstSprite() const { return mFirstSprite; }
 
   const OamObject& oamObject(unsigned id) const { return mOamObjects[id % N_OBJECTS]; }
   const OamObject& oamObject(const QModelIndex& index) const;

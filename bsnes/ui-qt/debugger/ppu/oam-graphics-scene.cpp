@@ -25,8 +25,6 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
     item->setFlag(QGraphicsItem::ItemIsSelectable, true);
     item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 
-    item->setZValue(N_OBJECTS - objectId);
-
     this->addItem(item);
 
     objects.append(item);
@@ -163,6 +161,7 @@ void OamGraphicsScene::refresh() {
   updateBackgroundColors();
 
   const OamDataModel::ObjectSizes& objectSizes = dataModel->objectSizes();
+  const unsigned firstSprite = dataModel->firstSprite();
 
   resizeImageBuffer(smallImageBuffer, objectSizes.small);
   resizeImageBuffer(largeImageBuffer, objectSizes.large);
@@ -171,7 +170,10 @@ void OamGraphicsScene::refresh() {
     QGraphicsPixmapItem* item = objects.at(id);
     const OamObject& obj = dataModel->oamObject(id);
 
+    int zValue = N_OBJECTS - ((id + N_OBJECTS - firstSprite) % N_OBJECTS) + 100;
+
     item->setPos(obj.xpos, obj.ypos);
+    item->setZValue(zValue);
 
     if(obj.size == false) {
       drawObject(smallImageBuffer, obj);
@@ -187,6 +189,7 @@ void OamGraphicsScene::refresh() {
     if(obj.ypos + objSize.height() > 256) {
         yWrapedItem->setPixmap(item->pixmap());
         yWrapedItem->setPos(obj.xpos, int(obj.ypos) - 256);
+        yWrapedItem->setZValue(zValue);
         yWrapedItem->setVisible(obj.visible);
         yWrapedItem->setSelected(selectedIds_.contains(id));
     }

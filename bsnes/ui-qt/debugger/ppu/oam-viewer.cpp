@@ -126,6 +126,12 @@ OamViewer::OamViewer() {
   backgroundCombo->addItem("Black",            OamGraphicsScene::BackgroundType::BLACK);
   sidebarLayout->addRow("Background:", backgroundCombo);
 
+  firstSprite = new QLineEdit;
+  firstSprite->setReadOnly(true);
+  firstSprite->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  firstSprite->setMinimumWidth(5 * firstSprite->fontMetrics().width('0'));
+  sidebarLayout->addRow("First Sprite:", firstSprite);
+
 
   splitter->setSizes({ INT_MAX / 100 * 2, INT_MAX / 100 * 1 });
   splitter->setStretchFactor(0, 2);
@@ -179,6 +185,8 @@ void OamViewer::refresh() {
   dataModel->refresh();
   graphicsScene->refresh();
   canvas->refresh();
+
+  firstSprite->setText(QString::number(dataModel->firstSprite()));
 
   inRefreshCall = false;
 }

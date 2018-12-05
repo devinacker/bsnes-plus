@@ -71,6 +71,7 @@ private:
   QPushButton *refreshButton;
   QCheckBox *showScreenOutlineBox;
   QComboBox *backgroundCombo;
+  QLineEdit *firstSprite;
 
   QAction* toggleVisibility;
   QAction* showOnlySelectedObjects;
