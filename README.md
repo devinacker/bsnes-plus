@@ -28,7 +28,7 @@ Non-debugging features:
 ## Building on Windows
 
 - Get mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download)
-- Install Qt 4.8.6 (http://download.qt.io/archive/qt/) and make sure its `bin` directory is in your path
+- Initialize the bsnes-plus-ext-qt submodule in git
 - Run `mingw32-make`
 
 Building with the original MinGW used to be the preferred way to do it, but made building "out of the box" annoying for various reasons (including requiring outdated DirectX headers/libs and problems with some native Windows code) and is no longer supported.

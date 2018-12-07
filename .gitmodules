@@ -1,0 +1,3 @@
+[submodule "external/qt"]
+	path = external/qt
+	url = https://github.com/CypherSignal/bsnes-plus-ext-qt.git
