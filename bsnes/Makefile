@@ -85,7 +85,8 @@ ifeq ($(platform),osx)
 	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
 	sed 's/@VERSION/$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
 else
-	$(foreach qtdll,$(qtdlls),xcopy $(winqtpath)\bin\$(qtdll) .\out /D /Y &)
+	$(foreach qtdll,$(qtdlls),xcopy $(winqtpath)\bin\$(qtdll) .\out\ /D /Y &)
+	$(foreach qtplatformdll,$(qtplatformdlls),xcopy $(winqtpath)\$(qtplatformdll) .\out\platforms\ /D /Y &)
 	$(strip $(cpp) -o out/bsnes $(objects) $(link))
 endif
 

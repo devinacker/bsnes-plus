@@ -8,6 +8,8 @@
 # $(rcc)   -- resource compiler
 # $(qtinc) -- includes for compiling
 # $(qtlib) -- libraries for linking
+# $(qtdlls) -- dlls to be copied to output directory on windows
+# $(qtplatformdlls) -- dlls to copied to "output/platforms" on windows
 
 ifeq ($(platform),$(filter $(platform),x msys))
   qtlibs := $(subst Qt,Qt5,$(qtlibs))
@@ -57,6 +59,7 @@ else ifeq ($(platform),win)
   # qtlib += -lqjpeg -lqmng
 
   qtdlls := $(qtlibs:Qt%=Qt5%.dll)
+  qtplatformdlls := plugins\platforms\qwindows.dll
 
 endif
 
