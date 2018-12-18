@@ -9,7 +9,7 @@ public:
   static const int IdRole = 0;
 
   enum BackgroundType {
-    TRANSPARENT,
+    BG_TRANSPARENT,
     SCREEN_BG,
     PALETTE_0_BG,
     PALETTE_1_BG,

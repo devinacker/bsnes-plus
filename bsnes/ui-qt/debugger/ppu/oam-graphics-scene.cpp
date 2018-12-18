@@ -7,7 +7,7 @@ OamGraphicsScene::OamGraphicsScene(OamDataModel* dataModel, QObject* parent)
   , largeImageBuffer()
   , spritePalette()
   , objects()
-  , backgroundType(BackgroundType::TRANSPARENT)
+  , backgroundType(BackgroundType::BG_TRANSPARENT)
   , showScreenOutline(true)
 {
   const QString toolTipStr = QString::fromLatin1("Sprite %1");
@@ -117,7 +117,7 @@ QImage OamGraphicsScene::renderToImage() {
 
   clearSelection();
 
-  QImage::Format format = backgroundType == BackgroundType::TRANSPARENT ? QImage::Format_ARGB32 : QImage::Format_RGB32;
+  QImage::Format format = backgroundType == BackgroundType::BG_TRANSPARENT ? QImage::Format_ARGB32 : QImage::Format_RGB32;
 
   QImage image(sceneRect().size().toSize(), format);
   image.fill(0);
@@ -214,7 +214,7 @@ void OamGraphicsScene::refresh() {
 
 void OamGraphicsScene::refreshRectItemColors()
 {
-  if(backgroundType == BackgroundType::TRANSPARENT) {
+  if(backgroundType == BackgroundType::BG_TRANSPARENT) {
     backgroundRectItem->setBrush(Qt::NoBrush);
     screenOutlineRectItem->setPen(QPen(Qt::black, 0));
     return;
