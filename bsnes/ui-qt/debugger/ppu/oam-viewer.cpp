@@ -110,7 +110,7 @@ OamViewer::OamViewer() {
   sidebarLayout->addRow(showScreenOutlineBox);
 
   backgroundCombo = new QComboBox;
-  backgroundCombo->addItem("Transparent",      OamGraphicsScene::BackgroundType::BG_TRANSPARENT);
+  backgroundCombo->addItem("Transparent",      OamGraphicsScene::BackgroundType::TRANSPARENT_BG);
   backgroundCombo->addItem("Screen BG",        OamGraphicsScene::BackgroundType::SCREEN_BG);
   backgroundCombo->addItem("Sprite Palette 0", OamGraphicsScene::BackgroundType::PALETTE_0_BG);
   backgroundCombo->addItem("Sprite Palette 1", OamGraphicsScene::BackgroundType::PALETTE_1_BG);
