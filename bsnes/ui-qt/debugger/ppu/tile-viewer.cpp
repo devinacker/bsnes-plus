@@ -378,9 +378,9 @@ void TileViewer::updateTileInfo() {
     unsigned tileAddr = renderer.address + tileId * renderer.bytesInbetweenTiles();
 
     if(renderer.source == TileRenderer::VRAM) {
-      text = string("Selected Tile Address: ", hex<4>(tileAddr & 0xffff));
+      text = string("Selected Tile Address: 0x", hex<4>(tileAddr & 0xffff));
     } else {
-      text = string("Selected Tile Address: ", hex<6>(tileAddr & 0xffffff));
+      text = string("Selected Tile Address: 0x", hex<6>(tileAddr & 0xffffff));
     }
   } else {
     imageGridWidget->selectNone();
