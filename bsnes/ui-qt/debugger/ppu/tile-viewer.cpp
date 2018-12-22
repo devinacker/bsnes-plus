@@ -376,6 +376,7 @@ void TileViewer::updateTileInfo() {
   string text;
   if(tileId < renderer.nTiles()) {
     unsigned tileAddr = renderer.address + tileId * renderer.bytesInbetweenTiles();
+    if(renderer.isMode7()) tileAddr++;
 
     if(renderer.source == TileRenderer::VRAM) {
       text = string("Selected Tile Address: 0x", hex<4>(tileAddr & 0xffff));
