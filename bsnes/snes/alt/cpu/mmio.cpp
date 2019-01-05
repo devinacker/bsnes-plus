@@ -58,14 +58,14 @@ uint8 CPU::mmio_read(unsigned addr) {
     case 0x4216: return status.rdmpy >> 0;
     case 0x4217: return status.rdmpy >> 8;
 
-    case 0x4218: return status.joy1l;
-    case 0x4219: return status.joy1h;
-    case 0x421a: return status.joy2l;
-    case 0x421b: return status.joy2h;
-    case 0x421c: return status.joy3l;
-    case 0x421d: return status.joy3h;
-    case 0x421e: return status.joy4l;
-    case 0x421f: return status.joy4h;
+    case 0x4218: return status.joy1 >> 0;
+    case 0x4219: return status.joy1 >> 8;
+    case 0x421a: return status.joy2 >> 0;
+    case 0x421b: return status.joy2 >> 8;
+    case 0x421c: return status.joy3 >> 0;
+    case 0x421d: return status.joy3 >> 8;
+    case 0x421e: return status.joy4 >> 0;
+    case 0x421f: return status.joy4 >> 8;
   }
 
   if((addr & 0xff80) == 0x4300) {
