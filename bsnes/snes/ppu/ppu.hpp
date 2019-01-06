@@ -3,6 +3,7 @@ public:
   enum : bool { Threaded = true };
   enum : bool { SupportsLayerEnable = false };
   enum : bool { SupportsFrameSkip = false };
+  enum : bool { SupportsVRAMExpansion = true };
 
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_cpu();

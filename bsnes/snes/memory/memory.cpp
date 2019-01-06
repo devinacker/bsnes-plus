@@ -166,7 +166,10 @@ void Bus::map_system() {
   map(MapMode::Linear, 0x80, 0xbf, 0x0000, 0x1fff, memory::wram, 0x000000, 0x002000);
   map(MapMode::Linear, 0x7e, 0x7f, 0x0000, 0xffff, memory::wram);
   
-  unsigned vram_size = 1<<(16+max(0,min(2,config.vram_size)));
+  unsigned vram_size = 1<<16;
+  if (SNES::PPU::SupportsVRAMExpansion) {
+    vram_size = 1<<(16+max(0,min(2,config.vram_size)));
+  }
   memory::vram.map(new uint8[vram_size], vram_size);
 }
 
