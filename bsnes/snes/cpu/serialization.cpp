@@ -54,7 +54,10 @@ void CPU::serialize(serializer &s) {
   s.integer(status.auto_joypad_poll);
 
   s.integer(status.pio);
-
+  if (s.mode() == serializer::Load) {
+    memory::vram.bank(!(status.pio & 0x01), (status.pio & 0x02) >> 1);
+  }
+  
   s.integer(status.wrmpya);
   s.integer(status.wrmpyb);
 

@@ -119,7 +119,7 @@ void PPU::Sprite::tilefetch() {
     x &= 511;
     y &= 255;
 
-    uint16 tiledata_addr = regs.tiledata_addr;
+    unsigned tiledata_addr = regs.tiledata_addr;
     uint16 chrx = (sprite.character >> 0) & 15;
     uint16 chry = (sprite.character >> 4) & 15;
     if(sprite.nameselect) {
@@ -142,7 +142,7 @@ void PPU::Sprite::tilefetch() {
 
       unsigned mx = (sprite.hflip == false) ? tx : ((tile_width - 1) - tx);
       unsigned pos = tiledata_addr + ((chry + ((chrx + mx) & 15)) << 5);
-      uint16 addr = (pos & 0xffe0) + ((y & 7) * 2);
+      unsigned addr = (pos & 0x1ffe0) + ((y & 7) * 2);
 
       oam_tile[n].d0 = memory::vram[addr +  0];
       oam_tile[n].d1 = memory::vram[addr +  1];

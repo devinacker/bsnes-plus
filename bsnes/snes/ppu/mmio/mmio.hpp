@@ -83,7 +83,7 @@ struct {
   uint16 vcounter;
 } regs;
 
-uint16 get_vram_address();
+unsigned get_vram_address();
 debugvirtual uint8 vram_read(unsigned addr);
 debugvirtual void vram_write(unsigned addr, uint8 data);
 

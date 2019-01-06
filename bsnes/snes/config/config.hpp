@@ -2,6 +2,7 @@ struct Configuration {
   Input::Device controller_port1;
   Input::Device controller_port2;
   System::ExpansionPortDevice expansion_port;
+  unsigned vram_size;
   System::Region region;
   bool random;
 

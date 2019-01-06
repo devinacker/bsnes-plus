@@ -27,6 +27,13 @@ public:
   QRadioButton *portNone;
   QWidget *portSpacer;
 
+  QLabel *vramTitle;
+  QHBoxLayout *vramLayout;
+  QButtonGroup *vramGroup;
+  QRadioButton *vram64kb;
+  QRadioButton *vram128kb;
+  QRadioButton *vram256kb;
+
   QLabel *focusTitle;
   QHBoxLayout *focusLayout;
   QButtonGroup *focusButtonGroup;
@@ -52,6 +59,9 @@ public slots:
   void setRegionPAL();
   void setPortSatellaview();
   void setPortNone();
+  void setVRAM64kb();
+  void setVRAM128kb();
+  void setVRAM256kb();
   void pauseWithoutFocus();
   void ignoreInputWithoutFocus();
   void allowInputWithoutFocus();

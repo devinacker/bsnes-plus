@@ -137,7 +137,7 @@ void MemoryEditor::sourceChanged(int index) {
   switch(index) { default:
     case 0: memorySource = SNES::Debugger::MemorySource::CPUBus; editor->setEditorSize(16 * 1024 * 1024); break;
     case 1: memorySource = SNES::Debugger::MemorySource::APUBus; editor->setEditorSize(64 * 1024);        break;
-    case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(64 * 1024);        break;
+    case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(SNES::memory::vram.size()); break;
     case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setEditorSize(544);              break;
     case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setEditorSize(512);              break;
     case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setEditorSize(SNES::memory::cartrom.size()); break;

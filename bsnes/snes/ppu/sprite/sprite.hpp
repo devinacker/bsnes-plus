@@ -40,7 +40,7 @@ class Sprite {
 
     uint8 base_size;
     uint8 nameselect;
-    uint16 tiledata_addr;
+    unsigned tiledata_addr;
     uint8 first_sprite;
 
     unsigned priority0;

@@ -73,6 +73,7 @@ void CPU::mmio_w4200(uint8 data) {
 //WRIO
 void CPU::mmio_w4201(uint8 data) {
   if((status.pio & 0x80) && !(data & 0x80)) ppu.latch_counters();
+  memory::vram.bank(!(data & 0x01), (data & 0x02) >> 1);
   status.pio = data;
 }
 
@@ -375,6 +376,7 @@ void CPU::mmio_reset() {
 
   //$4201
   status.pio = 0xff;
+  memory::vram.bank(false);
 
   //$4202-$4203
   status.wrmpya = 0xff;

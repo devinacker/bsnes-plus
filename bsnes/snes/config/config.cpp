@@ -6,6 +6,7 @@ Configuration::Configuration() {
   controller_port1 = Input::Device::Joypad;
   controller_port2 = Input::Device::Joypad;
   expansion_port   = System::ExpansionPortDevice::BSX;
+  vram_size        = 0; // 64 kb
   region           = System::Region::Autodetect;
   random           = true;
 

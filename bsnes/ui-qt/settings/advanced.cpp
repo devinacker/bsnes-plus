@@ -81,6 +81,28 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   portSpacer = new QWidget;
   portLayout->addWidget(portSpacer);
 
+  vramTitle = new QLabel("VRAM size:");
+  layout->addWidget(vramTitle);
+
+  vramLayout = new QHBoxLayout;
+  vramLayout->setSpacing(Style::WidgetSpacing);
+  layout->addLayout(vramLayout);
+  layout->addSpacing(Style::WidgetSpacing);
+
+  vramGroup = new QButtonGroup(this);
+
+  vram64kb = new QRadioButton("64 kb (no expansion)");
+  vramGroup->addButton(vram64kb);
+  vramLayout->addWidget(vram64kb);
+
+  vram128kb = new QRadioButton("128 kb");
+  vramGroup->addButton(vram128kb);
+  vramLayout->addWidget(vram128kb);
+
+  vram256kb = new QRadioButton("256 kb");
+  vramGroup->addButton(vram256kb);
+  vramLayout->addWidget(vram256kb);
+
   focusTitle = new QLabel("When main window does not have focus:");
   layout->addWidget(focusTitle);
 
@@ -131,6 +153,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   connect(regionPAL, SIGNAL(pressed()), this, SLOT(setRegionPAL()));
   connect(portSatellaview, SIGNAL(pressed()), this, SLOT(setPortSatellaview()));
   connect(portNone, SIGNAL(pressed()), this, SLOT(setPortNone()));
+  connect(vram64kb, SIGNAL(pressed()), this, SLOT(setVRAM64kb()));
+  connect(vram128kb, SIGNAL(pressed()), this, SLOT(setVRAM128kb()));
+  connect(vram256kb, SIGNAL(pressed()), this, SLOT(setVRAM256kb()));
   connect(focusPause, SIGNAL(pressed()), this, SLOT(pauseWithoutFocus()));
   connect(focusIgnore, SIGNAL(pressed()), this, SLOT(ignoreInputWithoutFocus()));
   connect(focusAllow, SIGNAL(pressed()), this, SLOT(allowInputWithoutFocus()));
@@ -168,6 +193,10 @@ void AdvancedSettingsWindow::initializeUi() {
   portSatellaview->setChecked(SNES::config.expansion_port == SNES::System::ExpansionPortDevice::BSX);
   portNone->setChecked       (SNES::config.expansion_port == SNES::System::ExpansionPortDevice::None);
 
+  vram64kb->setChecked(SNES::config.vram_size == 0);
+  vram128kb->setChecked(SNES::config.vram_size == 1);
+  vram256kb->setChecked(SNES::config.vram_size == 2);
+
   focusPause->setChecked (config().input.focusPolicy == Configuration::Input::FocusPolicyPauseEmulation);
   focusIgnore->setChecked(config().input.focusPolicy == Configuration::Input::FocusPolicyIgnoreInput);
   focusAllow->setChecked (config().input.focusPolicy == Configuration::Input::FocusPolicyAllowInput);
@@ -196,6 +225,10 @@ void AdvancedSettingsWindow::setRegionPAL()  { SNES::config.region = SNES::Syste
 
 void AdvancedSettingsWindow::setPortSatellaview() { SNES::config.expansion_port = SNES::System::ExpansionPortDevice::BSX; }
 void AdvancedSettingsWindow::setPortNone()        { SNES::config.expansion_port = SNES::System::ExpansionPortDevice::None; }
+
+void AdvancedSettingsWindow::setVRAM64kb()  { SNES::config.vram_size = 0; }
+void AdvancedSettingsWindow::setVRAM128kb() { SNES::config.vram_size = 1; }
+void AdvancedSettingsWindow::setVRAM256kb() { SNES::config.vram_size = 2; }
 
 void AdvancedSettingsWindow::pauseWithoutFocus()       { config().input.focusPolicy = Configuration::Input::FocusPolicyPauseEmulation; }
 void AdvancedSettingsWindow::ignoreInputWithoutFocus() { config().input.focusPolicy = Configuration::Input::FocusPolicyIgnoreInput; }

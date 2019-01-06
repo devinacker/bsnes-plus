@@ -58,7 +58,7 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     } break;
 
     case MemorySource::VRAM: {
-      return memory::vram.read(addr & 0xffff);
+      return memory::vram.read(addr & 0x3ffff);
     } break;
 
     case MemorySource::OAM: {
@@ -106,7 +106,7 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     } break;
 
     case MemorySource::VRAM: {
-      memory::vram.write(addr & 0xffff, data);
+      memory::vram.write(addr & 0x3ffff, data);
     } break;
 
     case MemorySource::OAM: {

@@ -14,6 +14,7 @@ Configuration::Configuration() {
   attach((unsigned&)(SNES::config.controller_port1 = SNES::Input::Device::Joypad), "snes.controllerPort1");
   attach((unsigned&)(SNES::config.controller_port2 = SNES::Input::Device::Joypad), "snes.controllerPort2");
   attach((unsigned&)(SNES::config.expansion_port   = SNES::System::ExpansionPortDevice::BSX), "snes.expansionPort");
+  attach((unsigned&)(SNES::config.vram_size        = 0), "snes.vramSize");
   attach((unsigned&)(SNES::config.region           = SNES::System::Region::Autodetect), "snes.region");
 
   attach(SNES::config.random = true, "snes.random", "Randomize some system state on powerup");

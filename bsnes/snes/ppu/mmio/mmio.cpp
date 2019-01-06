@@ -19,8 +19,8 @@ void PPU::latch_counters() {
   regs.counters_latched = true;
 }
 
-uint16 PPU::get_vram_address() {
-  uint16 addr = regs.vram_addr;
+unsigned PPU::get_vram_address() {
+  unsigned addr = regs.vram_addr;
   switch(regs.vram_mapping) {
     case 0: break;  //direct mapping
     case 1: addr = (addr & 0xff00) | ((addr & 0x001f) << 3) | ((addr >> 5) & 7); break;
@@ -172,12 +172,12 @@ void PPU::mmio_w2100(uint8 data) {
 void PPU::mmio_w2101(uint8 data) {
   oam.regs.base_size = (data >> 5) & 7;
   oam.regs.nameselect = (data >> 3) & 3;
-  oam.regs.tiledata_addr = (data & 3) << 14;
+  oam.regs.tiledata_addr = (data & 7) << 14;
 }
 
 //OAMADDL
 void PPU::mmio_w2102(uint8 data) {
-  regs.oam_baseaddr = (regs.oam_baseaddr & 0x0200) | (data << 1);
+  regs.oam_baseaddr = (regs.oam_baseaddr & 0x0600) | (data << 1);
   oam.address_reset();
 }
 
@@ -227,38 +227,38 @@ void PPU::mmio_w2106(uint8 data) {
 
 //BG1SC
 void PPU::mmio_w2107(uint8 data) {
-  bg1.regs.screen_addr = (data & 0x7c) << 9;
+  bg1.regs.screen_addr = (data & 0xfc) << 9;
   bg1.regs.screen_size = data & 3;
 }
 
 //BG2SC
 void PPU::mmio_w2108(uint8 data) {
-  bg2.regs.screen_addr = (data & 0x7c) << 9;
+  bg2.regs.screen_addr = (data & 0xfc) << 9;
   bg2.regs.screen_size = data & 3;
 }
 
 //BG3SC
 void PPU::mmio_w2109(uint8 data) {
-  bg3.regs.screen_addr = (data & 0x7c) << 9;
+  bg3.regs.screen_addr = (data & 0xfc) << 9;
   bg3.regs.screen_size = data & 3;
 }
 
 //BG4SC
 void PPU::mmio_w210a(uint8 data) {
-  bg4.regs.screen_addr = (data & 0x7c) << 9;
+  bg4.regs.screen_addr = (data & 0xfc) << 9;
   bg4.regs.screen_size = data & 3;
 }
 
 //BG12NBA
 void PPU::mmio_w210b(uint8 data) {
-  bg1.regs.tiledata_addr = (data & 0x07) << 13;
-  bg2.regs.tiledata_addr = (data & 0x70) <<  9;
+  bg1.regs.tiledata_addr = (data & 0x0f) << 13;
+  bg2.regs.tiledata_addr = (data & 0xf0) <<  9;
 }
 
 //BG34NBA
 void PPU::mmio_w210c(uint8 data) {
-  bg3.regs.tiledata_addr = (data & 0x07) << 13;
-  bg4.regs.tiledata_addr = (data & 0x70) <<  9;
+  bg3.regs.tiledata_addr = (data & 0x0f) << 13;
+  bg4.regs.tiledata_addr = (data & 0xf0) <<  9;
 }
 
 //BG1HOFS
@@ -335,7 +335,7 @@ void PPU::mmio_w2115(uint8 data) {
 void PPU::mmio_w2116(uint8 data) {
   regs.vram_addr &= 0xff00;
   regs.vram_addr |= (data << 0);
-  uint16 addr = get_vram_address();
+  unsigned addr = get_vram_address();
   regs.vram_readbuffer  = vram_read(addr + 0) << 0;
   regs.vram_readbuffer |= vram_read(addr + 1) << 8;
 }
@@ -344,21 +344,21 @@ void PPU::mmio_w2116(uint8 data) {
 void PPU::mmio_w2117(uint8 data) {
   regs.vram_addr &= 0x00ff;
   regs.vram_addr |= (data << 8);
-  uint16 addr = get_vram_address();
+  unsigned addr = get_vram_address();
   regs.vram_readbuffer  = vram_read(addr + 0) << 0;
   regs.vram_readbuffer |= vram_read(addr + 1) << 8;
 }
 
 //VMDATAL
 void PPU::mmio_w2118(uint8 data) {
-  uint16 addr = get_vram_address() + 0;
+  unsigned addr = get_vram_address() + 0;
   vram_write(addr, data);
   if(regs.vram_incmode == 0) regs.vram_addr += regs.vram_incsize;
 }
 
 //VMDATAH
 void PPU::mmio_w2119(uint8 data) {
-  uint16 addr = get_vram_address() + 1;
+  unsigned addr = get_vram_address() + 1;
   vram_write(addr, data);
   if(regs.vram_incmode == 1) regs.vram_addr += regs.vram_incsize;
 }
@@ -630,7 +630,7 @@ uint8 PPU::mmio_r2139() {
   if(Memory::debugger_access())
     return regs.vram_readbuffer >> 0;
   
-  uint16 addr = get_vram_address() + 0;
+  unsigned addr = get_vram_address() + 0;
   
   regs.ppu1_mdr = regs.vram_readbuffer >> 0;
   if(regs.vram_incmode == 0) {
@@ -647,7 +647,7 @@ uint8 PPU::mmio_r213a() {
   if(Memory::debugger_access())
     return regs.vram_readbuffer >> 8;
     
-  uint16 addr = get_vram_address() + 1;
+  unsigned addr = get_vram_address() + 1;
     
   regs.ppu1_mdr = regs.vram_readbuffer >> 8;
   if(regs.vram_incmode == 1) {

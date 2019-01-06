@@ -58,6 +58,20 @@ private:
   bool write_protect_;
 };
 
+struct VRAM : MappedRAM {
+  inline void reset();
+  inline void map(uint8*, unsigned);
+  inline void copy(const uint8*, unsigned);
+  inline void bank(bool enable, unsigned num = 0);
+  
+  inline uint8& operator[](unsigned addr);
+  inline VRAM();
+
+private:
+  uint8 *access_;
+  unsigned mask_;
+};
+
 struct MMIOAccess : Memory {
   enum : unsigned { Min = 0x2000, Max = 0x4fff };
 
@@ -112,7 +126,7 @@ namespace memory {
   extern MMIOAccess mmio;   //S-CPU, S-PPU
   extern StaticRAM wram;    //S-CPU
   extern StaticRAM apuram;  //S-SMP, S-DSP
-  extern StaticRAM vram;    //S-PPU
+  extern VRAM vram;         //S-PPU
   extern StaticRAM oam;     //S-PPU
   extern StaticRAM cgram;   //S-PPU
 

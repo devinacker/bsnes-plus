@@ -30,7 +30,7 @@ void PPU::Background::get_tile() {
   unsigned color_depth = (regs.mode == Mode::BPP2 ? 0 : regs.mode == Mode::BPP4 ? 1 : 2);
   unsigned palette_offset = (self.regs.bgmode == 0 ? (id << 5) : 0);
   unsigned palette_size = 2 << color_depth;
-  unsigned tile_mask = 0x0fff >> color_depth;
+  unsigned tile_mask = 0x1fff >> color_depth;
   unsigned tiledata_index = regs.tiledata_addr >> (4 + color_depth);
 
   unsigned tile_height = (regs.tile_size == TileSize::Size8x8 ? 3 : 4);
@@ -91,11 +91,11 @@ void PPU::Background::get_tile() {
   unsigned tx = hoffset >> tile_width;
   unsigned ty = voffset >> tile_height;
 
-  uint16 offset = ((ty & 0x1f) << 5) + (tx & 0x1f);
+  unsigned offset = ((ty & 0x1f) << 5) + (tx & 0x1f);
   if(tx & 0x20) offset += screen_x;
   if(ty & 0x20) offset += screen_y;
 
-  uint16 addr = regs.screen_addr + (offset << 1);
+  unsigned addr = regs.screen_addr + (offset << 1);
   tile = (memory::vram[addr + 0] << 0) + (memory::vram[addr + 1] << 8);
   bool mirror_y = tile & 0x8000;
   bool mirror_x = tile & 0x4000;
@@ -269,11 +269,11 @@ unsigned PPU::Background::get_tile(unsigned x, unsigned y) {
   x = (x & mask_x) >> tile_width;
   y = (y & mask_y) >> tile_height;
 
-  uint16 offset = ((y & 0x1f) << 5) + (x & 0x1f);
+  unsigned offset = ((y & 0x1f) << 5) + (x & 0x1f);
   if(x & 0x20) offset += screen_x;
   if(y & 0x20) offset += screen_y;
 
-  uint16 addr = regs.screen_addr + (offset << 1);
+  unsigned addr = regs.screen_addr + (offset << 1);
   return (memory::vram[addr + 0] << 0) + (memory::vram[addr + 1] << 8);
 }
 

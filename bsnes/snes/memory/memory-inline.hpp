@@ -57,6 +57,36 @@ void MappedRAM::write(unsigned addr, uint8 n) { if(!write_protect_ || debugger_a
 const uint8& MappedRAM::operator[](unsigned addr) const { return data_[addr]; }
 MappedRAM::MappedRAM() : data_(0), size_(0), write_protect_(false) {}
 
+//VRAM
+
+void VRAM::reset() {
+  MappedRAM::reset();
+  bank(false);
+}
+
+void VRAM::map(uint8 *source, unsigned length) {
+  MappedRAM::map(source, length);
+  bank(false);
+}
+
+void VRAM::copy(const uint8 *data, unsigned size) {
+  MappedRAM::copy(data, size);
+  bank(false);
+}
+
+void VRAM::bank(bool enable, unsigned num) {
+  if (enable && (size() >= 1<<17)) {
+    access_ = data() + ((num << 17) & (size() - 1));
+    mask_ = 0x1ffff;
+  } else {
+    access_ = data();
+    mask_ = 0xffff;
+  }
+}
+
+uint8& VRAM::operator[](unsigned addr) { return access_[addr & mask_]; }
+VRAM::VRAM() : MappedRAM() { reset(); }
+
 //Bus
 
 uint8 Bus::read(uint24 addr) {
