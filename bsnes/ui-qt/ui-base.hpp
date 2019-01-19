@@ -57,6 +57,9 @@ using namespace ruby;
   #include "debugger/ppu/cgram-widget.moc.hpp"
   #include "debugger/ppu/image-grid-widget.moc.hpp"
 
+  #include "debugger/ppu/oam-data-model.moc.hpp"
+  #include "debugger/ppu/oam-graphics-scene.moc.hpp"
+
   #include "debugger/ppu/tile-viewer.moc.hpp"
   #include "debugger/ppu/tilemap-viewer.moc.hpp"
   #include "debugger/ppu/oam-viewer.moc.hpp"
