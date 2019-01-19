@@ -1,4 +1,4 @@
-struct ControllerPort1 { enum { None, Gamepad, Asciipad, Multitap, Mouse }; };
+struct ControllerPort1 { enum { None, Gamepad, Asciipad, Multitap, Mouse, NTTDataKeypad }; };
 struct ControllerPort2 { enum { None, Gamepad, Asciipad, Multitap, Mouse, SuperScope, Justifier, Justifiers }; };
 
 namespace Controllers {
@@ -59,6 +59,16 @@ struct Asciipad : InputGroup {
   Asciipad(unsigned, const char*, const char*);
 };
 
+struct NTTDataKeypad : InputGroup {
+  DigitalInput up, down, left, right, b, a, y, x, l, r, select, start;
+  DigitalInput digit0, digit1, digit2, digit3, digit4, digit5, digit6, digit7;
+  DigitalInput digit8, digit9, star, hash, period, c, hangup;
+  TurboInput turboB, turboA, turboY, turboX, turboL, turboR;
+  // TODO : Add extra buttons
+  int16_t status(unsigned, unsigned) const;
+  NTTDataKeypad(unsigned, const char*, const char*);
+};
+
 struct Mouse : InputGroup {
   AnalogInput x, y;
   DigitalInput left, right;
@@ -95,6 +105,7 @@ extern Gamepad multitap1c;
 extern Gamepad multitap1d;
 extern Multitap multitap1;
 extern Mouse mouse1;
+extern NTTDataKeypad nttdatakeypad1;
 
 extern Gamepad gamepad2;
 extern Asciipad asciipad2;

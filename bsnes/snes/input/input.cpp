@@ -209,6 +209,28 @@ uint8 Input::port_read(bool portnumber) {
         case 31: return 0;
       }
     } //case Device::Justifier(s)
+
+    case Device::NTTDataKeypad: {
+      if(cpu.joylatch() == 0) {
+        if(p.counter0 >= 32) return 1;
+
+		// Id bits for NTTDataKeypad
+		if(p.counter0 >= 12 && p.counter0 <= 15) {
+			if(p.counter0 == 13) {
+				p.counter0++;
+				return 1;
+			}
+			p.counter0++;
+			return 0;
+		}
+
+        return system.interface->input_poll(portnumber, p.device, 0, p.counter0++);
+      } else {
+        return system.interface->input_poll(portnumber, p.device, 0, 0);
+      }
+    } //case Device::NTTDataKeypad
+
+
   } //switch(p.device)
 
   //no device connected
