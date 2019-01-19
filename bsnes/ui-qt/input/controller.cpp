@@ -360,6 +360,126 @@ port1(port1_), port2(port2_) {
 
 //
 
+int16_t NTTDataKeypad::status(unsigned index, unsigned id) const {
+  if(config().input.allowInvalidInput == false) {
+    //block up+down and left+right combinations:
+    //a real gamepad has a pivot in the D-pad that makes this impossible;
+    //some software titles will crash if up+down or left+right are detected
+    if(id == (unsigned)SNES::Input::NTTDataKeypadID::Down && up.cachedState) return 0;
+    if(id == (unsigned)SNES::Input::NTTDataKeypadID::Right && left.cachedState) return 0;
+  }
+
+  switch((SNES::Input::NTTDataKeypadID)id) {
+    case SNES::Input::NTTDataKeypadID::Up: return up.cachedState;
+    case SNES::Input::NTTDataKeypadID::Down: return down.cachedState;
+    case SNES::Input::NTTDataKeypadID::Left: return left.cachedState;
+    case SNES::Input::NTTDataKeypadID::Right: return right.cachedState;
+    case SNES::Input::NTTDataKeypadID::A: return a.cachedState | turboA.cachedState;
+    case SNES::Input::NTTDataKeypadID::B: return b.cachedState | turboB.cachedState;
+    case SNES::Input::NTTDataKeypadID::X: return x.cachedState | turboX.cachedState;
+    case SNES::Input::NTTDataKeypadID::Y: return y.cachedState | turboY.cachedState;
+    case SNES::Input::NTTDataKeypadID::L: return l.cachedState | turboL.cachedState;
+    case SNES::Input::NTTDataKeypadID::R: return r.cachedState | turboR.cachedState;
+    case SNES::Input::NTTDataKeypadID::Select: return select.cachedState;
+    case SNES::Input::NTTDataKeypadID::Start: return start.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit0: return digit0.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit1: return digit1.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit2: return digit2.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit3: return digit3.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit4: return digit4.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit5: return digit5.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit6: return digit6.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit7: return digit7.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit8: return digit8.cachedState;
+    case SNES::Input::NTTDataKeypadID::Digit9: return digit9.cachedState;
+    case SNES::Input::NTTDataKeypadID::Star: return star.cachedState;
+    case SNES::Input::NTTDataKeypadID::Hash: return hash.cachedState;
+    case SNES::Input::NTTDataKeypadID::Period: return period.cachedState;
+    case SNES::Input::NTTDataKeypadID::C: return c.cachedState;
+    case SNES::Input::NTTDataKeypadID::Hangup: return hangup.cachedState;
+  }
+  return 0;
+}
+
+
+NTTDataKeypad::NTTDataKeypad(unsigned category, const char *label, const char *configName) :
+InputGroup(category, label),
+up("Up", string() << "input." << configName << ".up"),
+down("Down", string() << "input." << configName << ".down"),
+left("Left", string() << "input." << configName << ".left"),
+right("Right", string() << "input." << configName << ".right"),
+b("B", string() << "input." << configName << ".b"),
+a("A", string() << "input." << configName << ".a"),
+y("Y", string() << "input." << configName << ".y"),
+x("X", string() << "input." << configName << ".x"),
+l("L", string() << "input." << configName << ".l"),
+r("R", string() << "input." << configName << ".r"),
+select("Select", string() << "input." << configName << ".select"),
+start("Start", string() << "input." << configName << ".start"),
+digit0("0", string() << "input." << configName << ".0"),
+digit1("1", string() << "input." << configName << ".1"),
+digit2("2", string() << "input." << configName << ".2"),
+digit3("3", string() << "input." << configName << ".3"),
+digit4("4", string() << "input." << configName << ".4"),
+digit5("5", string() << "input." << configName << ".5"),
+digit6("6", string() << "input." << configName << ".6"),
+digit7("7", string() << "input." << configName << ".7"),
+digit8("8", string() << "input." << configName << ".8"),
+digit9("9", string() << "input." << configName << ".9"),
+star("*", string() << "input." << configName << ".star"),
+hash("#", string() << "input." << configName << ".hash"),
+period(".", string() << "input." << configName << ".period"),
+c("C", string() << "input." << configName << ".c"),
+hangup("Hang up", string() << "input." << configName << ".hangup"),
+turboB("Turbo B", string() << "input." << configName << ".turboB"),
+turboA("Turbo A", string() << "input." << configName << ".turboA"),
+turboY("Turbo Y", string() << "input." << configName << ".turboY"),
+turboX("Turbo X", string() << "input." << configName << ".turboX"),
+turboL("Turbo L", string() << "input." << configName << ".turboL"),
+turboR("Turbo R", string() << "input." << configName << ".turboR") {
+  attach(&up); attach(&down); attach(&left); attach(&right);
+  attach(&b); attach(&a); attach(&y); attach(&x);
+  attach(&l); attach(&r); attach(&select); attach(&start);
+  attach(&digit0); attach(&digit1); attach(&digit2); attach(&digit3);
+  attach(&digit4); attach(&digit5); attach(&digit6); attach(&digit7);
+  attach(&digit8); attach(&digit9); attach(&star); attach(&hash);
+  attach(&period); attach(&c); attach(&hangup);
+  attach(&turboB); attach(&turboA); attach(&turboY); attach(&turboX);
+  attach(&turboL); attach(&turboR);
+
+  if(this == &nttdatakeypad1) {
+    up.name = "KB0::Up";
+    down.name = "KB0::Down";
+    left.name = "KB0::Left";
+    right.name = "KB0::Right";
+    b.name = "KB0::Z";
+    a.name = "KB0::X";
+    y.name = "KB0::A";
+    x.name = "KB0::S";
+    l.name = "KB0::D";
+    r.name = "KB0::C";
+    select.name = "KB0::Apostrophe";
+    start.name = "KB0::Return";
+    digit0.name = "KB0::Num0";
+    digit1.name = "KB0::Num1";
+    digit2.name = "KB0::Num2";
+    digit3.name = "KB0::Num3";
+    digit4.name = "KB0::Num4";
+    digit5.name = "KB0::Num5";
+    digit6.name = "KB0::Num6";
+    digit7.name = "KB0::Num7";
+    digit8.name = "KB0::Num8";
+    digit9.name = "KB0::Num9";
+    star.name = "KB0::Multiply";
+    hash.name = "KB0::N";
+    period.name = "KB0::Period";
+    c.name = "KB0::Backspace";
+    hangup.name = "KB0::End";
+  }
+}
+
+//
+
 Gamepad gamepad1(InputCategory::Port1, "Gamepad", "gamepad1");
 Asciipad asciipad1(InputCategory::Port1, "asciiPad", "asciipad1");
 Gamepad multitap1a(InputCategory::Port1, "Multitap - Port 1", "multitap1a");
@@ -368,6 +488,7 @@ Gamepad multitap1c(InputCategory::Port1, "Multitap - Port 3", "multitap1c");
 Gamepad multitap1d(InputCategory::Port1, "Multitap - Port 4", "multitap1d");
 Multitap multitap1(multitap1a, multitap1b, multitap1c, multitap1d);
 Mouse mouse1(InputCategory::Port1, "Mouse", "mouse1");
+NTTDataKeypad nttdatakeypad1(InputCategory::Port1, "NTT Data Keypad", "nttdatakeypad1");
 
 Gamepad gamepad2(InputCategory::Port2, "Gamepad", "gamepad2");
 Asciipad asciipad2(InputCategory::Port2, "asciiPad", "asciipad2");
@@ -381,5 +502,6 @@ SuperScope superscope(InputCategory::Port2, "Super Scope", "superscope");
 Justifier justifier1(InputCategory::Port2, "Justifier 1", "justifier1");
 Justifier justifier2(InputCategory::Port2, "Justifier 2", "justifier2");
 Justifiers justifiers(justifier1, justifier2);
+
 
 }

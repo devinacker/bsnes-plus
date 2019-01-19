@@ -48,6 +48,7 @@ MainWindow::MainWindow() {
   system_port1->addAction(system_port1_asciipad = new RadioAction("&asciiPad", 0));
   system_port1->addAction(system_port1_multitap = new RadioAction("&Multitap", 0));
   system_port1->addAction(system_port1_mouse = new RadioAction("&Mouse", 0));
+  system_port1->addAction(system_port1_nttdatakeypad = new RadioAction("NTT Data &Keypad", 0));
 
   system_port2 = system->addMenu("Controller Port &2");
   system_port2->addAction(system_port2_none = new RadioAction("&None", 0));
@@ -268,6 +269,7 @@ MainWindow::MainWindow() {
   connect(system_port1_asciipad, SIGNAL(triggered()), this, SLOT(setPort1Asciipad()));
   connect(system_port1_multitap, SIGNAL(triggered()), this, SLOT(setPort1Multitap()));
   connect(system_port1_mouse, SIGNAL(triggered()), this, SLOT(setPort1Mouse()));
+  connect(system_port1_nttdatakeypad, SIGNAL(triggered()), this, SLOT(setPort1NTTDataKeypad()));
   connect(system_port2_none, SIGNAL(triggered()), this, SLOT(setPort2None()));
   connect(system_port2_gamepad, SIGNAL(triggered()), this, SLOT(setPort2Gamepad()));
   connect(system_port2_asciipad, SIGNAL(triggered()), this, SLOT(setPort2Asciipad()));
@@ -335,6 +337,7 @@ void MainWindow::syncUi() {
   system_port1_asciipad->setChecked  (config().input.port1 == ControllerPort1::Asciipad);
   system_port1_multitap->setChecked  (config().input.port1 == ControllerPort1::Multitap);
   system_port1_mouse->setChecked     (config().input.port1 == ControllerPort1::Mouse);
+  system_port1_nttdatakeypad->setChecked(config().input.port1 == ControllerPort1::NTTDataKeypad);
 
   system_port2_none->setChecked      (config().input.port2 == ControllerPort2::None);
   system_port2_gamepad->setChecked   (config().input.port2 == ControllerPort2::Gamepad);
@@ -466,6 +469,12 @@ void MainWindow::setPort1Multitap() {
 void MainWindow::setPort1Mouse() {
   config().input.port1 = ControllerPort1::Mouse;
   SNES::config.controller_port1 = SNES::Input::Device::Mouse;
+  utility.updateControllers();
+}
+
+void MainWindow::setPort1NTTDataKeypad() {
+  config().input.port1 = ControllerPort1::NTTDataKeypad;
+  SNES::config.controller_port1 = SNES::Input::Device::NTTDataKeypad;
   utility.updateControllers();
 }
 

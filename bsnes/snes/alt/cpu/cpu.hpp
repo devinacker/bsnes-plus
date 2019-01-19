@@ -135,10 +135,10 @@ private:
     uint16 rddiv;
     uint16 rdmpy;
 
-    uint8 joy1l, joy1h;
-    uint8 joy2l, joy2h;
-    uint8 joy3l, joy3h;
-    uint8 joy4l, joy4h;
+    uint16 joy1;
+    uint16 joy2;
+    uint16 joy3;
+    uint16 joy4;
   } status;
 
   friend class CPUDebugger;

@@ -28,6 +28,9 @@ Debugger *debugger;
 #include "ppu/cgram-widget.cpp"
 #include "ppu/image-grid-widget.cpp"
 
+#include "ppu/oam-data-model.cpp"
+#include "ppu/oam-graphics-scene.cpp"
+
 #include "ppu/tile-viewer.cpp"
 #include "ppu/tilemap-viewer.cpp"
 #include "ppu/oam-viewer.cpp"

@@ -153,10 +153,10 @@ void CPU::reset() {
 
   status.rom_speed = 8;
 
-  status.joy1l = status.joy1h = 0x00;
-  status.joy2l = status.joy2h = 0x00;
-  status.joy3l = status.joy3h = 0x00;
-  status.joy4l = status.joy4h = 0x00;
+  status.joy1 = 0x0000;
+  status.joy2 = 0x0000;
+  status.joy3 = 0x0000;
+  status.joy4 = 0x0000;
 
   dma_reset();
 }
