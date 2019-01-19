@@ -119,6 +119,7 @@ void Utility::updateControllers() {
     case ControllerPort1::Asciipad: mapper().port1 = &Controllers::asciipad1; break;
     case ControllerPort1::Multitap: mapper().port1 = &Controllers::multitap1; break;
     case ControllerPort1::Mouse: mapper().port1 = &Controllers::mouse1; break;
+    case ControllerPort1::NTTDataKeypad: mapper().port1 = &Controllers::nttdatakeypad1; break;
   }
 
   switch(config().input.port2) { default:

@@ -1,23 +1,9 @@
-struct OamObject {
-  unsigned width;
-  unsigned height;
-  signed   xpos;
-  unsigned ypos;
-  unsigned character;
-  unsigned priority;
-  unsigned palette;
-  bool hFlip;
-  bool vFlip;
-  bool table;
-
-  static OamObject getObject(unsigned);
-};
 
 class OamCanvas : public QFrame {
   Q_OBJECT
 
 public:
-  OamCanvas();
+  OamCanvas(OamDataModel* dataModel, OamGraphicsScene* graphicsScene, QWidget* parent);
   void paintEvent(QPaintEvent*);
 
 public slots:
@@ -26,13 +12,15 @@ public slots:
   void setScale(unsigned);
 
 private:
-  void refreshImage(const OamObject& obj);
-  unsigned maximumOamBaseSize();
+  OamDataModel *dataModel;
+  OamGraphicsScene *graphicsScene;
 
-private:
   int selected;
   unsigned imageSize;
-  QImage image;
+
+  QColor backgroundColor;
+  QPixmap pixmap;
+  int pixmapScale;
 };
 
 class OamViewer : public Window {
@@ -46,15 +34,48 @@ public slots:
   void show();
   void refresh();
 
-  void onSelectedChanged();
+  void onExportClicked();
+
+  void onZoomChanged(int index);
+  void onBackgroundChanged(int index);
+
+  void onTreeViewSelectionChanged();
+  void onGraphicsSceneSelectedIdsEdited();
+
+  void onToggleVisibility();
+  void onShowOnlySelectedObjects();
 
 private:
+  void updateActions();
+
+private:
+  OamDataModel *dataModel;
+  QSortFilterProxyModel* proxyModel;
+
+  OamGraphicsScene *graphicsScene;
+
+  QVBoxLayout *outerLayout;
+  QSplitter *splitter;
+  QGraphicsView* graphicsView;
+
+  QWidget* bottomWidget;
   QHBoxLayout *layout;
-  QTreeWidget *list;
-  QVBoxLayout *controlLayout;
+  QHBoxLayout *buttonLayout;
+  QTreeView *treeView;
+
+  QFormLayout *sidebarLayout;
   OamCanvas *canvas;
+  QComboBox *zoomCombo;
   QCheckBox *autoUpdateBox;
+  QPushButton *exportButton;
   QPushButton *refreshButton;
+  QCheckBox *showScreenOutlineBox;
+  QComboBox *backgroundCombo;
+  QLineEdit *firstSprite;
+
+  QAction* toggleVisibility;
+  QAction* showOnlySelectedObjects;
+  QAction* showAllObjects;
 
   bool inRefreshCall;
 };

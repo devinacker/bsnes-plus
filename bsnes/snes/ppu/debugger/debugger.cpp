@@ -91,6 +91,10 @@ uint8 PPUDebugger::oam_base_size() const {
   return oam.regs.base_size; 
 }
 
+unsigned PPUDebugger::oam_first_sprite() const {
+  return oam.regs.first_sprite;
+}
+
 bool PPUDebugger::mode7_extbg() const {
   return regs.mode7_extbg;
 }
