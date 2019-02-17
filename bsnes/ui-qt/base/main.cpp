@@ -731,3 +731,8 @@ void CanvasWidget::mouseReleaseEvent(QMouseEvent *event) {
 void CanvasWidget::paintEvent(QPaintEvent *event) {
   event->ignore();
 }
+
+void CanvasWidget::focusOutEvent(QFocusEvent *event) {
+  utility.unacquireMouse();
+  QWidget::focusOutEvent(event);
+}

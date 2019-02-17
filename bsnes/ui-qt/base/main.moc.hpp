@@ -12,6 +12,7 @@ public:
   QPaintEngine* paintEngine() const;
   void mouseReleaseEvent(QMouseEvent*);
   void paintEvent(QPaintEvent*);
+  void focusOutEvent(QFocusEvent*);
 };
 
 class MainWindow : public Window {

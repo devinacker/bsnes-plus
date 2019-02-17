@@ -325,6 +325,8 @@ void TilemapViewer::updateTileInfoNormal() {
   bool hFlip = tile & 0x4000;
   bool vFlip = tile & 0x8000;
 
+  unsigned charAddr = renderer.characterAddress(character);
+
   string text;
 
   text << "<table>";
@@ -335,6 +337,7 @@ void TilemapViewer::updateTileInfoNormal() {
   text << "<tr><td>Value: </td><td>0x" << hex<4>(tile) << "</td></tr>";
   text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
   text << "<tr><td>Character: </td><td>" << character << "</td></tr>";
+  text << "<tr><td>Char Address: </td><td>0x" << hex<4>(charAddr) << "</td></tr>";
   text << "<tr><td>Palette: </td><td>" << pal << "</td></tr>";
   text << "<tr><td>Priority: </td><td>" << (unsigned)priority << "</td></tr>";
   text << "<tr><td>hFlip: </td><td>" << (unsigned)hFlip << "</td></tr>";
@@ -353,6 +356,8 @@ void TilemapViewer::updateTileInfoMode7() {
   unsigned addr = yPos * 256 + xPos * 2;
   unsigned tile = vram[addr];
 
+  unsigned charAddr = renderer.characterAddress(tile);
+
   string text;
 
   text << "<table>";
@@ -360,6 +365,7 @@ void TilemapViewer::updateTileInfoMode7() {
   text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
   text << "<tr><td>Address: </td><td>0x" << hex<4>(addr) << "</td></tr>";
   text << "<tr><td>Value: </td><td>" << tile << "</td></tr>";
+  text << "<tr><td>Char Address: </td><td>0x" << hex<4>(charAddr) << "</td></tr>";
   text << "</table>";
 
   tileInfo->setText(text);

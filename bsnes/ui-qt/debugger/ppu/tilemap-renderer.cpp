@@ -136,13 +136,19 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
   }
 }
 
-void TilemapRenderer::drawMap8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, unsigned palOffset, bool hFlip, bool vFlip) {
-  unsigned addr = 0;
+unsigned TilemapRenderer::characterAddress(unsigned c) const {
   switch(bitDepth) {
-    case BitDepth::BPP8: addr = (tileAddr + c * 64) & 0xffc0; break;
-    case BitDepth::BPP4: addr = (tileAddr + c * 32) & 0xffe0; break;
-    case BitDepth::BPP2: addr = (tileAddr + c * 16) & 0xfff0; break;
+    case BitDepth::BPP8:        return (tileAddr + c * 64) & 0xffc0;
+    case BitDepth::BPP4:        return (tileAddr + c * 32) & 0xffe0;
+    case BitDepth::BPP2:        return (tileAddr + c * 16) & 0xfff0;
+    case BitDepth::MODE7:       return (c & 0xff) * 128 + 1;
+    case BitDepth::MODE7_EXTBG: return (c & 0xff) * 128 + 1;
   }
+  return 0;
+}
+
+void TilemapRenderer::drawMap8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, unsigned palOffset, bool hFlip, bool vFlip) {
+  unsigned addr = characterAddress(c);
 
   const uint8_t *tile = SNES::memory::vram.data() + addr;
 
