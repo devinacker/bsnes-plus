@@ -46,7 +46,7 @@ uint32_t CpuDisasmProcessor::findStartLineAddress(uint32_t currentAddress, uint3
 
   for (line=0; line<linesBelow; line++) {
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(currentAddress + i) & 0xFFFFFF] & 0x10) == 0) {
+      if ((usagePointer[(currentAddress + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -268,7 +268,7 @@ void CpuDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(startAddress - i) & 0xFFFFFF] & 0x10) == 0) {
+      if ((usagePointer[(startAddress - i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -289,7 +289,7 @@ void CpuDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(endAddress + i) & 0xFFFFFF] & 0x10) == 0) {
+      if ((usagePointer[(endAddress + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 

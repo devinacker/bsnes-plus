@@ -66,7 +66,7 @@ uint32_t CommonDisasmProcessor::findStartLineAddress(uint32_t currentAddress, ui
 
   for (line=0; line<linesBelow; line++) {
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(currentAddress + i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(currentAddress + i) & mask] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -114,7 +114,7 @@ bool CommonDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address)
   result.setOpcode(address, text);
 
   for (uint32_t i=1; i<=4; i++) {
-    if ((usagePointer[(address + i) & mask] & 0x10) == 0) {
+    if ((usagePointer[(address + i) & mask] & SNES::CPUDebugger::UsageOpcode) == 0) {
       continue;
     }
 
@@ -140,7 +140,7 @@ void CommonDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &st
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(startAddress - i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(startAddress - i) & mask] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -161,7 +161,7 @@ void CommonDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &st
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((usagePointer[(endAddress + i) & mask] & 0x10) == 0) {
+      if ((usagePointer[(endAddress + i) & mask] & SNES::CPUDebugger::UsageOpcode) == 0) {
         continue;
       }
 
