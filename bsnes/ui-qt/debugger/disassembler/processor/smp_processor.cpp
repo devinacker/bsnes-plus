@@ -20,7 +20,7 @@ uint32_t SmpDisasmProcessor::findStartLineAddress(uint32_t currentAddress, uint3
 
   for (line=0; line<linesBelow; line++) {
     for (i=1; i<=4; i++) {
-      if ((SNES::smp.usage[(currentAddress + i) & 0xFFFF] & 0x10) == 0) {
+      if ((SNES::smp.usage[(currentAddress + i) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -46,7 +46,7 @@ bool SmpDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   result.setOpcode(address, text);
 
   for (uint32_t i=1; i<=4; i++) {
-    if ((SNES::smp.usage[(address + i) & 0xFFFF] & 0x10) == 0) {
+    if ((SNES::smp.usage[(address + i) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) == 0) {
       continue;
     }
 
@@ -72,7 +72,7 @@ void SmpDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((SNES::smp.usage[(startAddress - i) & 0xFFFF] & 0x10) == 0) {
+      if ((SNES::smp.usage[(startAddress - i) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -93,7 +93,7 @@ void SmpDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((SNES::smp.usage[(endAddress + i) & 0xFFFF] & 0x10) == 0) {
+      if ((SNES::smp.usage[(endAddress + i) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) == 0) {
         continue;
       }
 
