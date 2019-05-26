@@ -27,6 +27,8 @@ uint32_t CommonDisasmProcessor::getCurrentAddress() {
     case SFX: return SNES::superfx.opcode_pc;
     case SA1: return SNES::sa1.opcode_pc;
   }
+  
+  return 0;
 }
 
 // ------------------------------------------------------------------------

@@ -54,6 +54,7 @@ struct Opcode {
     switch (optype) {
       case OPTYPE_IMPL:
       case OPTYPE_A:
+      default:  
         return 1;
 
       case OPTYPE_DP:
@@ -131,6 +132,7 @@ struct Opcode {
 
   uint32 opall() {
     switch (size()) {
+	  default:
       case 1: return 0;
       case 2: return op8();
       case 3: return op16();

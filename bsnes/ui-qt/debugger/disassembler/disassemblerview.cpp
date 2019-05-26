@@ -627,7 +627,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
                 x += renderValue(painter, x, y, argType, argLength, param.value);
               }
               line.addressSizeX = x - line.addressPosX;
-              directComment += QString("[%1]").arg(param.address, 6, 16, QChar('0'));
+              directComment += QString("[%1]").arg(param.targetAddress, 6, 16, QChar('0'));
               break;
 
             default:

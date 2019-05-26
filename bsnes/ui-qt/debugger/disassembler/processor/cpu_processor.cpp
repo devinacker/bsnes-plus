@@ -23,6 +23,8 @@ uint32_t CpuDisasmProcessor::getCurrentAddress() {
     case CPU: return SNES::cpu.opcode_pc;
     case SA1: return SNES::sa1.opcode_pc;
   }
+  
+  return 0;
 }
 
 // ------------------------------------------------------------------------
@@ -73,37 +75,44 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_DPX:
       result.paramFormat = "%1X2, X";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_DPY:
       result.paramFormat = "%1X2, Y";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_IDP:
       result.paramFormat = "(%1X2)";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_IDPX:
       result.paramFormat = "(%1X2, X)";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_IDPY:
       result.paramFormat = "(%1X2), Y";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ILDP:
       result.paramFormat = "[%1X2]";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ILDPY:
       result.paramFormat = "[%1X2], Y";
-      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
+                             decode(SNES::CPU::OPTYPE_DP, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ADDR:
@@ -113,22 +122,26 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_ADDRX:
       result.paramFormat = "%1X4, X";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
+                             decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ADDRY:
       result.paramFormat = "%1X4, Y";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
+                             decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_IADDRX:
       result.paramFormat = "(%1X4, X)";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
+                             decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ILADDR:
       result.paramFormat = "[%1X4]";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
+                             decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_LONG:
@@ -138,17 +151,18 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_LONGX:
       result.paramFormat = "%1X6, X";
-      result.params.append(DisassemblerParam::createAddress(opcode.op24(), decode(opcode.optype, opcode.op24(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op24(),
+                             decode(SNES::CPU::OPTYPE_LONG, opcode.op24(), pc), decode(opcode.optype, opcode.op24(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_SR:
       result.paramFormat = "%1X2, S";
-      result.params.append(DisassemblerParam::createValue(opcode.op8()));
+      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ISRY:
       result.paramFormat = "(%1X2, S), Y";
-      result.params.append(DisassemblerParam::createValue(opcode.op8()));
+      result.params.append(DisassemblerParam::createAddress(opcode.op8(),decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_ADDR_PC:
@@ -158,17 +172,20 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_IADDR_PC:
       result.paramFormat = "($%1X4)";
-      result.params.append(DisassemblerParam::createAddress(opcode.op16(), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
+                             decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_RELB:
       result.paramFormat = "%1X4";
-      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op8(), pc), decode(opcode.optype, opcode.op8(), pc)));
+      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op8(), pc), 
+                             decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_RELW:
       result.paramFormat = "%1X4";
-      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
+      result.params.append(DisassemblerParam::createAddress((uint16_t)decode(opcode.optype, opcode.op16(), pc), 
+                             decode(opcode.optype, opcode.op16(), pc)));
       break;
 
     case SNES::CPU::OPTYPE_A:

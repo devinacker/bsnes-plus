@@ -9,6 +9,16 @@ struct DisassemblerParam {
     param.type = Address;
     param.value = value;
     param.address = address;
+    param.targetAddress = address;
+    return param;
+  }
+
+  static DisassemblerParam createTargetAddress(uint32_t value, uint32_t address, uint32_t target) {
+    DisassemblerParam param;
+    param.type = Address;
+    param.value = value;
+    param.address = address;
+	param.targetAddress = target;
     return param;
   }
 
@@ -29,6 +39,7 @@ struct DisassemblerParam {
   Type type;
   uint32_t value;
   uint32_t address;
+  uint32_t targetAddress;
   string text;
 };
 
