@@ -18,7 +18,7 @@ struct DisassemblerParam {
     param.type = Address;
     param.value = value;
     param.address = address;
-	param.targetAddress = target;
+    param.targetAddress = target;
     return param;
   }
 

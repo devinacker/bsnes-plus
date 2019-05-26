@@ -132,7 +132,7 @@ struct Opcode {
 
   uint32 opall() {
     switch (size()) {
-	  default:
+      default:
       case 1: return 0;
       case 2: return op8();
       case 3: return op16();
