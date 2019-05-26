@@ -637,7 +637,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
 
           }
         }
-        painter.setPen(opColor);
+        painter.setPen(textColor);
 
         i += 3;
         left = i + 1;
@@ -645,7 +645,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
       }
     }
 
-    if (left + 1 < textLength) {
+    if (left < textLength) {
       painter.drawText(x, y, nall::substr(line.line.paramFormat, left, textLength - left));
       x += (textLength - left) * charWidth;
     }
