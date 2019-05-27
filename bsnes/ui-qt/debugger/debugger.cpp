@@ -326,11 +326,14 @@ void Debugger::synchronize() {
   bool stepOtherEnabled = stepEnabled && (debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
                                           debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() == 1)
                           && !debugSFX->stepProcessor->isChecked(); // TODO: implement this for superfx
+  bool stepHVBEnabled = stepEnabled && debugCPU->stepProcessor->isChecked();
   bool stepInterruptEnabled = stepOtherEnabled && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked());
 
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
+  stepToVBlank->setEnabled(stepHVBEnabled);
+  stepToHBlank->setEnabled(stepHVBEnabled);
   stepToNMI->setEnabled(stepInterruptEnabled);
   stepToIRQ->setEnabled(stepInterruptEnabled);
   
