@@ -63,8 +63,9 @@ void RegisterEditCPU::setupUI() {
 	fullLayout->addLayout(layout);
 
 	layout = new QGridLayout;
-	for (int i = 0; i < 9; i++) {
-		flag_editor(i["ENVMXDIZC"], i, (i >> 1), i & 1);
+	flag_editor("E", 0, 0, 0);
+	for (int i = 0; i < 8; i++) {
+		flag_editor(i["NVMXDIZC"], i + 1, (i >> 1) + 1, i & 1);
 	}
 	fullLayout->addLayout(layout);
 
