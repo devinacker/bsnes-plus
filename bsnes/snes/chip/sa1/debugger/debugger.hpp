@@ -44,6 +44,7 @@ public:
 
   uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
 
+  void interrupt(uint16 vector);
   void op_step();
   uint8_t op_readpc();
   uint8 op_read(uint32 addr);

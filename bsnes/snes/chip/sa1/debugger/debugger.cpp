@@ -8,6 +8,20 @@ uint8 SA1Debugger::disassembler_read(uint32 addr)
   return data;
 }
 
+void SA1Debugger::interrupt(uint16 vector) {
+  SA1::interrupt(vector);
+  
+  if (debugger.step_sa1) {
+    debugger.call_count++;
+    
+    if ((debugger.step_type == Debugger::StepType::StepToNMI && (vector & 0xf) == 0xa)
+        || (debugger.step_type == Debugger::StepType::StepToIRQ && (vector & 0xf) == 0xe)) {
+      // break on next instruction after interrupt
+      debugger.step_type = Debugger::StepType::StepInto;
+    }
+  }
+}
+
 void SA1Debugger::op_step() {
   bool break_event = false;
 
@@ -38,7 +52,6 @@ void SA1Debugger::op_step() {
 
   // adjust call count if this is a call or return
   // (or if we're stepping over and no call occurred)
-  // (TODO: track interrupts as well?)
   if (debugger.step_sa1) {
     if (debugger.step_over_new && debugger.call_count == 0) {
       debugger.call_count = -1;
@@ -48,7 +61,7 @@ void SA1Debugger::op_step() {
     uint8 opcode = disassembler_read(opcode_pc);
     if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
       debugger.call_count++;
-    } else if (opcode == 0x60 || opcode == 0x6b) {
+    } else if (opcode == 0x60 || opcode == 0x6b || opcode == 0x40) {
       debugger.call_count--;
     }
   }

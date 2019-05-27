@@ -122,7 +122,7 @@ private:
   } alu;
 
   static void Enter();
-  void op_irq();
+  debugvirtual void op_irq();
   debugvirtual void op_step();
 
   friend class CPUDebugger;

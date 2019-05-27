@@ -156,6 +156,20 @@ Debugger::Debugger() {
   stepOut->defaultAction()->setShortcut(Qt::Key_F8);
   toolBar->addWidget(stepOut);
 
+  toolBar->addSeparator();
+
+  stepToNMI = new QToolButton;
+  stepToNMI->setDefaultAction(new QAction("Run to NMI", this));
+  stepToNMI->defaultAction()->setToolTip("Resume execution until next NMI");
+  toolBar->addWidget(stepToNMI);
+
+  stepToIRQ = new QToolButton;
+  stepToIRQ->setDefaultAction(new QAction("Run to IRQ", this));
+  stepToIRQ->defaultAction()->setToolTip("Resume execution until next IRQ");
+  toolBar->addWidget(stepToIRQ);
+
+  toolBar->addSeparator();
+
   traceMask = new QToolButton;
   traceMask->setDefaultAction(new QAction("Enable trace mask", this));
   traceMask->defaultAction()->setCheckable(true);
@@ -181,6 +195,8 @@ Debugger::Debugger() {
   connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
   connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
   connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
+  connect(stepToNMI->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToNMIAction()));
+  connect(stepToIRQ->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToIRQAction()));
 
   connect(debugCPU, SIGNAL(synchronized()), this, SLOT(synchronize()));
   connect(debugSMP, SIGNAL(synchronized()), this, SLOT(synchronize()));
@@ -298,10 +314,13 @@ void Debugger::synchronize() {
   bool stepOtherEnabled = stepEnabled && (debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
                                           debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() == 1)
                           && !debugSFX->stepProcessor->isChecked(); // TODO: implement this for superfx
+  bool stepInterruptEnabled = stepOtherEnabled && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked());
 
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
+  stepToNMI->setEnabled(stepInterruptEnabled);
+  stepToIRQ->setEnabled(stepInterruptEnabled);
   
   config().debugger.cacheUsageToDisk = menu_misc_cacheUsage->isChecked();
   config().debugger.saveBreakpoints = menu_misc_saveBreakpoints->isChecked();
@@ -374,6 +393,24 @@ void Debugger::stepOverAction() {
 
 void Debugger::stepOutAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepOut;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToNMIAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToNMI;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToIRQAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToIRQ;
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;

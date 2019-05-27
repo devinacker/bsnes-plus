@@ -28,6 +28,8 @@ public:
   QToolButton *stepInstruction;
   QToolButton *stepOver;
   QToolButton *stepOut;
+  QToolButton *stepToNMI;
+  QToolButton *stepToIRQ;
   QToolButton *traceMask;
 
   class DebuggerView *debugCPU;
@@ -54,6 +56,8 @@ public slots:
   void stepAction();
   void stepOverAction();
   void stepOutAction();
+  void stepToNMIAction();
+  void stepToIRQAction();
   void createMemoryEditor();
 
 private:

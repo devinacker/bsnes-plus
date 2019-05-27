@@ -10,6 +10,8 @@ namespace SNES {
   // since they were mostly identical
   #include "../../cpu/debugger/debugger.cpp"
   CPUDebugger cpu;
+  #include "../../cpu/debugger/analyst.cpp"
+  CPUAnalyst cpuAnalyst;
 #else
   CPU cpu;
 #endif

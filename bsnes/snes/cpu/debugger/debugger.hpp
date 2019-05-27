@@ -51,16 +51,16 @@ public:
   uint8 mmio_read(unsigned addr);
   void mmio_write(unsigned addr, uint8 data);
   
-  uint32 opcode_pc;
-  
+  void op_irq(uint16 vector);
 #else
   uint8 mmio_r2180();
   void mmio_w2180(uint8 data);
   
-  uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
-  
+  void op_irq();
 #endif
 
+  uint24 opcode_pc;  //points to the current opcode, used to backtrace on read/write breakpoints
+  
   void op_step();
   uint8_t op_readpc();
   uint8 op_read(uint32 addr);
