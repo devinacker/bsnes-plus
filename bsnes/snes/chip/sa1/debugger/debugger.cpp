@@ -23,8 +23,6 @@ void SA1Debugger::interrupt(uint16 vector) {
 }
 
 void SA1Debugger::op_step() {
-  bool break_event = false;
-
   usage[regs.pc] &= ~(UsageFlagM | UsageFlagX);
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;

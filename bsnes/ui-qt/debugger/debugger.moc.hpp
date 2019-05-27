@@ -28,6 +28,8 @@ public:
   QToolButton *stepInstruction;
   QToolButton *stepOver;
   QToolButton *stepOut;
+  QToolButton *stepToVBlank;
+  QToolButton *stepToHBlank;
   QToolButton *stepToNMI;
   QToolButton *stepToIRQ;
   QToolButton *traceMask;
@@ -56,6 +58,8 @@ public slots:
   void stepAction();
   void stepOverAction();
   void stepOutAction();
+  void stepToVBlankAction();
+  void stepToHBlankAction();
   void stepToNMIAction();
   void stepToIRQAction();
   void createMemoryEditor();

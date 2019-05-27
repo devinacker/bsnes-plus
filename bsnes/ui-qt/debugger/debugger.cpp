@@ -158,6 +158,16 @@ Debugger::Debugger() {
 
   toolBar->addSeparator();
 
+  stepToVBlank = new QToolButton;
+  stepToVBlank->setDefaultAction(new QAction("Run to VBlank", this));
+  stepToVBlank->defaultAction()->setToolTip("Resume execution until next vertical blank");
+  toolBar->addWidget(stepToVBlank);
+
+  stepToHBlank = new QToolButton;
+  stepToHBlank->setDefaultAction(new QAction("Run to HBlank", this));
+  stepToHBlank->defaultAction()->setToolTip("Resume execution until next horizontal blank");
+  toolBar->addWidget(stepToHBlank);
+  
   stepToNMI = new QToolButton;
   stepToNMI->setDefaultAction(new QAction("Run to NMI", this));
   stepToNMI->defaultAction()->setToolTip("Resume execution until next NMI");
@@ -195,6 +205,8 @@ Debugger::Debugger() {
   connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
   connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
   connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
+  connect(stepToVBlank->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToVBlankAction()));
+  connect(stepToHBlank->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToHBlankAction()));
   connect(stepToNMI->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToNMIAction()));
   connect(stepToIRQ->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToIRQAction()));
 
@@ -393,6 +405,24 @@ void Debugger::stepOverAction() {
 
 void Debugger::stepOutAction() {
   SNES::debugger.step_type = SNES::Debugger::StepType::StepOut;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToVBlankAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToVBlank;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToHBlankAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToHBlank;
   SNES::debugger.call_count = 0;
   
   application.debugrun = true;

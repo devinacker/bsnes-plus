@@ -13,6 +13,15 @@ uint8 CPUDebugger::disassembler_read(uint32 addr)
   return data;
 }
 
+uint8 CPUDebugger::hvbjoy()
+{
+#if defined(ALT_CPU_CPP)
+  return mmio_read(0x4212);
+#else
+  return mmio_r4212();
+#endif
+}
+
 #ifdef ALT_CPU_CPP
 void CPUDebugger::op_irq(uint16 vector) {
   CPU::op_irq(vector);
@@ -33,8 +42,6 @@ void CPUDebugger::op_irq() {
 }
 
 void CPUDebugger::op_step() {
-  bool break_event = false;
-
   usage[regs.pc] &= ~(UsageFlagM | UsageFlagX);
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
@@ -60,6 +67,8 @@ void CPUDebugger::op_step() {
   }
   if(step_event) step_event();
 
+  uint8 hvb_old;
+
   // adjust call count if this is a call or return
   // (or if we're stepping over and no call occurred)
   if (debugger.step_cpu) {
@@ -74,10 +83,21 @@ void CPUDebugger::op_step() {
     } else if (opcode == 0x60 || opcode == 0x6b || opcode == 0x40) {
       debugger.call_count--;
     }
+
+    hvb_old = hvbjoy();
   }
 
   CPU::op_step();
   synchronize_smp();
+  
+  if (debugger.step_cpu) {
+    uint8 hvb_new = hvbjoy();
+    if ((debugger.step_type == Debugger::StepType::StepToVBlank && !(hvb_old & 0x80) && (hvb_new & 0x80))
+        || (debugger.step_type == Debugger::StepType::StepToHBlank && !(hvb_old & 0x40) && (hvb_new & 0x40))) {
+      // break on next instruction after vblank/hblank
+      debugger.step_type = Debugger::StepType::StepInto;
+    }
+  }
 }
 
 alwaysinline uint8_t CPUDebugger::op_readpc() {
@@ -265,11 +285,7 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   
   //$4212
   {
-#if defined(ALT_CPU_CPP)
-  uint8 r = mmio_read(0x4212);
-#else
-  uint8 r = mmio_r4212();
-#endif
+  uint8 r = hvbjoy();
   item("$4212", "");
   item("V-Blank Flag", (r & 0x80) != 0);
   item("H-Blank Flag", (r & 0x40) != 0);

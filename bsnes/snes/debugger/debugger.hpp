@@ -36,7 +36,7 @@ public:
   bool break_on_brk;
 
   enum class StepType : unsigned {
-    None, StepToNMI, StepToIRQ, StepInto, StepOver, StepOut
+    None, StepToNMI, StepToIRQ, StepToVBlank, StepToHBlank, StepInto, StepOver, StepOut
   } step_type;
   int call_count;
   bool step_over_new;
