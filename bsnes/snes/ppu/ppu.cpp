@@ -60,6 +60,7 @@ void PPU::enter() {
         add_clocks(2);
       }
 
+      oam.scanline();
       add_clocks(14);
       oam.tilefetch();
     } else {
@@ -108,33 +109,27 @@ void PPU::reset() {
   window.reset();
   screen.reset();
 
-  frame();
+  system.frame();
 }
 
 void PPU::scanline() {
   if(vcounter() == 0) {
-    frame();
+    system.frame();
+    display.interlace = regs.interlace;
+    display.overscan = regs.overscan;
     bg1.frame();
     bg2.frame();
     bg3.frame();
     bg4.frame();
+    oam.frame();
   }
 
   bg1.scanline();
   bg2.scanline();
   bg3.scanline();
   bg4.scanline();
-  oam.scanline();
   window.scanline();
   screen.scanline();
-}
-
-void PPU::frame() {
-  system.frame();
-  oam.frame();
-
-  display.interlace = regs.interlace;
-  display.overscan = regs.overscan;
 }
 
 PPU::PPU() :
