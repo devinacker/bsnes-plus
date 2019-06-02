@@ -283,6 +283,10 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "    <map mode='shadow' address='00-0f:8000-ffff'/>\n";
     xml << "    <map mode='shadow' address='80-bf:8000-ffff'/>\n";
     xml << "    <map mode='linear' address='c0-cf:0000-ffff'/>\n";
+    if (size >= 0x700000) {
+      // Tengai Makyou Zero english translation
+      xml << "    <map mode='linear' address='40-4f:0000-ffff' offset='600000'/>\n";
+    }
     xml << "  </rom>\n";
 
     xml << "  <spc7110>\n";
