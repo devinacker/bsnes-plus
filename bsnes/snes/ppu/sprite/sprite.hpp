@@ -29,8 +29,8 @@ class Sprite {
     unsigned tile_count;
 
     bool active;
-    uint8 item[32];
-    TileItem tile[34];
+    uint8 item[2][32];
+    TileItem tile[2][34];
   } t;
 
   struct Regs {

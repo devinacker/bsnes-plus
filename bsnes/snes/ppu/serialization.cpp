@@ -144,16 +144,18 @@ void PPU::Sprite::serialize(serializer &s) {
   s.integer(t.tile_count);
 
   s.integer(t.active);
-  s.array(t.item);
-  for(unsigned i = 0; i < 34; i++) {
-    s.integer(t.tile[i].x);
-    s.integer(t.tile[i].priority);
-    s.integer(t.tile[i].palette);
-    s.integer(t.tile[i].hflip);
-    s.integer(t.tile[i].d0);
-    s.integer(t.tile[i].d1);
-    s.integer(t.tile[i].d2);
-    s.integer(t.tile[i].d3);
+  for(unsigned n = 0; n < 2; n++) {
+    s.array(t.item[n]);
+    for(unsigned i = 0; i < 34; i++) {
+      s.integer(t.tile[n][i].x);
+      s.integer(t.tile[n][i].priority);
+      s.integer(t.tile[n][i].palette);
+      s.integer(t.tile[n][i].hflip);
+      s.integer(t.tile[n][i].d0);
+      s.integer(t.tile[n][i].d1);
+      s.integer(t.tile[n][i].d2);
+      s.integer(t.tile[n][i].d3);
+    }
   }
 
   s.integer(regs.main_enable);

@@ -23,21 +23,25 @@ void PPU::Sprite::scanline() {
   t.item_count = 0;
   t.tile_count = 0;
 
-  if(t.y == (!self.regs.overscan ? 225 : 240) && self.regs.display_disable == false) address_reset();
-  if(t.y >= (!self.regs.overscan ? 224 : 239) || self.regs.display_disable == true) return;
+  t.active = !t.active;
+  auto oam_item = t.item[t.active];
+  auto oam_tile = t.tile[t.active];
 
-  memset(t.item, 0xff, 32);  //default to invalid
-  for(unsigned i = 0; i < 34; i++) t.tile[i].x = 0xffff;  //default to invalid
+  if(t.y == (!self.regs.overscan ? 225 : 240) && self.regs.display_disable == false) address_reset();
+  if(t.y >= (!self.regs.overscan ? 224 : 239)) return;
+
+  memset(oam_item, 0xff, 32);  //default to invalid
+  for(unsigned i = 0; i < 34; i++) oam_tile[i].x = 0xffff;  //default to invalid
 
   for(unsigned i = 0; i < 128; i++) {
     unsigned sprite = (regs.first_sprite + i) & 127;
     if(on_scanline(list[sprite]) == false) continue;
     if(t.item_count++ >= 32) break;
-    t.item[t.item_count - 1] = sprite;
+    oam_item[t.item_count - 1] = sprite;
   }
 
-  if(t.item_count > 0 && t.item[t.item_count - 1] != 0xff) {
-    ppu.regs.oam_iaddr = 0x0200 + (t.item[t.item_count - 1] >> 2);
+  if(t.item_count > 0 && oam_item[t.item_count - 1] != 0xff) {
+    ppu.regs.oam_iaddr = 0x0200 + (oam_item[t.item_count - 1] >> 2);
   }
 }
 
@@ -53,11 +57,12 @@ void PPU::Sprite::run() {
   output.main.priority = 0;
   output.sub.priority = 0;
 
+  auto oam_tile = t.tile[!t.active];
   unsigned priority_table[] = { regs.priority0, regs.priority1, regs.priority2, regs.priority3 };
   unsigned x = t.x++;
 
   for(unsigned n = 0; n < 34; n++) {
-    auto tile = t.tile[n];
+    auto tile = oam_tile[n];
     if(tile.x == 0xffff) break;
 
     int px = x - sclip<9>(tile.x);
@@ -85,9 +90,12 @@ void PPU::Sprite::run() {
 }
 
 void PPU::Sprite::tilefetch() {
+  auto oam_item = t.item[t.active];
+  auto oam_tile = t.tile[t.active];
+
   for(signed i = 31; i >= 0; i--) {
-    if(t.item[i] == 0xff) continue;
-    auto sprite = list[t.item[i]];
+    if(oam_item[i] == 0xff) continue;
+    auto sprite = list[oam_item[i]];
 
     unsigned tile_width = sprite.width() >> 3;
     signed x = sprite.x;
@@ -127,21 +135,21 @@ void PPU::Sprite::tilefetch() {
       if(t.tile_count++ >= 34) break;
 
       unsigned n = t.tile_count - 1;
-      t.tile[n].x = sx;
-      t.tile[n].priority = sprite.priority;
-      t.tile[n].palette = 128 + (sprite.palette << 4);
-      t.tile[n].hflip = sprite.hflip;
+      oam_tile[n].x = sx;
+      oam_tile[n].priority = sprite.priority;
+      oam_tile[n].palette = 128 + (sprite.palette << 4);
+      oam_tile[n].hflip = sprite.hflip;
 
       unsigned mx = (sprite.hflip == false) ? tx : ((tile_width - 1) - tx);
       unsigned pos = tiledata_addr + ((chry + ((chrx + mx) & 15)) << 5);
       uint16 addr = (pos & 0xffe0) + ((y & 7) * 2);
 
-      t.tile[n].d0 = memory::vram[addr +  0];
-      t.tile[n].d1 = memory::vram[addr +  1];
+      oam_tile[n].d0 = memory::vram[addr +  0];
+      oam_tile[n].d1 = memory::vram[addr +  1];
       self.add_clocks(2);
 
-      t.tile[n].d2 = memory::vram[addr + 16];
-      t.tile[n].d3 = memory::vram[addr + 17];
+      oam_tile[n].d2 = memory::vram[addr + 16];
+      oam_tile[n].d3 = memory::vram[addr + 17];
       self.add_clocks(2);
     }
   }
@@ -171,16 +179,18 @@ void PPU::Sprite::reset() {
   t.tile_count = 0;
 
   t.active = 0;
-  memset(t.item, 0, 32);
-  for(unsigned i = 0; i < 34; i++) {
-    t.tile[i].x = 0;
-    t.tile[i].priority = 0;
-    t.tile[i].palette = 0;
-    t.tile[i].hflip = 0;
-    t.tile[i].d0 = 0;
-    t.tile[i].d1 = 0;
-    t.tile[i].d2 = 0;
-    t.tile[i].d3 = 0;
+  for(unsigned n = 0; n < 2; n++) {
+    memset(t.item[n], 0, 32);
+    for(unsigned i = 0; i < 34; i++) {
+      t.tile[n][i].x = 0;
+      t.tile[n][i].priority = 0;
+      t.tile[n][i].palette = 0;
+      t.tile[n][i].hflip = 0;
+      t.tile[n][i].d0 = 0;
+      t.tile[n][i].d1 = 0;
+      t.tile[n][i].d2 = 0;
+      t.tile[n][i].d3 = 0;
+    }
   }
 
   regs.main_enable = random(0);

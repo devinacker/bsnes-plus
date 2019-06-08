@@ -55,6 +55,7 @@ private:
   void add_clocks(unsigned);
 
   void scanline();
+  void frame();
 
   friend class PPU::Background;
   friend class PPU::Sprite;
