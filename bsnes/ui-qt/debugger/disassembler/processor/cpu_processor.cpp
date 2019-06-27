@@ -171,7 +171,7 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
       break;
 
     case SNES::CPU::OPTYPE_IADDR_PC:
-      result.paramFormat = "($%1X4)";
+      result.paramFormat = "(%1X4)";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
                              decode(SNES::CPU::OPTYPE_ADDR, opcode.op16(), pc), decode(opcode.optype, opcode.op16(), pc)));
       break;
