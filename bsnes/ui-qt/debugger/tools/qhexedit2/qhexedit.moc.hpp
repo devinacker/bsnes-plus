@@ -216,8 +216,16 @@ public:
     */
     QString toReadableString();
 
+    bool canUndo() const;
+	bool canRedo() const;
 
 public slots:
+    void cut();
+	
+	void copy();
+	
+	void paste();
+
     /*! Redoes the last operation. If there is no operation to redo, i.e.
       there is no redo step in the undo/redo history, nothing happens.
       */

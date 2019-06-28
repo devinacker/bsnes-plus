@@ -166,9 +166,9 @@ void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr
   else { return; }
 
   mode.lower();
-  if(mode.position("r")) { mode_r->setChecked(true); }
-  if(mode.position("w")) { mode_w->setChecked(true); }
-  if(mode.position("x")) { mode_x->setChecked(true); }
+  mode_r->setChecked(mode.position("r"));
+  mode_w->setChecked(mode.position("w"));
+  mode_x->setChecked(mode.position("x"));
 
   lstring addresses;
   addresses.split<2>("=", addrStr);

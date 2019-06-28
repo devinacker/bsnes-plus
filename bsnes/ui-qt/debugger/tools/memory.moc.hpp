@@ -45,13 +45,31 @@ public:
 private:
   QByteArray searchStr;
   int searchPos;
+  int breakpointPos;
 
+  void addBreakpoint(const string& mode);
+
+  void gotoPrevious(int);
+  void gotoNext(int);
+  
+  void exportMemory(SNES::Memory&, const string&) const;
+  void importMemory(SNES::Memory&, const string&) const;
+  
 public slots:
   void show();
-  void sourceChanged(int);
   void refresh();
+  
+private slots:
+  void sourceChanged(int);
   void updateOffset();
   void showAddress(qint64);
+  void showContextMenu(const QPoint& pos);
+  
+  void addBreakpointR();
+  void addBreakpointW();
+  void addBreakpointX();
+  void addBreakpointRW();
+  void addBreakpointRWX();
   
   void prevCode();
   void nextCode();
@@ -59,8 +77,6 @@ public slots:
   void nextData();
   void prevUnknown();
   void nextUnknown();
-  void gotoPrevious(int);
-  void gotoNext(int);
   
   void search();
   void searchNext();
@@ -68,8 +84,6 @@ public slots:
   
   void exportMemory();
   void importMemory();
-  void exportMemory(SNES::Memory&, const string&) const;
-  void importMemory(SNES::Memory&, const string&) const;
 };
 
 //extern MemoryEditor *memoryEditor;
