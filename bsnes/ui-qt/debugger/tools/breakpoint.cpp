@@ -11,6 +11,15 @@ const QStringList BreakpointModel::sources = {
   "SuperFX bus",
 };
 
+const QStringList BreakpointModel::compares = {
+  "=",
+  "!=",
+  "<",
+  "<=",
+  ">",
+  ">="
+};
+
 BreakpointModel::BreakpointModel(QObject* parent)
   : QAbstractTableModel(parent) {
 }
@@ -36,6 +45,10 @@ QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
     case BreakAddrEnd:
       if (b.addr_end) return QString::asprintf("%06x", b.addr_end);
       break;
+    case BreakCompare:
+      if (role == Qt::EditRole) return (unsigned)b.compare;
+      if ((unsigned)b.compare < compares.count()) return compares[(unsigned)b.compare];
+      break;
     case BreakData:
       if (b.data >= 0) return QString::asprintf("%02x", b.data);
       if (role == Qt::DisplayRole) return "any";
@@ -47,7 +60,7 @@ QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
     case BreakExecute:
       return (bool)(b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec);
     case BreakSource:
-	  if (role == Qt::EditRole) return (unsigned)b.source;
+      if (role == Qt::EditRole) return (unsigned)b.source;
       if ((unsigned)b.source < sources.count()) return sources[(unsigned)b.source];
       break;
     }
@@ -63,7 +76,7 @@ QVariant BreakpointModel::headerData(int section, Qt::Orientation orientation, i
       switch (section) {
       case BreakAddrStart: return "Start";
       case BreakAddrEnd:   return "End (optional)";
-      case BreakData:      return "Data";
+      case BreakCompare:   return "Data";
       case BreakRead:      return "R";
       case BreakWrite:     return "W";
       case BreakExecute:   return "X";
@@ -94,6 +107,11 @@ bool BreakpointModel::setData(const QModelIndex &index, const QVariant &value, i
         b.addr_end = 0;
       emit dataChanged(index, index);
       return true;
+      
+    case BreakCompare:
+      b.compare = (SNES::Debugger::Breakpoint::Compare)value.toInt();
+      emit dataChanged(index, index);
+      break;
       
     case BreakData:
       if (!value.toString().isEmpty())
@@ -191,12 +209,14 @@ BreakpointEditor::BreakpointEditor() {
   table->setItemDelegateForColumn(BreakpointModel::BreakWrite, checkDelegate);
   table->setItemDelegateForColumn(BreakpointModel::BreakExecute, checkDelegate);
   
+  table->setItemDelegateForColumn(BreakpointModel::BreakCompare, new ComboDelegate(BreakpointModel::compares, this));
   table->setItemDelegateForColumn(BreakpointModel::BreakSource, new ComboDelegate(BreakpointModel::sources, this));
   
   QHeaderView *header = table->horizontalHeader();
   header->setSectionsClickable(false);
   header->setStretchLastSection(true);
   header->setDefaultAlignment(Qt::AlignLeft);
+  header->setSectionResizeMode(BreakpointModel::BreakCompare, QHeaderView::ResizeToContents);
   header->setSectionResizeMode(BreakpointModel::BreakData, QHeaderView::ResizeToContents);
   header->setSectionResizeMode(BreakpointModel::BreakRead, QHeaderView::ResizeToContents);
   header->setSectionResizeMode(BreakpointModel::BreakWrite, QHeaderView::ResizeToContents);
@@ -283,11 +303,25 @@ void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, con
     model->setData(model->index(row, BreakpointModel::BreakWrite), (bool)modeStr.position("w"));
     model->setData(model->index(row, BreakpointModel::BreakExecute), (bool)modeStr.position("x"));
 
+    string addrStr;
     lstring addresses;
-    addresses.split<2>("=", addr);
-    if (addresses.size() >= 2) { model->setData(model->index(row, BreakpointModel::BreakData), (const char*)addresses[1]); }
-
-    string addrStr = addresses[0];
+    // Try to find a comparison operator.
+    // Search in reverse through the available ones so that two-character operators (!=, <=, >=) get found first
+    for (int i = BreakpointModel::compares.count() - 1; i >= 0; i--) {
+      const char *oper = BreakpointModel::compares[i].toUtf8().constData();
+      if (addr.position(oper)) {
+        addresses.split<2>(oper, addr);
+        model->setData(model->index(row, BreakpointModel::BreakCompare), i);
+        break;
+      }
+    }
+    if (addresses.size() >= 2) { 
+      model->setData(model->index(row, BreakpointModel::BreakData), (const char*)addresses[1]);
+      addrStr = addresses[0];
+    } else {
+      addrStr = addr;
+    }
+    
     addresses.split<2>("-", addrStr);
     model->setData(model->index(row, BreakpointModel::BreakAddrStart), (const char*)addresses[0]);
     if (addresses.size() >= 2) { model->setData(model->index(row, BreakpointModel::BreakAddrEnd), (const char*)addresses[1]); }
@@ -311,8 +345,8 @@ int32_t BreakpointEditor::indexOfBreakpointExec(uint32_t addr, const string &sou
   for(unsigned n = 0; n < SNES::debugger.breakpoint.size(); n++) {
     const SNES::Debugger::Breakpoint &b = SNES::debugger.breakpoint[n];
     if((b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec) 
-       && b.addr <= addr 
-       && (b.addr_end == 0 || b.addr_end >= addr)) {
+       && addr >= b.addr 
+       && addr <= (b.addr_end ? b.addr_end : b.addr)) {
       return n;
     }
   }
@@ -332,10 +366,11 @@ string BreakpointEditor::toStrings() const {
       breakpoints << "-" << hex<6>(b.addr_end);
     }
     
-    if (b.data >= 0) {
-      breakpoints << "=" << hex<2>(b.data);
+    if (b.data >= 0 && (unsigned)b.compare < BreakpointModel::compares.count()) {
+      breakpoints << BreakpointModel::compares[(unsigned)b.compare].toUtf8().constData();
+      breakpoints << hex<2>(b.data);
     }
-  
+    
     breakpoints << ":";
     if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Read) breakpoints << "r";
     if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write) breakpoints << "w";

@@ -16,6 +16,11 @@ public:
     unsigned addr = 0;
     unsigned addr_end = 0; //0 = unused
     signed data = -1;  //-1 = unused
+    enum class Compare : unsigned { Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual } compare = Compare::Equal;
+    
+    // compare breakpoint against read/written data using specified value and comparator
+    alwaysinline bool operator==(const uint8& data) const;
+    alwaysinline bool operator!=(const uint8& data) const;
     
     enum class Mode : unsigned { Exec = 1, Read = 2, Write = 4 };
     unsigned mode = 0;

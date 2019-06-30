@@ -5,6 +5,7 @@ public:
 enum {
   BreakAddrStart,
   BreakAddrEnd,
+  BreakCompare,
   BreakData,
   BreakRead,
   BreakWrite,
@@ -15,6 +16,7 @@ enum {
 };
 
   static const QStringList sources;
+  static const QStringList compares;
 
   BreakpointModel(QObject *parent = 0);
   ~BreakpointModel() {}

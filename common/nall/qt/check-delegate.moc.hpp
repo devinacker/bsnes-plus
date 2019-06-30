@@ -56,20 +56,19 @@ inline QWidget* CheckDelegate::createEditor(QWidget *, const QStyleOptionViewIte
 
 inline void CheckDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   // paint the background
-  static const QModelIndex dummy;
-  QStyledItemDelegate::paint(painter, option, dummy);
+  const QWidget *widget = option.widget;
+  QStyle *style = widget ? widget->style() : QApplication::style();
+  style->drawControl(QStyle::CE_ItemViewItem, &option, painter, widget);
 
   // paint the widget
   QRect rect = CheckBoxRect(option);
 
-  if (index.model()->data(index, Qt::DisplayRole).toBool())
+  if (index.model()->data(index, Qt::EditRole).toBool())
     painter->drawPixmap(rect, this->pixmapOn);
   else 
     painter->drawPixmap(rect, this->pixmapOff);
 }
 
-// This is essentially copied from QStyledItemEditor, except that we
-// have to determine our own "hot zone" for the mouse click.
 inline bool CheckDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
   if ((event->type() == QEvent::MouseButtonRelease) || (event->type() == QEvent::MouseButtonDblClick)) {
 	
@@ -87,8 +86,9 @@ inline bool CheckDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
 	  
   } else return false;
 
-  bool checked = index.model()->data(index, Qt::DisplayRole).toBool();
-  return model->setData(index, !checked, Qt::EditRole);
+  bool checked = index.model()->data(index, Qt::EditRole).toBool();
+  model->setData(index, !checked);
+  return true;
 }
 
 }

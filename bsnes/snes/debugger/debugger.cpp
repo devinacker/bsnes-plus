@@ -2,12 +2,29 @@
 
 Debugger debugger;
 
+bool Debugger::Breakpoint::operator==(const uint8& data) const {
+  if (this->data < 0) return true;
+  switch (compare) {
+  case Compare::Equal:        return data == this->data;
+  case Compare::NotEqual:     return data != this->data;
+  case Compare::Less:         return data <  this->data;
+  case Compare::LessEqual:    return data <= this->data;
+  case Compare::Greater:      return data >  this->data;
+  case Compare::GreaterEqual: return data >= this->data;
+  }
+  return false;
+}
+
+bool Debugger::Breakpoint::operator!=(const uint8& data) const {
+  return !operator==(data);
+}
+
 void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Breakpoint::Mode mode, unsigned addr, uint8 data) {
   for(unsigned i = 0; i < breakpoint.size(); i++) {
-    if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
 
-    if(breakpoint[i].data != -1 && breakpoint[i].data != data) continue;
     if(breakpoint[i].source != source) continue;
+    if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
+    if(breakpoint[i] != data) continue;
     
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
     // (with 64kb granularity for ranged breakpoints)
