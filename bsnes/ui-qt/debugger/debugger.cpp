@@ -463,12 +463,12 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
       
-      if (n < SNES::Debugger::Breakpoints)
-        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
-      else if (n == SNES::Debugger::SoftBreakCPU)
+      if (n == SNES::Debugger::SoftBreakCPU)
         echo(string() << "Software breakpoint hit (CPU).<br>");
       else if (n == SNES::Debugger::SoftBreakSA1)
         echo(string() << "Software breakpoint hit (SA-1).<br>");
+      else if (n < SNES::debugger.breakpoint.size())
+        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
       else break;
         
       if(n == SNES::Debugger::SoftBreakCPU

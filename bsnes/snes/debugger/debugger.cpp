@@ -3,13 +3,11 @@
 Debugger debugger;
 
 void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Breakpoint::Mode mode, unsigned addr, uint8 data) {
-  for(unsigned i = 0; i < Breakpoints; i++) {
-    if(breakpoint[i].enabled == false) continue;
+  for(unsigned i = 0; i < breakpoint.size(); i++) {
+    if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
 
     if(breakpoint[i].data != -1 && breakpoint[i].data != data) continue;
     if(breakpoint[i].source != source) continue;
-    
-    if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
     
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
     // (with 64kb granularity for ranged breakpoints)
@@ -142,14 +140,6 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
 Debugger::Debugger() {
   break_event = BreakEvent::None;
 
-  for(unsigned n = 0; n < Breakpoints; n++) {
-    breakpoint[n].enabled = false;
-    breakpoint[n].addr = 0;
-    breakpoint[n].data = -1;
-    breakpoint[n].mode = (unsigned)Breakpoint::Mode::Exec;
-    breakpoint[n].source = Breakpoint::Source::CPUBus;
-    breakpoint[n].counter = 0;
-  }
   breakpoint_hit = 0;
 
   step_cpu = false;

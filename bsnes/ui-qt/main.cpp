@@ -23,6 +23,8 @@ const char defaultStylesheet[] =
   "}\n";
 
 #include "check-action.moc"
+#include "check-delegate.moc"
+#include "combo-delegate.moc"
 #include "file-dialog.moc"
 #include "radio-action.moc"
 #include "window.moc"

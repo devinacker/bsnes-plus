@@ -9,21 +9,21 @@ public:
     SFXStep,
   } break_event;
 
-  enum { Breakpoints = 8,
-         SoftBreakCPU = Breakpoints,
-         SoftBreakSA1, };
+  enum { SoftBreakCPU = -1,
+         SoftBreakSA1 = -2, };
+  
   struct Breakpoint {
-    bool enabled;
-    unsigned addr;
-    unsigned addr_end; //0 = unused
-    signed data;  //-1 = unused
+    unsigned addr = 0;
+    unsigned addr_end = 0; //0 = unused
+    signed data = -1;  //-1 = unused
     
     enum class Mode : unsigned { Exec = 1, Read = 2, Write = 4 };
-    unsigned mode;
+    unsigned mode = 0;
     
-    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus, SFXBus } source;
-    unsigned counter;  //number of times breakpoint has been hit since being set
-  } breakpoint[Breakpoints];
+    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus, SFXBus } source = Source::CPUBus;
+    unsigned counter = 0;  //number of times breakpoint has been hit since being set
+  };
+  linear_vector<Breakpoint> breakpoint;
   unsigned breakpoint_hit;
   void breakpoint_test(Breakpoint::Source source, Breakpoint::Mode mode, unsigned addr, uint8 data);
 

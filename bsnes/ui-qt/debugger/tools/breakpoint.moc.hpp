@@ -1,47 +1,35 @@
-class BreakpointItem : public QWidget {
+class BreakpointModel : public QAbstractTableModel {
   Q_OBJECT
 
+public:
 enum {
   BreakAddrStart,
-  BreakAddrDash,
   BreakAddrEnd,
   BreakData,
   BreakRead,
   BreakWrite,
   BreakExecute,
-  BreakSource
+  BreakSource,
+  
+  BreakColumnCount
 };
 
-public:
-  QGridLayout *layout;
-  QLineEdit *addr;
-  QLineEdit *addr_end;
-  QLineEdit *data;
-  QCheckBox *mode_r;
-  QCheckBox *mode_w;
-  QCheckBox *mode_x;
-  QComboBox *source;
-  BreakpointItem(unsigned id);
+  static const QStringList sources;
 
-  void removeBreakpoint();
-  void setBreakpoint(string addr, string mode, string source);
-  string toString() const;
+  BreakpointModel(QObject *parent = 0);
+  ~BreakpointModel() {}
 
-  bool isEnabled() const;
-  uint32_t getAddressFrom() const;
-  uint32_t getAddressTo() const;
-  bool isModeR() const;
-  bool isModeW() const;
-  bool isModeX() const;
-  string getBus() const;
-
-public slots:
-  void init();
-  void toggle();
-  void clear();
-
-private:
-  const unsigned id;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+  bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+  
+  Qt::ItemFlags flags(const QModelIndex &index) const;
+  
+  bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+  bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 };
 
 class BreakpointEditor : public Window {
@@ -49,7 +37,11 @@ class BreakpointEditor : public Window {
 
 public:
   QVBoxLayout *layout;
-  BreakpointItem *breakpoint[SNES::Debugger::Breakpoints];
+  QTableView *table;
+  BreakpointModel *model;
+  QHBoxLayout *btnLayout;
+  QPushButton *btnAdd;
+  QPushButton *btnRemove;
   QCheckBox *breakOnWDM;
   QCheckBox *breakOnBRK;
 
@@ -64,6 +56,8 @@ public:
   int32_t indexOfBreakpointExec(uint32_t addr, const string &source) const;
 
 public slots:
+  void add();
+  void remove();
   void toggle();
   void clear();
 };

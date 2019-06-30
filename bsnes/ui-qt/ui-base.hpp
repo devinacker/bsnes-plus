@@ -18,6 +18,8 @@
 #include <nall/snes/cartridge.hpp>
 #include <nall/qt/concept.hpp>
 #include <nall/qt/check-action.moc.hpp>
+#include <nall/qt/check-delegate.moc.hpp>
+#include <nall/qt/combo-delegate.moc.hpp>
 #include <nall/qt/file-dialog.moc.hpp>
 #include <nall/qt/radio-action.moc.hpp>
 #include <nall/qt/window.moc.hpp>

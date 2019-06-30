@@ -1,208 +1,169 @@
 #include "breakpoint.moc"
 BreakpointEditor *breakpointEditor;
 
-BreakpointItem::BreakpointItem(unsigned id_) : id(id_) {
-  layout = new QGridLayout;
-  layout->setMargin(0);
-  layout->setSpacing(Style::WidgetSpacing);
-  setLayout(layout);
+const QStringList BreakpointModel::sources = {
+  "S-CPU bus",
+  "S-SMP bus",
+  "S-PPU VRAM",
+  "S-PPU OAM",
+  "S-PPU CGRAM",
+  "SA-1 bus",
+  "SuperFX bus",
+};
 
-  addr = new QLineEdit;
-  addr->setFixedWidth(80);
-  layout->addWidget(addr, 1, BreakAddrStart);
-  connect(addr, SIGNAL(textChanged(const QString&)), this, SLOT(init()));
-  connect(addr, SIGNAL(textChanged(const QString&)), this, SLOT(toggle()));
-  
-  layout->addWidget(new QLabel(" - "), 1, BreakAddrDash);
-
-  addr_end = new QLineEdit;
-  addr_end->setFixedWidth(80);
-  layout->addWidget(addr_end, 1, BreakAddrEnd);
-  connect(addr_end, SIGNAL(textChanged(const QString&)), this, SLOT(init()));
-  connect(addr_end, SIGNAL(textChanged(const QString&)), this, SLOT(toggle()));
-  
-  data = new QLineEdit;
-  data->setFixedWidth(40);
-  layout->addWidget(data, 1, BreakData);
-  connect(data, SIGNAL(textChanged(const QString&)), this, SLOT(init()));
-  connect(data, SIGNAL(textChanged(const QString&)), this, SLOT(toggle()));
-  
-  mode_r = new QCheckBox;
-  layout->addWidget(mode_r, 1, BreakRead);
-  connect(mode_r, SIGNAL(toggled(bool)), this, SLOT(toggle()));
-  mode_w = new QCheckBox;
-  layout->addWidget(mode_w, 1, BreakWrite);
-  connect(mode_w, SIGNAL(toggled(bool)), this, SLOT(toggle()));
-  mode_x = new QCheckBox;
-  layout->addWidget(mode_x, 1, BreakExecute);
-  connect(mode_x, SIGNAL(toggled(bool)), this, SLOT(toggle()));
-  
-  source = new QComboBox;
-  source->addItem("S-CPU bus");
-  source->addItem("S-SMP bus");
-  source->addItem("S-PPU VRAM");
-  source->addItem("S-PPU OAM");
-  source->addItem("S-PPU CGRAM");
-  source->addItem("SA-1 bus");
-  source->addItem("SuperFX bus");
-  layout->addWidget(source, 1, BreakSource);
-  connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(init()));
-  connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(toggle()));
-  
-  if (id_ == 0) {
-    layout->addWidget(new QLabel("Address Range"), 0, BreakAddrStart, 1, BreakAddrEnd - BreakAddrStart + 1);
-    layout->addWidget(new QLabel("Data"), 0, BreakData);
-    QLabel *label = new QLabel("R");
-    label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(label, 0, BreakRead);
-    label = new QLabel("W");
-    label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(label, 0, BreakWrite);
-    label = new QLabel("X");
-    label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(label, 0, BreakExecute);
-    layout->addWidget(new QLabel("Source"), 0, BreakSource);
-  }
-  
-  init();
+BreakpointModel::BreakpointModel(QObject* parent)
+  : QAbstractTableModel(parent) {
 }
 
-void BreakpointItem::init() {
-  SNES::debugger.breakpoint[id].enabled = false;
-  SNES::debugger.breakpoint[id].counter = 0;
+int BreakpointModel::rowCount(const QModelIndex& parent) const {
+  return parent.isValid() ? 0 : SNES::debugger.breakpoint.size();
 }
 
-bool BreakpointItem::isEnabled() const {
-  return SNES::debugger.breakpoint[id].enabled;
+int BreakpointModel::columnCount(const QModelIndex& parent) const {
+  return parent.isValid() ? 0 : BreakColumnCount;
 }
 
-uint32_t BreakpointItem::getAddressFrom() const {
-  return SNES::debugger.breakpoint[id].addr;
-}
+QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
+  if (index.row() >= SNES::debugger.breakpoint.size())
+    return QVariant();
 
-uint32_t BreakpointItem::getAddressTo() const {
-  if (SNES::debugger.breakpoint[id].addr_end == 0) {
-    return SNES::debugger.breakpoint[id].addr;
-  } else {
-    return SNES::debugger.breakpoint[id].addr_end;
-  }
-}
-
-bool BreakpointItem::isModeR() const {
-  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Read;
-}
-
-bool BreakpointItem::isModeW() const {
-  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write;
-}
-
-bool BreakpointItem::isModeX() const {
-  return SNES::debugger.breakpoint[id].mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec;
-}
-
-string BreakpointItem::getBus() const {
-  switch (source->currentIndex()) {
-  default:
-  case 0: return "cpu";
-  case 1: return "smp";
-  case 2: return "vram";
-  case 3: return "oam";
-  case 4: return "cgram";
-  case 5: return "sa1";
-  case 6: return "sfx";
-  }
-
-  return "";
-}
-
-void BreakpointItem::toggle() {
-  bool state = mode_r->isChecked() | mode_w->isChecked() | mode_x->isChecked();
-  SNES::debugger.breakpoint[id].enabled = state;
+  const SNES::Debugger::Breakpoint& b = SNES::debugger.breakpoint[index.row()];
     
-  if(state) {
-    SNES::debugger.breakpoint[id].addr = hex(addr->text().toUtf8().data()) & 0xffffff;
-    SNES::debugger.breakpoint[id].addr_end = hex(addr_end->text().toUtf8().data()) & 0xffffff;
-    if(addr_end->text().length() == 0) SNES::debugger.breakpoint[id].addr_end = 0;
-    SNES::debugger.breakpoint[id].data = hex(data->text().toUtf8().data()) & 0xff;
-    if(data->text().length() == 0) SNES::debugger.breakpoint[id].data = -1;
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    switch (index.column()) {
+    case BreakAddrStart: 
+      return QString::asprintf("%06x", b.addr);
+    case BreakAddrEnd:
+      if (b.addr_end) return QString::asprintf("%06x", b.addr_end);
+      break;
+    case BreakData:
+      if (b.data >= 0) return QString::asprintf("%02x", b.data);
+      if (role == Qt::DisplayRole) return "any";
+      break;
+    case BreakRead:
+      return (bool)(b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Read);
+    case BreakWrite:
+      return (bool)(b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write);
+    case BreakExecute:
+      return (bool)(b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec);
+    case BreakSource:
+	  if (role == Qt::EditRole) return (unsigned)b.source;
+      if ((unsigned)b.source < sources.count()) return sources[(unsigned)b.source];
+      break;
+    }
     
-    SNES::debugger.breakpoint[id].mode = 0;
-    if(mode_r->isChecked()) SNES::debugger.breakpoint[id].mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Read;
-    if(mode_w->isChecked()) SNES::debugger.breakpoint[id].mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Write;
-    if(mode_x->isChecked()) SNES::debugger.breakpoint[id].mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Exec;
+  }
+
+  return QVariant();
+}
+
+QVariant BreakpointModel::headerData(int section, Qt::Orientation orientation, int role) const {
+  if (role == Qt::DisplayRole) {
+    if (orientation == Qt::Horizontal) {
+      switch (section) {
+      case BreakAddrStart: return "Start";
+      case BreakAddrEnd:   return "End (optional)";
+      case BreakData:      return "Data";
+      case BreakRead:      return "R";
+      case BreakWrite:     return "W";
+      case BreakExecute:   return "X";
+      case BreakSource:    return "Source";
+      }
+    } else {
+      return QString::number(section);
+    }
+  }
+  
+  return QVariant();
+}
+
+bool BreakpointModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+  if (role == Qt::EditRole && index.row() < SNES::debugger.breakpoint.size()) {
+    SNES::Debugger::Breakpoint& b = SNES::debugger.breakpoint[index.row()];
     
-    SNES::debugger.breakpoint[id].source = (SNES::Debugger::Breakpoint::Source)source->currentIndex();
-  }
-}
-
-void BreakpointItem::clear() {
-  addr->setText("");
-  addr_end->setText("");
-  data->setText("");
-  
-  mode_r->setChecked(false);
-  mode_w->setChecked(false);
-  mode_x->setChecked(false);
-  
-  source->setCurrentIndex(0);
-}
-
-void BreakpointItem::removeBreakpoint() {
-  clear();
-  toggle();
-}
-
-void BreakpointItem::setBreakpoint(string addrStr, string mode, string sourceStr) {
-  if (addrStr == "") return;
-
-  sourceStr.lower();
-  if(sourceStr == "cpu")        { source->setCurrentIndex(0); }
-  else if(sourceStr == "smp")   { source->setCurrentIndex(1); }
-  else if(sourceStr == "vram")  { source->setCurrentIndex(2); }
-  else if(sourceStr == "oam")   { source->setCurrentIndex(3); }
-  else if(sourceStr == "cgram") { source->setCurrentIndex(4); }
-  else if(sourceStr == "sa1")   { source->setCurrentIndex(5); }
-  else if(sourceStr == "sfx")   { source->setCurrentIndex(6); }
-  else { return; }
-
-  mode.lower();
-  mode_r->setChecked(mode.position("r"));
-  mode_w->setChecked(mode.position("w"));
-  mode_x->setChecked(mode.position("x"));
-
-  lstring addresses;
-  addresses.split<2>("=", addrStr);
-  if (addresses.size() >= 2) { data->setText(addresses[1]); }
-  
-  addrStr = addresses[0];
-  addresses.split<2>("-", addrStr);
-  addr->setText(addresses[0]);
-  if (addresses.size() >= 2) { addr_end->setText(addresses[1]); }
-
-  toggle();
-}
-
-string BreakpointItem::toString() const {
-  if (addr->text().isEmpty()) return "";
-  
-  string breakpoint;
-  
-  breakpoint << addr->text().toUtf8().data();
-  if (!addr_end->text().isEmpty()) {
-    breakpoint << "-" << addr_end->text().toUtf8().data();
-  }
-  if (!data->text().isEmpty()) {
-    breakpoint << "=" << data->text().toUtf8().data();
+    switch (index.column()) {
+    case BreakAddrStart: 
+      b.addr = hex(value.toString().toUtf8().data()) & 0xffffff;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakAddrEnd:
+      if (!value.toString().isEmpty())
+        b.addr_end = hex(value.toString().toUtf8().data()) & 0xffffff;
+      else
+        b.addr_end = 0;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakData:
+      if (!value.toString().isEmpty())
+        b.data = hex(value.toString().toUtf8().data()) & 0xff;
+      else
+        b.data = -1;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakRead:
+      if (value.toBool())
+        b.mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Read;
+      else
+        b.mode &= ~(unsigned)SNES::Debugger::Breakpoint::Mode::Read;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakWrite:
+      if (value.toBool())
+        b.mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Write;
+      else
+        b.mode &= ~(unsigned)SNES::Debugger::Breakpoint::Mode::Write;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakExecute:
+      if (value.toBool())
+        b.mode |= (unsigned)SNES::Debugger::Breakpoint::Mode::Exec;
+      else
+        b.mode &= ~(unsigned)SNES::Debugger::Breakpoint::Mode::Exec;
+      emit dataChanged(index, index);
+      return true;
+      
+    case BreakSource:
+      b.source = (SNES::Debugger::Breakpoint::Source)value.toInt();
+      emit dataChanged(index, index);
+      return true;
+    }
   }
   
-  breakpoint << ":";
-  if (mode_r->isChecked()) breakpoint << "r";
-  if (mode_w->isChecked()) breakpoint << "w";
-  if (mode_x->isChecked()) breakpoint << "x";
-  
-  breakpoint << ":" << getBus();
-  
-  return breakpoint;
+  return false;
+}
+
+Qt::ItemFlags BreakpointModel::flags(const QModelIndex &index) const {
+  return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+}
+
+bool BreakpointModel::insertRows(int row, int count, const QModelIndex &parent) {
+  if (!parent.isValid() && row <= rowCount() && count > 0) {
+    beginInsertRows(parent, row, row + count - 1);
+    while (count--)
+      SNES::debugger.breakpoint.insert(row, SNES::Debugger::Breakpoint());
+    endInsertRows();
+    
+    return true;
+  }
+
+  return false;
+}
+
+bool BreakpointModel::removeRows(int row, int count, const QModelIndex &parent) {
+  if (!parent.isValid() && row <= rowCount() && count > 0) {
+    beginRemoveRows(parent, row, row + count - 1);
+    SNES::debugger.breakpoint.remove(row, count);
+    endRemoveRows();
+    
+    return true;
+  }
+
+  return false;
 }
 
 BreakpointEditor::BreakpointEditor() {
@@ -212,15 +173,54 @@ BreakpointEditor::BreakpointEditor() {
   application.windowList.append(this);
 
   layout = new QVBoxLayout;
-  layout->setSizeConstraint(QLayout::SetFixedSize);
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
 
-  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
-    breakpoint[n] = new BreakpointItem(n);
-    layout->addWidget(breakpoint[n]);
-  }
+  model = new BreakpointModel(this);
+
+  table = new QTableView;
+  table->setModel(model);
+  table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  table->setSelectionMode(QAbstractItemView::ContiguousSelection);
+  table->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+  layout->addWidget(table);
+  
+  CheckDelegate *checkDelegate = new CheckDelegate(this);
+  table->setItemDelegateForColumn(BreakpointModel::BreakRead, checkDelegate);
+  table->setItemDelegateForColumn(BreakpointModel::BreakWrite, checkDelegate);
+  table->setItemDelegateForColumn(BreakpointModel::BreakExecute, checkDelegate);
+  
+  table->setItemDelegateForColumn(BreakpointModel::BreakSource, new ComboDelegate(BreakpointModel::sources, this));
+  
+  QHeaderView *header = table->horizontalHeader();
+  header->setSectionsClickable(false);
+  header->setStretchLastSection(true);
+  header->setDefaultAlignment(Qt::AlignLeft);
+  header->setSectionResizeMode(BreakpointModel::BreakData, QHeaderView::ResizeToContents);
+  header->setSectionResizeMode(BreakpointModel::BreakRead, QHeaderView::ResizeToContents);
+  header->setSectionResizeMode(BreakpointModel::BreakWrite, QHeaderView::ResizeToContents);
+  header->setSectionResizeMode(BreakpointModel::BreakExecute, QHeaderView::ResizeToContents);
+  
+  header = table->verticalHeader();
+  header->setSectionResizeMode(QHeaderView::ResizeToContents);
+  
+  btnLayout = new QHBoxLayout;
+  btnLayout->setMargin(0);
+  btnLayout->setSpacing(Style::WidgetSpacing);
+  layout->addLayout(btnLayout);
+  
+  btnAdd = new QPushButton; 
+  btnAdd->setText("Add");
+  connect(btnAdd, SIGNAL(clicked(bool)), this, SLOT(add()));
+  btnLayout->addWidget(btnAdd);
+
+  btnRemove = new QPushButton;
+  btnRemove->setText("Del");
+  connect(btnRemove, SIGNAL(clicked(bool)), this, SLOT(remove()));
+  btnLayout->addWidget(btnRemove);
+  
+  btnLayout->addStretch(1);
 
   breakOnWDM = new QCheckBox("Break on WDM (CPU/SA-1 opcode 0x42)");
   breakOnWDM->setChecked(SNES::debugger.break_on_wdm);
@@ -233,15 +233,25 @@ BreakpointEditor::BreakpointEditor() {
   layout->addWidget(breakOnBRK);
 }
 
+void BreakpointEditor::add() {
+  model->insertRow(model->rowCount());
+}
+
+void BreakpointEditor::remove() {
+  QModelIndexList selected = table->selectionModel()->selectedRows();
+  qSort(selected);
+  if (selected.count() > 0) {
+    model->removeRows(selected[0].row(), selected.count());
+  }
+}
+
 void BreakpointEditor::toggle() {
   SNES::debugger.break_on_brk = breakOnBRK->isChecked();
   SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
 }
 
 void BreakpointEditor::clear() {
-  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
-    breakpoint[n]->clear();
-  }
+  model->removeRows(0, model->rowCount());
 }
 
 void BreakpointEditor::setBreakOnBrk(bool b) {
@@ -250,11 +260,37 @@ void BreakpointEditor::setBreakOnBrk(bool b) {
 }
 
 void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, const string& source) {
-  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
-    if(breakpoint[n]->addr->text().isEmpty()) {
-      breakpoint[n]->setBreakpoint(addr, mode, source);
-      return;
-    }
+  if (addr == "") return;
+  
+  int row = model->rowCount();
+  if (model->insertRow(row)) {
+    string sourceStr = source;
+    sourceStr.lower();
+    int nSource;
+    if(sourceStr == "cpu")        { nSource = 0; }
+    else if(sourceStr == "smp")   { nSource = 1; }
+    else if(sourceStr == "vram")  { nSource = 2; }
+    else if(sourceStr == "oam")   { nSource = 3; }
+    else if(sourceStr == "cgram") { nSource = 4; }
+    else if(sourceStr == "sa1")   { nSource = 5; }
+    else if(sourceStr == "sfx")   { nSource = 6; }
+    else { return; }
+    model->setData(model->index(row, BreakpointModel::BreakSource), nSource);
+
+    string modeStr = mode;
+    modeStr.lower();
+    model->setData(model->index(row, BreakpointModel::BreakRead), (bool)modeStr.position("r"));
+    model->setData(model->index(row, BreakpointModel::BreakWrite), (bool)modeStr.position("w"));
+    model->setData(model->index(row, BreakpointModel::BreakExecute), (bool)modeStr.position("x"));
+
+    lstring addresses;
+    addresses.split<2>("=", addr);
+    if (addresses.size() >= 2) { model->setData(model->index(row, BreakpointModel::BreakData), (const char*)addresses[1]); }
+
+    string addrStr = addresses[0];
+    addresses.split<2>("-", addrStr);
+    model->setData(model->index(row, BreakpointModel::BreakAddrStart), (const char*)addresses[0]);
+    if (addresses.size() >= 2) { model->setData(model->index(row, BreakpointModel::BreakAddrEnd), (const char*)addresses[1]); }
   }
 }
 
@@ -268,16 +304,15 @@ void BreakpointEditor::addBreakpoint(const string& breakpoint) {
 }
 
 void BreakpointEditor::removeBreakpoint(uint32_t index) {
-  if (index >= SNES::Debugger::Breakpoints) {
-    return;
-  }
-
-  breakpoint[index]->removeBreakpoint();
+  model->removeRow(index);
 }
 
 int32_t BreakpointEditor::indexOfBreakpointExec(uint32_t addr, const string &source) const {
-  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
-    if(breakpoint[n]->isEnabled() && breakpoint[n]->isModeX() && breakpoint[n]->getAddressFrom() <= addr && breakpoint[n]->getAddressTo() >= addr) {
+  for(unsigned n = 0; n < SNES::debugger.breakpoint.size(); n++) {
+    const SNES::Debugger::Breakpoint &b = SNES::debugger.breakpoint[n];
+    if((b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec) 
+       && b.addr <= addr 
+       && (b.addr_end == 0 || b.addr_end >= addr)) {
       return n;
     }
   }
@@ -288,9 +323,33 @@ int32_t BreakpointEditor::indexOfBreakpointExec(uint32_t addr, const string &sou
 string BreakpointEditor::toStrings() const {
   string breakpoints;
   
-  for(unsigned n = 0; n < SNES::Debugger::Breakpoints; n++) {
-    if(!breakpoint[n]->addr->text().isEmpty()) {
-      breakpoints << breakpoint[n]->toString() << "\n";
+  for(unsigned n = 0; n < SNES::debugger.breakpoint.size(); n++) {
+    const SNES::Debugger::Breakpoint &b = SNES::debugger.breakpoint[n];
+    
+    breakpoints << hex<6>(b.addr);
+    
+    if (b.addr_end) {
+      breakpoints << "-" << hex<6>(b.addr_end);
+    }
+    
+    if (b.data >= 0) {
+      breakpoints << "=" << hex<2>(b.data);
+    }
+  
+    breakpoints << ":";
+    if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Read) breakpoints << "r";
+    if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write) breakpoints << "w";
+    if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec) breakpoints << "x";
+    
+    switch ((unsigned)b.source) {
+    default:
+    case 0: breakpoints << ":cpu\n"; break;
+    case 1: breakpoints << ":smp\n"; break;
+    case 2: breakpoints << ":vram\n"; break;
+    case 3: breakpoints << ":oam\n"; break;
+    case 4: breakpoints << ":cgram\n"; break;
+    case 5: breakpoints << ":sa1\n"; break;
+    case 6: breakpoints << ":sfx\n"; break;
     }
   }
   
