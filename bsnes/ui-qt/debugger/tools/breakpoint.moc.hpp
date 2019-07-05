@@ -32,6 +32,9 @@ enum {
   
   bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+
+private:
+  QString displayAddr(unsigned addr, SNES::Debugger::Breakpoint::Source source) const;
 };
 
 class BreakpointEditor : public Window {

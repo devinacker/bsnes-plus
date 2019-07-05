@@ -32,18 +32,45 @@ int BreakpointModel::columnCount(const QModelIndex& parent) const {
   return parent.isValid() ? 0 : BreakColumnCount;
 }
 
+QString BreakpointModel::displayAddr(unsigned addr, SNES::Debugger::Breakpoint::Source source) const {
+  SymbolMap *symbolMap = 0;
+  
+  switch (source) {
+  case SNES::Debugger::Breakpoint::Source::CPUBus:
+    symbolMap = debugger->symbolsCPU;
+    break;
+  case SNES::Debugger::Breakpoint::Source::APURAM:
+    symbolMap = debugger->symbolsSMP;
+    break;
+  case SNES::Debugger::Breakpoint::Source::SA1Bus:
+    symbolMap = debugger->symbolsSA1;
+    break;
+  }
+  
+  if (symbolMap) {
+    Symbol symbol = symbolMap->getSymbol(addr);
+    if (symbol.isSymbol()) return symbol.name;
+  }
+
+  return QString::asprintf("%06x", addr);
+}
+
 QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
   if (index.row() >= SNES::debugger.breakpoint.size())
     return QVariant();
 
   const SNES::Debugger::Breakpoint& b = SNES::debugger.breakpoint[index.row()];
     
-  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+  if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole) {
     switch (index.column()) {
-    case BreakAddrStart: 
+    case BreakAddrStart:
+      if (role == Qt::DisplayRole) return displayAddr(b.addr, b.source);
       return QString::asprintf("%06x", b.addr);
     case BreakAddrEnd:
-      if (b.addr_end) return QString::asprintf("%06x", b.addr_end);
+      if (b.addr_end) {
+        if (role == Qt::DisplayRole) return displayAddr(b.addr_end, b.source);
+        return QString::asprintf("%06x", b.addr_end);
+      }
       break;
     case BreakCompare:
       if (role == Qt::EditRole) return (unsigned)b.compare;
@@ -147,7 +174,8 @@ bool BreakpointModel::setData(const QModelIndex &index, const QVariant &value, i
       
     case BreakSource:
       b.source = (SNES::Debugger::Breakpoint::Source)value.toInt();
-      emit dataChanged(index, index);
+      // also refresh start+end addresses (for formatting/labels)
+      emit dataChanged(this->index(index.row(), BreakAddrStart), index);
       return true;
     }
   }
