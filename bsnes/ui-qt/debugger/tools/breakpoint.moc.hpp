@@ -1,20 +1,45 @@
+class SymbolItemModel : public QStandardItemModel {
+  Q_OBJECT
+  
+public:
+  SymbolItemModel(SymbolMap *symbols, QObject *parent = 0);
+};
+
+class SymbolDelegate : public QStyledItemDelegate {
+  Q_OBJECT
+
+public:
+  SymbolDelegate(QObject *parent = 0);
+  
+  QWidget* createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+
+private:
+  QStringList strings;
+};
+
 class BreakpointModel : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-enum {
-  BreakAddrStart,
-  BreakAddrEnd,
-  BreakCompare,
-  BreakData,
-  BreakRead,
-  BreakWrite,
-  BreakExecute,
-  BreakSource,
-  
-  BreakColumnCount
-};
+  enum {
+    BreakAddrStart,
+    BreakAddrEnd,
+    BreakCompare,
+    BreakData,
+    BreakRead,
+    BreakWrite,
+    BreakExecute,
+    BreakSource,
 
+    BreakColumnCount
+  };
+
+  enum {
+    SymbolMapRole = Qt::UserRole,
+  };
+  
   static const QStringList sources;
   static const QStringList compares;
 

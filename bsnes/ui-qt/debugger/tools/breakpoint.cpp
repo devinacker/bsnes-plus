@@ -1,6 +1,74 @@
 #include "breakpoint.moc"
 BreakpointEditor *breakpointEditor;
 
+SymbolItemModel::SymbolItemModel(SymbolMap *symbols, QObject *parent)
+  : QStandardItemModel(parent) {
+
+  for (int i = 0; i < symbols->symbols.size(); i++) {
+    Symbol symbol = symbols->symbols[i].getSymbol();
+    if (!symbol.isSymbol()) continue;
+    
+    QStandardItem *item = new QStandardItem();
+    item->setText(QString::asprintf("%06x %s", symbol.address, symbol.name()));
+    item->setData(symbol.address);
+    appendRow(item);
+  }
+}
+
+SymbolDelegate::SymbolDelegate(QObject *parent)
+  : QStyledItemDelegate(parent) {
+}
+
+QWidget* SymbolDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const {
+  SymbolMap *symbolMap = index.model()->data(index, BreakpointModel::SymbolMapRole).value<SymbolMap*>();
+  
+  if (symbolMap) {
+    // symbols are available - use a dropdown
+    QComboBox *combo = new QComboBox(parent);
+    combo->setEditable(true);
+    combo->setInsertPolicy(QComboBox::NoInsert);
+    combo->view()->setTextElideMode(Qt::ElideRight);
+    
+    SymbolItemModel *symbolModel = new SymbolItemModel(symbolMap, combo);
+    combo->setModel(symbolModel);
+    
+    QCompleter *completer = new QCompleter(symbolModel, combo);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+    combo->setCompleter(completer);
+    return combo;
+  }
+  else
+  {
+    // no symbols - just use a line edit
+    QLineEdit *lineEdit = new QLineEdit(parent);
+    return lineEdit;
+  }
+}
+
+void SymbolDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+  QString text = index.model()->data(index, Qt::EditRole).toString();
+  
+  if (QString(editor->metaObject()->className()) == "QComboBox") {
+    QComboBox *combo = qobject_cast<QComboBox*>(editor);
+    combo->setCurrentText(text);
+    combo->lineEdit()->selectAll();
+  } else {
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(editor);
+    lineEdit->setText(text);
+  }
+}
+
+void SymbolDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+  if (QString(editor->metaObject()->className()) == "QComboBox") {
+    QComboBox *combo = qobject_cast<QComboBox*>(editor);
+    model->setData(index, combo->currentText());
+  } else {
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(editor);
+    model->setData(index, lineEdit->text());
+  }
+}
+
 const QStringList BreakpointModel::sources = {
   "S-CPU bus",
   "S-SMP bus",
@@ -92,6 +160,15 @@ QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
       break;
     }
     
+  } else if (role == SymbolMapRole) {
+    switch (b.source) {
+    case SNES::Debugger::Breakpoint::Source::CPUBus: 
+      return QVariant::fromValue(debugger->symbolsCPU);
+    case SNES::Debugger::Breakpoint::Source::APURAM: 
+      return QVariant::fromValue(debugger->symbolsSMP);
+    case SNES::Debugger::Breakpoint::Source::SA1Bus: 
+      return QVariant::fromValue(debugger->symbolsSA1);
+    }
   }
 
   return QVariant();
@@ -123,11 +200,13 @@ bool BreakpointModel::setData(const QModelIndex &index, const QVariant &value, i
     
     switch (index.column()) {
     case BreakAddrStart: 
+      // TODO allow setting by symbol name
       b.addr = hex(value.toString().toUtf8().data()) & 0xffffff;
       emit dataChanged(index, index);
       return true;
       
     case BreakAddrEnd:
+      // TODO allow setting by symbol name
       if (!value.toString().isEmpty())
         b.addr_end = hex(value.toString().toUtf8().data()) & 0xffffff;
       else
@@ -236,6 +315,9 @@ BreakpointEditor::BreakpointEditor() {
   table->setItemDelegateForColumn(BreakpointModel::BreakRead, checkDelegate);
   table->setItemDelegateForColumn(BreakpointModel::BreakWrite, checkDelegate);
   table->setItemDelegateForColumn(BreakpointModel::BreakExecute, checkDelegate);
+  
+  table->setItemDelegateForColumn(BreakpointModel::BreakAddrStart, new SymbolDelegate(this));
+  table->setItemDelegateForColumn(BreakpointModel::BreakAddrEnd, new SymbolDelegate(this));
   
   table->setItemDelegateForColumn(BreakpointModel::BreakCompare, new ComboDelegate(BreakpointModel::compares, this));
   table->setItemDelegateForColumn(BreakpointModel::BreakSource, new ComboDelegate(BreakpointModel::sources, this));

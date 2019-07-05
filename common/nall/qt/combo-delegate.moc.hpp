@@ -3,8 +3,7 @@
 
 namespace nall {
 
-class ComboDelegate : public QStyledItemDelegate
-{
+class ComboDelegate : public QStyledItemDelegate {
   Q_OBJECT
 
 public:

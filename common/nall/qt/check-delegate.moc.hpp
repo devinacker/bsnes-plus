@@ -3,8 +3,7 @@
 
 namespace nall {
 
-class CheckDelegate : public QStyledItemDelegate
-{
+class CheckDelegate : public QStyledItemDelegate {
   Q_OBJECT
 
 public:
