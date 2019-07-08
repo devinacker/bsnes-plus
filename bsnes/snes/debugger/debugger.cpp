@@ -22,8 +22,8 @@ bool Debugger::Breakpoint::operator!=(const uint8& data) const {
 void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Breakpoint::Mode mode, unsigned addr, uint8 data) {
   for(unsigned i = 0; i < breakpoint.size(); i++) {
 
-    if(breakpoint[i].source != source) continue;
     if((breakpoint[i].mode & (unsigned)mode) == 0) continue;
+    if(breakpoint[i].source != source) continue;
     if(breakpoint[i] != data) continue;
     
     // account for address mirroring on the S-CPU and SA-1 (and other) buses
