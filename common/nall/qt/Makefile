@@ -41,7 +41,7 @@ else ifeq ($(platform),osx)
   qtlib += -framework ApplicationServices
 else ifeq ($(platform),win)
   ifeq ($(qtpath),)
-    qtpath := ../external/qt/mingw53_32
+    qtpath := ../external/qt/mingw-w64
     winqtpath := $(subst /,\,$(qtpath))
   endif
 
