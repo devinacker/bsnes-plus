@@ -109,12 +109,6 @@ bool Cartridge::loadNormal(const char *base) {
   loadMemory(baseName, ".srm", SNES::memory::cartram);
   loadMemory(baseName, ".rtc", SNES::memory::cartrtc);
 
-  #if defined(DEBUGGER)
-    debugger->symbolsCPU->loadFromFile(nall::basename(baseName), ".sym");
-    debugger->symbolsCPU->loadFromFile(nall::basename(baseName), ".cpu.sym");
-    debugger->symbolsSMP->loadFromFile(nall::basename(baseName), ".smp.sym");
-  #endif
-
   fileName = baseName;
   name = notdir(nall::basename(baseName));
 

@@ -271,6 +271,16 @@ void Debugger::modifySystemState(unsigned state) {
       SNES::cpuAnalyst.performFullAnalysis();
     }
     
+    symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
+    symbolsCPU->loadFromFile(nall::basename(symfile), ".sym");
+    symbolsCPU->loadFromFile(nall::basename(symfile), ".cpu.sym");
+    symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+    symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym");
+    if (SNES::cartridge.has_sa1())
+      symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
+    else
+      symbolsSA1->reset();
+    
     string data;
     if(config().debugger.saveBreakpoints) {
       breakpointEditor->clear();
@@ -298,8 +308,10 @@ void Debugger::modifySystemState(unsigned state) {
     }
     
     if(config().debugger.saveSymbols) {
-      debugger->symbolsCPU->saveToFile(nall::basename(symfile), ".cpu.sym");
-      debugger->symbolsSMP->saveToFile(nall::basename(symfile), ".smp.sym");
+      symbolsCPU->saveToFile(nall::basename(symfile), ".cpu.sym");
+      symbolsSMP->saveToFile(nall::basename(symfile), ".smp.sym");
+      if (SNES::cartridge.has_sa1())
+        symbolsSA1->saveToFile(nall::basename(symfile), ".sa1.sym");
     }
 
     if(config().debugger.saveBreakpoints) {

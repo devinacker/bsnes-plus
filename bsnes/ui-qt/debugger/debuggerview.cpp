@@ -55,16 +55,13 @@ DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, 
     symbolsViewerDialog = new SymbolsView(processor);
     symbolsViewer = new QPushButton("Symbols");
     controlLayout->addWidget(symbolsViewer);
+    connect(symbolsViewer, SIGNAL(clicked(bool)), symbolsViewerDialog, SLOT(show()));
   }
 
   controlLayout->addStretch();
 
-  connect(stepProcessor, SIGNAL(released()), this, SLOT(synchronize()));
+  connect(stepProcessor, SIGNAL(clicked(bool)), this, SLOT(synchronize()));
   connect(traceProcessor, SIGNAL(stateChanged(int)), this, SIGNAL(traceStateChanged(int)));
-
-  if (processor->getSymbols() != NULL) {
-    connect(symbolsViewer, SIGNAL(released()), symbolsViewerDialog, SLOT(show()));
-  }
 
   connect(consoleLayout, SIGNAL(splitterMoved(int,int)), this, SLOT(synchronize()));
 

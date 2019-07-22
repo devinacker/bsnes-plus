@@ -53,6 +53,12 @@ int32_t SymbolMap::getSymbolIndex(uint32_t address) {
 }
 
 // ------------------------------------------------------------------------
+void SymbolMap::reset() {
+  symbols.reset();
+  finishUpdates();
+}
+
+// ------------------------------------------------------------------------
 void SymbolMap::addLocation(uint32_t address, const string &name) {
   addSymbol(address, Symbol::createLocation(address, name));
 }
@@ -186,6 +192,7 @@ void SymbolMap::loadFromString(const string &file) {
     return;
   }
 
+  symbols.reset();
   if (adapter->read(rows, this)) {
     finishUpdates();
   }

@@ -71,6 +71,7 @@ public:
 
   typedef nall::linear_vector<Symbols> SymbolsLists;
 
+  void reset();
   void addLocation(uint32_t address, const string &name);
   void addComment(uint32_t address, const string &name);
   void addSymbol(uint32_t address, const Symbol &name);
