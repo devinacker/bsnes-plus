@@ -1,3 +1,39 @@
+v05 [2019-07-??]
+Migrated project from Qt 4 to 5
+Added reworked debugger/disassembler view [BenjaminSchulte]
+Added support for symbol files in VICE, FMA, and WLA-DX formats for CPU, SMP, and SA1 [BenjaminSchulte]
+	(.cpu.sym, .smp.sym, or .sa1.sym extensions)
+Added reworked sprite viewer [UnDisbeliever]
+Added reworked breakpoint editor; supports unlimited breakpoints and symbol usage [Revenant]
+Added configurable comparison operators for breakpoint "data" field [Revenant]
+Added context menu to memory editor, including shortcuts to add new breakpoints [Revenant]
+Added buttons to debug view for running to next NMI/IRQ/vblank/hblank [Revenant]
+Added support for variable BS-X memory pack sizes up to 32Mbit [Revenant]
+	(default size for empty pack is configurable in emulator options)
+Added more accurate emulation of Satellaview download bandwidth [Revenant]
+	(allows simulated downloads of smaller games and other content without crashing BS-X)
+Added support for save states with BS-X cartridges [Revenant]
+Added support for NTT Data Keypad controller [raphnet]
+Added built-in support for expanded SPC7110 ROMs [Revenant]
+	(allows running Tengai Makyou Zero translation without special manifest)
+Fixed mouse cursor staying locked when window loses focus if using mouse/super scope/etc [Revenant]
+Fixed scaling of window elements on hi-DPI Windows systems [CypherSignal]
+Fixed unfiltered screenshots still incorporating gamma curve if enabled [Revenant]
+Fixed memory editor ignoring uppercase letters A-F when editing [Revenant]
+Fixed memory editor sometimes copying one more byte than what's actually selected [Revenant]
+Fixed "reload" option and drag-and-drop for special cartridge types [Revenant]
+Fixed detection of SA1 carts with a battery but no BWRAM [Revenant]
+	(partially fixes Pachi Slot Monogatari PAL Special)
+Fixed Esc key potentially closing both a dialog box and parent window at the same time [Revenant]
+Fixed automatically loading an empty BS-X memory pack if none was previously specified [Revenant]
+Updated memory editor to allow opening multiple instances simultaneously [BenjaminSchulte]
+Updated tilemap viewer to show address of selected character [UnDisbeliever]
+Updated some Cx4 timing and memory mapping details [Revenant]
+Updated some BS-X base unit register behavior for downloading content [Revenant]
+Backported SA1 mul/div register behavior fixes
+Backported DMA/HDMA timing fixes
+Backported PPU timing tweaks from higan v106r124
+
 v04 [2018-06-18]
 Added reworked tile viewer, fully replaces original VRAM viewer [UnDisbeliever]
 Added tilemap export option and various other improvements to tilemap viewer [UnDisbeliever]
