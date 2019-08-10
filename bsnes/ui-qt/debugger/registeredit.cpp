@@ -9,7 +9,7 @@ RegisterEditSFX *registerEditSFX;
 	edit_##name = new QLineEdit(this); \
 	edit_##name->setFont(QFont(Style::Monospace)); \
 	edit_##name->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum); \
-	edit_##name->setFixedWidth((digits + 1) * edit_##name->fontMetrics().width(' ')); \
+	edit_##name->setFixedWidth((digits + 1) * edit_##name->fontMetrics().width('0')); \
 	edit_##name->setInputMask(QString("H").repeated(digits)); \
 	edit_##name->setMaxLength(digits); \
 	connect(edit_##name, SIGNAL(textEdited(QString)), this, SLOT(commit())); \
@@ -185,7 +185,7 @@ void RegisterEditSFX::setupUI() {
 		edit_r[reg] = new QLineEdit(this);
 		edit_r[reg]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 		edit_r[reg]->setFont(QFont(Style::Monospace));
-		edit_r[reg]->setFixedWidth((4 + 1) * edit_r[reg]->fontMetrics().width(' '));
+		edit_r[reg]->setFixedWidth((4 + 1) * edit_r[reg]->fontMetrics().width('0'));
 		edit_r[reg]->setInputMask("HHHH");
 		edit_r[reg]->setMaxLength(4);
 		connect(edit_r[reg], SIGNAL(textEdited(QString)), this, SLOT(commit()));
