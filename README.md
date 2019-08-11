@@ -36,7 +36,13 @@ Currently, OS X is not officially 100% supported. See [this fork](https://github
 
 ## Building on Linux / other *nix
 
-TODO
+As there is no ``configure`` step, make sure necessary Qt5/X11 packages are installed. On a Debian/Ubuntu system, it would require a command like:
+
+```
+sudo apt install qt5-default qtbase5-dev-tools libxv-dev libsdl1.2-dev libao-dev libopenal-dev g++
+```
+
+Afterwards, run ``make`` and if everything works out correctly you will find the output binary in the ``out/`` directory.
 
 The snesfilter, snesreader, and supergameboy plugins can all be built by running make (or mingw32-make) after you've configured your environment to build bsnes itself.
 After building, just copy the .dll, .so, or .dylib files into the same directory as bsnes itself.
