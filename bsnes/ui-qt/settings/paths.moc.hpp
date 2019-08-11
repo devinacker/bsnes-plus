@@ -10,7 +10,6 @@ public:
   QPushButton *pathDefault;
 
   string &pathValue;
-  string pathDefaultLabel;
   string pathBrowseLabel;
   string pathDefaultValue;
   void acceptPath(const string&);

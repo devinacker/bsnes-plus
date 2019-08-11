@@ -2,7 +2,6 @@
 PathSettingsWindow *pathSettingsWindow;
 
 PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, const char *pathDefaultLabel_, const char *pathBrowseLabel_, const char *pathDefaultValue_) : pathValue(pathValue_) {
-  pathDefaultLabel = pathDefaultLabel_;
   pathBrowseLabel = pathBrowseLabel_;
   pathDefaultValue = pathDefaultValue_;
 
@@ -20,6 +19,7 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
 
   path = new QLineEdit;
   path->setReadOnly(true);
+  path->setPlaceholderText(pathDefaultLabel_);
   controlLayout->addWidget(path);
 
   pathSelect = new QPushButton("Select ...");
@@ -42,10 +42,8 @@ void PathSettingWidget::acceptPath(const string &newPath) {
 
 void PathSettingWidget::updatePath() {
   if(pathValue == pathDefaultValue) {
-    path->setStyleSheet("color: #808080");
-    path->setText(pathDefaultLabel);
+    path->setText("");
   } else {
-    path->setStyleSheet("color: #000000");
     path->setText(pathValue);
   }
 }
