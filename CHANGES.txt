@@ -1,4 +1,4 @@
-v05 [2019-07-??]
+v05 [2019-08-18]
 Migrated project from Qt 4 to 5
 Added reworked debugger/disassembler view [BenjaminSchulte]
 Added support for symbol files in VICE, FMA, and WLA-DX formats for CPU, SMP, and SA1 [BenjaminSchulte]
