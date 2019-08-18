@@ -56,7 +56,7 @@ configuration data.
 
 The "snesreader" plugin adds additional support for compressed archives and less-common ROM file extensions, 
 and the "supergameboy" plugin adds support for Game Boy and Super Game Boy ROMs (a copy of the actual Super 
-Game Boy BIOS is required).
+Game Boy BIOS is required). The "snesmusic" plugin adds support for SPC, SNSF, and MiniSNSF music files.
 <br>
 
 <h3>Using the Debugger</h3><br>
@@ -96,7 +96,7 @@ can identify a breakpoint by its red background color.
 <p>
 
 You can add a comment to the disassembler by clicking in the comment section. All comments and symbols will be saved
-to the disk, if the "save symbols" option in the options window is activated.
+to the disk, if the "save symbols" option in the "Misc" menu is activated.
 
 <h3>Debugger Menu: Tools</h3>
 <h4>Breakpoint Editor</h4><br>
@@ -107,7 +107,7 @@ read or modified. Each breakpoint contains these fields:<p>
 <b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end
 of an address range, and is optional.<br>
 <b>Data:</b> (optional) If this is specified, read and write breakpoints will only trigger if the byte being read from or written to
-the given address equals this value.<br>
+the given address matches this value.<br>
 <b>R/W/X:</b> Specify any combination of read (R), write (W), and execute (X) operations that will trigger this breakpoint.<br>
 <b>Source:</b> Select which address space this breakpoint applies to; the default is the SNES CPU. Change this when debugging
 a coprocessor or monitoring reads/writes involving VRAM or other PPU memory.
@@ -126,6 +126,9 @@ is being executed from RAM).
 
 The seek and search buttons can be used to jump to nearby regions of code, data, or unmarked memory, and to search for strings
 of byte values or ASCII text. Memory can also be dumped to disk and reloaded at a later time.
+<p>
+
+Right-clicking within the memory view also allows you to add a new breakpoint at a given location in memory.
 <p>
 
 <h4>Properties Viewer</h4><br>
@@ -161,8 +164,8 @@ via the S-PPU tab on the Properties Viewer window, under registers $2105 and $21
 
 <h4>Sprite Viewer</h4><br>
 
-This view displays the current properties of all sprites, based on the contents of OAM. Clicking on any sprite listed will display 
-its graphics in the upper right corner of the window. The sprites can also be sorted by any of their properties by clicking the
+This view displays the current properties and positions of all sprites, based on the contents of OAM. Clicking on any sprite listed 
+will display its graphics on the right side of the window. The sprites can also be sorted by any of their properties by clicking the
 respective column header in the table.
 <p>
 
@@ -181,6 +184,9 @@ This window allows you to configure a couple of options related to the debug win
 <b>Cache memory usage table to disk:</b> Causes logged information about SNES memory usage (code/data regions) to be saved to disk
 and restored the next time the ROM is loaded. This is useful for long-term debugging/exploring across multiple sessions, but is
 disabled by default to avoid excessive disk space usage.<br>
+<b>Save breakpoints/symbols to disk between sessions:</b> Allows breakpoints and symbols/comments defined during the current 
+debugging session to be automatically saved to disk when quitting or unloading the ROM, and then automatically reloaded when the
+same ROM is loaded again at a later time.<br>
 <b>Show H-position in clocks instead of dots:</b> Normally, when single-stepping the CPU, the output log shows the CPU's vertical
 counter value (in scanlines) and horizontal counter value (in dots/pixels). Enabling this option shows a more precise horizontal
 counter value based on the number of master clock cycles per scanline.
