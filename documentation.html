@@ -56,7 +56,7 @@ configuration data.
 
 The "snesreader" plugin adds additional support for compressed archives and less-common ROM file extensions, 
 and the "supergameboy" plugin adds support for Game Boy and Super Game Boy ROMs (a copy of the actual Super 
-Game Boy BIOS is required).
+Game Boy BIOS is required). The "snesmusic" plugin adds support for SPC, SNSF, and MiniSNSF music files.
 <br>
 
 <h3>Using the Debugger</h3><br>
@@ -71,9 +71,9 @@ and optionally keep a trace log of executed code saved to disk for long-term deb
 
 When emulation is stopped, either by pressing the Break/Run button or after a breakpoint is triggered (see below),
 you can press the Step button to execute a single instruction, the Step Over button to execute a single instruction or
-entire subroutine, or the Step Out button to exit the current subroutine. The checkboxes underneath allow you to select
-which combination of processors to single-step; each processor's code appears with a different color in the
-disassembly window.
+entire subroutine, or the Step Out button to exit the current subroutine. The checkboxes on the different processor
+tabs allow you to select which combination of processors to single-step; each processor's code appears with a different
+color in the disassembly log window on the bottom.
 <p>
 
 (Note: the Step Over and Step Out buttons are unavailable when stepping multiple processors, and when stepping the
@@ -87,26 +87,27 @@ be logged the first time it is executed; disabling this provides more thorough a
 increased file size and CPU usage.
 <p>
 
-At the bottom of the main debug window, you can view the current register values for all steppable processors, and edit
+At the right of the main debug window, you can view the current register values for all steppable processors, and edit
 register values for the processor currently being stepped.
 <p>
 
-<h3>Debugger Menu: Tools</h3>
-<h4>Disassembler Window</h4><br>
-
-When single-stepping code, the disassembler window allows you to see other code in the vicinity of the current instruction.
-Only memory within a certain range that is known to actually be code is shown here.
+By clicking on the address bar in the main disassembly window, you can toggle a breakpoint at the given address. You
+can identify a breakpoint by its red background color.
 <p>
 
+You can add a comment to the disassembler by clicking in the comment section. All comments and symbols will be saved
+to the disk, if the "save symbols" option in the "Misc" menu is activated.
+
+<h3>Debugger Menu: Tools</h3>
 <h4>Breakpoint Editor</h4><br>
 
 Breakpoints allow you to automatically pause execution when code at a given location is executed, or when specific data is
 read or modified. Each breakpoint contains these fields:<p>
 
-<b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end 
+<b>Address Range:</b> The address or range of addresses for the breakpoint to monitor. The second column represents the end
 of an address range, and is optional.<br>
 <b>Data:</b> (optional) If this is specified, read and write breakpoints will only trigger if the byte being read from or written to
-the given address equals this value.<br>
+the given address matches this value.<br>
 <b>R/W/X:</b> Specify any combination of read (R), write (W), and execute (X) operations that will trigger this breakpoint.<br>
 <b>Source:</b> Select which address space this breakpoint applies to; the default is the SNES CPU. Change this when debugging
 a coprocessor or monitoring reads/writes involving VRAM or other PPU memory.
@@ -125,6 +126,9 @@ is being executed from RAM).
 
 The seek and search buttons can be used to jump to nearby regions of code, data, or unmarked memory, and to search for strings
 of byte values or ASCII text. Memory can also be dumped to disk and reloaded at a later time.
+<p>
+
+Right-clicking within the memory view also allows you to add a new breakpoint at a given location in memory.
 <p>
 
 <h4>Properties Viewer</h4><br>
@@ -160,8 +164,8 @@ via the S-PPU tab on the Properties Viewer window, under registers $2105 and $21
 
 <h4>Sprite Viewer</h4><br>
 
-This view displays the current properties of all sprites, based on the contents of OAM. Clicking on any sprite listed will display 
-its graphics in the upper right corner of the window. The sprites can also be sorted by any of their properties by clicking the
+This view displays the current properties and positions of all sprites, based on the contents of OAM. Clicking on any sprite listed 
+will display its graphics on the right side of the window. The sprites can also be sorted by any of their properties by clicking the
 respective column header in the table.
 <p>
 
@@ -180,6 +184,9 @@ This window allows you to configure a couple of options related to the debug win
 <b>Cache memory usage table to disk:</b> Causes logged information about SNES memory usage (code/data regions) to be saved to disk
 and restored the next time the ROM is loaded. This is useful for long-term debugging/exploring across multiple sessions, but is
 disabled by default to avoid excessive disk space usage.<br>
+<b>Save breakpoints/symbols to disk between sessions:</b> Allows breakpoints and symbols/comments defined during the current 
+debugging session to be automatically saved to disk when quitting or unloading the ROM, and then automatically reloaded when the
+same ROM is loaded again at a later time.<br>
 <b>Show H-position in clocks instead of dots:</b> Normally, when single-stepping the CPU, the output log shows the CPU's vertical
 counter value (in scanlines) and horizontal counter value (in dots/pixels). Enabling this option shows a more precise horizontal
 counter value based on the number of master clock cycles per scanline.
@@ -187,7 +194,7 @@ counter value based on the number of master clock cycles per scanline.
 
 <h3>Satellaview and BS-X Support</h3><br>
 
-As of version 073+3, bsnes-plus features extensive Satellaview and BS-X support.
+As of version 3, bsnes-plus features extensive Satellaview and BS-X support.
 <p>
 
 Before using the Satellaview, first make sure it is enabled as the expansion port device on the "Advanced" tab of the emulator 
@@ -233,6 +240,8 @@ This is a list of others who have contributed to bsnes-plus, either directly or 
 &bull; Alex W. Jackson<br>
 &bull; Andreas Naive<br>
 &bull; anomie<br>
+&bull; Benjamin Schulte<br>
+&bull; CypherSignal<br>
 &bull; David Lindecrantz<br>
 &bull; _Demo_<br>
 &bull; Derrick Sobodash<br>
@@ -253,6 +262,7 @@ This is a list of others who have contributed to bsnes-plus, either directly or 
 &bull; Nach<br>
 &bull; neviksti<br>
 &bull; Overload<br>
+&bull; Raphaël Assénat<br>
 &bull; RedDwarf<br>
 &bull; Richard Bannister<br>
 &bull; Shay Green<br>
