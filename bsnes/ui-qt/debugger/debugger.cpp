@@ -52,30 +52,30 @@ Debugger::Debugger() {
   menu = new QMenuBar;
   layout->setMenuBar(menu);
 
-  menu_tools = menu->addMenu("Tools");
-  menu_tools_breakpoint = menu_tools->addAction("Breakpoint Editor ...");
-  menu_tools_memory = menu_tools->addAction("Memory Editor ...");
-  menu_tools_propertiesViewer = menu_tools->addAction("Properties Viewer ...");
+  menu_tools = menu->addMenu("&Tools");
+  menu_tools_breakpoint = menu_tools->addAction("&Breakpoint Editor ...");
+  menu_tools_memory = menu_tools->addAction("&Memory Editor ...");
+  menu_tools_propertiesViewer = menu_tools->addAction("&Properties Viewer ...");
 
-  menu_ppu = menu->addMenu("S-PPU");
-  menu_ppu_tileViewer = menu_ppu->addAction("Tile Viewer ...");
-  menu_ppu_tilemapViewer = menu_ppu->addAction("Tilemap Viewer ...");
-  menu_ppu_oamViewer = menu_ppu->addAction("Sprite Viewer ...");
-  menu_ppu_cgramViewer = menu_ppu->addAction("Palette Viewer ...");
+  menu_ppu = menu->addMenu("&S-PPU");
+  menu_ppu_tileViewer = menu_ppu->addAction("&Tile Viewer ...");
+  menu_ppu_tilemapViewer = menu_ppu->addAction("Tile&map Viewer ...");
+  menu_ppu_oamViewer = menu_ppu->addAction("&Sprite Viewer ...");
+  menu_ppu_cgramViewer = menu_ppu->addAction("&Palette Viewer ...");
 
-  menu_misc = menu->addMenu("Misc");
-  menu_misc_clear = menu_misc->addAction("Clear Console");
+  menu_misc = menu->addMenu("&Misc");
+  menu_misc_clear = menu_misc->addAction("&Clear Console");
   menu_misc->addSeparator();
-  menu_misc_cacheUsage = menu_misc->addAction("Cache memory usage table to disk");
+  menu_misc_cacheUsage = menu_misc->addAction("Cache &memory usage table to disk");
   menu_misc_cacheUsage->setCheckable(true);
   menu_misc_cacheUsage->setChecked(config().debugger.cacheUsageToDisk);
-  menu_misc_saveBreakpoints = menu_misc->addAction("Save breakpoints to disk between sessions");
+  menu_misc_saveBreakpoints = menu_misc->addAction("Save &breakpoints to disk between sessions");
   menu_misc_saveBreakpoints->setCheckable(true);
   menu_misc_saveBreakpoints->setChecked(config().debugger.saveBreakpoints);
-  menu_misc_saveSymbols = menu_misc->addAction("Save symbols to disk between sessions");
+  menu_misc_saveSymbols = menu_misc->addAction("Save &symbols to disk between sessions");
   menu_misc_saveSymbols->setCheckable(true);
   menu_misc_saveSymbols->setChecked(config().debugger.saveSymbols);
-  menu_misc_showHClocks = menu_misc->addAction("Show H-position in clocks instead of dots");
+  menu_misc_showHClocks = menu_misc->addAction("Show &H-position in clocks instead of dots");
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
@@ -160,22 +160,26 @@ Debugger::Debugger() {
 
   stepToVBlank = new QToolButton;
   stepToVBlank->setDefaultAction(new QAction("Run to VBlank", this));
-  stepToVBlank->defaultAction()->setToolTip("Resume execution until next vertical blank");
+  stepToVBlank->defaultAction()->setToolTip("Resume execution until next vertical blank (F9)");
+  stepToVBlank->defaultAction()->setShortcut(Qt::Key_F9);
   toolBar->addWidget(stepToVBlank);
 
   stepToHBlank = new QToolButton;
   stepToHBlank->setDefaultAction(new QAction("Run to HBlank", this));
-  stepToHBlank->defaultAction()->setToolTip("Resume execution until next horizontal blank");
+  stepToHBlank->defaultAction()->setToolTip("Resume execution until next horizontal blank (F10)");
+  stepToHBlank->defaultAction()->setShortcut(Qt::Key_F10);
   toolBar->addWidget(stepToHBlank);
   
   stepToNMI = new QToolButton;
   stepToNMI->setDefaultAction(new QAction("Run to NMI", this));
-  stepToNMI->defaultAction()->setToolTip("Resume execution until next NMI");
+  stepToNMI->defaultAction()->setToolTip("Resume execution until next NMI (F11)");
+  stepToNMI->defaultAction()->setShortcut(Qt::Key_F11);
   toolBar->addWidget(stepToNMI);
 
   stepToIRQ = new QToolButton;
   stepToIRQ->setDefaultAction(new QAction("Run to IRQ", this));
-  stepToIRQ->defaultAction()->setToolTip("Resume execution until next IRQ");
+  stepToIRQ->defaultAction()->setToolTip("Resume execution until next IRQ (F12)");
+  stepToIRQ->defaultAction()->setShortcut(Qt::Key_F12);
   toolBar->addWidget(stepToIRQ);
 
   toolBar->addSeparator();

@@ -29,7 +29,7 @@ MainWindow::MainWindow() {
 
   system_loadSpecial_superGameBoy = system_loadSpecial->addAction("Load Super &Game Boy Cartridge ...");
 
-  system_saveMemoryPack = system->addAction("Save Memory Pack ...");
+  system_saveMemoryPack = system->addAction("Save &Memory Pack ...");
   system_saveMemoryPack->setVisible(false);
 
   system_reload = system->addAction("Re&load");
