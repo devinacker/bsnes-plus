@@ -123,7 +123,7 @@ ifeq ($(platform),osx)
 	mkdir -p $(osxbundle)/Contents/Frameworks
 	cp -f ../snesreader/libsnesreader.dylib $(osxbundle)/Contents/Frameworks/libsnesreader.dylib
 	cp -f ../snesfilter/libsnesfilter.dylib $(osxbundle)/Contents/Frameworks/libsnesfilter.dylib
-	cp -f ../snesfilter/libsnesmusic.dylib $(osxbundle)/Contents/Frameworks/libsnesmusic.dylib
+	cp -f ../snesmusic/libsnesmusic.dylib $(osxbundle)/Contents/Frameworks/libsnesmusic.dylib
 	cp -f ../supergameboy/libsupergameboy.dylib $(osxbundle)/Contents/Frameworks/libsupergameboy.dylib
 endif
 
