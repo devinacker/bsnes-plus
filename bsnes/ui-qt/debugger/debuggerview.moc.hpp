@@ -27,6 +27,9 @@ signals:
   void synchronized();
   void traceStateChanged(int);
 
+protected:
+  void resizeEvent(QResizeEvent*);
+
 private:
   class RegisterEdit *registers;
   uint32_t addressOffset;

@@ -26,6 +26,7 @@ DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, 
   ramViewer->setAddressWidth(6);
   ramViewer->setMinimumHeight(70);
   ramViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ramViewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   consoleLayout->addWidget(ramViewer);
 
   consoleLayout->setStretchFactor(0, 8);
@@ -109,10 +110,17 @@ void DebuggerView::refresh(uint32_t address) {
 
 // ------------------------------------------------------------------------
 void DebuggerView::synchronize() {
-  float h = ceil(ramViewer->height() / 0x10);
+  int h = ceil((double)ramViewer->height() / (ramViewer->fontMetrics().height() + 1)) - 1;
   if (h < 1) { h = 1; }
 
   ramViewer->setEditorSize((uint32_t)h * 0x10);
+  ramViewer->verticalScrollBar()->setMaximum(0);
 
   emit synchronized();
+}
+
+// ------------------------------------------------------------------------
+void DebuggerView::resizeEvent(QResizeEvent *ev) {
+  QTimer::singleShot(0, this, SLOT(synchronize()));
+  QWidget::resizeEvent(ev);
 }
