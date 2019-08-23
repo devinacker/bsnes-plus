@@ -48,7 +48,7 @@ void SymbolsView::bind(QTreeWidgetItem *item, int value) {
   int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(address, processor->getBreakpointBusName());
   if (!enable && breakpoint >= 0) {
     breakpointEditor->removeBreakpoint(breakpoint);
-  } else if (enable) {
+  } else if (enable && breakpoint < 0) {
     breakpointEditor->addBreakpoint(nall::hex(address), "x", processor->getBreakpointBusName());
   }
 }
@@ -60,6 +60,9 @@ void SymbolsView::synchronize() {
 
   list->clear();
   list->setSortingEnabled(false);
+
+  // don't cause existing breakpoints to be added or removed while repopulating the list
+  bool blocked = list->blockSignals(true);
 
   uint32_t count = symbols->symbols.size();
   for (uint32_t i=0; i<count; i++) {
@@ -93,6 +96,8 @@ void SymbolsView::synchronize() {
     item->setText(1, sym.name);
     item->setText(2, "");
   }
+
+  list->blockSignals(blocked);
 
   list->resizeColumnToContents(0);
   list->resizeColumnToContents(1);
