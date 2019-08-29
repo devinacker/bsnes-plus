@@ -112,5 +112,3 @@ struct Style {
     SeparatorSpacing = 5,
   };
 };
-
-extern string filepath(const char *filename, const char *filepath);
