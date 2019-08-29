@@ -18,8 +18,9 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   layout->addLayout(controlLayout);
 
   path = new QLineEdit;
-  path->setReadOnly(true);
   path->setPlaceholderText(pathDefaultLabel_);
+  if (pathValue != pathDefaultValue)
+    path->setText(pathValue);
   controlLayout->addWidget(path);
 
   pathSelect = new QPushButton("Select ...");
@@ -28,23 +29,22 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   pathDefault = new QPushButton("Default");
   controlLayout->addWidget(pathDefault);
 
-  connect(pathSelect, SIGNAL(released()), this, SLOT(selectPath()));
-  connect(pathDefault, SIGNAL(released()), this, SLOT(defaultPath()));
-  updatePath();
+  connect(path, SIGNAL(textChanged(QString)), this, SLOT(updatePath()));
+  connect(pathSelect, SIGNAL(clicked(bool)), this, SLOT(selectPath()));
+  connect(pathDefault, SIGNAL(clicked(bool)), path, SLOT(clear()));
 }
 
 void PathSettingWidget::acceptPath(const string &newPath) {
   fileBrowser->close();
-  pathValue = string() << newPath << "/";
-  config().path.current.folder = dir(pathValue);
-  updatePath();
+  path->setText(string() << newPath << "/");
+  config().path.current.folder = dir(newPath);
 }
 
 void PathSettingWidget::updatePath() {
-  if(pathValue == pathDefaultValue) {
-    path->setText("");
+  if (path->text().isEmpty()) {
+    pathValue = pathDefaultValue;
   } else {
-    path->setText(pathValue);
+    pathValue = path->text();
   }
 }
 
@@ -55,11 +55,6 @@ void PathSettingWidget::selectPath() {
   fileBrowser->setWindowTitle(pathBrowseLabel);
   fileBrowser->setPath(config().path.current.folder);
   fileBrowser->chooseFolder();
-}
-
-void PathSettingWidget::defaultPath() {
-  pathValue = pathDefaultValue;
-  updatePath();
 }
 
 PathSettingsWindow::PathSettingsWindow() {

@@ -13,13 +13,12 @@ public:
   string pathBrowseLabel;
   string pathDefaultValue;
   void acceptPath(const string&);
-  void updatePath();
 
   PathSettingWidget(string&, const char*, const char*, const char*, const char*);
 
 public slots:
+  void updatePath();
   void selectPath();
-  void defaultPath();
 };
 
 class PathSettingsWindow : public QWidget {
