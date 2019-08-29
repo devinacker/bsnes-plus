@@ -74,7 +74,7 @@ bool BSXBase::stream_fileload(BSXStream &stream)
   char filename[256];
   string filepath;
   sprintf(filename, "BSX%04X-%d.bin", stream.channel, stream.count);
-  filepath << config.sat.path << filename;
+  filepath << config.path.bsxdat << filename;
   
   //Open Satellaview file
   if (stream.packets.open(filepath, file::mode::read))

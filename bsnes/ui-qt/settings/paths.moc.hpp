@@ -33,6 +33,7 @@ public:
   PathSettingWidget *patchPath;
   PathSettingWidget *cheatPath;
   PathSettingWidget *dataPath;
+  PathSettingWidget *firmwarePath;
   PathSettingWidget *satdataPath;
 
   PathSettingsWindow();

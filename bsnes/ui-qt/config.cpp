@@ -29,7 +29,9 @@ Configuration::Configuration() {
   attach(SNES::config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
   attach(SNES::config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
 
-  attach(SNES::config.sat.path = "./bsxdat/", "bsx.satdata");
+  attach(SNES::config.path.firmware = "", "path.firmware");
+
+  attach(SNES::config.path.bsxdat = "./bsxdat/", "bsx.satdata");
   attach(SNES::config.sat.local_time = true, "bsx.localTime");
   attach((signed&)(SNES::config.sat.custom_time = 798653040) /* 1995-04-23 16:04 */, "bsx.customTime");
   attach((unsigned&)(SNES::config.sat.default_size = 2) /* 8 Mbit */, "bsx.defaultSize", "Default Memory Pack size, 0..4 = 2..32 Mbit");
