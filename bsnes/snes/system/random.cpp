@@ -5,7 +5,7 @@ void Random::seed(unsigned seed) {
 }
 
 unsigned Random::operator()(unsigned result) {
-  return config.random ? _random() : result;
+  return config().random ? _random() : result;
 }
 
 void Random::serialize(serializer& s) {

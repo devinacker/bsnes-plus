@@ -78,8 +78,8 @@ void PPU::add_clocks(unsigned clocks) {
 }
 
 void PPU::power() {
-  ppu1_version = config.ppu1.version;
-  ppu2_version = config.ppu2.version;
+  ppu1_version = config().ppu1.version;
+  ppu2_version = config().ppu2.version;
 
   for(unsigned i = 0; i < memory::vram.size(); i++) {
     memory::vram.write(i, random(0));

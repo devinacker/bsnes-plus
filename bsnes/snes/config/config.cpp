@@ -1,6 +1,9 @@
 #ifdef SYSTEM_CPP
 
-Configuration config;
+Configuration &config() {
+  static Configuration configuration;
+  return configuration;
+}
 
 Configuration::Configuration() {
   controller_port1 = Input::Device::Joypad;

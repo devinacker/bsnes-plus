@@ -549,7 +549,7 @@ bool Cartridge::saveMemory(const char *filename, const char *extension, SNES::Ma
 }
 
 bool Cartridge::loadEmptyMemoryPack(string &xml, SNES::MappedRAM &memory) {
-  size_t size = 0x40000 << min(4, SNES::config.sat.default_size);
+  size_t size = 0x40000 << min(4, SNES::config().sat.default_size);
 
   uint8_t *emptydata = new uint8_t[size];
   memset(emptydata, 0xFF, size);

@@ -71,8 +71,8 @@ PathSettingsWindow::PathSettingsWindow() {
   cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path", "");
   dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path", "");
   
-  firmwarePath = new PathSettingWidget(SNES::config.path.firmware, "Extra chip firmware:", "Same as loaded game", "Default Chip Firmware Path", "");
-  satdataPath  = new PathSettingWidget(SNES::config.path.bsxdat,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
+  firmwarePath = new PathSettingWidget(SNES::config().path.firmware, "Extra chip firmware:", "Same as loaded game", "Default Chip Firmware Path", "");
+  satdataPath  = new PathSettingWidget(SNES::config().path.bsxdat,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
 
   layout->addWidget(gamePath);
   layout->addWidget(savePath);

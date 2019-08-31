@@ -39,4 +39,4 @@ struct Configuration {
   Configuration();
 };
 
-extern Configuration config;
+Configuration &config();

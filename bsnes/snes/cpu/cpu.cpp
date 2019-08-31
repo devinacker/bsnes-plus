@@ -101,7 +101,7 @@ void CPU::op_irq() {
 }
 
 void CPU::power() {
-  cpu_version = config.cpu.version;
+  cpu_version = config().cpu.version;
 
   regs.a = regs.x = regs.y = 0x0000;
   regs.s = 0x01ff;

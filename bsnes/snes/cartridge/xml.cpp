@@ -217,7 +217,7 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
     } else if(attr.name == "frequency") {
       necdsp.frequency = decimal(attr.content);
     } else if(attr.name == "program") {
-      program << filepath(dir(basename()), config.path.firmware);
+      program << filepath(dir(basename()), config().path.firmware);
       program << attr.content;
     } else if(attr.name == "sha256") {
       sha256 = attr.content;

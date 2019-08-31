@@ -50,8 +50,8 @@ void BSXBase::reset() {
 
   memset(&regs, 0x00, sizeof regs);
   
-  local_time = config.sat.local_time;
-  custom_time = config.sat.custom_time;
+  local_time = config().sat.local_time;
+  custom_time = config().sat.custom_time;
 
   regs.r2196 = 0x10;
   regs.r2197 = 0xFF;
@@ -74,7 +74,7 @@ bool BSXBase::stream_fileload(BSXStream &stream)
   char filename[256];
   string filepath;
   sprintf(filename, "BSX%04X-%d.bin", stream.channel, stream.count);
-  filepath << config.path.bsxdat << filename;
+  filepath << config().path.bsxdat << filename;
   
   //Open Satellaview file
   if (stream.packets.open(filepath, file::mode::read))

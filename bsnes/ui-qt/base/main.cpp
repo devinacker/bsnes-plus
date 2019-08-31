@@ -444,85 +444,85 @@ void MainWindow::reset() {
 
 void MainWindow::setPort1None() {
   config().input.port1 = ControllerPort1::None;
-  SNES::config.controller_port1 = SNES::Input::Device::None;
+  SNES::config().controller_port1 = SNES::Input::Device::None;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Gamepad() {
   config().input.port1 = ControllerPort1::Gamepad;
-  SNES::config.controller_port1 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port1 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Asciipad() {
   config().input.port1 = ControllerPort1::Asciipad;
-  SNES::config.controller_port1 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port1 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Multitap() {
   config().input.port1 = ControllerPort1::Multitap;
-  SNES::config.controller_port1 = SNES::Input::Device::Multitap;
+  SNES::config().controller_port1 = SNES::Input::Device::Multitap;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Mouse() {
   config().input.port1 = ControllerPort1::Mouse;
-  SNES::config.controller_port1 = SNES::Input::Device::Mouse;
+  SNES::config().controller_port1 = SNES::Input::Device::Mouse;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1NTTDataKeypad() {
   config().input.port1 = ControllerPort1::NTTDataKeypad;
-  SNES::config.controller_port1 = SNES::Input::Device::NTTDataKeypad;
+  SNES::config().controller_port1 = SNES::Input::Device::NTTDataKeypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2None() {
   config().input.port2 = ControllerPort2::None;
-  SNES::config.controller_port2 = SNES::Input::Device::None;
+  SNES::config().controller_port2 = SNES::Input::Device::None;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Gamepad() {
   config().input.port2 = ControllerPort2::Gamepad;
-  SNES::config.controller_port2 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port2 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Asciipad() {
   config().input.port2 = ControllerPort2::Asciipad;
-  SNES::config.controller_port2 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port2 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Multitap() {
   config().input.port2 = ControllerPort2::Multitap;
-  SNES::config.controller_port2 = SNES::Input::Device::Multitap;
+  SNES::config().controller_port2 = SNES::Input::Device::Multitap;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Mouse() {
   config().input.port2 = ControllerPort2::Mouse;
-  SNES::config.controller_port2 = SNES::Input::Device::Mouse;
+  SNES::config().controller_port2 = SNES::Input::Device::Mouse;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2SuperScope() {
   config().input.port2 = ControllerPort2::SuperScope;
-  SNES::config.controller_port2 = SNES::Input::Device::SuperScope;
+  SNES::config().controller_port2 = SNES::Input::Device::SuperScope;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Justifier() {
   config().input.port2 = ControllerPort2::Justifier;
-  SNES::config.controller_port2 = SNES::Input::Device::Justifier;
+  SNES::config().controller_port2 = SNES::Input::Device::Justifier;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Justifiers() {
   config().input.port2 = ControllerPort2::Justifiers;
-  SNES::config.controller_port2 = SNES::Input::Device::Justifiers;
+  SNES::config().controller_port2 = SNES::Input::Device::Justifiers;
   utility.updateControllers();
 }
 

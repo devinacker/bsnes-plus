@@ -123,8 +123,8 @@ void PPU::frame() {
 }
 
 void PPU::power() {
-  ppu1_version = config.ppu1.version;
-  ppu2_version = config.ppu2.version;
+  ppu1_version = config().ppu1.version;
+  ppu2_version = config().ppu2.version;
 
   for(unsigned i = 0; i < memory::vram.size();  i++) memory::vram[i]  = 0x00;
   for(unsigned i = 0; i < memory::oam.size();   i++) memory::oam[i]   = 0x00;

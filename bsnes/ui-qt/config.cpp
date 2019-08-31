@@ -11,30 +11,32 @@ bool Configuration::load(const char *filename) {
 
 Configuration::Configuration() {
   //external
-  attach((unsigned&)(SNES::config.controller_port1 = SNES::Input::Device::Joypad), "snes.controllerPort1");
-  attach((unsigned&)(SNES::config.controller_port2 = SNES::Input::Device::Joypad), "snes.controllerPort2");
-  attach((unsigned&)(SNES::config.expansion_port   = SNES::System::ExpansionPortDevice::BSX), "snes.expansionPort");
-  attach((unsigned&)(SNES::config.region           = SNES::System::Region::Autodetect), "snes.region");
+  SNES::Configuration &snes_config = SNES::config();
+  
+  attach((unsigned&)(snes_config.controller_port1 = SNES::Input::Device::Joypad), "snes.controllerPort1");
+  attach((unsigned&)(snes_config.controller_port2 = SNES::Input::Device::Joypad), "snes.controllerPort2");
+  attach((unsigned&)(snes_config.expansion_port   = SNES::System::ExpansionPortDevice::BSX), "snes.expansionPort");
+  attach((unsigned&)(snes_config.region           = SNES::System::Region::Autodetect), "snes.region");
 
-  attach(SNES::config.random = true, "snes.random", "Randomize some system state on powerup");
+  attach(snes_config.random = true, "snes.random", "Randomize some system state on powerup");
 
-  attach(SNES::config.cpu.version         =        2, "cpu.version", "Valid version(s) are: 1, 2");
-  attach(SNES::config.cpu.ntsc_frequency = 21477272, "cpu.ntscFrequency");
-  attach(SNES::config.cpu.pal_frequency  = 21281370, "cpu.palFrequency");
-  attach(SNES::config.cpu.wram_init_value =     0x55, "cpu.wramInitValue");
+  attach(snes_config.cpu.version         =        2, "cpu.version", "Valid version(s) are: 1, 2");
+  attach(snes_config.cpu.ntsc_frequency = 21477272, "cpu.ntscFrequency");
+  attach(snes_config.cpu.pal_frequency  = 21281370, "cpu.palFrequency");
+  attach(snes_config.cpu.wram_init_value =     0x55, "cpu.wramInitValue");
 
-  attach(SNES::config.smp.ntsc_frequency = 24607104, "smp.ntscFrequency");
-  attach(SNES::config.smp.pal_frequency  = 24607104, "smp.palFrequency");
+  attach(snes_config.smp.ntsc_frequency = 24607104, "smp.ntscFrequency");
+  attach(snes_config.smp.pal_frequency  = 24607104, "smp.palFrequency");
 
-  attach(SNES::config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
-  attach(SNES::config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
+  attach(snes_config.ppu1.version = 1, "ppu1.version", "Valid version(s) are: 1");
+  attach(snes_config.ppu2.version = 3, "ppu2.version", "Valid version(s) are: 1, 2, 3");
 
-  attach(SNES::config.path.firmware = "", "path.firmware");
+  attach(snes_config.path.firmware = "", "path.firmware");
 
-  attach(SNES::config.path.bsxdat = "./bsxdat/", "bsx.satdata");
-  attach(SNES::config.sat.local_time = true, "bsx.localTime");
-  attach((signed&)(SNES::config.sat.custom_time = 798653040) /* 1995-04-23 16:04 */, "bsx.customTime");
-  attach((unsigned&)(SNES::config.sat.default_size = 2) /* 8 Mbit */, "bsx.defaultSize", "Default Memory Pack size, 0..4 = 2..32 Mbit");
+  attach(snes_config.path.bsxdat = "./bsxdat/", "bsx.satdata");
+  attach(snes_config.sat.local_time = true, "bsx.localTime");
+  attach((signed&)(snes_config.sat.custom_time = 798653040) /* 1995-04-23 16:04 */, "bsx.customTime");
+  attach((unsigned&)(snes_config.sat.default_size = 2) /* 8 Mbit */, "bsx.defaultSize", "Default Memory Pack size, 0..4 = 2..32 Mbit");
 
   //TODO: add superfx frequency
 
