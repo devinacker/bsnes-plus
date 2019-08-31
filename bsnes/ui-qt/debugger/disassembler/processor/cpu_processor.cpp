@@ -198,8 +198,8 @@ void CpuDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::CPU::Op
 
     case SNES::CPU::OPTYPE_MV:
       result.paramFormat = "%1X2, %2X2";
-      result.params.append(DisassemblerParam::createValue(opcode.op8()));
-      result.params.append(DisassemblerParam::createValue(opcode.op8()));
+      result.params.append(DisassemblerParam::createValue(opcode.op8(1)));
+      result.params.append(DisassemblerParam::createValue(opcode.op8(0)));
       break;
 
     case SNES::CPU::OPTYPE_IM:

@@ -118,16 +118,16 @@ struct Opcode {
   inline bool breaks() const { return flags & FLAG_BRK; }
   inline bool returns() const { return flags & FLAG_RETURN; }
 
-  uint8 op8() {
-    return param[1];
+  uint8 op8(unsigned index = 0) {
+    return param[1 + index];
   }
 
   uint16 op16() {
-    return *((uint16*)&param[1]);
+    return param[1] | param[2] << 8;
   }
 
   uint32 op24() {
-    return *((uint16*)&param[1]) | param[3] << 16;
+    return param[1] | param[2] << 8 | param[3] << 16;
   }
 
   uint32 opall() {
