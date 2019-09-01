@@ -12,7 +12,7 @@ struct SNESSMP {
     ADirect,          //a,$00
     AAbsolute,        //a,$0000
     AIX,              //a,(x)
-    AIDirectX,        //a,($00+x)
+    AIDirectIndX,     //a,($00+x)
     AConstant,        //a,#$00
     DirectDirect,     //$00,$00
     CAbsoluteBit,     //c,$0000:0
@@ -20,13 +20,13 @@ struct SNESSMP {
     P,                //p
     AbsoluteA,        //$0000,a
     Relative,         //+/-$00
-    ADirectX,         //a,$00+x
+    ADirectIndX,      //a,$00+x
     AAbsoluteX,       //a,$0000+x
     AAbsoluteY,       //a,$0000+y
-    AIDirectY,        //a,($00)+y
+    AIDirectIndY,     //a,($00)+y
     DirectConstant,   //$00,#$00
     IXIY,             //(x),(y)
-    DirectX,          //$00+x
+    DirectIndX,       //$00+x
     A,                //a
     X,                //x
     XAbsolute,        //x,$0000
@@ -48,24 +48,25 @@ struct SNESSMP {
     AIXP,             //a,(x)+
     DirectA,          //$00,a
     IXA,              //(x),a
-    IDirectXA,        //($00+x),a
+    IDirectIndXA,     //($00+x),a
     XConstant,        //x,#$00
     AbsoluteX,        //$0000,x
     AbsoluteBitC,     //$0000:0,c
     DirectY,          //$00,y
     AbsoluteY,        //$0000,y
     Ya,               //ya
-    DirectXA,         //$00+x,a
+    DirectIndXA,      //$00+x,a
     AbsoluteXA,       //$0000+x,a
     AbsoluteYA,       //$0000+y,a
-    IDirectYA,        //($00)+y,a
-    DirectYX,         //$00+y,x
+    IDirectIndYA,     //($00)+y,a
+	DirectX,          //$00,x
+    DirectIndYX,      //$00+y,x
     DirectYa,         //$00,ya
-    DirectXY,         //$00+x,y
+    DirectIndXY,      //$00+x,y
     AY,               //a,y
-    DirectXRelative,  //$00+x,+/-$00
-    XDirectY,         //x,$00+y
-    YDirectX,         //y,$00+x
+    DirectIndXRelative,//$00+x,+/-$00
+    XDirectIndY,      //x,$00+y
+    YDirectIndX,      //y,$00+x
     YA,               //y,a
     YRelative,        //y,+/-$00
   };
@@ -75,353 +76,351 @@ struct SNESSMP {
     unsigned mode;
   };
 
-  static const OpcodeInfo opcodeInfo[256];
-
   static unsigned getOpcodeLength(uint8_t opcode);
-  static string disassemble(uint16_t pc, uint8_t opcode, uint8_t pl, uint8_t ph);
-  static string disassemble(uint16_t pc, bool p, uint8_t opcode, uint8_t pl, uint8_t ph);
+  static bool getOpcodeIndirect(uint8_t opcode);
+  static string disassemble(uint16_t pc, uint8_t opcode, uint8_t pl, uint8_t ph, bool p = false);
 };
 
-const SNESSMP::OpcodeInfo SNESSMP::opcodeInfo[256] = {
+static const SNESSMP::OpcodeInfo smpOpcodeInfo[256] = {
   //0x00 - 0x0f
-  { "nop  ", Implied },
-  { "tcall", TVector },
-  { "set0 ", Direct },
-  { "bbs0 ", DirectRelative },
+  { "nop  ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set0 ", SNESSMP::Direct },
+  { "bbs0 ", SNESSMP::DirectRelative },
 
-  { "or   ", ADirect },
-  { "or   ", AAbsolute },
-  { "or   ", AIX },
-  { "or   ", AIDirectX },
+  { "or   ", SNESSMP::ADirect },
+  { "or   ", SNESSMP::AAbsolute },
+  { "or   ", SNESSMP::AIX },
+  { "or   ", SNESSMP::AIDirectIndX },
 
-  { "or   ", AConstant },
-  { "or   ", DirectDirect },
-  { "or1  ", CAbsoluteBit },
-  { "asl  ", Direct },
+  { "or   ", SNESSMP::AConstant },
+  { "or   ", SNESSMP::DirectDirect },
+  { "or1  ", SNESSMP::CAbsoluteBit },
+  { "asl  ", SNESSMP::Direct },
 
-  { "asl  ", Absolute },
-  { "push ", P },
-  { "tset ", AbsoluteA },
-  { "brk  ", Implied },
+  { "asl  ", SNESSMP::Absolute },
+  { "push ", SNESSMP::P },
+  { "tset ", SNESSMP::AbsoluteA },
+  { "brk  ", SNESSMP::Implied },
 
   //0x10 - 0x1f
-  { "bpl  ", Relative },
-  { "tcall", TVector },
-  { "clr0 ", Direct },
-  { "bbc0 ", DirectRelative },
+  { "bpl  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr0 ", SNESSMP::Direct },
+  { "bbc0 ", SNESSMP::DirectRelative },
 
-  { "or   ", ADirectX },
-  { "or   ", AAbsoluteX },
-  { "or   ", AAbsoluteY },
-  { "or   ", AIDirectY },
+  { "or   ", SNESSMP::ADirectIndX },
+  { "or   ", SNESSMP::AAbsoluteX },
+  { "or   ", SNESSMP::AAbsoluteY },
+  { "or   ", SNESSMP::AIDirectIndY },
 
-  { "or   ", DirectConstant },
-  { "or   ", IXIY },
-  { "decw ", Direct },
-  { "asl  ", DirectX },
+  { "or   ", SNESSMP::DirectConstant },
+  { "or   ", SNESSMP::IXIY },
+  { "decw ", SNESSMP::Direct },
+  { "asl  ", SNESSMP::DirectIndX },
 
-  { "asl  ", A },
-  { "dec  ", X },
-  { "cmp  ", XAbsolute },
-  { "jmp  ", IAbsoluteX },
+  { "asl  ", SNESSMP::A },
+  { "dec  ", SNESSMP::X },
+  { "cmp  ", SNESSMP::XAbsolute },
+  { "jmp  ", SNESSMP::IAbsoluteX },
 
   //0x20 - 0x2f
-  { "clrp ", Implied },
-  { "tcall", TVector },
-  { "set1 ", Direct },
-  { "bbs1 ", DirectRelative },
+  { "clrp ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set1 ", SNESSMP::Direct },
+  { "bbs1 ", SNESSMP::DirectRelative },
 
-  { "and  ", ADirect },
-  { "and  ", AAbsolute },
-  { "and  ", AIX },
-  { "and  ", AIDirectX },
+  { "and  ", SNESSMP::ADirect },
+  { "and  ", SNESSMP::AAbsolute },
+  { "and  ", SNESSMP::AIX },
+  { "and  ", SNESSMP::AIDirectIndX },
 
-  { "and  ", AConstant },
-  { "and  ", DirectDirect },
-  { "or1  ", CNAbsoluteBit },
-  { "rol  ", Direct },
+  { "and  ", SNESSMP::AConstant },
+  { "and  ", SNESSMP::DirectDirect },
+  { "or1  ", SNESSMP::CNAbsoluteBit },
+  { "rol  ", SNESSMP::Direct },
 
-  { "rol  ", Absolute },
-  { "push ", A },
-  { "cbne ", DirectRelative },
-  { "bra  ", Relative },
+  { "rol  ", SNESSMP::Absolute },
+  { "push ", SNESSMP::A },
+  { "cbne ", SNESSMP::DirectRelative },
+  { "bra  ", SNESSMP::Relative },
 
   //0x30 - 0x3f
-  { "bmi  ", Relative },
-  { "tcall", TVector },
-  { "clr1 ", Direct },
-  { "bbc1 ", DirectRelative },
+  { "bmi  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr1 ", SNESSMP::Direct },
+  { "bbc1 ", SNESSMP::DirectRelative },
 
-  { "and  ", ADirectX },
-  { "and  ", AAbsoluteX },
-  { "and  ", AAbsoluteY },
-  { "and  ", AIDirectY },
+  { "and  ", SNESSMP::ADirectIndX },
+  { "and  ", SNESSMP::AAbsoluteX },
+  { "and  ", SNESSMP::AAbsoluteY },
+  { "and  ", SNESSMP::AIDirectIndY },
 
-  { "and  ", DirectConstant },
-  { "and  ", IXIY },
-  { "incw ", Direct },
-  { "rol  ", DirectX },
+  { "and  ", SNESSMP::DirectConstant },
+  { "and  ", SNESSMP::IXIY },
+  { "incw ", SNESSMP::Direct },
+  { "rol  ", SNESSMP::DirectIndX },
 
-  { "rol  ", A },
-  { "inc  ", X },
-  { "cmp  ", XDirect },
-  { "call ", Absolute },
+  { "rol  ", SNESSMP::A },
+  { "inc  ", SNESSMP::X },
+  { "cmp  ", SNESSMP::XDirect },
+  { "call ", SNESSMP::Absolute },
 
   //0x40 - 0x4f
-  { "setp ", Implied },
-  { "tcall", TVector },
-  { "set2 ", Direct },
-  { "bbs2 ", DirectRelative },
+  { "setp ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set2 ", SNESSMP::Direct },
+  { "bbs2 ", SNESSMP::DirectRelative },
 
-  { "eor  ", ADirect },
-  { "eor  ", AAbsolute },
-  { "eor  ", AIX },
-  { "eor  ", AIDirectX },
+  { "eor  ", SNESSMP::ADirect },
+  { "eor  ", SNESSMP::AAbsolute },
+  { "eor  ", SNESSMP::AIX },
+  { "eor  ", SNESSMP::AIDirectIndX },
 
-  { "eor  ", AConstant },
-  { "eor  ", DirectDirect },
-  { "and1 ", CAbsoluteBit },
-  { "lsr  ", Direct },
+  { "eor  ", SNESSMP::AConstant },
+  { "eor  ", SNESSMP::DirectDirect },
+  { "and1 ", SNESSMP::CAbsoluteBit },
+  { "lsr  ", SNESSMP::Direct },
 
-  { "lsr  ", Absolute },
-  { "push ", X },
-  { "tclr ", AbsoluteA },
-  { "pcall", PVector },
+  { "lsr  ", SNESSMP::Absolute },
+  { "push ", SNESSMP::X },
+  { "tclr ", SNESSMP::AbsoluteA },
+  { "pcall", SNESSMP::PVector },
 
   //0x50 - 0x5f
-  { "bvc  ", Relative },
-  { "tcall", TVector },
-  { "clr2 ", Direct },
-  { "bbc2 ", DirectRelative },
+  { "bvc  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr2 ", SNESSMP::Direct },
+  { "bbc2 ", SNESSMP::DirectRelative },
 
-  { "eor  ", ADirectX },
-  { "eor  ", AAbsoluteX },
-  { "eor  ", AAbsoluteY },
-  { "eor  ", AIDirectY },
+  { "eor  ", SNESSMP::ADirectIndX },
+  { "eor  ", SNESSMP::AAbsoluteX },
+  { "eor  ", SNESSMP::AAbsoluteY },
+  { "eor  ", SNESSMP::AIDirectIndY },
 
-  { "eor  ", DirectConstant },
-  { "eor  ", IXIY },
-  { "cmpw ", YaDirect },
-  { "lsr  ", DirectX },
+  { "eor  ", SNESSMP::DirectConstant },
+  { "eor  ", SNESSMP::IXIY },
+  { "cmpw ", SNESSMP::YaDirect },
+  { "lsr  ", SNESSMP::DirectIndX },
 
-  { "lsr  ", A },
-  { "mov  ", XA },
-  { "cmp  ", YAbsolute },
-  { "jmp  ", Absolute },
+  { "lsr  ", SNESSMP::A },
+  { "mov  ", SNESSMP::XA },
+  { "cmp  ", SNESSMP::YAbsolute },
+  { "jmp  ", SNESSMP::Absolute },
 
   //0x60 - 0x6f
-  { "clrc ", Implied },
-  { "tcall", TVector },
-  { "set3 ", Direct },
-  { "bbs3 ", DirectRelative },
+  { "clrc ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set3 ", SNESSMP::Direct },
+  { "bbs3 ", SNESSMP::DirectRelative },
 
-  { "cmp  ", ADirect },
-  { "cmp  ", AAbsolute },
-  { "cmp  ", AIX },
-  { "cmp  ", AIDirectX },
+  { "cmp  ", SNESSMP::ADirect },
+  { "cmp  ", SNESSMP::AAbsolute },
+  { "cmp  ", SNESSMP::AIX },
+  { "cmp  ", SNESSMP::AIDirectIndX },
 
-  { "cmp  ", AConstant },
-  { "cmp  ", DirectDirect },
-  { "and1 ", CNAbsoluteBit },
-  { "ror  ", Direct },
+  { "cmp  ", SNESSMP::AConstant },
+  { "cmp  ", SNESSMP::DirectDirect },
+  { "and1 ", SNESSMP::CNAbsoluteBit },
+  { "ror  ", SNESSMP::Direct },
 
-  { "ror  ", Absolute },
-  { "push ", Y },
-  { "dbnz ", DirectRelative },
-  { "ret  ", Implied },
+  { "ror  ", SNESSMP::Absolute },
+  { "push ", SNESSMP::Y },
+  { "dbnz ", SNESSMP::DirectRelative },
+  { "ret  ", SNESSMP::Implied },
 
   //0x70 - 0x7f
-  { "bvs  ", Relative },
-  { "tcall", TVector },
-  { "clr3 ", Direct },
-  { "bbc3 ", DirectRelative },
+  { "bvs  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr3 ", SNESSMP::Direct },
+  { "bbc3 ", SNESSMP::DirectRelative },
 
-  { "cmp  ", ADirectX },
-  { "cmp  ", AAbsoluteX },
-  { "cmp  ", AAbsoluteY },
-  { "cmp  ", AIDirectY },
+  { "cmp  ", SNESSMP::ADirectIndX },
+  { "cmp  ", SNESSMP::AAbsoluteX },
+  { "cmp  ", SNESSMP::AAbsoluteY },
+  { "cmp  ", SNESSMP::AIDirectIndY },
 
-  { "cmp  ", DirectConstant },
-  { "cmp  ", IXIY },
-  { "addw ", YaDirect },
-  { "ror  ", DirectX },
+  { "cmp  ", SNESSMP::DirectConstant },
+  { "cmp  ", SNESSMP::IXIY },
+  { "addw ", SNESSMP::YaDirect },
+  { "ror  ", SNESSMP::DirectIndX },
 
-  { "ror  ", A },
-  { "mov  ", AX },
-  { "cmp  ", YDirect },
-  { "reti ", Implied },
+  { "ror  ", SNESSMP::A },
+  { "mov  ", SNESSMP::AX },
+  { "cmp  ", SNESSMP::YDirect },
+  { "reti ", SNESSMP::Implied },
 
   //0x80 - 0x8f
-  { "setc ", Implied },
-  { "tcall", TVector },
-  { "set4 ", Direct },
-  { "bbs4 ", DirectRelative },
+  { "setc ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set4 ", SNESSMP::Direct },
+  { "bbs4 ", SNESSMP::DirectRelative },
 
-  { "adc  ", ADirect },
-  { "adc  ", AAbsolute },
-  { "adc  ", AIX },
-  { "adc  ", AIDirectX },
+  { "adc  ", SNESSMP::ADirect },
+  { "adc  ", SNESSMP::AAbsolute },
+  { "adc  ", SNESSMP::AIX },
+  { "adc  ", SNESSMP::AIDirectIndX },
 
-  { "adc  ", AConstant },
-  { "adc  ", DirectDirect },
-  { "eor1 ", CAbsoluteBit },
-  { "dec  ", Direct },
+  { "adc  ", SNESSMP::AConstant },
+  { "adc  ", SNESSMP::DirectDirect },
+  { "eor1 ", SNESSMP::CAbsoluteBit },
+  { "dec  ", SNESSMP::Direct },
 
-  { "dec  ", Absolute },
-  { "mov  ", YConstant },
-  { "pop  ", P },
-  { "mov  ", DirectConstant },
+  { "dec  ", SNESSMP::Absolute },
+  { "mov  ", SNESSMP::YConstant },
+  { "pop  ", SNESSMP::P },
+  { "mov  ", SNESSMP::DirectConstant },
 
   //0x90 - 0x9f
-  { "bcc  ", Relative },
-  { "tcall", TVector },
-  { "clr4 ", Direct },
-  { "bbc4 ", DirectRelative },
+  { "bcc  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr4 ", SNESSMP::Direct },
+  { "bbc4 ", SNESSMP::DirectRelative },
 
-  { "adc  ", ADirectX },
-  { "adc  ", AAbsoluteX },
-  { "adc  ", AAbsoluteY },
-  { "adc  ", AIDirectY },
+  { "adc  ", SNESSMP::ADirectIndX },
+  { "adc  ", SNESSMP::AAbsoluteX },
+  { "adc  ", SNESSMP::AAbsoluteY },
+  { "adc  ", SNESSMP::AIDirectIndY },
 
-  { "adc  ", DirectRelative },
-  { "adc  ", IXIY },
-  { "subw ", YaDirect },
-  { "dec  ", DirectX },
+  { "adc  ", SNESSMP::DirectRelative },
+  { "adc  ", SNESSMP::IXIY },
+  { "subw ", SNESSMP::YaDirect },
+  { "dec  ", SNESSMP::DirectIndX },
 
-  { "dec  ", A },
-  { "mov  ", XSp },
-  { "div  ", YaX },
-  { "xcn  ", A },
+  { "dec  ", SNESSMP::A },
+  { "mov  ", SNESSMP::XSp },
+  { "div  ", SNESSMP::YaX },
+  { "xcn  ", SNESSMP::A },
 
   //0xa0 - 0xaf
-  { "ei   ", Implied },
-  { "tcall", TVector },
-  { "set5 ", Direct },
-  { "bbs5 ", DirectRelative },
+  { "ei   ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set5 ", SNESSMP::Direct },
+  { "bbs5 ", SNESSMP::DirectRelative },
 
-  { "sbc  ", ADirect },
-  { "sbc  ", AAbsolute },
-  { "sbc  ", AIX },
-  { "sbc  ", AIDirectX },
+  { "sbc  ", SNESSMP::ADirect },
+  { "sbc  ", SNESSMP::AAbsolute },
+  { "sbc  ", SNESSMP::AIX },
+  { "sbc  ", SNESSMP::AIDirectIndX },
 
-  { "sbc  ", AConstant },
-  { "sbc  ", DirectDirect },
-  { "mov1 ", CAbsoluteBit },
-  { "inc  ", Direct },
+  { "sbc  ", SNESSMP::AConstant },
+  { "sbc  ", SNESSMP::DirectDirect },
+  { "mov1 ", SNESSMP::CAbsoluteBit },
+  { "inc  ", SNESSMP::Direct },
 
-  { "inc  ", Absolute },
-  { "cmp  ", YConstant },
-  { "pop  ", A },
-  { "mov  ", IXPA },
+  { "inc  ", SNESSMP::Absolute },
+  { "cmp  ", SNESSMP::YConstant },
+  { "pop  ", SNESSMP::A },
+  { "mov  ", SNESSMP::IXPA },
 
   //0xb0 - 0xbf
-  { "bcs  ", Relative },
-  { "tcall", TVector },
-  { "clr5 ", Direct },
-  { "bbc5 ", DirectRelative },
+  { "bcs  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr5 ", SNESSMP::Direct },
+  { "bbc5 ", SNESSMP::DirectRelative },
 
-  { "sbc  ", ADirectX },
-  { "sbc  ", AAbsoluteX },
-  { "sbc  ", AAbsoluteY },
-  { "sbc  ", AIDirectY },
+  { "sbc  ", SNESSMP::ADirectIndX },
+  { "sbc  ", SNESSMP::AAbsoluteX },
+  { "sbc  ", SNESSMP::AAbsoluteY },
+  { "sbc  ", SNESSMP::AIDirectIndY },
 
-  { "sbc  ", DirectConstant },
-  { "sbc  ", IXIY },
-  { "movw ", YaDirect },
-  { "inc  ", DirectX },
+  { "sbc  ", SNESSMP::DirectConstant },
+  { "sbc  ", SNESSMP::IXIY },
+  { "movw ", SNESSMP::YaDirect },
+  { "inc  ", SNESSMP::DirectIndX },
 
-  { "inc  ", A },
-  { "mov  ", SpX },
-  { "das  ", A },
-  { "mov  ", AIXP },
+  { "inc  ", SNESSMP::A },
+  { "mov  ", SNESSMP::SpX },
+  { "das  ", SNESSMP::A },
+  { "mov  ", SNESSMP::AIXP },
 
   //0xc0 - 0xcf
-  { "di   ", Implied },
-  { "tcall", TVector },
-  { "set6 ", Direct },
-  { "bbs6 ", DirectRelative },
+  { "di   ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set6 ", SNESSMP::Direct },
+  { "bbs6 ", SNESSMP::DirectRelative },
 
-  { "mov  ", DirectA },
-  { "mov  ", AbsoluteA },
-  { "mov  ", IXA },
-  { "mov  ", IDirectXA },
+  { "mov  ", SNESSMP::DirectA },
+  { "mov  ", SNESSMP::AbsoluteA },
+  { "mov  ", SNESSMP::IXA },
+  { "mov  ", SNESSMP::IDirectIndXA },
 
-  { "cmp  ", XConstant },
-  { "mov  ", AbsoluteX },
-  { "mov1 ", AbsoluteBitC },
-  { "mov  ", DirectY },
+  { "cmp  ", SNESSMP::XConstant },
+  { "mov  ", SNESSMP::AbsoluteX },
+  { "mov1 ", SNESSMP::AbsoluteBitC },
+  { "mov  ", SNESSMP::DirectY },
 
-  { "mov  ", AbsoluteY },
-  { "mov  ", XConstant },
-  { "pop  ", X },
-  { "mul  ", Ya },
+  { "mov  ", SNESSMP::AbsoluteY },
+  { "mov  ", SNESSMP::XConstant },
+  { "pop  ", SNESSMP::X },
+  { "mul  ", SNESSMP::Ya },
 
   //0xd0 - 0xdf
-  { "bne  ", Relative },
-  { "tcall", TVector },
-  { "clr6 ", Relative },
-  { "bbc6 ", DirectRelative },
+  { "bne  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr6 ", SNESSMP::Relative },
+  { "bbc6 ", SNESSMP::DirectRelative },
 
-  { "mov  ", DirectXA },
-  { "mov  ", AbsoluteXA },
-  { "mov  ", AbsoluteYA },
-  { "mov  ", IDirectYA },
+  { "mov  ", SNESSMP::DirectIndXA },
+  { "mov  ", SNESSMP::AbsoluteXA },
+  { "mov  ", SNESSMP::AbsoluteYA },
+  { "mov  ", SNESSMP::IDirectIndYA },
 
-  { "mov  ", DirectX },
-  { "mov  ", DirectYX },
-  { "movw ", DirectYa },
-  { "mov  ", DirectXY },
+  { "mov  ", SNESSMP::DirectX },
+  { "mov  ", SNESSMP::DirectIndYX },
+  { "movw ", SNESSMP::DirectYa },
+  { "mov  ", SNESSMP::DirectIndXY },
 
-  { "dec  ", Y },
-  { "mov  ", AY },
-  { "cbne ", DirectXRelative },
-  { "daa  ", A },
+  { "dec  ", SNESSMP::Y },
+  { "mov  ", SNESSMP::AY },
+  { "cbne ", SNESSMP::DirectIndXRelative },
+  { "daa  ", SNESSMP::A },
 
   //0xe0 - 0xef
-  { "clrv ", Implied },
-  { "tcall", TVector },
-  { "set7 ", Direct },
-  { "bbs7 ", DirectRelative },
+  { "clrv ", SNESSMP::Implied },
+  { "tcall", SNESSMP::TVector },
+  { "set7 ", SNESSMP::Direct },
+  { "bbs7 ", SNESSMP::DirectRelative },
 
-  { "mov  ", ADirect },
-  { "mov  ", AAbsolute },
-  { "mov  ", AIX },
-  { "mov  ", AIDirectX },
+  { "mov  ", SNESSMP::ADirect },
+  { "mov  ", SNESSMP::AAbsolute },
+  { "mov  ", SNESSMP::AIX },
+  { "mov  ", SNESSMP::AIDirectIndX },
 
-  { "mov  ", AConstant },
-  { "mov  ", XAbsolute },
-  { "not1 ", CAbsoluteBit },
-  { "mov  ", YDirect },
+  { "mov  ", SNESSMP::AConstant },
+  { "mov  ", SNESSMP::XAbsolute },
+  { "not1 ", SNESSMP::CAbsoluteBit },
+  { "mov  ", SNESSMP::YDirect },
 
-  { "mov  ", YAbsolute },
-  { "notc ", Implied },
-  { "pop  ", Y },
-  { "sleep", Implied },
+  { "mov  ", SNESSMP::YAbsolute },
+  { "notc ", SNESSMP::Implied },
+  { "pop  ", SNESSMP::Y },
+  { "sleep", SNESSMP::Implied },
 
   //0xf0 - 0xff
-  { "beq  ", Relative },
-  { "tcall", TVector },
-  { "clr7 ", Direct },
-  { "bbc7 ", DirectRelative },
+  { "beq  ", SNESSMP::Relative },
+  { "tcall", SNESSMP::TVector },
+  { "clr7 ", SNESSMP::Direct },
+  { "bbc7 ", SNESSMP::DirectRelative },
 
-  { "mov  ", ADirectX },
-  { "mov  ", AAbsoluteX },
-  { "mov  ", AAbsoluteY },
-  { "mov  ", AIDirectY },
+  { "mov  ", SNESSMP::ADirectIndX },
+  { "mov  ", SNESSMP::AAbsoluteX },
+  { "mov  ", SNESSMP::AAbsoluteY },
+  { "mov  ", SNESSMP::AIDirectIndY },
 
-  { "mov  ", XDirect },
-  { "mov  ", XDirectY },
-  { "mov  ", DirectDirect },
-  { "mov  ", YDirectX },
+  { "mov  ", SNESSMP::XDirect },
+  { "mov  ", SNESSMP::XDirectIndY },
+  { "mov  ", SNESSMP::DirectDirect },
+  { "mov  ", SNESSMP::YDirectIndX },
 
-  { "inc  ", Y },
-  { "mov  ", YA },
-  { "dbz  ", YRelative },
-  { "stop ", Implied },
+  { "inc  ", SNESSMP::Y },
+  { "mov  ", SNESSMP::YA },
+  { "dbz  ", SNESSMP::YRelative },
+  { "stop ", SNESSMP::Implied },
 };
 
 inline unsigned SNESSMP::getOpcodeLength(uint8_t opcode) {
-  switch(opcodeInfo[opcode].mode) { default:
+  switch(smpOpcodeInfo[opcode].mode) { default:
     case Implied:         return 1;  //
     case TVector:         return 1;  //0
     case Direct:          return 2;  //$00
@@ -429,7 +428,7 @@ inline unsigned SNESSMP::getOpcodeLength(uint8_t opcode) {
     case ADirect:         return 2;  //a,$00
     case AAbsolute:       return 3;  //a,$0000
     case AIX:             return 1;  //a,(x)
-    case AIDirectX:       return 2;  //a,($00+x)
+    case AIDirectIndX:    return 2;  //a,($00+x)
     case AConstant:       return 2;  //a,#$00
     case DirectDirect:    return 3;  //$00,$00
     case CAbsoluteBit:    return 3;  //c,$0000:0
@@ -437,13 +436,13 @@ inline unsigned SNESSMP::getOpcodeLength(uint8_t opcode) {
     case P:               return 1;  //p
     case AbsoluteA:       return 3;  //$0000,a
     case Relative:        return 2;  //+/-$00
-    case ADirectX:        return 2;  //a,$00+x
+    case ADirectIndX:     return 2;  //a,$00+x
     case AAbsoluteX:      return 3;  //a,$0000+x
     case AAbsoluteY:      return 3;  //a,$0000+y
-    case AIDirectY:       return 2;  //a,($00)+y
+    case AIDirectIndY:    return 2;  //a,($00)+y
     case DirectConstant:  return 3;  //$00,#$00
     case IXIY:            return 1;  //(x),(y)
-    case DirectX:         return 2;  //$00+x
+    case DirectIndX:      return 2;  //$00+x
     case A:               return 1;  //a
     case X:               return 1;  //x
     case XAbsolute:       return 3;  //x,$0000
@@ -465,104 +464,53 @@ inline unsigned SNESSMP::getOpcodeLength(uint8_t opcode) {
     case AIXP:            return 1;  //a,(x)+
     case DirectA:         return 2;  //$00,a
     case IXA:             return 1;  //(x),a
-    case IDirectXA:       return 2;  //($00+x),a
+    case IDirectIndXA:    return 2;  //($00+x),a
     case XConstant:       return 2;  //x,#$00
     case AbsoluteX:       return 3;  //$0000,x
     case AbsoluteBitC:    return 3;  //$0000:0,c
     case DirectY:         return 2;  //$00,y
     case AbsoluteY:       return 3;  //$0000,y
     case Ya:              return 1;  //ya
-    case DirectXA:        return 2;  //$00+x,a
+    case DirectIndXA:     return 2;  //$00+x,a
     case AbsoluteXA:      return 3;  //$0000+x,a
     case AbsoluteYA:      return 3;  //$0000+y,a
-    case IDirectYA:       return 2;  //($00)+y,a
-    case DirectYX:        return 2;  //$00+y,x
+    case IDirectIndYA:    return 2;  //($00)+y,a
+	case DirectX:         return 2; //$00,x
+    case DirectIndYX:     return 2;  //$00+y,x
     case DirectYa:        return 2;  //$00,ya
-    case DirectXY:        return 2;  //$00+x,y
+    case DirectIndXY:     return 2;  //$00+x,y
     case AY:              return 1;  //a,y
-    case DirectXRelative: return 3;  //$00+x,+/-$00
-    case XDirectY:        return 2;  //x,$00+y
-    case YDirectX:        return 2;  //y,$00+x
+    case DirectIndXRelative: return 3;  //$00+x,+/-$00
+    case XDirectIndY:     return 2;  //x,$00+y
+    case YDirectIndX:     return 2;  //y,$00+x
     case YA:              return 1;  //y,a
     case YRelative:       return 2;  //y,+/-$00
   }
 }
 
-inline string SNESSMP::disassemble(uint16_t pc, uint8_t opcode, uint8_t pl, uint8_t ph) {
-  string name = opcodeInfo[opcode].name;
-  unsigned mode = opcodeInfo[opcode].mode;
-  unsigned pa = (ph << 8) + pl;
+inline bool SNESSMP::getOpcodeIndirect(uint8_t opcode) {
+  switch(smpOpcodeInfo[opcode].mode) {
+    case TVector:
+    case AIX:
+    case AIDirectIndX:
+    case AIDirectIndY:
+    case IXIY:
+    case IAbsoluteX:
+    case IXPA:
+    case AIXP:
+    case IXA:
+    case IDirectIndXA:
+    case IDirectIndYA:
+      return true;
 
-  if(mode == Implied) return name;
-  if(mode == TVector) return { name, " ", opcode >> 4 };
-  if(mode == Direct) return { name, " $", hex<2>(pl) };
-  if(mode == DirectRelative) return { name, " $", hex<2>(pl), ",$", hex<4>(pc + 3 + (int8_t)ph) };
-  if(mode == ADirect) return { name, " a,$", hex<2>(pl) };
-  if(mode == AAbsolute) return { name, " a,$", hex<4>(pa) };
-  if(mode == AIX) return { name, "a,(x)" };
-  if(mode == AIDirectX) return { name, " a,($", hex<2>(pl), "+x)" };
-  if(mode == AConstant) return { name, " a,#$", hex<2>(pl) };
-  if(mode == DirectDirect) return { name, " $", hex<2>(ph), ",$", hex<2>(pl) };
-  if(mode == CAbsoluteBit) return { name, " c,$", hex<4>(pa & 0x1fff), ":", pa >> 13 };
-  if(mode == Absolute) return { name, " $", hex<4>(pa) };
-  if(mode == P) return { name, " p" };
-  if(mode == AbsoluteA) return { name, " $", hex<4>(pa), ",a" };
-  if(mode == Relative) return { name, " $", hex<4>(pc + 2 + (int8_t)pl) };
-  if(mode == ADirectX) return { name, " a,$", hex<2>(pl), "+x" };
-  if(mode == AAbsoluteX) return { name, " a,$", hex<4>(pa), "+x" };
-  if(mode == AAbsoluteY) return { name, " a,$", hex<4>(pa), "+y" };
-  if(mode == AIDirectY) return { name, " a,($", hex<2>(pl), ")+y" };
-  if(mode == DirectConstant) return { name, " $", hex<2>(ph), ",#$", hex<2>(pl) };
-  if(mode == IXIY) return { name, " (x),(y)" };
-  if(mode == DirectX) return { name, " $", hex<2>(pl), "+x" };
-  if(mode == A) return { name, " a" };
-  if(mode == X) return { name, " x" };
-  if(mode == XAbsolute) return { name, " x,$", hex<4>(pa) };
-  if(mode == IAbsoluteX) return { name, " ($", hex<4>(pa), "+x)" };
-  if(mode == CNAbsoluteBit) return { name, " c,!$", hex<4>(pa & 0x1fff), ":", pa >> 13 };
-  if(mode == XDirect) return { name, " x,$", hex<2>(pl) };
-  if(mode == PVector) return { name, " $ff", hex<2>(pl) };
-  if(mode == YaDirect) return { name, " ya,$", hex<2>(pl) };
-  if(mode == XA) return { name, " x,a" };
-  if(mode == YAbsolute) return { name, " y,$", hex<4>(pa) };
-  if(mode == Y) return { name, " y" };
-  if(mode == AX) return { name, " a,x" };
-  if(mode == YDirect) return { name, " y,$", hex<2>(pl) };
-  if(mode == YConstant) return { name, " y,#$", hex<2>(pl) };
-  if(mode == XSp) return { name, " x,sp" };
-  if(mode == YaX) return { name, " ya,x" };
-  if(mode == IXPA) return { name, " (x)+,a" };
-  if(mode == SpX) return { name, " sp,x" };
-  if(mode == AIXP) return { name, " a,(x)+" };
-  if(mode == DirectA) return { name, " $", hex<2>(pl), ",a" };
-  if(mode == IXA) return { name, " (x),a" };
-  if(mode == IDirectXA) return { name, " ($", hex<2>(pl), "+x),a" };
-  if(mode == XConstant) return { name, " x,#$", hex<2>(pl) };
-  if(mode == AbsoluteX) return { name, " $", hex<4>(pa), ",x" };
-  if(mode == AbsoluteBitC) return { name, " $", hex<4>(pa & 0x1fff), ":", pa >> 13, ",c" };
-  if(mode == DirectY) return { name, " $", hex<2>(pl), ",y" };
-  if(mode == AbsoluteY) return { name, " $", hex<4>(pa), ",y" };
-  if(mode == Ya) return { name, " ya" };
-  if(mode == DirectXA) return { name, " $", hex<2>(pl), "+x,a" };
-  if(mode == AbsoluteXA) return { name, " $", hex<4>(pa), "+x,a" };
-  if(mode == AbsoluteYA) return { name, " $", hex<4>(pa), "+y,a" };
-  if(mode == IDirectYA) return { name, " ($", hex<2>(pl), ")+y,a" };
-  if(mode == DirectYX) return { name, " $", hex<2>(pl), "+y,x" };
-  if(mode == DirectYa) return { name, " $", hex<2>(pl), ",ya" };
-  if(mode == DirectXY) return { name, " $", hex<2>(pl), "+x,y" };
-  if(mode == AY) return { name, " a,y" };
-  if(mode == DirectXRelative) return { name, " $", hex<2>(pl), ",$", hex<4>(pc + 3 + (int8_t)ph) };
-  if(mode == XDirectY) return { name, " x,$", hex<2>(pl), "+y" };
-  if(mode == YDirectX) return { name, " y,$", hex<2>(pl), "+x" };
-  if(mode == YA) return { name, " y,a" };
-  if(mode == YRelative) return { name, " y,$", hex<4>(pc + 2 + (int8_t)pl) };
-
-  return "";
+    default:
+      return false;
+  }
 }
 
-inline string SNESSMP::disassemble(uint16_t pc, bool p, uint8_t opcode, uint8_t pl, uint8_t ph) {
-  string name = opcodeInfo[opcode].name;
-  unsigned mode = opcodeInfo[opcode].mode;
+inline string SNESSMP::disassemble(uint16_t pc, uint8_t opcode, uint8_t pl, uint8_t ph, bool p) {
+  string name = smpOpcodeInfo[opcode].name;
+  unsigned mode = smpOpcodeInfo[opcode].mode;
   unsigned pdl = (p << 8) + pl;
   unsigned pdh = (p << 8) + ph;
   unsigned pa = (ph << 8) + pl;
@@ -571,65 +519,66 @@ inline string SNESSMP::disassemble(uint16_t pc, bool p, uint8_t opcode, uint8_t 
   if(mode == TVector) return { name, " ", opcode >> 4 };
   if(mode == Direct) return { name, " $", hex<3>(pdl) };
   if(mode == DirectRelative) return { name, " $", hex<3>(pdl), ",$", hex<4>(pc + 3 + (int8_t)ph) };
-  if(mode == ADirect) return { name, " a,$", hex<3>(pdl) };
-  if(mode == AAbsolute) return { name, " a,$", hex<4>(pa) };
+  if(mode == ADirect) return { name, " a, $", hex<3>(pdl) };
+  if(mode == AAbsolute) return { name, " a, $", hex<4>(pa) };
   if(mode == AIX) return { name, "a,(x)" };
-  if(mode == AIDirectX) return { name, " a,($", hex<3>(pdl), "+x)" };
-  if(mode == AConstant) return { name, " a,#$", hex<2>(pl) };
-  if(mode == DirectDirect) return { name, " $", hex<3>(pdh), ",$", hex<3>(pdl) };
-  if(mode == CAbsoluteBit) return { name, " c,$", hex<4>(pa & 0x1fff), ":", pa >> 13 };
+  if(mode == AIDirectIndX) return { name, " a, ($", hex<3>(pdl), "+x)" };
+  if(mode == AConstant) return { name, " a, #$", hex<2>(pl) };
+  if(mode == DirectDirect) return { name, " $", hex<3>(pdh), ", $", hex<3>(pdl) };
+  if(mode == CAbsoluteBit) return { name, " c, $", hex<4>(pa & 0x1fff), ":", pa >> 13 };
   if(mode == Absolute) return { name, " $", hex<4>(pa) };
   if(mode == P) return { name, " p" };
   if(mode == AbsoluteA) return { name, " $", hex<4>(pa), ",a" };
   if(mode == Relative) return { name, " $", hex<4>(pc + 2 + (int8_t)pl) };
-  if(mode == ADirectX) return { name, " a,$", hex<3>(pdl), "+x" };
-  if(mode == AAbsoluteX) return { name, " a,$", hex<4>(pa), "+x" };
-  if(mode == AAbsoluteY) return { name, " a,$", hex<4>(pa), "+y" };
-  if(mode == AIDirectY) return { name, " a,($", hex<3>(pdl), ")+y" };
-  if(mode == DirectConstant) return { name, " $", hex<3>(pdh), ",#$", hex<2>(pl) };
-  if(mode == IXIY) return { name, " (x),(y)" };
-  if(mode == DirectX) return { name, " $", hex<3>(pdl), "+x" };
+  if(mode == ADirectIndX) return { name, " a, $", hex<3>(pdl), "+x" };
+  if(mode == AAbsoluteX) return { name, " a, $", hex<4>(pa), "+x" };
+  if(mode == AAbsoluteY) return { name, " a, $", hex<4>(pa), "+y" };
+  if(mode == AIDirectIndY) return { name, " a, ($", hex<3>(pdl), ")+y" };
+  if(mode == DirectConstant) return { name, " $", hex<3>(pdh), ", #$", hex<2>(pl) };
+  if(mode == IXIY) return { name, " (x), (y)" };
+  if(mode == DirectIndX) return { name, " $", hex<3>(pdl), "+x" };
   if(mode == A) return { name, " a" };
   if(mode == X) return { name, " x" };
-  if(mode == XAbsolute) return { name, " x,$", hex<4>(pa) };
+  if(mode == XAbsolute) return { name, " x, $", hex<4>(pa) };
   if(mode == IAbsoluteX) return { name, " ($", hex<4>(pa), "+x)" };
-  if(mode == CNAbsoluteBit) return { name, " c,!$", hex<4>(pa & 0x1fff), ":", pa >> 13 };
-  if(mode == XDirect) return { name, " x,$", hex<3>(pdl) };
+  if(mode == CNAbsoluteBit) return { name, " c, !$", hex<4>(pa & 0x1fff), ":", pa >> 13 };
+  if(mode == XDirect) return { name, " x, $", hex<3>(pdl) };
   if(mode == PVector) return { name, " $ff", hex<2>(pl) };
-  if(mode == YaDirect) return { name, " ya,$", hex<3>(pdl) };
-  if(mode == XA) return { name, " x,a" };
-  if(mode == YAbsolute) return { name, " y,$", hex<4>(pa) };
+  if(mode == YaDirect) return { name, " ya, $", hex<3>(pdl) };
+  if(mode == XA) return { name, " x, a" };
+  if(mode == YAbsolute) return { name, " y, $", hex<4>(pa) };
   if(mode == Y) return { name, " y" };
-  if(mode == AX) return { name, " a,x" };
-  if(mode == YDirect) return { name, " y,$", hex<3>(pdl) };
-  if(mode == YConstant) return { name, " y,#$", hex<2>(pl) };
-  if(mode == XSp) return { name, " x,sp" };
-  if(mode == YaX) return { name, " ya,x" };
-  if(mode == IXPA) return { name, " (x)+,a" };
-  if(mode == SpX) return { name, " sp,x" };
-  if(mode == AIXP) return { name, " a,(x)+" };
-  if(mode == DirectA) return { name, " $", hex<3>(pdl), ",a" };
-  if(mode == IXA) return { name, " (x),a" };
-  if(mode == IDirectXA) return { name, " ($", hex<3>(pdl), "+x),a" };
-  if(mode == XConstant) return { name, " x,#$", hex<2>(pl) };
-  if(mode == AbsoluteX) return { name, " $", hex<4>(pa), ",x" };
-  if(mode == AbsoluteBitC) return { name, " $", hex<4>(pa & 0x1fff), ":", pa >> 13, ",c" };
-  if(mode == DirectY) return { name, " $", hex<3>(pdl), ",y" };
-  if(mode == AbsoluteY) return { name, " $", hex<4>(pa), ",y" };
+  if(mode == AX) return { name, " a, x" };
+  if(mode == YDirect) return { name, " y, $", hex<3>(pdl) };
+  if(mode == YConstant) return { name, " y, #$", hex<2>(pl) };
+  if(mode == XSp) return { name, " x, sp" };
+  if(mode == YaX) return { name, " ya, x" };
+  if(mode == IXPA) return { name, " (x)+, a" };
+  if(mode == SpX) return { name, " sp, x" };
+  if(mode == AIXP) return { name, " a, (x)+" };
+  if(mode == DirectA) return { name, " $", hex<3>(pdl), ", a" };
+  if(mode == IXA) return { name, " (x), a" };
+  if(mode == IDirectIndXA) return { name, " ($", hex<3>(pdl), "+x), a" };
+  if(mode == XConstant) return { name, " x, #$", hex<2>(pl) };
+  if(mode == AbsoluteX) return { name, " $", hex<4>(pa), ", x" };
+  if(mode == AbsoluteBitC) return { name, " $", hex<4>(pa & 0x1fff), ":", pa >> 13, ", c" };
+  if(mode == DirectY) return { name, " $", hex<3>(pdl), ", y" };
+  if(mode == AbsoluteY) return { name, " $", hex<4>(pa), ", y" };
   if(mode == Ya) return { name, " ya" };
-  if(mode == DirectXA) return { name, " $", hex<3>(pdl), "+x,a" };
-  if(mode == AbsoluteXA) return { name, " $", hex<4>(pa), "+x,a" };
-  if(mode == AbsoluteYA) return { name, " $", hex<4>(pa), "+y,a" };
-  if(mode == IDirectYA) return { name, " ($", hex<3>(pdl), ")+y,a" };
-  if(mode == DirectYX) return { name, " $", hex<3>(pdl), "+y,x" };
+  if(mode == DirectIndXA) return { name, " $", hex<3>(pdl), "+x, a" };
+  if(mode == AbsoluteXA) return { name, " $", hex<4>(pa), "+x, a" };
+  if(mode == AbsoluteYA) return { name, " $", hex<4>(pa), "+y, a" };
+  if(mode == IDirectIndYA) return { name, " ($", hex<3>(pdl), ")+y, a" };
+  if(mode == DirectX) return { name, " $", hex<3>(pdl), ", x" };
+  if(mode == DirectIndYX) return { name, " $", hex<3>(pdl), "+y, x" };
   if(mode == DirectYa) return { name, " $", hex<3>(pdl), ",ya" };
-  if(mode == DirectXY) return { name, " $", hex<3>(pdl), "+x,y" };
-  if(mode == AY) return { name, " a,y" };
-  if(mode == DirectXRelative) return { name, " $", hex<3>(pdl), ",$", hex<4>(pc + 3 + (int8_t)ph) };
-  if(mode == XDirectY) return { name, " x,$", hex<3>(pdl), "+y" };
-  if(mode == YDirectX) return { name, " y,$", hex<3>(pdl), "+x" };
-  if(mode == YA) return { name, " y,a" };
-  if(mode == YRelative) return { name, " y,$", hex<4>(pc + 2 + (int8_t)pl) };
+  if(mode == DirectIndXY) return { name, " $", hex<3>(pdl), "+x, y" };
+  if(mode == AY) return { name, " a, y" };
+  if(mode == DirectIndXRelative) return { name, " $", hex<3>(pdl), ", $", hex<4>(pc + 3 + (int8_t)ph) };
+  if(mode == XDirectIndY) return { name, " x, $", hex<3>(pdl), "+y" };
+  if(mode == YDirectIndX) return { name, " y, $", hex<3>(pdl), "+x" };
+  if(mode == YA) return { name, " y, a" };
+  if(mode == YRelative) return { name, " y, $", hex<4>(pc + 2 + (int8_t)pl) };
 
   return "";
 }

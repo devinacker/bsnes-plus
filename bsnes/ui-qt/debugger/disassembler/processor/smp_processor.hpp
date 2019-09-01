@@ -20,4 +20,6 @@ public:
 private:
   SymbolMap *symbols;
 
+  uint32_t decode(uint32_t type, uint32_t address, uint32_t pc);
+  void setOpcodeParams(DisassemblerLine &result, SNES::SMP::Opcode &opcode, uint32_t address);
 };
