@@ -88,7 +88,8 @@ void Tracer::setSfxTraceState(int state) {
   setTraceState(traceSfx);
 }
 
-void Tracer::setTraceMaskState(bool traceMask) {
+void Tracer::setTraceMaskState(bool state) {
+  traceMask = state;
   if(traceMask) {
     //flush all bitmasks once enabled
     memset(traceMaskCPU, 0x00, (1 << 24) >> 3);
