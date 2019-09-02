@@ -31,41 +31,41 @@ uint16 SMPcore::decode(uint8 offset_type, uint16 addr, uint16 pc) {
   case SNESSMP::ADirectIndX:
   case SNESSMP::YDirectIndX:
     r = dp | ((addr + regs.x) & 0xff);
-	break;
+    break;
   case SNESSMP::DirectIndYX:
   case SNESSMP::XDirectIndY:
     r = dp | ((addr + regs.y) & 0xff);
-	break;
+    break;
   case SNESSMP::Absolute:
     r = addr;
     break;
   case SNESSMP::AbsoluteXA:
   case SNESSMP::AAbsoluteX:
     r = addr + regs.x;
-	break;
+    break;
   case SNESSMP::AbsoluteYA:
   case SNESSMP::AAbsoluteY:
     r = addr + regs.y;
-	break;
+    break;
   case SNESSMP::AIDirectIndX:
   case SNESSMP::IDirectIndXA:
     r = dreadw(dp | ((addr + regs.x) & 0xff));
-	break;
+    break;
   case SNESSMP::AIDirectIndY:
   case SNESSMP::IDirectIndYA:
     r = dreadw(dp | (addr & 0xff)) + regs.y;
-	break;
+    break;
   case SNESSMP::IAbsoluteX:
     r = dreadw(addr + regs.x);
-	break;
+    break;
   case SNESSMP::Relative:
   case SNESSMP::YRelative:
     r = relb((int8)addr, 2, pc);
-	break;
+    break;
   case SNESSMP::DirectRelative:
   case SNESSMP::DirectIndXRelative:
     r = relb((int8)addr, 3, pc);
-	break;
+    break;
   case SNESSMP::PVector:
     r = 0xff00 | (addr & 0xff);
     break;

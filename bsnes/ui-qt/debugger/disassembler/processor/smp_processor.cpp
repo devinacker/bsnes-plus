@@ -65,21 +65,21 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::DirectDirect:
       result.paramFormat = "%1X2, %2X2";
       result.params.append(DisassemblerParam::createAddress(opcode.op8(1),
-	                         decode(SNESSMP::Direct, opcode.op8(1), pc)));
+                             decode(SNESSMP::Direct, opcode.op8(1), pc)));
       result.params.append(directParam);
       break;
     
     case SNESSMP::DirectConstant:
       result.paramFormat = "%1X2, #%2X2";
       result.params.append(DisassemblerParam::createAddress(opcode.op8(1),
-	                         decode(SNESSMP::Direct, opcode.op8(1), pc)));
+                             decode(SNESSMP::Direct, opcode.op8(1), pc)));
       result.params.append(DisassemblerParam::createValue(opcode.op8(0)));
       break;
 
     case SNESSMP::DirectIndX:
       result.paramFormat = "%1X2+x";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNESSMP::DirectA:
@@ -95,18 +95,18 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::DirectIndXA:
       result.paramFormat = "%1X2+x, a";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
     
     case SNESSMP::DirectX:
       result.paramFormat = "%1X2, x";
       result.params.append(directParam);
       break;
-	  
+      
     case SNESSMP::DirectIndYX:
       result.paramFormat = "%1X2+y, x";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
     
     case SNESSMP::DirectYa:
@@ -117,13 +117,13 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::DirectIndXY:
       result.paramFormat = "%1X2+x, y";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
     
     case SNESSMP::DirectIndXRelative:
       result.paramFormat = "%1X2+x, %2X4";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(SNESSMP::DirectIndX, opcode.op8(), pc)));
+                             directAddr, decode(SNESSMP::DirectIndX, opcode.op8(), pc)));
       result.params.append(DisassemblerParam::createAddress(decode(opcode.optype, opcode.op8(1), pc), 
                              decode(opcode.optype, opcode.op8(1), pc)));
       break;
@@ -137,7 +137,7 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
       result.paramFormat = "%1X4, a";
       result.params.append(absoluteParam);
       break;
-	  
+      
     case SNESSMP::AbsoluteX:
       result.paramFormat = "%1X4, x";
       result.params.append(absoluteParam);
@@ -158,13 +158,13 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::AbsoluteXA:
       result.paramFormat = "%1X4+x, a";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
-	                         absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
+                             absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
       break;
       	
     case SNESSMP::AbsoluteYA:
       result.paramFormat = "%1X4+y, a";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
-	                         absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
+                             absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
       break;
     
     case SNESSMP::ADirect:
@@ -180,7 +180,7 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::AIDirectIndX:
       result.paramFormat = "a, (%1X2+x)";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNESSMP::AConstant:
@@ -211,25 +211,25 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::ADirectIndX:
       result.paramFormat = "a, %1X2+x";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
 
     case SNESSMP::AAbsoluteX:
       result.paramFormat = "a, %1X4+x";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
-	                         absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
+                             absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
       break;
       
     case SNESSMP::AAbsoluteY:
       result.paramFormat = "a, %1X4+y";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
-	                         absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
+                             absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
       break;
       
     case SNESSMP::AIDirectIndY:
       result.paramFormat = "a, (%1X2)+y";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
     
     case SNESSMP::XAbsolute:
@@ -240,19 +240,19 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::IAbsoluteX:
       result.paramFormat = "(%1X4+x)";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op16(),
-	                         absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
+                             absoluteAddr, decode(opcode.optype, opcode.op16(), pc)));
       break;
     
     case SNESSMP::IDirectIndXA:
       result.paramFormat = "(%1X2+x), a";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
       
     case SNESSMP::IDirectIndYA:
       result.paramFormat = "(%1X2)+y, a";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
         
     case SNESSMP::XDirect:
@@ -263,7 +263,7 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::XDirectIndY:
       result.paramFormat = "x, %1X2+y";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
     
   	case SNESSMP::XConstant:
@@ -274,7 +274,7 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::PVector:
       result.paramFormat = "%1X4";
       result.params.append(DisassemblerParam::createAddress(opcode.op8(),
-	                         decode(opcode.optype, opcode.op8(), pc)));
+                             decode(opcode.optype, opcode.op8(), pc)));
       break;
       
     case SNESSMP::TVector:
@@ -304,7 +304,7 @@ void SmpDisasmProcessor::setOpcodeParams(DisassemblerLine &result, SNES::SMP::Op
     case SNESSMP::YDirectIndX:
       result.paramFormat = "y, %1X2+x";
       result.params.append(DisassemblerParam::createTargetAddress(opcode.op8(),
-	                         directAddr, decode(opcode.optype, opcode.op8(), pc)));
+                             directAddr, decode(opcode.optype, opcode.op8(), pc)));
       break;
       
     case SNESSMP::YRelative:
