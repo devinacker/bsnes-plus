@@ -2,6 +2,9 @@
 
 #if defined(DEBUGGER)
 
+#include <nall/snes/cpu.hpp>
+#include <nall/snes/smp.hpp>
+
 #include "debugger.moc"
 Debugger *debugger;
 
