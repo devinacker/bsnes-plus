@@ -23,11 +23,15 @@ DebuggerView::DebuggerView(RegisterEdit *registers, DisasmProcessor *processor, 
   ramViewer->reader = { &DebuggerView::reader, this };
   ramViewer->writer = { &DebuggerView::writer, this };
   ramViewer->usage  = { &DebuggerView::usage, this };
-  ramViewer->setAddressWidth(6);
+  // set fixed address width based on address bus size
+  ramViewer->setEditorSize(processor->getBusSize());
+  ramViewer->setAddressWidth(ramViewer->addressWidth());
   ramViewer->setMinimumHeight(70);
   ramViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   ramViewer->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   consoleLayout->addWidget(ramViewer);
+
+  disassembler->setAddressWidth(ramViewer->addressWidth());
 
   consoleLayout->setStretchFactor(0, 8);
   consoleLayout->setStretchFactor(1, 1);

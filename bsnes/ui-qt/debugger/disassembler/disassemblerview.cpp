@@ -2,6 +2,7 @@
 
 // ------------------------------------------------------------------------
 DisassemblerView::DisassemblerView(DisasmProcessor *processor) : hasValidAddress(false), processor(processor) {
+  addressWidth = 6;
   setFont(QFont(Style::Monospace));
   setMouseTracking(true);
   setContextMenuPolicy(Qt::CustomContextMenu);
@@ -39,11 +40,19 @@ void DisassemblerView::setFont(const QFont &font) {
   headerHeight = charHeight + 3;
   lineOffset = 3;
 
-  columnSizes[0] = charWidth * 6 + charWidth;
+  columnSizes[0] = charWidth * addressWidth + charWidth;
   columnSizes[1] = columnSizes[0] + 30 * charWidth;
 
   adjust();
   viewport()->update();
+}
+
+// ------------------------------------------------------------------------
+void DisassemblerView::setAddressWidth(uint32_t width) {
+  addressWidth = width;
+  
+  // adjust text dimensions
+  setFont(font());
 }
 
 // ------------------------------------------------------------------------
@@ -566,7 +575,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
     painter.drawPath(path);
   }
 
-  address = QString("%1").arg(line.line.address, 6, 16, QChar('0'));
+  address = QString("%1").arg(line.line.address, addressWidth, 16, QChar('0'));
 
   SET_CLIPPING(COLUMN_ADDRESS);
   painter.setPen(addressColor);
@@ -627,7 +636,7 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
                 x += renderValue(painter, x, y, argType, argLength, param.value);
               }
               line.addressSizeX = x - line.addressPosX;
-              directComment += QString("[%1]").arg(param.targetAddress, 6, 16, QChar('0'));
+              directComment += QString("[%1]").arg(param.targetAddress, addressWidth, 16, QChar('0'));
               break;
 
             default:

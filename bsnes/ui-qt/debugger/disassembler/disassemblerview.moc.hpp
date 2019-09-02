@@ -49,6 +49,7 @@ public:
   void refresh(uint32_t address);
 
   virtual void setFont(const QFont &font);
+  void setAddressWidth(uint32_t);
 
 protected:
   void paintEvent(QPaintEvent *event);
@@ -91,6 +92,7 @@ private:
   uint32_t charPadding;
   uint32_t rowsShown;
   uint32_t headerHeight;
+  uint32_t addressWidth;
 
   uint32_t emptyRowsAround;
 
