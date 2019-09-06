@@ -18,6 +18,7 @@ Debugger *debugger;
 #include "disassembler/processor/common_processor.cpp"
 #include "disassembler/processor/cpu_processor.cpp"
 #include "disassembler/processor/smp_processor.cpp"
+#include "disassembler/processor/sfx_processor.cpp"
 
 #include "registeredit.cpp"
 #include "debuggerview.cpp"
@@ -106,11 +107,12 @@ Debugger::Debugger() {
   symbolsSA1 = new SymbolMap();
   symbolsSMP = new SymbolMap();
   symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+  symbolsSFX = new SymbolMap();
 
   debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
   debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
-  debugSFX = new DebuggerView(registerEditSFX, new CommonDisasmProcessor(CommonDisasmProcessor::SFX));
+  debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
 
   QTabWidget *editTabs = new QTabWidget;
   editTabs->addTab(debugCPU, "CPU");

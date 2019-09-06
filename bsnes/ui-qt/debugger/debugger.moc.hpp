@@ -40,6 +40,7 @@ public:
   class DebuggerView *debugSMP;
 
   class SymbolMap *symbolsCPU;
+  class SymbolMap *symbolsSFX;
   class SymbolMap *symbolsSA1;
   class SymbolMap *symbolsSMP;
 
