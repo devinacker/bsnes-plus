@@ -26,6 +26,7 @@ Symbol Symbols::getComment() {
 // ------------------------------------------------------------------------
 SymbolMap::SymbolMap() {
   isValid = false;
+  isModified = false;
   adapters = new SymbolFileAdapters();
 }
 
@@ -55,6 +56,7 @@ int32_t SymbolMap::getSymbolIndex(uint32_t address) {
 // ------------------------------------------------------------------------
 void SymbolMap::reset() {
   symbols.reset();
+  isModified = false;
   finishUpdates();
 }
 
@@ -85,6 +87,8 @@ void SymbolMap::addSymbol(uint32_t address, const Symbol &name) {
   s.address = address;
   s.symbols.append(Symbol(name));
   symbols.append(s);
+  
+  isModified = true;
 }
 
 // ------------------------------------------------------------------------
@@ -138,13 +142,15 @@ void SymbolMap::removeSymbol(uint32_t address, Symbol::Type type) {
   if (s.symbols.size() == 0) {
     symbols.remove(index);
   }
+  
+  isModified = true;
 }
 
 // ------------------------------------------------------------------------
 bool SymbolMap::saveToFile(const string &baseName, const string &ext) {
   revalidate();
 
-  if (symbols.size() == 0) {
+  if (symbols.size() == 0 || !isModified) {
     return false;
   }
 
@@ -169,6 +175,8 @@ bool SymbolMap::saveToFile(const string &baseName, const string &ext) {
   adapter->write(f, this);
 
   f.close();
+  
+  isModified = false;
   return true;
 }
 
@@ -195,9 +203,11 @@ bool SymbolMap::loadFromString(const string &file) {
     return false;
   }
 
+  bool wasModified = isModified;
   if (adapter->read(rows, this)) {
     finishUpdates();
-	return true;
+    isModified = wasModified;
+    return true;
   }
   
   return false;

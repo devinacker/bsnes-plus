@@ -88,6 +88,7 @@ public:
   Symbol getComment(uint32_t address);
 
   bool isValid;
+  bool isModified;
   SymbolsLists symbols;
   SymbolFileAdapters *adapters;
 
