@@ -5,6 +5,9 @@
     <file alias="bsnes_512.png">../../data/bsnes_512.png</file>
     <file alias="cheats.xml">../../data/cheats.xml</file>
 
+    <file alias="default.cpu.sym">../../data/default.cpu.sym</file>
+    <file alias="default.smp.sym">../../data/default.smp.sym</file>
+
     <file alias="logo.png">../data/logo.png</file>
     <file alias="documentation.html">../data/documentation.html</file>
     <file alias="license.html">../data/license.html</file>

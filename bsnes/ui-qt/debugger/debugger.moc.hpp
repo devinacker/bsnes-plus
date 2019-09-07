@@ -70,6 +70,8 @@ private:
   inline void switchWindow();
 
   unsigned frameCounter;
+  string defaultSymbolsCPU;
+  string defaultSymbolsSMP;
 };
 
 extern Debugger *debugger;

@@ -11,8 +11,6 @@ Debugger *debugger;
 #include "tracer.cpp"
 
 #include "disassembler/symbols/symbol_map.cpp"
-#include "disassembler/symbols/symbol_map_cpu.hpp"
-#include "disassembler/symbols/symbol_map_smp.hpp"
 
 #include "disassembler/processor/processor.cpp"
 #include "disassembler/processor/common_processor.cpp"
@@ -109,9 +107,13 @@ Debugger::Debugger() {
   symbolsSA1 = new SymbolMap();
   symbolsSMP = new SymbolMap();
   symbolsSFX = new SymbolMap();
+  
+  application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
+  
   if (config().debugger.loadDefaultSymbols) {
-    symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
-    symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+    symbolsCPU->loadFromFile(defaultSymbolsCPU);
+    symbolsSMP->loadFromFile(defaultSymbolsSMP);
   }
   
   debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
@@ -294,11 +296,11 @@ void Debugger::modifySystemState(unsigned state) {
     if (!symbolsCPU->loadFromFile(nall::basename(symfile), ".cpu.sym") &&
         !symbolsCPU->loadFromFile(nall::basename(symfile), ".sym") &&
         config().debugger.loadDefaultSymbols) {
-      symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
+      symbolsCPU->loadFromFile(defaultSymbolsCPU);
     }
     if (!symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym") &&
         config().debugger.loadDefaultSymbols) {
-      symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+      symbolsCPU->loadFromFile(defaultSymbolsSMP);
     }
     if (SNES::cartridge.has_sa1())
       symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
