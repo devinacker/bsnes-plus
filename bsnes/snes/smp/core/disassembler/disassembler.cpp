@@ -143,7 +143,7 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
   op1 = smp.op_debugread(addr + 2);
   SNES::debugger.bus_access = false;
   
-  sprintf(t, "%-22s ", SNESSMP::disassemble(addr, op, op0, op1, regs.p.p)());
+  sprintf(t, "%-23s ", SNESSMP::disassemble(addr, op, op0, op1, regs.p.p)());
   strcat(s, t);
 
   sprintf(t, "A:%.2x X:%.2x Y:%.2x SP:01%.2x YA:%.4x ",

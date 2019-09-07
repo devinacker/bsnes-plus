@@ -168,7 +168,7 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr, bool track_regs) {
     break;
   }
   
-  sprintf(output, "%.6x %-5s %-13s", addr, op_info.name, t);
+  sprintf(output, "%.6x %-5s %-18s", addr, op_info.name, t);
   
   // status register and some flags (TODO: other flags?)
   sprintf(t, "S:%.4x %c%c%c%c ",
