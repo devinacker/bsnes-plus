@@ -109,7 +109,10 @@ Debugger::Debugger() {
   symbolsSFX = new SymbolMap();
   
   application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsCPUWithSA1 = "default_sa1.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsCPUWithSFX = "default_sfx.cpu.sym", true, true);
   application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
+  application.locateFile(defaultSymbolsSA1 = "default.sa1.sym", true, true);
   
   if (config().debugger.loadDefaultSymbols) {
     symbolsCPU->loadFromFile(defaultSymbolsCPU);
@@ -295,14 +298,21 @@ void Debugger::modifySystemState(unsigned state) {
         !symbolsCPU->loadFromFile(nall::basename(symfile), ".sym") &&
         config().debugger.loadDefaultSymbols) {
       symbolsCPU->loadFromFile(defaultSymbolsCPU);
+      if (SNES::cartridge.has_sa1())
+        symbolsCPU->loadFromFile(defaultSymbolsCPUWithSA1);
+      if (SNES::cartridge.has_superfx())
+        symbolsCPU->loadFromFile(defaultSymbolsCPUWithSFX);
     }
     if (!symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym") &&
         config().debugger.loadDefaultSymbols) {
-      symbolsCPU->loadFromFile(defaultSymbolsSMP);
+      symbolsSMP->loadFromFile(defaultSymbolsSMP);
     }
     if (SNES::cartridge.has_sa1()) {
       editTabs->addTab(debugSA1, "SA-1");
-      symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
+      if (!symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym") &&
+          config().debugger.loadDefaultSymbols) {
+        symbolsSA1->loadFromFile(defaultSymbolsSA1);  
+      }
     }
     if (SNES::cartridge.has_superfx()) {
       editTabs->addTab(debugSFX, "SuperFX");

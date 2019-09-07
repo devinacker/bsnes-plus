@@ -72,7 +72,10 @@ private:
 
   unsigned frameCounter;
   string defaultSymbolsCPU;
+  string defaultSymbolsCPUWithSA1;
+  string defaultSymbolsCPUWithSFX;
   string defaultSymbolsSMP;
+  string defaultSymbolsSA1;
 };
 
 extern Debugger *debugger;

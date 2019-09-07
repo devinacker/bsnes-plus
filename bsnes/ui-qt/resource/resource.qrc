@@ -6,7 +6,10 @@
     <file alias="cheats.xml">../../data/cheats.xml</file>
 
     <file alias="default.cpu.sym">../../data/default.cpu.sym</file>
+    <file alias="default_sa1.cpu.sym">../../data/default_sa1.cpu.sym</file>
+    <file alias="default_sfx.cpu.sym">../../data/default_sfx.cpu.sym</file>
     <file alias="default.smp.sym">../../data/default.smp.sym</file>
+    <file alias="default.sa1.sym">../../data/default.sa1.sym</file>
 
     <file alias="logo.png">../data/logo.png</file>
     <file alias="documentation.html">../data/documentation.html</file>
