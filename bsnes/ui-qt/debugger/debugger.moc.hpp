@@ -39,6 +39,7 @@ public:
   class DebuggerView *debugSFX;
   class DebuggerView *debugSA1;
   class DebuggerView *debugSMP;
+  QTabWidget *editTabs;
 
   class SymbolMap *symbolsCPU;
   class SymbolMap *symbolsSFX;

@@ -121,11 +121,9 @@ Debugger::Debugger() {
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
   debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
 
-  QTabWidget *editTabs = new QTabWidget;
+  editTabs = new QTabWidget;
   editTabs->addTab(debugCPU, "CPU");
   editTabs->addTab(debugSMP, "SMP");
-  editTabs->addTab(debugSA1, "SA-1");
-  editTabs->addTab(debugSFX, "SuperFX");
   editTabs->setTabPosition(QTabWidget::North);
   editTabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   consoleLayout->addWidget(editTabs);
@@ -302,11 +300,15 @@ void Debugger::modifySystemState(unsigned state) {
         config().debugger.loadDefaultSymbols) {
       symbolsCPU->loadFromFile(defaultSymbolsSMP);
     }
-    if (SNES::cartridge.has_sa1())
+    if (SNES::cartridge.has_sa1()) {
+      editTabs->addTab(debugSA1, "SA-1");
       symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
-    if (SNES::cartridge.has_superfx())
+    }
+    if (SNES::cartridge.has_superfx()) {
+      editTabs->addTab(debugSFX, "SuperFX");
       symbolsSFX->loadFromFile(nall::basename(symfile), ".sfx.sym");
-    
+    }
+
     string data;
     if(config().debugger.saveBreakpoints) {
       breakpointEditor->clear();
@@ -351,6 +353,12 @@ void Debugger::modifySystemState(unsigned state) {
         fp.close();
       }
     }
+    
+    // remove coprocessor debugger tabs
+    while (editTabs->count() > 2) {
+      editTabs->removeTab(2);
+    }
+    editTabs->setCurrentIndex(0);
   }
 }
 
@@ -524,6 +532,7 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         debugCPU->refresh(SNES::cpu.opcode_pc);
         registerEditCPU->setEnabled(true);
+        editTabs->setCurrentIndex(0);
         break;
       }
 
@@ -536,6 +545,7 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         debugSA1->refresh(SNES::sa1.opcode_pc);
         registerEditSA1->setEnabled(true);
+        editTabs->setCurrentIndex(editTabs->indexOf(debugSA1));
         break;
       }
 
@@ -547,6 +557,7 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         debugSMP->refresh(SNES::smp.opcode_pc);
         registerEditSMP->setEnabled(true);
+        editTabs->setCurrentIndex(1);
         break;
       }
 
@@ -558,6 +569,7 @@ void Debugger::event() {
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
         debugSFX->refresh(SNES::superfx.opcode_pc);
         registerEditSFX->setEnabled(true);
+        editTabs->setCurrentIndex(editTabs->indexOf(debugSFX));
         break;
       }
     } break;
