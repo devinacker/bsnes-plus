@@ -76,9 +76,9 @@ public:
   void addComment(uint32_t address, const string &name);
   void addSymbol(uint32_t address, const Symbol &name);
   void removeSymbol(uint32_t address, Symbol::Type type);
-  void loadFromString(const string &file);
-  void loadFromFile(const string &baseName, const string &ext);
-  void saveToFile(const string &baseName, const string &ext);
+  bool loadFromString(const string &file);
+  bool loadFromFile(const string &baseName, const string &ext);
+  bool saveToFile(const string &baseName, const string &ext);
   void finishUpdates();
 
   void revalidate();

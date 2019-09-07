@@ -132,6 +132,7 @@ Configuration::Configuration() {
 
   attach(debugger.cacheUsageToDisk = false, "debugger.cacheUsageToDisk");
   attach(debugger.saveBreakpoints = false, "debugger.saveBreakpoints");
+  attach(debugger.loadDefaultSymbols = true, "debugger.loadDefaultSymbols");
   attach(debugger.saveSymbols = true, "debugger.saveSymbols");
   attach(debugger.showHClocks = false, "debugger.showHClocks");
 

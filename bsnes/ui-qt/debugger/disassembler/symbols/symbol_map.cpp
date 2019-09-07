@@ -141,11 +141,11 @@ void SymbolMap::removeSymbol(uint32_t address, Symbol::Type type) {
 }
 
 // ------------------------------------------------------------------------
-void SymbolMap::saveToFile(const string &baseName, const string &ext) {
+bool SymbolMap::saveToFile(const string &baseName, const string &ext) {
   revalidate();
 
   if (symbols.size() == 0) {
-    return;
+    return false;
   }
 
   SymbolFileInterface *adapter = adapters->fetchAdapter(
@@ -163,39 +163,44 @@ void SymbolMap::saveToFile(const string &baseName, const string &ext) {
 
   ::nall::file f;
   if (!f.open((const char*)fileName, ::nall::file::mode::write)) {
-    return;
+    return false;
   }
 
   adapter->write(f, this);
 
   f.close();
+  return true;
 }
 
 // ------------------------------------------------------------------------
-void SymbolMap::loadFromFile(const string &baseName, const string &ext) {
+bool SymbolMap::loadFromFile(const string &baseName, const string &ext) {
   string fileName = baseName;
   fileName.append(ext);
 
   string buffer;
   if (buffer.readfile(fileName)) {
-    loadFromString(buffer);
+    return loadFromString(buffer);
   }
+  
+  return false;
 }
 
 // ------------------------------------------------------------------------
-void SymbolMap::loadFromString(const string &file) {
+bool SymbolMap::loadFromString(const string &file) {
   nall::lstring rows;
   rows.split("\n", file);
 
   SymbolFileInterface *adapter = adapters->findBestAdapter(rows);
   if (adapter == NULL) {
-    return;
+    return false;
   }
 
-  symbols.reset();
   if (adapter->read(rows, this)) {
     finishUpdates();
+	return true;
   }
+  
+  return false;
 }
 
 // ------------------------------------------------------------------------

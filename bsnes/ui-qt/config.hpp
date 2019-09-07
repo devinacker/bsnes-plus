@@ -80,6 +80,7 @@ public:
   struct Debugger {
     bool cacheUsageToDisk;
     bool saveBreakpoints;
+    bool loadDefaultSymbols;
     bool saveSymbols;
     bool showHClocks;
   } debugger;

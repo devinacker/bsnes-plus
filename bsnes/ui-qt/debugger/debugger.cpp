@@ -79,6 +79,9 @@ Debugger::Debugger() {
   menu_misc_saveSymbols = menu_misc->addAction("Save &symbols to disk between sessions");
   menu_misc_saveSymbols->setCheckable(true);
   menu_misc_saveSymbols->setChecked(config().debugger.saveSymbols);
+  menu_misc_loadDefaultSymbols = menu_misc->addAction("Load &default symbols if none are saved");
+  menu_misc_loadDefaultSymbols->setCheckable(true);
+  menu_misc_loadDefaultSymbols->setChecked(config().debugger.loadDefaultSymbols);
   menu_misc_showHClocks = menu_misc->addAction("Show &H-position in clocks instead of dots");
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
@@ -103,12 +106,14 @@ Debugger::Debugger() {
   layout->addWidget(consoleLayout);
 
   symbolsCPU = new SymbolMap();
-  symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
   symbolsSA1 = new SymbolMap();
   symbolsSMP = new SymbolMap();
-  symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
   symbolsSFX = new SymbolMap();
-
+  if (config().debugger.loadDefaultSymbols) {
+    symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
+    symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+  }
+  
   debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
   debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
@@ -206,6 +211,7 @@ Debugger::Debugger() {
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
   connect(menu_misc_cacheUsage, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_saveBreakpoints, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_loadDefaultSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_saveSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
 
@@ -280,19 +286,24 @@ void Debugger::modifySystemState(unsigned state) {
       SNES::cpuAnalyst.performFullAnalysis();
     }
     
-    symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
-    symbolsCPU->loadFromFile(nall::basename(symfile), ".sym");
-    symbolsCPU->loadFromFile(nall::basename(symfile), ".cpu.sym");
-    symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
-    symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym");
+    symbolsCPU->reset();
+    symbolsSMP->reset();
+    symbolsSA1->reset();
+    symbolsSFX->reset();
+    
+    if (!symbolsCPU->loadFromFile(nall::basename(symfile), ".cpu.sym") &&
+        !symbolsCPU->loadFromFile(nall::basename(symfile), ".sym") &&
+        config().debugger.loadDefaultSymbols) {
+      symbolsCPU->loadFromString(DEFAULT_SYMBOL_MAP_CPU);
+    }
+    if (!symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym") &&
+        config().debugger.loadDefaultSymbols) {
+      symbolsSMP->loadFromString(DEFAULT_SYMBOL_MAP_SMP);
+    }
     if (SNES::cartridge.has_sa1())
       symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
-    else
-      symbolsSA1->reset();
     if (SNES::cartridge.has_superfx())
       symbolsSFX->loadFromFile(nall::basename(symfile), ".sfx.sym");
-    else
-      symbolsSFX->reset();
     
     string data;
     if(config().debugger.saveBreakpoints) {
@@ -366,6 +377,7 @@ void Debugger::synchronize() {
   
   config().debugger.cacheUsageToDisk = menu_misc_cacheUsage->isChecked();
   config().debugger.saveBreakpoints = menu_misc_saveBreakpoints->isChecked();
+  config().debugger.loadDefaultSymbols = menu_misc_loadDefaultSymbols->isChecked();
   config().debugger.saveSymbols = menu_misc_saveSymbols->isChecked();
   config().debugger.showHClocks = menu_misc_showHClocks->isChecked();
   
