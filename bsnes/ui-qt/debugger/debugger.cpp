@@ -289,6 +289,10 @@ void Debugger::modifySystemState(unsigned state) {
       symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym");
     else
       symbolsSA1->reset();
+    if (SNES::cartridge.has_superfx())
+      symbolsSFX->loadFromFile(nall::basename(symfile), ".sfx.sym");
+    else
+      symbolsSFX->reset();
     
     string data;
     if(config().debugger.saveBreakpoints) {
@@ -321,6 +325,8 @@ void Debugger::modifySystemState(unsigned state) {
       symbolsSMP->saveToFile(nall::basename(symfile), ".smp.sym");
       if (SNES::cartridge.has_sa1())
         symbolsSA1->saveToFile(nall::basename(symfile), ".sa1.sym");
+      if (SNES::cartridge.has_superfx())
+        symbolsSFX->saveToFile(nall::basename(symfile), ".sfx.sym");
     }
 
     if(config().debugger.saveBreakpoints) {
