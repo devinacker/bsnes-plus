@@ -75,6 +75,8 @@ public:
   QCheckBox *breakOnWDM;
   QCheckBox *breakOnBRK;
 
+  static const QStringList sources;
+  
   BreakpointEditor();
 
   void addBreakpoint(const string& addr, const string& mode, const string& source);

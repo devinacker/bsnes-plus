@@ -296,6 +296,16 @@ bool BreakpointModel::removeRows(int row, int count, const QModelIndex &parent) 
   return false;
 }
 
+const QStringList BreakpointEditor::sources = {
+  "cpu",
+  "smp",
+  "vram",
+  "oam",
+  "cgram",
+  "sa1",
+  "sfx",
+};
+
 BreakpointEditor::BreakpointEditor() {
   setObjectName("breakpoint-editor");
   setWindowTitle("Breakpoint Editor");
@@ -401,15 +411,8 @@ void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, con
   if (model->insertRow(row)) {
     string sourceStr = source;
     sourceStr.lower();
-    int nSource;
-    if(sourceStr == "cpu")        { nSource = 0; }
-    else if(sourceStr == "smp")   { nSource = 1; }
-    else if(sourceStr == "vram")  { nSource = 2; }
-    else if(sourceStr == "oam")   { nSource = 3; }
-    else if(sourceStr == "cgram") { nSource = 4; }
-    else if(sourceStr == "sa1")   { nSource = 5; }
-    else if(sourceStr == "sfx")   { nSource = 6; }
-    else { return; }
+    int nSource = sources.indexOf(sourceStr);
+    if (nSource < 0) return;
     model->setData(model->index(row, BreakpointModel::BreakSource), nSource);
 
     string modeStr = mode;
@@ -461,7 +464,8 @@ int32_t BreakpointEditor::indexOfBreakpointExec(uint32_t addr, const string &sou
     const SNES::Debugger::Breakpoint &b = SNES::debugger.breakpoint[n];
     if((b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec) 
        && addr >= b.addr 
-       && addr <= (b.addr_end ? b.addr_end : b.addr)) {
+       && addr <= (b.addr_end ? b.addr_end : b.addr)
+       && sources.indexOf(source) == (unsigned)b.source) {
       return n;
     }
   }
@@ -491,16 +495,10 @@ string BreakpointEditor::toStrings() const {
     if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Write) breakpoints << "w";
     if (b.mode & (unsigned)SNES::Debugger::Breakpoint::Mode::Exec) breakpoints << "x";
     
-    switch ((unsigned)b.source) {
-    default:
-    case 0: breakpoints << ":cpu\n"; break;
-    case 1: breakpoints << ":smp\n"; break;
-    case 2: breakpoints << ":vram\n"; break;
-    case 3: breakpoints << ":oam\n"; break;
-    case 4: breakpoints << ":cgram\n"; break;
-    case 5: breakpoints << ":sa1\n"; break;
-    case 6: breakpoints << ":sfx\n"; break;
-    }
+    if ((unsigned)b.source < sources.size())
+      breakpoints << ":" << sources[(unsigned)b.source] << "\n";
+    else
+      breakpoints << ":cpu\n";
   }
   
   return breakpoints;
