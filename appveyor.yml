@@ -9,6 +9,8 @@ environment:
   PATH: '%MINGW_PATH%;%PATH%'
 build_script:
 - cmd: >-
+    echo hello, this is a pull request test for appveyor
+
     git submodule update --init
 
     cd bsnes
