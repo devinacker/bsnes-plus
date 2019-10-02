@@ -53,6 +53,6 @@ build_script:
     copy "%MINGW_PATH%\libwinpthread-1.dll"
 
 
-    7z a bsnes-plus.zip *
+    7z a bsnes-plus-v%APPVEYOR_BUILD_VERSION%.zip *
 artifacts:
-- path: bsnes\out\bsnes-plus.zip
+- path: bsnes\out\bsnes-plus-v$(appveyor_build_version).zip
