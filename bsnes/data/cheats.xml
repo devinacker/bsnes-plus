@@ -11945,7 +11945,7 @@
       <code>1D2C-3A4F</code>
     </cheat>
   </cartridge>
-  <cartridge sha256="d45e26eb10c323ecd480e5f2326b223e29264c3adde67f48f0d2791128e519e8 73731a5a7932965de02a9e98055dcf88b4d17b8f710a6ecfde3e36a1f248773b">	
+  <cartridge sha256="d45e26eb10c323ecd480e5f2326b223e29264c3adde67f48f0d2791128e519e8">	
     <name>Doom (USA)</name>
     <cheat>
       <description>Infinite health</description>
@@ -32062,7 +32062,7 @@
       <code>D03C-47D4</code>
     </cheat>
   </cartridge>
-  <cartridge sha256="417874aa57856fe93eefdb24066fa1a9ca3f23c72c09d5247ae2b3ab4b3d09d1 cb2fdfce61858063bf4c9da4228381c3ec3abe423f4d378cddd174ae4adb261e">	
+  <cartridge sha256="417874aa57856fe93eefdb24066fa1a9ca3f23c72c09d5247ae2b3ab4b3d09d1">	
     <name>Mortal Kombat 3 (USA)</name>
     <cheat>
       <description>Invincibility (except throws and uppercuts) - P1</description>
@@ -43125,7 +43125,7 @@
       <code>C281-D467</code>
     </cheat>
   </cartridge>
-  <cartridge sha256="2b34161e96ef3f0f48cecd67e531a9bb94310652d8686f301bac426e4ab97e77 d17cb5c73174060fcbd9cba6c705643f19c3b8be24d0f7ee43aee674ff1ea38e">	
+  <cartridge sha256="2b34161e96ef3f0f48cecd67e531a9bb94310652d8686f301bac426e4ab97e77">	
     <name>Street Fighter II (USA)</name>
     <cheat>
       <description>Championship mode on</description>
@@ -46899,7 +46899,7 @@
       <code>7FF8250F</code>
     </cheat>
   </cartridge>
-  <cartridge sha256="a8806bfe07cd3c9945d9fd3fcea932ae1cd671cab5cae12bb7a2ae726cbf9175 0838e531fe22c077528febe14cb3ff7c492f1f5fa8de354192bdff7137c27f5b">	
+  <cartridge sha256="0838e531fe22c077528febe14cb3ff7c492f1f5fa8de354192bdff7137c27f5b">	
     <name>Super Mario World (USA)</name>
     <cheat>
       <description>Invincibility</description>
