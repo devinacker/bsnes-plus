@@ -24,6 +24,12 @@ Non-debugging features:
 - IPS and BPS soft patching
 - Multiple emulation improvements backported from bsnes/higan (mostly via bsnes-classic)
 
+## Development builds
+
+[![Build status](https://ci.appveyor.com/api/projects/status/2eatkcuu14r8rnfx/branch/master?svg=true)](https://ci.appveyor.com/project/devinacker/bsnes-plus/branch/master)
+
+Up-to-date development builds are available [from AppVeyor](https://ci.appveyor.com/project/devinacker/bsnes-plus/branch/master/artifacts) (64-bit Windows, compatibility and accuracy profiles).
+
 ## Building on Windows
 
 - [Get mingw-w64](http://mingw-w64.yaxm.org/doku.php/download) (make sure toolchain supports 64-bit builds)

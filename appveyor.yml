@@ -1,0 +1,58 @@
+version: 05.{build}-{branch}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  except:
+  - gh-pages
+environment:
+  MINGW_PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin
+  PATH: '%MINGW_PATH%;%PATH%'
+build_script:
+- cmd: >-
+    git submodule update --init
+
+    cd bsnes
+
+    mingw32-make -j8 build platform=win profile=accuracy
+
+    move out\bsnes.exe out\bsnes-accuracy.exe
+
+    del /Q obj\*.o
+
+    mingw32-make -j8 platform=win profile=compatibility
+
+
+    cd out
+
+
+    move ..\..\snesfilter\snesfilter.dll
+
+    move ..\..\snesreader\snesreader.dll
+
+    move ..\..\snesmusic\snesmusic.dll
+
+    move ..\..\supergameboy\supergameboy.dll
+
+
+    mkdir bsxdat
+
+    copy ..\data\bsxdat bsxdat
+
+
+    copy "..\..\external\qt\mingw-w64\bin\*.dll"
+
+    xcopy /E "..\..\external\qt\mingw-w64\plugins"
+
+
+    copy "%MINGW_PATH%\libgcc_s_seh-1.dll"
+
+    copy "%MINGW_PATH%\libgomp-1.dll"
+
+    copy "%MINGW_PATH%\libstdc++-6.dll"
+
+    copy "%MINGW_PATH%\libwinpthread-1.dll"
+
+
+    7z a bsnes-plus.zip *
+artifacts:
+- path: bsnes\out\bsnes-plus.zip
