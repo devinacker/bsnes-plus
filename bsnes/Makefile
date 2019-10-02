@@ -9,15 +9,19 @@ ifeq ($(ui),)
   ui := ui-qt
 endif
 
-# build version
-version := v05
-
 # compiler
 c       := $(compiler) -xc -std=gnu99
 cpp     := $(compiler) -std=gnu++0x
 flags   := -I. -I$(common) -I$(snes)
 link    :=
 objects :=
+
+# build version
+ifeq ($(version),)
+  version := 05
+else
+  flags += -DBSNES_VERSION=\"$(version)\"
+endif
 
 ifeq ($(DEBUG), 1)
   flags += -O0 -g
@@ -83,7 +87,7 @@ ifeq ($(platform),osx)
 	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/bsnes $(objects) $(link))
 	mkdir -p $(osxbundle)/Contents/Resources
 	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
-	sed 's/@VERSION/$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
+	sed 's/@VERSION/v$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
 else
 #	$(foreach qtdll,$(qtdlls),xcopy $(winqtpath)\bin\$(qtdll) .\out\ /D /Y &)
 #	$(foreach qtplatformdll,$(qtplatformdlls),xcopy $(winqtpath)\$(qtplatformdll) .\out\platforms\ /D /Y &)
@@ -129,8 +133,8 @@ endif
 
 distribution: clean build plugins
 ifeq ($(platform),osx)
-	@rm -f ../bsnes_$(version)_osx.zip
-	@zip -9 -r ../bsnes_$(version)_osx.zip $(osxbundle)
+	@rm -f ../bsnes_v$(version)_osx.zip
+	@zip -9 -r ../bsnes_v$(version)_osx.zip $(osxbundle)
 	@rm -rf $(osxbundle)
 else
 	@echo Distribution target not available for current platform
