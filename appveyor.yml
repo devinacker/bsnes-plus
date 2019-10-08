@@ -19,6 +19,12 @@ build_script:
 
     del /Q obj\*.o
 
+    mingw32-make -j8 build platform=win profile=performance version=%APPVEYOR_BUILD_VERSION%
+
+    move out\bsnes.exe out\bsnes-performance.exe
+
+    del /Q obj\*.o
+
     mingw32-make -j8 platform=win profile=compatibility version=%APPVEYOR_BUILD_VERSION%
 
 
