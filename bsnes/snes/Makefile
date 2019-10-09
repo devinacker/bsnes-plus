@@ -35,49 +35,49 @@ else ifeq ($(profile),debugger)
   snesppu := $(snes)/alt/ppu
 endif
 
-obj/libco.o  : libco/libco.c libco/*
-obj/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
+$(objdir)/libco.o  : libco/libco.c libco/*
+$(objdir)/libsnes.o: $(snes)/libsnes/libsnes.cpp $(snes)/libsnes/*
 
-obj/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/) $(call rwildcard,$(snes)/debugger)
-obj/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
-obj/snes-cpucore.o  : $(snes)/cpu/core/core.cpp $(call rwildcard,$(snes)/cpu/core/)
-obj/snes-smpcore.o  : $(snes)/smp/core/core.cpp $(call rwildcard,$(snes)/smp/core/)
-obj/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/) $(call rwildcard,$(snes)/debugger) $(call rwildcard,$(snes)/cpu/debugger)
-obj/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/) $(call rwildcard,$(snes)/debugger)
-obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/) $(call rwildcard,$(snes)/debugger)
-obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/) $(call rwildcard,$(snes)/debugger)
-obj/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/cartridge/)
-obj/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
+$(objdir)/snes-system.o   : $(snes)/system/system.cpp $(call rwildcard,$(snes)/system/) $(call rwildcard,$(snes)/video/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-memory.o   : $(snes)/memory/memory.cpp $(call rwildcard,$(snes)/memory/)
+$(objdir)/snes-cpucore.o  : $(snes)/cpu/core/core.cpp $(call rwildcard,$(snes)/cpu/core/)
+$(objdir)/snes-smpcore.o  : $(snes)/smp/core/core.cpp $(call rwildcard,$(snes)/smp/core/)
+$(objdir)/snes-cpu.o      : $(snescpu)/cpu.cpp $(call rwildcard,$(snescpu)/) $(call rwildcard,$(snes)/debugger) $(call rwildcard,$(snes)/cpu/debugger)
+$(objdir)/snes-smp.o      : $(snessmp)/smp.cpp $(call rwildcard,$(snessmp)/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/cartridge/)
+$(objdir)/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
 
-obj/snes-supergameboy.o: $(snes)/chip/supergameboy/supergameboy.cpp $(call rwildcard,$(snes)/chip/supergameboy/)
-obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/) $(call rwildcard,$(snes)/debugger)
-obj/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/) $(call rwildcard,$(snes)/debugger)
-obj/snes-necdsp.o      : $(snes)/chip/necdsp/necdsp.cpp $(call rwildcard,$(snes)/chip/necdsp/)
-obj/snes-bsx.o         : $(snes)/chip/bsx/bsx.cpp $(snes)/chip/bsx/*
-obj/snes-srtc.o        : $(snes)/chip/srtc/srtc.cpp $(snes)/chip/srtc/*
-obj/snes-sdd1.o        : $(snes)/chip/sdd1/sdd1.cpp $(snes)/chip/sdd1/*
-obj/snes-spc7110.o     : $(snes)/chip/spc7110/spc7110.cpp $(snes)/chip/spc7110/*
-obj/snes-cx4.o         : $(snes)/chip/cx4/cx4.cpp $(snes)/chip/cx4/*
-obj/snes-obc1.o        : $(snes)/chip/obc1/obc1.cpp $(snes)/chip/obc1/*
-obj/snes-st0018.o      : $(snes)/chip/st0018/st0018.cpp $(snes)/chip/st0018/*
-obj/snes-msu1.o        : $(snes)/chip/msu1/msu1.cpp $(snes)/chip/msu1/*
-obj/snes-serial.o      : $(snes)/chip/serial/serial.cpp $(snes)/chip/serial/*
+$(objdir)/snes-supergameboy.o: $(snes)/chip/supergameboy/supergameboy.cpp $(call rwildcard,$(snes)/chip/supergameboy/)
+$(objdir)/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-sa1.o         : $(snes)/chip/sa1/sa1.cpp $(call rwildcard,$(snes)/chip/sa1/) $(call rwildcard,$(snes)/debugger)
+$(objdir)/snes-necdsp.o      : $(snes)/chip/necdsp/necdsp.cpp $(call rwildcard,$(snes)/chip/necdsp/)
+$(objdir)/snes-bsx.o         : $(snes)/chip/bsx/bsx.cpp $(snes)/chip/bsx/*
+$(objdir)/snes-srtc.o        : $(snes)/chip/srtc/srtc.cpp $(snes)/chip/srtc/*
+$(objdir)/snes-sdd1.o        : $(snes)/chip/sdd1/sdd1.cpp $(snes)/chip/sdd1/*
+$(objdir)/snes-spc7110.o     : $(snes)/chip/spc7110/spc7110.cpp $(snes)/chip/spc7110/*
+$(objdir)/snes-cx4.o         : $(snes)/chip/cx4/cx4.cpp $(snes)/chip/cx4/*
+$(objdir)/snes-obc1.o        : $(snes)/chip/obc1/obc1.cpp $(snes)/chip/obc1/*
+$(objdir)/snes-st0018.o      : $(snes)/chip/st0018/st0018.cpp $(snes)/chip/st0018/*
+$(objdir)/snes-msu1.o        : $(snes)/chip/msu1/msu1.cpp $(snes)/chip/msu1/*
+$(objdir)/snes-serial.o      : $(snes)/chip/serial/serial.cpp $(snes)/chip/serial/*
 
 ###########
 # library #
 ###########
 
-snes_objects := $(patsubst %,obj/%.o,$(snes_objects))
+snes_objects := $(patsubst %,$(objdir)/%.o,$(snes_objects))
 
-library: $(snes_objects) obj/libsnes.o
+library: $(snes_objects) $(objdir)/libsnes.o
 ifeq ($(platform),x)
-	ar rcs out/libsnes.a $(snes_objects) obj/libsnes.o
-	$(cpp) -o out/libsnes.so -shared -Wl,-soname,libsnes.so.1 $(snes_objects) obj/libsnes.o
+	ar rcs out/libsnes.a $(snes_objects) $(objdir)/libsnes.o
+	$(cpp) -o out/libsnes.so -shared -Wl,-soname,libsnes.so.1 $(snes_objects) $(objdir)/libsnes.o
 else ifeq ($(platform),osx)
-	ar rcs out/libsnes.a $(snes_objects) obj/libsnes.o
-	$(cpp) -o out/libsnes.dylib -install_name @executable_path/../Libraries/libsnes.dylib -shared -dynamiclib $(snes_objects) obj/libsnes.o
+	ar rcs out/libsnes.a $(snes_objects) $(objdir)/libsnes.o
+	$(cpp) -o out/libsnes.dylib -install_name @executable_path/../Libraries/libsnes.dylib -shared -dynamiclib $(snes_objects) $(objdir)/libsnes.o
 else ifeq ($(platform),$(filter $(platform),win msys))
-	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libsnes.a $(snes_objects) obj/libsnes.o
+	$(cpp) -o out/snes.dll -shared -Wl,--out-implib,libsnes.a $(snes_objects) $(objdir)/libsnes.o
 endif
 
 library-install:
