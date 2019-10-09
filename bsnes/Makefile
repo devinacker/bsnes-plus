@@ -8,8 +8,10 @@ endif
 
 ifeq ($(profile),)
   profile := compatibility
-  out     := bsnes
-else
+  ifeq ($(out),)
+    out   := bsnes
+  endif
+else ifeq ($(out),)
   out     := bsnes-$(profile)
 endif
 
