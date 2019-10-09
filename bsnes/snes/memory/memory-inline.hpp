@@ -75,7 +75,7 @@ void VRAM::copy(const uint8 *data, unsigned size) {
 }
 
 void VRAM::bank(bool enable, unsigned num) {
-  if (enable && (size() >= 1<<17)) {
+  if (PPU::SupportsVRAMExpansion && enable && (size() >= 1<<17)) {
     access_ = data() + ((num << 17) & (size() - 1));
     mask_ = 0x1ffff;
   } else {
@@ -84,7 +84,13 @@ void VRAM::bank(bool enable, unsigned num) {
   }
 }
 
-uint8& VRAM::operator[](unsigned addr) { return access_[addr & mask_]; }
+uint8& VRAM::operator[](unsigned addr) { 
+  if (PPU::SupportsVRAMExpansion)
+    return access_[addr & mask_];
+
+  // non-accuracy PPU still uses uint16 for VRAM addresses, no casting/masking needed here
+  return access_[addr];
+}
 VRAM::VRAM() : MappedRAM() { reset(); }
 
 //Bus

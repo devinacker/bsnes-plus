@@ -168,7 +168,7 @@ void Bus::map_system() {
   
   unsigned vram_size = 1<<16;
   if (SNES::PPU::SupportsVRAMExpansion) {
-    vram_size = 1<<(16+max(0,min(2,config.vram_size)));
+    vram_size = 1<<(16+max(0,min(2,config().vram_size)));
   }
   memory::vram.map(new uint8[vram_size], vram_size);
 }

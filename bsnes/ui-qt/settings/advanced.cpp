@@ -191,9 +191,9 @@ void AdvancedSettingsWindow::initializeUi() {
   portNone->setChecked       (SNES::config().expansion_port == SNES::System::ExpansionPortDevice::None);
 
   if (SNES::PPU::SupportsVRAMExpansion) {
-    vram64kb->setChecked(SNES::config.vram_size == 0);
-    vram128kb->setChecked(SNES::config.vram_size == 1);
-    vram256kb->setChecked(SNES::config.vram_size == 2);
+    vram64kb->setChecked(SNES::config().vram_size == 0);
+    vram128kb->setChecked(SNES::config().vram_size == 1);
+    vram256kb->setChecked(SNES::config().vram_size == 2);
     connect(vram64kb, SIGNAL(pressed()), this, SLOT(setVRAM64kb()));
     connect(vram128kb, SIGNAL(pressed()), this, SLOT(setVRAM128kb()));
     connect(vram256kb, SIGNAL(pressed()), this, SLOT(setVRAM256kb()));
@@ -231,9 +231,9 @@ void AdvancedSettingsWindow::setRegionPAL()  { SNES::config().region = SNES::Sys
 void AdvancedSettingsWindow::setPortSatellaview() { SNES::config().expansion_port = SNES::System::ExpansionPortDevice::BSX; }
 void AdvancedSettingsWindow::setPortNone()        { SNES::config().expansion_port = SNES::System::ExpansionPortDevice::None; }
 
-void AdvancedSettingsWindow::setVRAM64kb()  { SNES::config.vram_size = 0; }
-void AdvancedSettingsWindow::setVRAM128kb() { SNES::config.vram_size = 1; }
-void AdvancedSettingsWindow::setVRAM256kb() { SNES::config.vram_size = 2; }
+void AdvancedSettingsWindow::setVRAM64kb()  { SNES::config().vram_size = 0; }
+void AdvancedSettingsWindow::setVRAM128kb() { SNES::config().vram_size = 1; }
+void AdvancedSettingsWindow::setVRAM256kb() { SNES::config().vram_size = 2; }
 
 void AdvancedSettingsWindow::pauseWithoutFocus()       { config().input.focusPolicy = Configuration::Input::FocusPolicyPauseEmulation; }
 void AdvancedSettingsWindow::ignoreInputWithoutFocus() { config().input.focusPolicy = Configuration::Input::FocusPolicyIgnoreInput; }
