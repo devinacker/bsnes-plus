@@ -174,7 +174,7 @@ void Bus::map_system() {
 }
 
 void Bus::power() {
-  foreach(n, memory::wram) n = random(config.cpu.wram_init_value);
+  foreach(n, memory::wram) n = random(config().cpu.wram_init_value);
 }
 
 void Bus::reset() {

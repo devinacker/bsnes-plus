@@ -13,10 +13,13 @@ public:
   QCheckBox *cheatEnableBox;
   QWidget *spacer;
   QPushButton *findButton;
+  QPushButton *exportButton;
   QPushButton *clearButton;
 
   void load(const char *filename);
   void save(const char *filename);
+  void saveForSD2SNES(const char *filename);
+  void saveForEverdrive(const char *filename);
   void update();
 
   void synchronize();
@@ -29,6 +32,7 @@ private slots:
   void descEdited();
   void toggleCheatEnable();
   void findCheatCodes();
+  void exportCheatCodes();
   void clearSelected();
 
 private:

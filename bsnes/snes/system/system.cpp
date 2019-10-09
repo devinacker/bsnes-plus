@@ -89,8 +89,8 @@ void System::init(Interface *interface_) {
   audio.init();
   input.init();
 
-  input.port_set_device(0, config.controller_port1);
-  input.port_set_device(1, config.controller_port2);
+  input.port_set_device(0, config().controller_port1);
+  input.port_set_device(1, config().controller_port2);
 }
 
 void System::term() {
@@ -99,14 +99,14 @@ void System::term() {
 void System::power() {
   random.seed((unsigned)time(0));
 
-  region = config.region;
-  expansion = config.expansion_port;
+  region = config().region;
+  expansion = config().expansion_port;
   if(region == Region::Autodetect) {
     region = (cartridge.region() == Cartridge::Region::NTSC ? Region::NTSC : Region::PAL);
   }
 
-  cpu_frequency = region() == Region::NTSC ? config.cpu.ntsc_frequency : config.cpu.pal_frequency;
-  apu_frequency = region() == Region::NTSC ? config.smp.ntsc_frequency : config.smp.pal_frequency;
+  cpu_frequency = region() == Region::NTSC ? config().cpu.ntsc_frequency : config().cpu.pal_frequency;
+  apu_frequency = region() == Region::NTSC ? config().smp.ntsc_frequency : config().smp.pal_frequency;
 
   bus.power();
   memory::mmio.map(0x2100, 0x213f, ppu);
@@ -210,8 +210,8 @@ void System::reset() {
 
   scheduler.init();
 
-  input.port_set_device(0, config.controller_port1);
-  input.port_set_device(1, config.controller_port2);
+  input.port_set_device(0, config().controller_port1);
+  input.port_set_device(1, config().controller_port2);
   input.update();
 //video.update();
 }

@@ -8,22 +8,8 @@
 # $(rcc)   -- resource compiler
 # $(qtinc) -- includes for compiling
 # $(qtlib) -- libraries for linking
-
-ifeq ($(moc),)
-  ifeq ($(qtpath),)
-    moc := moc
-  else
-    moc := $(qtpath)/bin/moc
-  endif
-endif
-
-ifeq ($(rcc),)
-  ifeq ($(qtpath),)
-    rcc := rcc
-  else
-    rcc := $(qtpath)/bin/rcc
-  endif
-endif
+# $(qtdlls) -- dlls to be copied to output directory on windows
+# $(qtplatformdlls) -- dlls to copied to "output/platforms" on windows
 
 ifeq ($(platform),$(filter $(platform),x msys))
   qtlibs := $(subst Qt,Qt5,$(qtlibs))
@@ -55,11 +41,8 @@ else ifeq ($(platform),osx)
   qtlib += -framework ApplicationServices
 else ifeq ($(platform),win)
   ifeq ($(qtpath),)
-    # find Qt install directory from PATH environment variable
-    qtpath := $(foreach path,$(subst ;, ,$(PATH)),$(if $(wildcard $(path)/$(moc).exe),$(path)))
-    qtpath := $(strip $(qtpath))
-    qtpath := $(subst \,/,$(qtpath))
-    qtpath := $(patsubst %/bin,%,$(qtpath))
+    qtpath := ../external/qt/mingw-w64
+    winqtpath := $(subst /,\,$(qtpath))
   endif
 
   qtinc := -I$(qtpath)/include
@@ -74,4 +57,24 @@ else ifeq ($(platform),win)
 
   # optional image-file support:
   # qtlib += -lqjpeg -lqmng
+
+  qtdlls := $(qtlibs:Qt%=Qt5%.dll)
+  qtplatformdlls := plugins\platforms\qwindows.dll
+
+endif
+
+ifeq ($(moc),)
+  ifeq ($(qtpath),)
+    moc := moc
+  else
+    moc := $(qtpath)/bin/moc
+  endif
+endif
+
+ifeq ($(rcc),)
+  ifeq ($(qtpath),)
+    rcc := rcc
+  else
+    rcc := $(qtpath)/bin/rcc
+  endif
 endif

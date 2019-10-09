@@ -9,6 +9,7 @@
 #include <nall/bit.hpp>
 #include <nall/concept.hpp>
 #include <nall/foreach.hpp>
+#include <nall/sort.hpp>
 #include <nall/utility.hpp>
 
 namespace nall {
@@ -92,6 +93,10 @@ namespace nall {
       }
       if(count + index >= objectsize) resize(index);  //every element >= index was removed
       else resize(objectsize - count);
+    }
+
+    void sort() {
+      nall::sort(pool, objectsize);
     }
 
     inline T& operator[](unsigned index) {

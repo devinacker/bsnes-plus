@@ -29,7 +29,7 @@ MainWindow::MainWindow() {
 
   system_loadSpecial_superGameBoy = system_loadSpecial->addAction("Load Super &Game Boy Cartridge ...");
 
-  system_saveMemoryPack = system->addAction("Save Memory Pack ...");
+  system_saveMemoryPack = system->addAction("Save &Memory Pack ...");
   system_saveMemoryPack->setVisible(false);
 
   system_reload = system->addAction("Re&load");
@@ -48,6 +48,7 @@ MainWindow::MainWindow() {
   system_port1->addAction(system_port1_asciipad = new RadioAction("&asciiPad", 0));
   system_port1->addAction(system_port1_multitap = new RadioAction("&Multitap", 0));
   system_port1->addAction(system_port1_mouse = new RadioAction("&Mouse", 0));
+  system_port1->addAction(system_port1_nttdatakeypad = new RadioAction("NTT Data &Keypad", 0));
 
   system_port2 = system->addMenu("Controller Port &2");
   system_port2->addAction(system_port2_none = new RadioAction("&None", 0));
@@ -268,6 +269,7 @@ MainWindow::MainWindow() {
   connect(system_port1_asciipad, SIGNAL(triggered()), this, SLOT(setPort1Asciipad()));
   connect(system_port1_multitap, SIGNAL(triggered()), this, SLOT(setPort1Multitap()));
   connect(system_port1_mouse, SIGNAL(triggered()), this, SLOT(setPort1Mouse()));
+  connect(system_port1_nttdatakeypad, SIGNAL(triggered()), this, SLOT(setPort1NTTDataKeypad()));
   connect(system_port2_none, SIGNAL(triggered()), this, SLOT(setPort2None()));
   connect(system_port2_gamepad, SIGNAL(triggered()), this, SLOT(setPort2Gamepad()));
   connect(system_port2_asciipad, SIGNAL(triggered()), this, SLOT(setPort2Asciipad()));
@@ -310,11 +312,11 @@ MainWindow::MainWindow() {
   connect(tools_movies_recordFromHere, SIGNAL(triggered()), this, SLOT(recordMovieFromHere()));
   connect(tools_captureScreenshot, SIGNAL(triggered()), this, SLOT(saveScreenshot()));
   connect(tools_captureSPC, SIGNAL(triggered()), this, SLOT(saveSPC()));
-  connect(tools_cheatEditor, SIGNAL(triggered()), this, SLOT(showCheatEditor()));
-  connect(tools_cheatFinder, SIGNAL(triggered()), this, SLOT(showCheatFinder()));
-  connect(tools_stateManager, SIGNAL(triggered()), this, SLOT(showStateManager()));
-  connect(tools_effectToggle, SIGNAL(triggered()), this, SLOT(showEffectToggle()));
-  connect(tools_manifestViewer, SIGNAL(triggered()), this, SLOT(showManifestViewer()));
+  connect(tools_cheatEditor, SIGNAL(triggered()), toolsWindow, SLOT(showCheatEditor()));
+  connect(tools_cheatFinder, SIGNAL(triggered()), toolsWindow, SLOT(showCheatFinder()));
+  connect(tools_stateManager, SIGNAL(triggered()), toolsWindow, SLOT(showStateManager()));
+  connect(tools_effectToggle, SIGNAL(triggered()), toolsWindow, SLOT(showEffectToggle()));
+  connect(tools_manifestViewer, SIGNAL(triggered()), toolsWindow, SLOT(showManifestViewer()));
   connect(tools_soundViewer, SIGNAL(triggered()), this, SLOT(showSoundViewer()));
   connect(tools_debugger, SIGNAL(triggered()), this, SLOT(showDebugger()));
   connect(help_documentation, SIGNAL(triggered()), this, SLOT(showDocumentation()));
@@ -335,6 +337,7 @@ void MainWindow::syncUi() {
   system_port1_asciipad->setChecked  (config().input.port1 == ControllerPort1::Asciipad);
   system_port1_multitap->setChecked  (config().input.port1 == ControllerPort1::Multitap);
   system_port1_mouse->setChecked     (config().input.port1 == ControllerPort1::Mouse);
+  system_port1_nttdatakeypad->setChecked(config().input.port1 == ControllerPort1::NTTDataKeypad);
 
   system_port2_none->setChecked      (config().input.port2 == ControllerPort2::None);
   system_port2_gamepad->setChecked   (config().input.port2 == ControllerPort2::Gamepad);
@@ -441,79 +444,85 @@ void MainWindow::reset() {
 
 void MainWindow::setPort1None() {
   config().input.port1 = ControllerPort1::None;
-  SNES::config.controller_port1 = SNES::Input::Device::None;
+  SNES::config().controller_port1 = SNES::Input::Device::None;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Gamepad() {
   config().input.port1 = ControllerPort1::Gamepad;
-  SNES::config.controller_port1 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port1 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Asciipad() {
   config().input.port1 = ControllerPort1::Asciipad;
-  SNES::config.controller_port1 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port1 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Multitap() {
   config().input.port1 = ControllerPort1::Multitap;
-  SNES::config.controller_port1 = SNES::Input::Device::Multitap;
+  SNES::config().controller_port1 = SNES::Input::Device::Multitap;
   utility.updateControllers();
 }
 
 void MainWindow::setPort1Mouse() {
   config().input.port1 = ControllerPort1::Mouse;
-  SNES::config.controller_port1 = SNES::Input::Device::Mouse;
+  SNES::config().controller_port1 = SNES::Input::Device::Mouse;
+  utility.updateControllers();
+}
+
+void MainWindow::setPort1NTTDataKeypad() {
+  config().input.port1 = ControllerPort1::NTTDataKeypad;
+  SNES::config().controller_port1 = SNES::Input::Device::NTTDataKeypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2None() {
   config().input.port2 = ControllerPort2::None;
-  SNES::config.controller_port2 = SNES::Input::Device::None;
+  SNES::config().controller_port2 = SNES::Input::Device::None;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Gamepad() {
   config().input.port2 = ControllerPort2::Gamepad;
-  SNES::config.controller_port2 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port2 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Asciipad() {
   config().input.port2 = ControllerPort2::Asciipad;
-  SNES::config.controller_port2 = SNES::Input::Device::Joypad;
+  SNES::config().controller_port2 = SNES::Input::Device::Joypad;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Multitap() {
   config().input.port2 = ControllerPort2::Multitap;
-  SNES::config.controller_port2 = SNES::Input::Device::Multitap;
+  SNES::config().controller_port2 = SNES::Input::Device::Multitap;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Mouse() {
   config().input.port2 = ControllerPort2::Mouse;
-  SNES::config.controller_port2 = SNES::Input::Device::Mouse;
+  SNES::config().controller_port2 = SNES::Input::Device::Mouse;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2SuperScope() {
   config().input.port2 = ControllerPort2::SuperScope;
-  SNES::config.controller_port2 = SNES::Input::Device::SuperScope;
+  SNES::config().controller_port2 = SNES::Input::Device::SuperScope;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Justifier() {
   config().input.port2 = ControllerPort2::Justifier;
-  SNES::config.controller_port2 = SNES::Input::Device::Justifier;
+  SNES::config().controller_port2 = SNES::Input::Device::Justifier;
   utility.updateControllers();
 }
 
 void MainWindow::setPort2Justifiers() {
   config().input.port2 = ControllerPort2::Justifiers;
-  SNES::config.controller_port2 = SNES::Input::Device::Justifiers;
+  SNES::config().controller_port2 = SNES::Input::Device::Justifiers;
   utility.updateControllers();
 }
 
@@ -619,12 +628,6 @@ void MainWindow::saveState() {
   state.save(slot);
 }
 
-void MainWindow::showCheatEditor()    { toolsWindow->tab->setCurrentIndex(0); toolsWindow->show(); }
-void MainWindow::showCheatFinder()    { toolsWindow->tab->setCurrentIndex(1); toolsWindow->show(); }
-void MainWindow::showStateManager()   { toolsWindow->tab->setCurrentIndex(2); toolsWindow->show(); }
-void MainWindow::showEffectToggle()   { toolsWindow->tab->setCurrentIndex(3); toolsWindow->show(); }
-void MainWindow::showManifestViewer() { toolsWindow->tab->setCurrentIndex(4); toolsWindow->show(); }
-
 void MainWindow::showSoundViewer()  { soundViewerWindow->show(); }
 
 void MainWindow::showDebugger() {
@@ -714,9 +717,8 @@ void CanvasObject::mouseMoveEvent(QMouseEvent *event) {
 QPaintEngine* CanvasWidget::paintEngine() const {
   if(SNES::cartridge.loaded()) {
     video.refresh();
-    return 0;
   }
-  return QWidget::paintEngine();
+  return 0;
 }
 
 void CanvasWidget::mouseReleaseEvent(QMouseEvent *event) {
@@ -727,4 +729,9 @@ void CanvasWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void CanvasWidget::paintEvent(QPaintEvent *event) {
   event->ignore();
+}
+
+void CanvasWidget::focusOutEvent(QFocusEvent *event) {
+  utility.unacquireMouse();
+  QWidget::focusOutEvent(event);
 }

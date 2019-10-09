@@ -79,7 +79,7 @@ ifeq ($(platform),$(filter $(platform),win msys))
 	$(cpp) $(link) -o snesmusic.dll -shared -Wl,--out-implib,libsnesmusic.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
 	ar rcs libsnesmusic.a $(objects)
-	$(cpp) $(link) -o libssnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
+	$(cpp) $(link) -o libsnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
 else
 	ar rcs libsnesmusic.a $(objects)
 	$(cpp) $(link) -o libsnesmusic.so -shared -Wl,-soname,libsnesmusic.so.1 $(objects) $(qtlib)

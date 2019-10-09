@@ -9,7 +9,8 @@ void SFXDebugger::reset() {
 
 void SFXDebugger::op_step() {
   if (pc_valid) {
-    usage[opcode_pc] |= UsageOpcode;
+    usage[opcode_pc] &= ~(UsageFlagA2 | UsageFlagA1);
+    usage[opcode_pc] |= UsageOpcode | (regs.sfr.alt2 << 1) | (regs.sfr.alt1 << 0);
 
     if(debugger.step_sfx &&
         (debugger.step_type == Debugger::StepType::StepInto ||

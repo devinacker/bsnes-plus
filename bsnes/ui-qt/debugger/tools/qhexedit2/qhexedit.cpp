@@ -21,18 +21,21 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     setHighlightingColor(QColor(0xff, 0xff, 0x99, 0xff));
     setSelectionColor(this->palette().highlight().color());
 
-    connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
-    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
-    connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
-
     _cursorTimer.setInterval(500);
     _cursorTimer.start();
 
-    setAddressWidth(4);
-    setAddressArea(true);
-    setAsciiArea(true);
-    setHighlighting(true);
-    setReadOnly(false);
+    _editorSize = 0;
+    _lastEventSize = 0;
+    _asciiArea = true;
+    _addressArea = true;
+    _addressWidth = 4;
+    _highlighting = true;
+    _readOnly = false;
+    _cursorPosition = 0;
+    
+    connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
+    connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
 
     init();
 
@@ -319,6 +322,11 @@ bool QHexEdit::isModified()
     return _modified;
 }
 
+bool QHexEdit::canRedo() const
+{
+    return _undoStack->canRedo();
+}
+
 void QHexEdit::redo()
 {
     _undoStack->redo();
@@ -354,9 +362,58 @@ QString QHexEdit::toReadableString()
     return toReadable(ba);
 }
 
+bool QHexEdit::canUndo() const
+{
+    return _undoStack->canUndo();
+}
+
 void QHexEdit::undo()
 {
     _undoStack->undo();
+    refresh();
+}
+
+void QHexEdit::cut()
+{
+    QByteArray bytes;
+    for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
+        bytes.append(reader ? reader(i) : 0);
+
+    QByteArray ba = bytes.toHex();
+    for (qint64 idx = 32; idx < ba.size(); idx +=33)
+        ba.insert(idx, "\n");
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(ba);
+    qint64 len = getSelectionEnd() - getSelectionBegin();
+    replace(getSelectionBegin(), (int)len, QByteArray((int)len, char(0)));
+
+    setCursorPosition(2*getSelectionBegin());
+    resetSelection(2*getSelectionBegin());
+    refresh();
+}
+
+void QHexEdit::copy()
+{
+    QByteArray bytes;
+    for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
+        bytes.append(reader ? reader(i) : 0);
+        
+    QByteArray ba = bytes.toHex();
+    for (qint64 idx = 32; idx < ba.size(); idx +=33)
+        ba.insert(idx, "\n");
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(ba);
+    refresh();
+}
+
+void QHexEdit::paste()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    QByteArray ba = QByteArray().fromHex(clipboard->text().toLatin1());
+    replace(_bPosCurrent, ba.size(), ba);
+
+    setCursorPosition(_cursorPosition + 2 * ba.size());
+    resetSelection(getSelectionBegin());
     refresh();
 }
 
@@ -528,31 +585,13 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
         /* Cut */
         if (event->matches(QKeySequence::Cut))
         {
-            QByteArray bytes;
-            for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
-                bytes.append(reader ? reader(i) : 0);
-            
-            QByteArray ba = bytes.toHex();
-            for (qint64 idx = 32; idx < ba.size(); idx +=33)
-                ba.insert(idx, "\n");
-            QClipboard *clipboard = QApplication::clipboard();
-            clipboard->setText(ba);
-            qint64 len = getSelectionEnd() - getSelectionBegin();
-            replace(getSelectionBegin(), (int)len, QByteArray((int)len, char(0)));
-            
-            setCursorPosition(2*getSelectionBegin());
-            resetSelection(2*getSelectionBegin());
+            cut();
         }
 
         /* Paste */
         if (event->matches(QKeySequence::Paste))
         {
-            QClipboard *clipboard = QApplication::clipboard();
-            QByteArray ba = QByteArray().fromHex(clipboard->text().toLatin1());
-            replace(_bPosCurrent, ba.size(), ba);
-            
-            setCursorPosition(_cursorPosition + 2 * ba.size());
-            resetSelection(getSelectionBegin());
+            paste();
         }
 
         /* Delete char */
@@ -612,15 +651,7 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
     /* Copy */
     if (event->matches(QKeySequence::Copy))
     {
-        QByteArray bytes;
-        for (qint64 i = getSelectionBegin(); i < getSelectionEnd(); i++)
-            bytes.append(reader ? reader(i) : 0);
-        
-        QByteArray ba = bytes.toHex();
-        for (qint64 idx = 32; idx < ba.size(); idx +=33)
-            ba.insert(idx, "\n");
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(ba);
+        copy();
     }
 
     refresh();
@@ -628,6 +659,8 @@ void QHexEdit::keyPressEvent(QKeyEvent *event)
 
 void QHexEdit::mouseMoveEvent(QMouseEvent * event)
 {
+    if (!(event->buttons() & Qt::LeftButton)) return;
+
     _blink = false;
     viewport()->update();
     qint64 actPos = cursorPosition(event->pos());
@@ -640,6 +673,8 @@ void QHexEdit::mouseMoveEvent(QMouseEvent * event)
 
 void QHexEdit::mousePressEvent(QMouseEvent * event)
 {
+    if (event->button() != Qt::LeftButton) return;
+
     _blink = false;
     viewport()->update();
     qint64 cPos = cursorPosition(event->pos());

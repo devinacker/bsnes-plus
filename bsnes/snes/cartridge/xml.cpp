@@ -217,7 +217,8 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
     } else if(attr.name == "frequency") {
       necdsp.frequency = decimal(attr.content);
     } else if(attr.name == "program") {
-      program = attr.content;
+      program << filepath(dir(basename()), config().path.firmware);
+      program << attr.content;
     } else if(attr.name == "sha256") {
       sha256 = attr.content;
     }
@@ -228,7 +229,7 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
   unsigned filesize = promsize * 3 + dromsize * 2;
 
   file fp;
-  if(fp.open(string(dir(basename()), program), file::mode::read)) {
+  if(fp.open(program, file::mode::read)) {
     if(fp.size() == filesize) {
       for(unsigned n = 0; n < promsize; n++) necdsp.programROM[n] = fp.readm(3);
       for(unsigned n = 0; n < dromsize; n++) necdsp.dataROM[n] = fp.readm(2);

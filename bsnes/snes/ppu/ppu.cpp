@@ -38,7 +38,7 @@ void PPU::enter() {
     }
 
     scanline();
-    add_clocks(68);
+    add_clocks(28);
 
     if(vcounter() <= (!regs.overscan ? 224 : 239)) {
       for(signed pixel = -7; pixel <= 255; pixel++) {
@@ -60,13 +60,11 @@ void PPU::enter() {
         add_clocks(2);
       }
 
-      add_clocks(14);
+      add_clocks(14 + 34*2);
       oam.tilefetch();
-    } else {
-      add_clocks(1052 + 14 + 136);
     }
 
-    add_clocks(lineclocks() - 68 - 1052 - 14 - 136);
+    add_clocks(lineclocks() - hcounter());
   }
 }
 
@@ -80,8 +78,8 @@ void PPU::add_clocks(unsigned clocks) {
 }
 
 void PPU::power() {
-  ppu1_version = config.ppu1.version;
-  ppu2_version = config.ppu2.version;
+  ppu1_version = config().ppu1.version;
+  ppu2_version = config().ppu2.version;
 
   for(unsigned i = 0; i < memory::vram.size(); i++) {
     memory::vram.write(i, random(0));

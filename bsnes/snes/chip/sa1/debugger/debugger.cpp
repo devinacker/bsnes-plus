@@ -8,9 +8,21 @@ uint8 SA1Debugger::disassembler_read(uint32 addr)
   return data;
 }
 
-void SA1Debugger::op_step() {
-  bool break_event = false;
+void SA1Debugger::interrupt(uint16 vector) {
+  SA1::interrupt(vector);
+  
+  if (debugger.step_sa1) {
+    debugger.call_count++;
+    
+    if ((debugger.step_type == Debugger::StepType::StepToNMI && (vector & 0xf) == 0xa)
+        || (debugger.step_type == Debugger::StepType::StepToIRQ && (vector & 0xf) == 0xe)) {
+      // break on next instruction after interrupt
+      debugger.step_type = Debugger::StepType::StepInto;
+    }
+  }
+}
 
+void SA1Debugger::op_step() {
   usage[regs.pc] &= ~(UsageFlagM | UsageFlagX);
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
@@ -18,15 +30,15 @@ void SA1Debugger::op_step() {
   if(debugger.step_sa1 &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
-      
+
     debugger.break_event = Debugger::BreakEvent::SA1Step;
     debugger.step_type = Debugger::StepType::None;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
   } else {
-        
-    if (debugger.break_on_wdm) {
+
+    if (debugger.break_on_wdm || debugger.break_on_brk) {
       uint8 opcode = disassembler_read(opcode_pc);
-      if (opcode == 0x42) {
+      if ((opcode == 0x42 && debugger.break_on_wdm) || (opcode == 0x00 && debugger.break_on_brk)) {
         debugger.breakpoint_hit = Debugger::SoftBreakSA1;
         debugger.break_event = Debugger::BreakEvent::BreakpointHit;
         scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
@@ -38,7 +50,6 @@ void SA1Debugger::op_step() {
 
   // adjust call count if this is a call or return
   // (or if we're stepping over and no call occurred)
-  // (TODO: track interrupts as well?)
   if (debugger.step_sa1) {
     if (debugger.step_over_new && debugger.call_count == 0) {
       debugger.call_count = -1;
@@ -48,7 +59,7 @@ void SA1Debugger::op_step() {
     uint8 opcode = disassembler_read(opcode_pc);
     if (opcode == 0x20 || opcode == 0x22 || opcode == 0xfc) {
       debugger.call_count++;
-    } else if (opcode == 0x60 || opcode == 0x6b) {
+    } else if (opcode == 0x60 || opcode == 0x6b || opcode == 0x40) {
       debugger.call_count--;
     }
   }

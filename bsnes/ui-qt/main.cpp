@@ -3,7 +3,7 @@
 
 #if defined(PLATFORM_X)
   #include "platform/platform_x.cpp"
-  const char Style::Monospace[64] = "Liberation Mono";
+  const char Style::Monospace[64] = "monospace";
 #elif defined(PLATFORM_OSX)
   #include "platform/platform_osx.cpp"
   const char Style::Monospace[64] = "Courier New";
@@ -23,6 +23,8 @@ const char defaultStylesheet[] =
   "}\n";
 
 #include "check-action.moc"
+#include "check-delegate.moc"
+#include "combo-delegate.moc"
 #include "file-dialog.moc"
 #include "radio-action.moc"
 #include "window.moc"
@@ -32,13 +34,6 @@ const char defaultStylesheet[] =
 #include "link/music.cpp"
 #include "link/reader.cpp"
 #include "utility/utility.cpp"
-
-//override filename's path with filepath, but only if filepath isn't empty
-//used for GUI's "path selection" functionality
-string filepath(const char *filename, const char *filepath) {
-  if(!filepath || !*filepath) return filename;
-  return string() << dir(filepath) << notdir(filename);
-}
 
 int main(int argc, char **argv) {
   return application.main(argc, argv);

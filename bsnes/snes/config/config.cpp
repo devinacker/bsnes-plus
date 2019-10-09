@@ -1,6 +1,9 @@
 #ifdef SYSTEM_CPP
 
-Configuration config;
+Configuration &config() {
+  static Configuration configuration;
+  return configuration;
+}
 
 Configuration::Configuration() {
   controller_port1 = Input::Device::Joypad;
@@ -21,7 +24,8 @@ Configuration::Configuration() {
   ppu1.version = 1;
   ppu2.version = 3;
 
-  sat.path = "./bsxdat/";
+  path.bsxdat = "./bsxdat/";
+  
   sat.local_time = true;
   sat.custom_time = 798653040; // 1995-04-23 16:04
   sat.default_size = 2; // 8 Mbit

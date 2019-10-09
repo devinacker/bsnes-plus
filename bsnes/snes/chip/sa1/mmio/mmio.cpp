@@ -407,15 +407,17 @@ void SA1::mmio_w2254(uint8 data) {
   if(mmio.acm == 0) {
     if(mmio.md == 0) {
       //signed multiplication
-      mmio.mr = (int16)mmio.ma * (int16)mmio.mb;
+      mmio.mr = (uint32)((int16)mmio.ma * (int16)mmio.mb);
       mmio.mb = 0;
     } else {
       //unsigned division
       if(mmio.mb == 0) {
         mmio.mr = 0;
       } else {
-        int16  quotient  = (int16)mmio.ma / (uint16)mmio.mb;
-        uint16 remainder = (int16)mmio.ma % (uint16)mmio.mb;
+        int16  dividend = mmio.ma;
+        uint16 divisor = mmio.mb;
+        uint16 remainder = (dividend >= 0) ? (dividend % divisor) : ((dividend % divisor + divisor) % divisor);
+        uint16 quotient  = (dividend - remainder) / divisor;
         mmio.mr = (remainder << 16) | quotient;
       }
       mmio.ma = 0;

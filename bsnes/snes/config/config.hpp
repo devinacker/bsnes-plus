@@ -26,8 +26,12 @@ struct Configuration {
     unsigned version;
   } ppu2;
 
+  struct Path {
+    string firmware;
+    string bsxdat;
+  } path;
+
   struct Satellaview {
-    string path;
     bool local_time;
     time_t custom_time;
     unsigned default_size;
@@ -36,4 +40,4 @@ struct Configuration {
   Configuration();
 };
 
-extern Configuration config;
+Configuration &config();

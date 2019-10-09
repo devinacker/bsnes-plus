@@ -18,6 +18,8 @@
 #include <nall/snes/cartridge.hpp>
 #include <nall/qt/concept.hpp>
 #include <nall/qt/check-action.moc.hpp>
+#include <nall/qt/check-delegate.moc.hpp>
+#include <nall/qt/combo-delegate.moc.hpp>
 #include <nall/qt/file-dialog.moc.hpp>
 #include <nall/qt/radio-action.moc.hpp>
 #include <nall/qt/window.moc.hpp>
@@ -42,10 +44,14 @@ using namespace ruby;
 
 #if defined(DEBUGGER)
   #include "debugger/debugger.moc.hpp"
+  #include "debugger/disassembler/symbols/symbol_map.moc.hpp"
+  #include "debugger/debuggerview.moc.hpp"
   #include "debugger/tracer.moc.hpp"
   #include "debugger/registeredit.moc.hpp"
 
-  #include "debugger/tools/disassembler.moc.hpp"
+  #include "debugger/disassembler/symbolsview.moc.hpp"
+  #include "debugger/disassembler/disassemblerview.moc.hpp"
+
   #include "debugger/tools/breakpoint.moc.hpp"
   #include "debugger/tools/memory.moc.hpp"
   #include "debugger/tools/properties.moc.hpp"
@@ -56,6 +62,9 @@ using namespace ruby;
 
   #include "debugger/ppu/cgram-widget.moc.hpp"
   #include "debugger/ppu/image-grid-widget.moc.hpp"
+
+  #include "debugger/ppu/oam-data-model.moc.hpp"
+  #include "debugger/ppu/oam-graphics-scene.moc.hpp"
 
   #include "debugger/ppu/tile-viewer.moc.hpp"
   #include "debugger/ppu/tilemap-viewer.moc.hpp"
@@ -103,5 +112,3 @@ struct Style {
     SeparatorSpacing = 5,
   };
 };
-
-extern string filepath(const char *filename, const char *filepath);

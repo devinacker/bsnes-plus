@@ -34,6 +34,8 @@ public:
     UsageWrite  = 0x40,
     UsageExec   = 0x20,
     UsageOpcode = 0x10,
+    UsageFlagA2 = 0x02,
+    UsageFlagA1 = 0x01,
   };
   uint8 *usage;
   uint8 **cart_usage;

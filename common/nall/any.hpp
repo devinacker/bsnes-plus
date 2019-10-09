@@ -29,6 +29,7 @@ namespace nall {
     }
 
     any() : container(0) {}
+    ~any() { delete container; }
     template<typename T> any(const T& value_) : container(0) { operator=(value_); }
 
   private:

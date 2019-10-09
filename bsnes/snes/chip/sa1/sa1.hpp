@@ -19,7 +19,7 @@ public:
 
   static void Enter();
   void enter();
-  void interrupt(uint16 vector);
+  debugvirtual void interrupt(uint16 vector);
   void tick();
   
   // used by the SA-1 debugger prior to executing instructions

@@ -36,6 +36,13 @@ string currentpath() {
   return "";
 }
 
+//override filename's path with filepath, but only if filepath isn't empty
+//used for GUI's "path selection" functionality
+string filepath(const char *filename, const char *filepath) {
+  if(!filepath || !*filepath) return filename;
+  return string() << dir(filepath) << notdir(filename);
+}
+
 }
 
 #endif

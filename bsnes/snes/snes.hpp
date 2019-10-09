@@ -1,7 +1,10 @@
 namespace SNES {
   namespace Info {
     static const char Name[] = "bsnes-plus";
-    static const char Version[] = "04";
+    #ifndef BSNES_VERSION
+      #define BSNES_VERSION "05"
+    #endif
+    static const char Version[] = BSNES_VERSION;
     static const unsigned SerializerSignature = 0x43545342; //'BSTC'
     static const unsigned SerializerVersion = 14;
   }

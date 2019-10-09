@@ -57,7 +57,7 @@ BSXSettingsWindow::BSXSettingsWindow() {
 }
 
 void BSXSettingsWindow::initializeUi() {
-  if (SNES::config.sat.local_time) {
+  if (SNES::config().sat.local_time) {
     useLocalTime->setChecked(true);
     dateTime->setEnabled(false);
   } else {
@@ -66,21 +66,21 @@ void BSXSettingsWindow::initializeUi() {
   
   dateTime->setCalendarPopup(true);
   dateTime->setTimeSpec(Qt::UTC);
-  dateTime->setDateTime(QDateTime::fromTime_t(SNES::config.sat.custom_time).toTimeSpec(Qt::UTC));
+  dateTime->setDateTime(QDateTime::fromTime_t(SNES::config().sat.custom_time).toTimeSpec(Qt::UTC));
   
-  sizeCombo->setCurrentIndex(SNES::config.sat.default_size);
+  sizeCombo->setCurrentIndex(SNES::config().sat.default_size);
 }
 
 void BSXSettingsWindow::timeSettingToggled() {
-  SNES::config.sat.local_time = useLocalTime->isChecked();
+  SNES::config().sat.local_time = useLocalTime->isChecked();
   
-  dateTime->setEnabled(!SNES::config.sat.local_time);
+  dateTime->setEnabled(!SNES::config().sat.local_time);
 }
 
 void BSXSettingsWindow::customTimeSet() {
-  SNES::config.sat.custom_time = dateTime->dateTime().toTime_t();
+  SNES::config().sat.custom_time = dateTime->dateTime().toTime_t();
 }
 
 void BSXSettingsWindow::defaultSizeSet() {
-  SNES::config.sat.default_size = sizeCombo->currentIndex();
+  SNES::config().sat.default_size = sizeCombo->currentIndex();
 }

@@ -31,7 +31,7 @@ private:
   //cpu
   static void Enter();
   debugvirtual void op_step();
-  void op_irq(uint16 vector);
+  debugvirtual void op_irq(uint16 vector);
 
   //timing
   struct QueueEvent {
@@ -149,6 +149,9 @@ private:
   // since they were mostly identical
   #include "../../cpu/debugger/debugger.hpp"
   extern CPUDebugger cpu;
+  
+  #include "../../cpu/debugger/analyst.hpp"
+  extern CPUAnalyst cpuAnalyst;
 #else
   extern CPU cpu;
 #endif

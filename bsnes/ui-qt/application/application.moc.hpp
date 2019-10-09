@@ -48,7 +48,7 @@ public:
 
   int main(int &argc, char **argv);
   bool singleUserMode();
-  void locateFile(string &filename, bool createDataDirectory = false);
+  void locateFile(string &filename, bool createDataDirectory = false, bool createFile = false);
   void loadCartridge(const string& filename); // used for command-line loading
   void reloadCartridge();
   void initPaths(const char *basename);

@@ -5,7 +5,7 @@
 #include "qhexedit2/qhexedit.cpp"
 #include "qhexedit2/commands.cpp"
 
-MemoryEditor *memoryEditor;
+QVector <MemoryEditor*> memoryEditors;
 
 MemoryEditor::MemoryEditor() {
   setObjectName("memory-editor");
@@ -19,6 +19,7 @@ MemoryEditor::MemoryEditor() {
   setLayout(layout);
 
   editor = new QHexEdit;
+  editor->setContextMenuPolicy(Qt::CustomContextMenu);
   editor->reader = { &MemoryEditor::reader, this };
   editor->writer = { &MemoryEditor::writer, this };
   editor->usage  = { &MemoryEditor::usage, this };
@@ -94,6 +95,7 @@ MemoryEditor::MemoryEditor() {
   layout->addWidget(statusBar, 1, 0, 1, 2);
 
   connect(editor, SIGNAL(currentAddressChanged(qint64)), this, SLOT(showAddress(qint64)));
+  connect(editor, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
   connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceChanged(int)));
   connect(addr, SIGNAL(textEdited(const QString&)), this, SLOT(updateOffset()));
   connect(addr, SIGNAL(returnPressed()), this, SLOT(updateOffset()));
@@ -101,12 +103,23 @@ MemoryEditor::MemoryEditor() {
   connect(exportButton, SIGNAL(released()), this, SLOT(exportMemory()));
   connect(importButton, SIGNAL(released()), this, SLOT(importMemory()));
   
+  searchPos = -1;
+  breakpointPos = -1;
+  
   sourceChanged(0);
 }
 
 void MemoryEditor::autoUpdate() {
   if(SNES::cartridge.loaded() && autoUpdateBox->isChecked()) {
     editor->refresh(false);
+  }
+}
+
+void MemoryEditor::closeEvent(QCloseEvent*) {
+  int32_t index = memoryEditors.indexOf(this);
+
+  if (index >= 0) {
+    memoryEditors.remove(index);
   }
 }
 
@@ -130,6 +143,9 @@ void MemoryEditor::synchronize() {
 
 void MemoryEditor::show() {
   Window::show();
+
+  memoryEditors.push_back(this);
+
   refresh();
 }
 
@@ -165,10 +181,78 @@ void MemoryEditor::showAddress(qint64 address) {
   if (address < 0) {
     statusBar->setText("");
   } else {
-    QString msg;
-    msg.sprintf("Address: 0x%06X", address);
-    statusBar->setText(msg);
+    statusBar->setText(QString::asprintf("Address: 0x%06X", address));
   }
+}
+
+void MemoryEditor::showContextMenu(const QPoint& pos) {
+  QMenu menu;
+  
+  menu.addAction("Cut", editor, SLOT(cut()), QKeySequence::Cut);
+  menu.addAction("Copy", editor, SLOT(copy()), QKeySequence::Copy);
+  menu.addAction("Paste", editor, SLOT(paste()), QKeySequence::Paste);
+  
+  menu.addSeparator();
+  
+  menu.addAction("Undo", editor, SLOT(undo()), QKeySequence::Undo)
+    ->setEnabled(editor->canUndo());
+  menu.addAction("Redo", editor, SLOT(redo()), QKeySequence::Redo)
+    ->setEnabled(editor->canRedo());
+    
+  if (memorySource != SNES::Debugger::MemorySource::CartROM
+      && memorySource != SNES::Debugger::MemorySource::CartRAM) {
+    menu.addSeparator();  
+    
+	breakpointPos = editor->cursorPosition(pos) / 2;
+
+    QMenu *menuBreakpoint = menu.addMenu(QString::asprintf("Add breakpoint at 0x%06X", breakpointPos));
+    menuBreakpoint->addAction("Read", this, SLOT(addBreakpointR()));
+    menuBreakpoint->addAction("Write", this, SLOT(addBreakpointW()));
+    menuBreakpoint->addAction("Execute", this, SLOT(addBreakpointX()));
+    menuBreakpoint->addAction("Read/Write", this, SLOT(addBreakpointRW()));
+    menuBreakpoint->addAction("Read/Write/Execute", this, SLOT(addBreakpointRWX()));
+  }
+  
+  menu.exec(editor->mapToGlobal(pos));
+}
+
+void MemoryEditor::addBreakpoint(const string& mode) {
+  if (breakpointPos < 0) return;
+  string source;
+  
+  switch (memorySource) {
+  case SNES::Debugger::MemorySource::CPUBus: source = "cpu"; break;
+  case SNES::Debugger::MemorySource::APUBus: source = "smp"; break;
+  case SNES::Debugger::MemorySource::VRAM:   source = "vram"; break;
+  case SNES::Debugger::MemorySource::OAM:    source = "oam"; break;
+  case SNES::Debugger::MemorySource::CGRAM:  source = "cgram"; break;
+  case SNES::Debugger::MemorySource::SA1Bus: source = "sa1"; break;
+  case SNES::Debugger::MemorySource::SFXBus: source = "sfx"; break;
+  default: return; // cart ROM/RAM breakpoints not supported
+  }
+  
+  breakpointEditor->addBreakpoint(hex<6>(breakpointPos), mode, source);
+  breakpointEditor->show();
+}
+
+void MemoryEditor::addBreakpointR() {
+  addBreakpoint("r");
+}
+
+void MemoryEditor::addBreakpointW() {
+  addBreakpoint("w");
+}
+
+void MemoryEditor::addBreakpointX() {
+  addBreakpoint("x");
+}
+
+void MemoryEditor::addBreakpointRW() {
+  addBreakpoint("rw");
+}
+
+void MemoryEditor::addBreakpointRWX() {
+  addBreakpoint("rwx");
 }
 
 void MemoryEditor::prevCode() {

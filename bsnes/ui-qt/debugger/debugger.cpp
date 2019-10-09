@@ -2,14 +2,25 @@
 
 #if defined(DEBUGGER)
 
+#include <nall/snes/cpu.hpp>
+#include <nall/snes/smp.hpp>
+
 #include "debugger.moc"
 Debugger *debugger;
 
 #include "tracer.cpp"
 
-#include "registeredit.cpp"
+#include "disassembler/symbols/symbol_map.cpp"
 
-#include "tools/disassembler.cpp"
+#include "disassembler/processor/processor.cpp"
+#include "disassembler/processor/common_processor.cpp"
+#include "disassembler/processor/cpu_processor.cpp"
+#include "disassembler/processor/smp_processor.cpp"
+#include "disassembler/processor/sfx_processor.cpp"
+
+#include "registeredit.cpp"
+#include "debuggerview.cpp"
+
 #include "tools/breakpoint.cpp"
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
@@ -20,6 +31,9 @@ Debugger *debugger;
 
 #include "ppu/cgram-widget.cpp"
 #include "ppu/image-grid-widget.cpp"
+
+#include "ppu/oam-data-model.cpp"
+#include "ppu/oam-graphics-scene.cpp"
 
 #include "ppu/tile-viewer.cpp"
 #include "ppu/tilemap-viewer.cpp"
@@ -32,7 +46,7 @@ Debugger::Debugger() {
   setGeometryString(&config().geometry.debugger);
   application.windowList.append(this);
 
-  layout = new QHBoxLayout;
+  layout = new QVBoxLayout;
   layout->setMargin(Style::WindowMargin);
   layout->setSpacing(Style::WidgetSpacing);
   setLayout(layout);
@@ -40,140 +54,156 @@ Debugger::Debugger() {
   menu = new QMenuBar;
   layout->setMenuBar(menu);
 
-  menu_tools = menu->addMenu("Tools");
-  menu_tools_disassembler = menu_tools->addAction("Disassembler ...");
-  menu_tools_breakpoint = menu_tools->addAction("Breakpoint Editor ...");
-  menu_tools_memory = menu_tools->addAction("Memory Editor ...");
-  menu_tools_propertiesViewer = menu_tools->addAction("Properties Viewer ...");
+  menu_tools = menu->addMenu("&Tools");
+  menu_tools_breakpoint = menu_tools->addAction("&Breakpoint Editor ...");
+  menu_tools_memory = menu_tools->addAction("&Memory Editor ...");
+  menu_tools_propertiesViewer = menu_tools->addAction("&Properties Viewer ...");
 
-  menu_ppu = menu->addMenu("S-PPU");
-  menu_ppu_tileViewer = menu_ppu->addAction("Tile Viewer ...");
-  menu_ppu_tilemapViewer = menu_ppu->addAction("Tilemap Viewer ...");
-  menu_ppu_oamViewer = menu_ppu->addAction("Sprite Viewer ...");
-  menu_ppu_cgramViewer = menu_ppu->addAction("Palette Viewer ...");
+  menu_ppu = menu->addMenu("&S-PPU");
+  menu_ppu_tileViewer = menu_ppu->addAction("&Tile Viewer ...");
+  menu_ppu_tilemapViewer = menu_ppu->addAction("Tile&map Viewer ...");
+  menu_ppu_oamViewer = menu_ppu->addAction("&Sprite Viewer ...");
+  menu_ppu_cgramViewer = menu_ppu->addAction("&Palette Viewer ...");
 
-  menu_misc = menu->addMenu("Misc");
-  menu_misc_clear = menu_misc->addAction("Clear Console");
+  menu_misc = menu->addMenu("&Misc");
+  menu_misc_clear = menu_misc->addAction("&Clear Console");
   menu_misc->addSeparator();
-  menu_misc_cacheUsage = menu_misc->addAction("Cache memory usage table to disk");
+  menu_misc_cacheUsage = menu_misc->addAction("Cache &memory usage table to disk");
   menu_misc_cacheUsage->setCheckable(true);
   menu_misc_cacheUsage->setChecked(config().debugger.cacheUsageToDisk);
-  menu_misc_saveBreakpoints = menu_misc->addAction("Save breakpoints to disk between sessions");
+  menu_misc_saveBreakpoints = menu_misc->addAction("Save &breakpoints to disk between sessions");
   menu_misc_saveBreakpoints->setCheckable(true);
   menu_misc_saveBreakpoints->setChecked(config().debugger.saveBreakpoints);
-  menu_misc_showHClocks = menu_misc->addAction("Show H-position in clocks instead of dots");
+  menu_misc_saveSymbols = menu_misc->addAction("Save &symbols to disk between sessions");
+  menu_misc_saveSymbols->setCheckable(true);
+  menu_misc_saveSymbols->setChecked(config().debugger.saveSymbols);
+  menu_misc_loadDefaultSymbols = menu_misc->addAction("Load &default symbols if none are saved");
+  menu_misc_loadDefaultSymbols->setCheckable(true);
+  menu_misc_loadDefaultSymbols->setChecked(config().debugger.loadDefaultSymbols);
+  menu_misc_showHClocks = menu_misc->addAction("Show &H-position in clocks instead of dots");
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
-  consoleLayout = new QVBoxLayout;
-  consoleLayout->setSpacing(0);
-  layout->addLayout(consoleLayout);
-  
-  console = new QTextEdit;
-  console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  console->setReadOnly(true);
-  console->setFont(QFont(Style::Monospace));
-  console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
-  console->setMinimumHeight((25 + 1) * console->fontMetrics().height());
-  consoleLayout->addWidget(console);
-
-  QTabWidget *editTabs = new QTabWidget;
-  editTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  registerEditCPU = new RegisterEditCPU(SNES::cpu);
-  editTabs->addTab(registerEditCPU, "CPU Registers");
-  registerEditSMP = new RegisterEditSMP;
-  editTabs->addTab(registerEditSMP, "SMP Registers");
-  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
-  editTabs->addTab(registerEditSA1, "SA-1 Registers");
-  registerEditSFX = new RegisterEditSFX;
-  editTabs->addTab(registerEditSFX, "SuperFX Registers");
-  editTabs->setTabPosition(QTabWidget::South);
-  consoleLayout->addWidget(editTabs);
-
-  controlLayout = new QVBoxLayout;
-  controlLayout->setSpacing(0);
-  layout->addLayout(controlLayout);
-
-  commandLayout = new QHBoxLayout;
-  controlLayout->addLayout(commandLayout);
-
-  // TODO: icons instead of text
-  runBreak = new QToolButton;
-  runBreak->setDefaultAction(new QAction("Break", this));
-  runBreak->setFixedWidth(runBreak->minimumSizeHint().width());
-  runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
-  runBreak->defaultAction()->setShortcut(Qt::Key_F5);
-  commandLayout->addWidget(runBreak);
-  commandLayout->addSpacing(Style::WidgetSpacing);
-
-  stepInstruction = new QToolButton;
-  stepInstruction->setDefaultAction(new QAction("Step", this));
-  stepInstruction->defaultAction()->setToolTip("Step through current instruction (F6)");
-  stepInstruction->defaultAction()->setShortcut(Qt::Key_F6);
-  commandLayout->addWidget(stepInstruction);
-
-  stepOver = new QToolButton;
-  stepOver->setDefaultAction(new QAction("Over", this));
-  stepOver->defaultAction()->setToolTip("Step over current instruction (F7)");
-  stepOver->defaultAction()->setShortcut(Qt::Key_F7);
-  commandLayout->addWidget(stepOver);
-
-  stepOut = new QToolButton;
-  stepOut->setDefaultAction(new QAction("Out", this));
-  stepOut->defaultAction()->setToolTip("Step out of current routine (F8)");
-  stepOut->defaultAction()->setShortcut(Qt::Key_F8);
-  commandLayout->addWidget(stepOut);
-
-  controlLayout->addSpacing(Style::WidgetSpacing);
-
-  stepCPU = new QCheckBox("Step S-CPU");
-  stepCPU->setChecked(true);
-  controlLayout->addWidget(stepCPU);
-
-  stepSMP = new QCheckBox("Step S-SMP");
-  controlLayout->addWidget(stepSMP);
-
-  stepSA1 = new QCheckBox("Step SA-1");
-  controlLayout->addWidget(stepSA1);
-
-  stepSFX = new QCheckBox("Step SuperFX");
-  controlLayout->addWidget(stepSFX);
-  
-  controlLayout->addSpacing(Style::WidgetSpacing);
-
-  traceCPU = new QCheckBox("Trace S-CPU opcodes");
-  controlLayout->addWidget(traceCPU);
-
-  traceSMP = new QCheckBox("Trace S-SMP opcodes");
-  controlLayout->addWidget(traceSMP);
-  
-  traceSA1 = new QCheckBox("Trace SA-1 opcodes");
-  controlLayout->addWidget(traceSA1);
-  
-  traceSFX = new QCheckBox("Trace SuperFX opcodes");
-  controlLayout->addWidget(traceSFX);
-
-  traceMask = new QCheckBox("Enable trace mask");
-  controlLayout->addWidget(traceMask);
-
-  spacer = new QWidget;
-  spacer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-  controlLayout->addWidget(spacer);
-
   tracer = new Tracer;
-  disassembler = new Disassembler;
   breakpointEditor = new BreakpointEditor;
-  memoryEditor = new MemoryEditor;
   propertiesViewer = new PropertiesViewer;
   tileViewer = new TileViewer;
   tilemapViewer = new TilemapViewer;
   oamViewer = new OamViewer;
   cgramViewer = new CgramViewer;
 
-  connect(menu_tools_disassembler, SIGNAL(triggered()), disassembler, SLOT(show()));
+  registerEditCPU = new RegisterEditCPU(SNES::cpu);
+  registerEditSMP = new RegisterEditSMP;
+  registerEditSA1 = new RegisterEditCPU(SNES::sa1);
+  registerEditSFX = new RegisterEditSFX;
+
+  QToolBar *toolBar = new QToolBar;
+  layout->addWidget(toolBar);
+
+  consoleLayout = new QSplitter(Qt::Vertical);
+  layout->addWidget(consoleLayout);
+
+  symbolsCPU = new SymbolMap();
+  symbolsSA1 = new SymbolMap();
+  symbolsSMP = new SymbolMap();
+  symbolsSFX = new SymbolMap();
+  
+  application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsCPUWithSA1 = "default_sa1.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsCPUWithSFX = "default_sfx.cpu.sym", true, true);
+  application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
+  application.locateFile(defaultSymbolsSA1 = "default.sa1.sym", true, true);
+  
+  if (config().debugger.loadDefaultSymbols) {
+    symbolsCPU->loadFromFile(defaultSymbolsCPU);
+    symbolsSMP->loadFromFile(defaultSymbolsSMP);
+  }
+  
+  debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
+  debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
+  debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
+  debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
+
+  editTabs = new QTabWidget;
+  editTabs->addTab(debugCPU, "CPU");
+  editTabs->addTab(debugSMP, "SMP");
+  editTabs->setTabPosition(QTabWidget::North);
+  editTabs->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  consoleLayout->addWidget(editTabs);
+
+  console = new QTextEdit;
+  console->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  console->setReadOnly(true);
+  console->setFont(QFont(Style::Monospace));
+  console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
+  console->setMinimumHeight((6 + 1) * console->fontMetrics().height());
+  consoleLayout->addWidget(console);
+
+  runBreak = new QToolButton;
+  runBreak->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  runBreak->setDefaultAction(new QAction(QIcon(":16x16/dbg-break.png"), "Break", this));
+  runBreak->setFixedWidth(runBreak->minimumSizeHint().width());
+  runBreak->defaultAction()->setToolTip("Pause/resume execution (F5)");
+  runBreak->defaultAction()->setShortcut(Qt::Key_F5);
+  toolBar->addWidget(runBreak);
+
+  stepInstruction = new QToolButton;
+  stepInstruction->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepInstruction->setDefaultAction(new QAction(QIcon(":16x16/dbg-step.png"), "Step", this));
+  stepInstruction->defaultAction()->setToolTip("Step through current instruction (F6)");
+  stepInstruction->defaultAction()->setShortcut(Qt::Key_F6);
+  toolBar->addWidget(stepInstruction);
+
+  stepOver = new QToolButton;
+  stepOver->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepOver->setDefaultAction(new QAction(QIcon(":16x16/dbg-step-over.png"), "Over", this));
+  stepOver->defaultAction()->setToolTip("Step over current instruction (F7)");
+  stepOver->defaultAction()->setShortcut(Qt::Key_F7);
+  toolBar->addWidget(stepOver);
+
+  stepOut = new QToolButton;
+  stepOut->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  stepOut->setDefaultAction(new QAction(QIcon(":16x16/dbg-step-out.png"), "Out", this));
+  stepOut->defaultAction()->setToolTip("Step out of current routine (F8)");
+  stepOut->defaultAction()->setShortcut(Qt::Key_F8);
+  toolBar->addWidget(stepOut);
+
+  toolBar->addSeparator();
+
+  stepToVBlank = new QToolButton;
+  stepToVBlank->setDefaultAction(new QAction("Run to VBlank", this));
+  stepToVBlank->defaultAction()->setToolTip("Resume execution until next vertical blank (F9)");
+  stepToVBlank->defaultAction()->setShortcut(Qt::Key_F9);
+  toolBar->addWidget(stepToVBlank);
+
+  stepToHBlank = new QToolButton;
+  stepToHBlank->setDefaultAction(new QAction("Run to HBlank", this));
+  stepToHBlank->defaultAction()->setToolTip("Resume execution until next horizontal blank (F10)");
+  stepToHBlank->defaultAction()->setShortcut(Qt::Key_F10);
+  toolBar->addWidget(stepToHBlank);
+  
+  stepToNMI = new QToolButton;
+  stepToNMI->setDefaultAction(new QAction("Run to NMI", this));
+  stepToNMI->defaultAction()->setToolTip("Resume execution until next NMI (F11)");
+  stepToNMI->defaultAction()->setShortcut(Qt::Key_F11);
+  toolBar->addWidget(stepToNMI);
+
+  stepToIRQ = new QToolButton;
+  stepToIRQ->setDefaultAction(new QAction("Run to IRQ", this));
+  stepToIRQ->defaultAction()->setToolTip("Resume execution until next IRQ (F12)");
+  stepToIRQ->defaultAction()->setShortcut(Qt::Key_F12);
+  toolBar->addWidget(stepToIRQ);
+
+  toolBar->addSeparator();
+
+  traceMask = new QToolButton;
+  traceMask->setDefaultAction(new QAction("Enable trace mask", this));
+  traceMask->defaultAction()->setCheckable(true);
+  toolBar->addWidget(traceMask);
+
   connect(menu_tools_breakpoint, SIGNAL(triggered()), breakpointEditor, SLOT(show()));
-  connect(menu_tools_memory, SIGNAL(triggered()), memoryEditor, SLOT(show()));
+  connect(menu_tools_memory, SIGNAL(triggered()), this, SLOT(createMemoryEditor()));
   connect(menu_tools_propertiesViewer, SIGNAL(triggered()), propertiesViewer, SLOT(show()));
 
   connect(menu_ppu_tileViewer, SIGNAL(triggered()), tileViewer, SLOT(show()));
@@ -184,36 +214,50 @@ Debugger::Debugger() {
   connect(menu_misc_clear, SIGNAL(triggered()), this, SLOT(clear()));
   connect(menu_misc_cacheUsage, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_saveBreakpoints, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_loadDefaultSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_saveSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
-  
+
   connect(stepInstruction->defaultAction(), SIGNAL(triggered()), this, SLOT(stepAction()));
   connect(stepOver->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOverAction()));
   connect(stepOut->defaultAction(), SIGNAL(triggered()), this, SLOT(stepOutAction()));
-  
-  connect(stepCPU, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSMP, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSA1, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(stepSFX, SIGNAL(released()), this, SLOT(synchronize()));
-  connect(traceCPU, SIGNAL(stateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
-  connect(traceSMP, SIGNAL(stateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
-  connect(traceSA1, SIGNAL(stateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
-  connect(traceSFX, SIGNAL(stateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
-  connect(traceMask, SIGNAL(stateChanged(int)), tracer, SLOT(setTraceMaskState(int)));
+  connect(stepToVBlank->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToVBlankAction()));
+  connect(stepToHBlank->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToHBlankAction()));
+  connect(stepToNMI->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToNMIAction()));
+  connect(stepToIRQ->defaultAction(), SIGNAL(triggered()), this, SLOT(stepToIRQAction()));
+
+  connect(debugCPU, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSMP, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSA1, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSFX, SIGNAL(synchronized()), this, SLOT(synchronize()));
+
+  connect(debugCPU, SIGNAL(traceStateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
+  connect(debugSMP, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
+  connect(debugSA1, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
+  connect(debugSFX, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
+  connect(traceMask->defaultAction(), SIGNAL(toggled(bool)), tracer, SLOT(setTraceMaskState(bool)));
 
   frameCounter = 0;
   synchronize();
-  resize(855, 425);
-  
+  resize(855, 745);
+
   QTimer *updateTimer = new QTimer(this);
   connect(updateTimer, SIGNAL(timeout()), this, SLOT(frameTick()));
   updateTimer->start(15);
 }
 
+void Debugger::createMemoryEditor() {
+  MemoryEditor *editor = new MemoryEditor();
+  editor->show();
+}
+
 void Debugger::modifySystemState(unsigned state) {
   string usagefile = filepath(nall::basename(cartridge.fileName), config().path.data);
   string bpfile = usagefile;
+  string symfile = usagefile;
+
   usagefile << "-usage.bin";
   bpfile << ".bp";
   file fp;
@@ -241,8 +285,40 @@ void Debugger::modifySystemState(unsigned state) {
         if (offset >= 0 && i < 0x600000)
           SNES::cpu.cart_usage[offset] |= SNES::superfx.usage[i];
       }
+    } else {
+      SNES::cpuAnalyst.performFullAnalysis();
     }
     
+    symbolsCPU->reset();
+    symbolsSMP->reset();
+    symbolsSA1->reset();
+    symbolsSFX->reset();
+    
+    if (!symbolsCPU->loadFromFile(nall::basename(symfile), ".cpu.sym") &&
+        !symbolsCPU->loadFromFile(nall::basename(symfile), ".sym") &&
+        config().debugger.loadDefaultSymbols) {
+      symbolsCPU->loadFromFile(defaultSymbolsCPU);
+      if (SNES::cartridge.has_sa1())
+        symbolsCPU->loadFromFile(defaultSymbolsCPUWithSA1);
+      if (SNES::cartridge.has_superfx())
+        symbolsCPU->loadFromFile(defaultSymbolsCPUWithSFX);
+    }
+    if (!symbolsSMP->loadFromFile(nall::basename(symfile), ".smp.sym") &&
+        config().debugger.loadDefaultSymbols) {
+      symbolsSMP->loadFromFile(defaultSymbolsSMP);
+    }
+    if (SNES::cartridge.has_sa1()) {
+      editTabs->addTab(debugSA1, "SA-1");
+      if (!symbolsSA1->loadFromFile(nall::basename(symfile), ".sa1.sym") &&
+          config().debugger.loadDefaultSymbols) {
+        symbolsSA1->loadFromFile(defaultSymbolsSA1);  
+      }
+    }
+    if (SNES::cartridge.has_superfx()) {
+      editTabs->addTab(debugSFX, "SuperFX");
+      symbolsSFX->loadFromFile(nall::basename(symfile), ".sfx.sym");
+    }
+
     string data;
     if(config().debugger.saveBreakpoints) {
       breakpointEditor->clear();
@@ -269,6 +345,15 @@ void Debugger::modifySystemState(unsigned state) {
       fp.close();
     }
     
+    if(config().debugger.saveSymbols) {
+      symbolsCPU->saveToFile(nall::basename(symfile), ".cpu.sym");
+      symbolsSMP->saveToFile(nall::basename(symfile), ".smp.sym");
+      if (SNES::cartridge.has_sa1())
+        symbolsSA1->saveToFile(nall::basename(symfile), ".sa1.sym");
+      if (SNES::cartridge.has_superfx())
+        symbolsSFX->saveToFile(nall::basename(symfile), ".sfx.sym");
+    }
+
     if(config().debugger.saveBreakpoints) {
       string data = breakpointEditor->toStrings();
       
@@ -278,33 +363,49 @@ void Debugger::modifySystemState(unsigned state) {
         fp.close();
       }
     }
+    
+    // remove coprocessor debugger tabs
+    while (editTabs->count() > 2) {
+      editTabs->removeTab(2);
+    }
+    editTabs->setCurrentIndex(0);
   }
 }
 
 void Debugger::synchronize() {
   bool active = application.debug && !application.debugrun;
 
+  runBreak->defaultAction()->setIcon(active ? QIcon(":16x16/dbg-run.png") : QIcon(":16x16/dbg-break.png"));
   runBreak->defaultAction()->setText(active ? "Run" : "Break");
-  bool stepEnabled = SNES::cartridge.loaded() && active && 
-                     (stepCPU->isChecked() || stepSMP->isChecked() || 
-                      stepSA1->isChecked() || stepSFX->isChecked());
-  bool stepOtherEnabled = stepEnabled && (stepCPU->isChecked() + stepSMP->isChecked() + 
-                                          stepSA1->isChecked() + stepSFX->isChecked() == 1)
-                          && !stepSFX->isChecked(); // TODO: implement this for superfx
-  
+
+  bool stepEnabled = SNES::cartridge.loaded() && active &&
+                     (debugCPU->stepProcessor->isChecked() || debugSMP->stepProcessor->isChecked() ||
+                      debugSA1->stepProcessor->isChecked() || debugSFX->stepProcessor->isChecked());
+  bool stepOtherEnabled = stepEnabled && (debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
+                                          debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() == 1)
+                          && !debugSFX->stepProcessor->isChecked(); // TODO: implement this for superfx
+  bool stepHVBEnabled = stepEnabled && debugCPU->stepProcessor->isChecked();
+  bool stepInterruptEnabled = stepOtherEnabled && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked());
+
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);
   stepOut->setEnabled(stepOtherEnabled);
+  stepToVBlank->setEnabled(stepHVBEnabled);
+  stepToHBlank->setEnabled(stepHVBEnabled);
+  stepToNMI->setEnabled(stepInterruptEnabled);
+  stepToIRQ->setEnabled(stepInterruptEnabled);
   
   config().debugger.cacheUsageToDisk = menu_misc_cacheUsage->isChecked();
   config().debugger.saveBreakpoints = menu_misc_saveBreakpoints->isChecked();
+  config().debugger.loadDefaultSymbols = menu_misc_loadDefaultSymbols->isChecked();
+  config().debugger.saveSymbols = menu_misc_saveSymbols->isChecked();
   config().debugger.showHClocks = menu_misc_showHClocks->isChecked();
   
   // todo: factor in whether or not cartridge actually contains SA1/SuperFX
-  SNES::debugger.step_cpu = application.debug && stepCPU->isChecked();
-  SNES::debugger.step_smp = application.debug && stepSMP->isChecked();
-  SNES::debugger.step_sa1 = application.debug && stepSA1->isChecked();
-  SNES::debugger.step_sfx = application.debug && stepSFX->isChecked();
+  SNES::debugger.step_cpu = application.debug && debugCPU->stepProcessor->isChecked();
+  SNES::debugger.step_smp = application.debug && debugSMP->stepProcessor->isChecked();
+  SNES::debugger.step_sa1 = application.debug && debugSA1->stepProcessor->isChecked();
+  SNES::debugger.step_sfx = application.debug && debugSFX->stepProcessor->isChecked();
 
   if(!active) {
     registerEditCPU->setEnabled(false);
@@ -312,7 +413,10 @@ void Debugger::synchronize() {
     registerEditSA1->setEnabled(false);
     registerEditSFX->setEnabled(false);
   }
-  memoryEditor->synchronize();
+  QVectorIterator<MemoryEditor*> i(memoryEditors);
+  while (i.hasNext()) {
+    i.next()->synchronize();
+  }
 }
 
 void Debugger::echo(const char *message) {
@@ -370,6 +474,42 @@ void Debugger::stepOutAction() {
   switchWindow();
 }
 
+void Debugger::stepToVBlankAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToVBlank;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToHBlankAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToHBlank;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToNMIAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToNMI;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
+void Debugger::stepToIRQAction() {
+  SNES::debugger.step_type = SNES::Debugger::StepType::StepToIRQ;
+  SNES::debugger.call_count = 0;
+  
+  application.debugrun = true;
+  synchronize();
+  switchWindow();
+}
+
 void Debugger::event() {
   char t[256];
 
@@ -382,12 +522,12 @@ void Debugger::event() {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
       
-      if (n < SNES::Debugger::Breakpoints)
-        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
-      else if (n == SNES::Debugger::SoftBreakCPU)
+      if (n == SNES::Debugger::SoftBreakCPU)
         echo(string() << "Software breakpoint hit (CPU).<br>");
       else if (n == SNES::Debugger::SoftBreakSA1)
         echo(string() << "Software breakpoint hit (SA-1).<br>");
+      else if (n < SNES::debugger.breakpoint.size())
+        echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
       else break;
         
       if(n == SNES::Debugger::SoftBreakCPU
@@ -400,8 +540,9 @@ void Debugger::event() {
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+        debugCPU->refresh(SNES::cpu.opcode_pc);
         registerEditCPU->setEnabled(true);
+        editTabs->setCurrentIndex(0);
         break;
       }
 
@@ -412,30 +553,33 @@ void Debugger::event() {
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+        debugSA1->refresh(SNES::sa1.opcode_pc);
         registerEditSA1->setEnabled(true);
+        editTabs->setCurrentIndex(editTabs->indexOf(debugSA1));
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+        debugSMP->refresh(SNES::smp.opcode_pc);
         registerEditSMP->setEnabled(true);
+        editTabs->setCurrentIndex(1);
         break;
       }
-      
+
       if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
         SNES::debugger.step_sfx = true;
         SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
         echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
-        disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+        debugSFX->refresh(SNES::superfx.opcode_pc);
         registerEditSFX->setEnabled(true);
+        editTabs->setCurrentIndex(editTabs->indexOf(debugSFX));
         break;
       }
     } break;
@@ -445,7 +589,7 @@ void Debugger::event() {
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::CPU, SNES::cpu.opcode_pc);
+      debugCPU->refresh(SNES::cpu.opcode_pc);
       registerEditCPU->setEnabled(true);
     } break;
 
@@ -454,25 +598,25 @@ void Debugger::event() {
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#a00000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SMP, SNES::smp.opcode_pc);
+      debugSMP->refresh(SNES::smp.opcode_pc);
       registerEditSMP->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SA1Step: {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SA1, SNES::sa1.opcode_pc);
+      debugSA1->refresh(SNES::sa1.opcode_pc);
       registerEditSA1->setEnabled(true);
     } break;
-    
+
     case SNES::Debugger::BreakEvent::SFXStep: {
       SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc, true);
       string s = t;
       s.replace(" ", "&nbsp;");
       echo(string() << "<font color='#008000'>" << s << "</font><br>");
-      disassembler->refresh(Disassembler::SFX, SNES::superfx.opcode_pc);
+      debugSFX->refresh(SNES::superfx.opcode_pc);
       registerEditSFX->setEnabled(true);
     } break;
   }
@@ -497,14 +641,20 @@ void Debugger::frameTick() {
   } else {
     // update memory editor every time since once per second isn't very useful
     // (TODO: and PPU viewers, maybe?) 
-    memoryEditor->autoUpdate();
+    QVectorIterator<MemoryEditor*> i(memoryEditors);
+    while (i.hasNext()) {
+      i.next()->autoUpdate();
+    }
   }
   
   frameCounter = frame;
 }
 
 void Debugger::autoUpdate() {
-  memoryEditor->autoUpdate();
+  QVectorIterator<MemoryEditor*> i(memoryEditors);
+  while (i.hasNext()) {
+    i.next()->synchronize();
+  }
   propertiesViewer->autoUpdate();
   tileViewer->autoUpdate();
   tilemapViewer->autoUpdate();

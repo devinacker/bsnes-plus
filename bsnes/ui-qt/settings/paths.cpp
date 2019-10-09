@@ -2,7 +2,6 @@
 PathSettingsWindow *pathSettingsWindow;
 
 PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, const char *pathDefaultLabel_, const char *pathBrowseLabel_, const char *pathDefaultValue_) : pathValue(pathValue_) {
-  pathDefaultLabel = pathDefaultLabel_;
   pathBrowseLabel = pathBrowseLabel_;
   pathDefaultValue = pathDefaultValue_;
 
@@ -19,7 +18,9 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   layout->addLayout(controlLayout);
 
   path = new QLineEdit;
-  path->setReadOnly(true);
+  path->setPlaceholderText(pathDefaultLabel_);
+  if (pathValue != pathDefaultValue)
+    path->setText(pathValue);
   controlLayout->addWidget(path);
 
   pathSelect = new QPushButton("Select ...");
@@ -28,25 +29,22 @@ PathSettingWidget::PathSettingWidget(string &pathValue_, const char *labelText, 
   pathDefault = new QPushButton("Default");
   controlLayout->addWidget(pathDefault);
 
-  connect(pathSelect, SIGNAL(released()), this, SLOT(selectPath()));
-  connect(pathDefault, SIGNAL(released()), this, SLOT(defaultPath()));
-  updatePath();
+  connect(path, SIGNAL(textChanged(QString)), this, SLOT(updatePath()));
+  connect(pathSelect, SIGNAL(clicked(bool)), this, SLOT(selectPath()));
+  connect(pathDefault, SIGNAL(clicked(bool)), path, SLOT(clear()));
 }
 
 void PathSettingWidget::acceptPath(const string &newPath) {
   fileBrowser->close();
-  pathValue = string() << newPath << "/";
-  config().path.current.folder = dir(pathValue);
-  updatePath();
+  path->setText(string() << newPath << "/");
+  config().path.current.folder = dir(newPath);
 }
 
 void PathSettingWidget::updatePath() {
-  if(pathValue == pathDefaultValue) {
-    path->setStyleSheet("color: #808080");
-    path->setText(pathDefaultLabel);
+  if (path->text().isEmpty()) {
+    pathValue = pathDefaultValue;
   } else {
-    path->setStyleSheet("color: #000000");
-    path->setText(pathValue);
+    pathValue = path->text();
   }
 }
 
@@ -57,11 +55,6 @@ void PathSettingWidget::selectPath() {
   fileBrowser->setWindowTitle(pathBrowseLabel);
   fileBrowser->setPath(config().path.current.folder);
   fileBrowser->chooseFolder();
-}
-
-void PathSettingWidget::defaultPath() {
-  pathValue = pathDefaultValue;
-  updatePath();
 }
 
 PathSettingsWindow::PathSettingsWindow() {
@@ -77,7 +70,9 @@ PathSettingsWindow::PathSettingsWindow() {
   patchPath = new PathSettingWidget(config().path.patch, "BPS/UPS/IPS patches:",   "Same as loaded game", "Default BPS/UPS/IPS Patch Path", "");
   cheatPath = new PathSettingWidget(config().path.cheat, "Cheat codes:",   "Same as loaded game", "Default Cheat Code Path", "");
   dataPath  = new PathSettingWidget(config().path.data,  "Exported data:", "Same as loaded game", "Default Exported Data Path", "");
-  satdataPath  = new PathSettingWidget(SNES::config.sat.path,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
+  
+  firmwarePath = new PathSettingWidget(SNES::config().path.firmware, "Extra chip firmware:", "Same as loaded game", "Default Chip Firmware Path", "");
+  satdataPath  = new PathSettingWidget(SNES::config().path.bsxdat,  "Satellaview signal data:", "./bsxdat/", "Default Satellaview Signal Data Path", "./bsxdat/");
 
   layout->addWidget(gamePath);
   layout->addWidget(savePath);
@@ -85,5 +80,6 @@ PathSettingsWindow::PathSettingsWindow() {
   layout->addWidget(patchPath);
   layout->addWidget(cheatPath);
   layout->addWidget(dataPath);
+  layout->addWidget(firmwarePath);
   layout->addWidget(satdataPath);
 }

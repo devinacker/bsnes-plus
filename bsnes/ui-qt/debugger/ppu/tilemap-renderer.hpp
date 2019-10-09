@@ -21,6 +21,8 @@ public:
 
   void drawTilemap();
 
+  unsigned characterAddress(unsigned c) const;
+
 private:
   void drawMap(unsigned mapAddr, unsigned startX, unsigned startY);
   void drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline, const uint8_t* map);

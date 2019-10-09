@@ -44,11 +44,12 @@ void Utility::updateSystemState() {
 
 void Utility::acquireMouse() {
   if(SNES::cartridge.loaded()) {
-    if(SNES::config.controller_port1 == SNES::Input::Device::Mouse
-    || SNES::config.controller_port2 == SNES::Input::Device::Mouse
-    || SNES::config.controller_port2 == SNES::Input::Device::SuperScope
-    || SNES::config.controller_port2 == SNES::Input::Device::Justifier
-    || SNES::config.controller_port2 == SNES::Input::Device::Justifiers
+    SNES::Configuration &snes_config = SNES::config();
+    if(snes_config.controller_port1 == SNES::Input::Device::Mouse
+    || snes_config.controller_port2 == SNES::Input::Device::Mouse
+    || snes_config.controller_port2 == SNES::Input::Device::SuperScope
+    || snes_config.controller_port2 == SNES::Input::Device::Justifier
+    || snes_config.controller_port2 == SNES::Input::Device::Justifiers
     ) input.acquire();
   }
 }
@@ -110,8 +111,8 @@ void Utility::updateEmulationSpeed(unsigned speed) {
 }
 
 void Utility::updateControllers() {
-  SNES::input.port_set_device(0, SNES::config.controller_port1);
-  SNES::input.port_set_device(1, SNES::config.controller_port2);
+  SNES::input.port_set_device(0, SNES::config().controller_port1);
+  SNES::input.port_set_device(1, SNES::config().controller_port2);
 
   switch(config().input.port1) { default:
     case ControllerPort1::None: mapper().port1 = 0; break;
@@ -119,6 +120,7 @@ void Utility::updateControllers() {
     case ControllerPort1::Asciipad: mapper().port1 = &Controllers::asciipad1; break;
     case ControllerPort1::Multitap: mapper().port1 = &Controllers::multitap1; break;
     case ControllerPort1::Mouse: mapper().port1 = &Controllers::mouse1; break;
+    case ControllerPort1::NTTDataKeypad: mapper().port1 = &Controllers::nttdatakeypad1; break;
   }
 
   switch(config().input.port2) { default:

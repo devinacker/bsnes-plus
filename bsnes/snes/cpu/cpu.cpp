@@ -6,6 +6,8 @@ namespace SNES {
 #if defined(DEBUGGER)
   #include "debugger/debugger.cpp"
   CPUDebugger cpu;
+  #include "debugger/analyst.cpp"
+  CPUAnalyst cpuAnalyst;
 #else
   CPU cpu;
 #endif
@@ -99,7 +101,7 @@ void CPU::op_irq() {
 }
 
 void CPU::power() {
-  cpu_version = config.cpu.version;
+  cpu_version = config().cpu.version;
 
   regs.a = regs.x = regs.y = 0x0000;
   regs.s = 0x01ff;

@@ -146,15 +146,13 @@ void PPU::Sprite::tilefetch() {
 
       oam_tile[n].d0 = memory::vram[addr +  0];
       oam_tile[n].d1 = memory::vram[addr +  1];
-      self.add_clocks(2);
-
       oam_tile[n].d2 = memory::vram[addr + 16];
       oam_tile[n].d3 = memory::vram[addr + 17];
       self.add_clocks(2);
     }
   }
 
-  if(t.tile_count < 34) self.add_clocks((34 - t.tile_count) * 4);
+  if(t.tile_count < 34) self.add_clocks((34 - t.tile_count) * 2);
   regs.time_over  |= (t.tile_count > 34);
   regs.range_over |= (t.item_count > 32);
 }

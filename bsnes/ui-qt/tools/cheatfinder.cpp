@@ -102,8 +102,8 @@ CheatFinderWindow::CheatFinderWindow() {
   connect(compareToValue, SIGNAL(toggled(bool)), this, SLOT(toggle_editline(bool)));
 
   connect(valueEdit, SIGNAL(returnPressed()), this, SLOT(searchMemory()));
-  connect(searchButton, SIGNAL(released()), this, SLOT(searchMemory()));
-  connect(resetButton, SIGNAL(released()), this, SLOT(resetSearch()));
+  connect(searchButton, SIGNAL(clicked(bool)), this, SLOT(searchMemory()));
+  connect(resetButton, SIGNAL(clicked(bool)), this, SLOT(resetSearch()));
   synchronize();
 }
 

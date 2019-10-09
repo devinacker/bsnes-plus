@@ -29,7 +29,7 @@ static struct {
 	
 } info;
 
-static const char *spc_header = "SNES-SPC700 Sound File Data v0.30\x1a\x1a";
+static const char spc_header[] = "SNES-SPC700 Sound File Data v0.30\x1a\x1a";
 
 static void read_tag_id666(file &spc);
 static bool load_snsf_internal(nall::string &filename, uint8_t *&data, unsigned &size, int depth = 0);
@@ -53,7 +53,7 @@ bsnesexport bool snesmusic_load_spc(string &filename, uint8_t *&dump,
                                     uint16_t &pc, uint8_t (&regs)[4], uint8_t &p) {
 
 	file spc;
-	char header[sizeof(spc_header)];
+	char header[sizeof(spc_header)-1];
 		
 	snesmusic_unload();
 	
@@ -336,8 +336,6 @@ static void point_shadow(uint16_t *dest, unsigned pitch) {
 }
 
 bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width, unsigned height) {
-	using namespace BitmapFont;
-
 #define PAD 8
 #define PXL(x,y) (data + (x) + (y)*pitch)
 
@@ -347,17 +345,20 @@ bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width
 	// TODO: clip text to height if needed, but we're not drawing that much right now
 	
 	// show title
-	const char titleStr[] = {T, i, t, l, e, 0};
-	print(PXL(PAD+0, PAD+0), pitch, point_shadow<0x001f>, titleStr);
-	print(PXL(PAD+40, PAD+0), pitch, point_shadow, string_convert(info.title, width-40));
+	BitmapFont::print(PXL(PAD+0, PAD+0), pitch, 
+		point_shadow<0x001f>, string_convert("Title", 40));
+	BitmapFont::print(PXL(PAD+40, PAD+0), pitch, 
+		point_shadow, string_convert(info.title, width-40));
 	// show artist
-	const char artistStr[] = {A, r, t, i, s, t, 0};
-	print(PXL(PAD+0, PAD+HEIGHT), pitch, point_shadow<0x001f>, artistStr);
-	print(PXL(PAD+40, PAD+HEIGHT), pitch, point_shadow, string_convert(info.artist, width-40));
+	BitmapFont::print(PXL(PAD+0, PAD+BitmapFont::HEIGHT), pitch, 
+		point_shadow<0x001f>, string_convert("Artist", 40));
+	BitmapFont::print(PXL(PAD+40, PAD+BitmapFont::HEIGHT), pitch, 
+		point_shadow, string_convert(info.artist, width-40));
 	// show game name
-	const char gameStr[] = {G, a, m, e, 0};
-	print(PXL(PAD+0, PAD+HEIGHT*2), pitch, point_shadow<0x001f>, gameStr);
-	print(PXL(PAD+40, PAD+HEIGHT*2), pitch, point_shadow, string_convert(info.game, width-40));
+	BitmapFont::print(PXL(PAD+0, PAD+BitmapFont::HEIGHT*2), pitch, 
+		point_shadow<0x001f>, string_convert("Game", 40));
+	BitmapFont::print(PXL(PAD+40, PAD+BitmapFont::HEIGHT*2), pitch, 
+		point_shadow, string_convert(info.game, width-40));
 	
 #undef PAD
 #undef PXL

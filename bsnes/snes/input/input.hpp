@@ -8,6 +8,7 @@ public:
     SuperScope,
     Justifier,
     Justifiers,
+    NTTDataKeypad,
   };
 
   enum class JoypadID : unsigned {
@@ -27,6 +28,16 @@ public:
   enum class JustifierID : unsigned {
     X = 0, Y = 1, Trigger = 2, Start = 3,
   };
+
+  enum class NTTDataKeypadID : unsigned {
+    B  =  0, Y    =  1, Select =  2, Start =  3,
+    Up =  4, Down =  5, Left   =  6, Right =  7,
+    A  =  8, X    =  9, L      = 10, R     = 11,
+	Digit0 = 16, Digit1 = 17, Digit2 = 18, Digit3 = 19, Digit4 = 20,
+	Digit5 = 21, Digit6 = 22, Digit7 = 23, Digit8 = 24, Digit9 = 25,
+	Star = 26, Hash = 27, Period = 28, C = 29, Hangup = 31,
+  };
+
 
   uint8 port_read(bool port);
   void port_set_device(bool port, Device device);

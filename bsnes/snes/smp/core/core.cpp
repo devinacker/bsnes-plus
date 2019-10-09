@@ -1,4 +1,5 @@
 #include <snes.hpp>
+#include <nall/snes/smp.hpp>
 
 #define SMPCORE_CPP
 namespace SNES {

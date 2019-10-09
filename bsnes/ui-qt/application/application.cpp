@@ -52,7 +52,7 @@ bool Application::singleUserMode() {
   return file::exists(temp);
 }
 
-void Application::locateFile(string &filename, bool createDataDirectory) {
+void Application::locateFile(string &filename, bool createDataDirectory, bool createFile) {
   string temp;
 
   if(singleUserMode()) {
@@ -64,7 +64,11 @@ void Application::locateFile(string &filename, bool createDataDirectory) {
     if(createDataDirectory) mkdir(temp, 0755);  //ensure directory exists
     temp << "/" << filename;
   }
-
+  
+  if(createFile && !QFile::exists(temp)) {
+    QFile::copy(QString(":/") + filename(), temp);
+  }
+  
   filename = temp;
 }
 
@@ -143,17 +147,13 @@ int Application::main(int &argc, char **argv) {
   initPaths(argv[0]);
   locateFile(configFilename = "bsnes-qt.cfg", true);
   locateFile(styleSheetFilename = "style.qss");
-  locateFile(cheatsFilename = "cheats.xml");
+  locateFile(cheatsFilename = "cheats.xml", true, true);
 
   string customStylesheet;
   if(customStylesheet.readfile(styleSheetFilename) == true) {
     app->setStyleSheet((const char*)customStylesheet);
   } else {
     app->setStyleSheet(defaultStylesheet);
-  }
-
-  if(!QFile::exists(cheatsFilename)) {
-    QFile::copy(":/cheats.xml", cheatsFilename);
   }
 
   config().load(configFilename);

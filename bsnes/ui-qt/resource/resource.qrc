@@ -5,6 +5,12 @@
     <file alias="bsnes_512.png">../../data/bsnes_512.png</file>
     <file alias="cheats.xml">../../data/cheats.xml</file>
 
+    <file alias="default.cpu.sym">../../data/default.cpu.sym</file>
+    <file alias="default_sa1.cpu.sym">../../data/default_sa1.cpu.sym</file>
+    <file alias="default_sfx.cpu.sym">../../data/default_sfx.cpu.sym</file>
+    <file alias="default.smp.sym">../../data/default.smp.sym</file>
+    <file alias="default.sa1.sym">../../data/default.sa1.sym</file>
+
     <file alias="logo.png">../data/logo.png</file>
     <file alias="documentation.html">../data/documentation.html</file>
     <file alias="license.html">../data/license.html</file>
@@ -16,14 +22,20 @@
 
     <file alias="16x16/folder-new.png">../data/icons-16x16/folder-new.png</file>
     <file alias="16x16/go-up.png">../data/icons-16x16/go-up.png</file>
-    
+
+    <file alias="16x16/dbg-break.png">../data/icons-16x16/dbg-break.png</file>
+    <file alias="16x16/dbg-run.png">../data/icons-16x16/dbg-run.png</file>
+    <file alias="16x16/dbg-step-out.png">../data/icons-16x16/dbg-step-out.png</file>
+    <file alias="16x16/dbg-step-over.png">../data/icons-16x16/dbg-step-over.png</file>
+    <file alias="16x16/dbg-step.png">../data/icons-16x16/dbg-step.png</file>
+
     <file alias="16x16/mem-prev-code.png">../data/icons-16x16/mem-prev-code.png</file>
     <file alias="16x16/mem-next-code.png">../data/icons-16x16/mem-next-code.png</file>
     <file alias="16x16/mem-prev-data.png">../data/icons-16x16/mem-prev-data.png</file>
     <file alias="16x16/mem-next-data.png">../data/icons-16x16/mem-next-data.png</file>
     <file alias="16x16/mem-prev-unknown.png">../data/icons-16x16/mem-prev-unknown.png</file>
     <file alias="16x16/mem-next-unknown.png">../data/icons-16x16/mem-next-unknown.png</file>
-    
+
     <file alias="16x16/mem-find.png">../data/icons-16x16/mem-find.png</file>
   </qresource>
 </RCC>

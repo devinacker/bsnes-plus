@@ -12,6 +12,7 @@ public:
   QPaintEngine* paintEngine() const;
   void mouseReleaseEvent(QMouseEvent*);
   void paintEvent(QPaintEvent*);
+  void focusOutEvent(QFocusEvent*);
 };
 
 class MainWindow : public Window {
@@ -38,6 +39,7 @@ public:
       RadioAction *system_port1_asciipad;
       RadioAction *system_port1_multitap;
       RadioAction *system_port1_mouse;
+      RadioAction *system_port1_nttdatakeypad;
     QMenu *system_port2;
       RadioAction *system_port2_none;
       RadioAction *system_port2_gamepad;
@@ -125,6 +127,7 @@ public slots:
   void setPort1Asciipad();
   void setPort1Multitap();
   void setPort1Mouse();
+  void setPort1NTTDataKeypad();
   void setPort2None();
   void setPort2Gamepad();
   void setPort2Asciipad();
@@ -165,11 +168,6 @@ public slots:
   void saveSPC();
   void loadState();
   void saveState();
-  void showCheatEditor();
-  void showCheatFinder();
-  void showStateManager();
-  void showEffectToggle();
-  void showManifestViewer();
   void showSoundViewer();
   void showDebugger();
   void showDocumentation();
