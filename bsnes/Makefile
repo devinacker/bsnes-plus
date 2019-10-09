@@ -2,12 +2,20 @@ common := ../common
 nall   := $(common)/nall
 include $(nall)/Makefile
 snes := snes
-ifeq ($(profile),)
-  profile := compatibility
-endif
 ifeq ($(ui),)
   ui := ui-qt
 endif
+
+ifeq ($(profile),)
+  profile := compatibility
+  ifeq ($(out),)
+    out   := bsnes
+  endif
+else ifeq ($(out),)
+  out     := bsnes-$(profile)
+endif
+
+objdir := obj/$(profile)
 
 # compiler
 c       := $(compiler) -xc -std=gnu99
@@ -78,25 +86,25 @@ all: build plugins;
 include $(snes)/Makefile
 include $(ui)/Makefile
 
-objects := $(patsubst %,obj/%.o,$(objects))
+objects := $(patsubst %,$(objdir)/%.o,$(objects))
 
 # targets
 build: ui_build $(objects)
 ifeq ($(platform),osx)
 	test -d $(osxbundle) || mkdir -p $(osxbundle)/Contents/MacOS
-	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/bsnes $(objects) $(link))
+	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/$(out) $(objects) $(link))
 	mkdir -p $(osxbundle)/Contents/Resources
 	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
 	sed 's/@VERSION/v$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
 else
 #	$(foreach qtdll,$(qtdlls),xcopy $(winqtpath)\bin\$(qtdll) .\out\ /D /Y &)
 #	$(foreach qtplatformdll,$(qtplatformdlls),xcopy $(winqtpath)\$(qtplatformdll) .\out\platforms\ /D /Y &)
-	$(strip $(cpp) -o out/bsnes $(objects) $(link))
+	$(strip $(cpp) -o out/$(out) $(objects) $(link))
 endif
 
 install: build plugins
 ifeq ($(platform),x)
-	install -D -m 755 out/bsnes $(DESTDIR)$(prefix)/bin/bsnes
+	install -D -m 755 out/$(out) $(DESTDIR)$(prefix)/bin/$(out)
 	install -D -m 644 data/bsnes.png $(DESTDIR)$(prefix)/share/pixmaps/bsnes.png
 	install -D -m 644 data/bsnes.desktop $(DESTDIR)$(prefix)/share/applications/bsnes.desktop
 	test -d ~/.bsnes || mkdir ~/.bsnes
@@ -109,7 +117,7 @@ endif
 
 uninstall:
 ifeq ($(platform),x)
-	rm $(DESTDIR)$(prefix)/bin/bsnes
+	rm $(DESTDIR)$(prefix)/bin/$(out)
 	rm $(DESTDIR)$(prefix)/share/pixmaps/bsnes.png
 	rm $(DESTDIR)$(prefix)/share/applications/bsnes.desktop
 else ifeq ($(platform),osx)
@@ -141,11 +149,11 @@ else
 endif
 
 clean: ui_clean plugins_clean
-	-@$(call delete,obj/*.o)
-	-@$(call delete,obj/*.a)
-	-@$(call delete,obj/*.so)
-	-@$(call delete,obj/*.dylib)
-	-@$(call delete,obj/*.dll)
+	-@$(call delete,$(objdir)/*.o)
+	-@$(call delete,$(objdir)/*.a)
+	-@$(call delete,$(objdir)/*.so)
+	-@$(call delete,$(objdir)/*.dylib)
+	-@$(call delete,$(objdir)/*.dll)
 	-@$(call delete,*.res)
 	-@$(call delete,*.pgd)
 	-@$(call delete,*.pgc)
