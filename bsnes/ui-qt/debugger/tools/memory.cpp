@@ -97,6 +97,7 @@ MemoryEditor::MemoryEditor() {
   connect(editor, SIGNAL(currentAddressChanged(qint64)), this, SLOT(showAddress(qint64)));
   connect(editor, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showContextMenu(QPoint)));
   connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(sourceChanged(int)));
+  connect(source, SIGNAL(currentIndexChanged(int)), this, SLOT(updateOffset()));
   connect(addr, SIGNAL(textEdited(const QString&)), this, SLOT(updateOffset()));
   connect(addr, SIGNAL(returnPressed()), this, SLOT(updateOffset()));
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
@@ -139,6 +140,8 @@ void MemoryEditor::synchronize() {
     exportButton->setEnabled(true);
     importButton->setEnabled(true);
   }
+  
+  sourceChanged(source->currentIndex());
 }
 
 void MemoryEditor::show() {
@@ -161,8 +164,6 @@ void MemoryEditor::sourceChanged(int index) {
     case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setEditorSize(16 * 1024 * 1024); break;
     case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(8 * 1024 * 1024); break;
   }
-
-  updateOffset();
 }
 
 void MemoryEditor::refresh() {
@@ -203,7 +204,7 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
       && memorySource != SNES::Debugger::MemorySource::CartRAM) {
     menu.addSeparator();  
     
-	breakpointPos = editor->cursorPosition(pos) / 2;
+    breakpointPos = editor->cursorPosition(pos) / 2;
 
     QMenu *menuBreakpoint = menu.addMenu(QString::asprintf("Add breakpoint at 0x%06X", breakpointPos));
     menuBreakpoint->addAction("Read", this, SLOT(addBreakpointR()));
