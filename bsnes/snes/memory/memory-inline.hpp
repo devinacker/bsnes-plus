@@ -76,6 +76,10 @@ void VRAM::copy(const uint8 *data, unsigned size) {
 
 void VRAM::bank(bool enable, unsigned num) {
   if (PPU::SupportsVRAMExpansion && enable && (size() >= 1<<17)) {
+    // Super V-Power expansion inverts CPU pin 20 -> VRAM A17
+    // assume higher address lines (if any are ever used) would also invert
+    num ^= 0x3f;
+    
     access_ = data() + ((num << 17) & (size() - 1));
     mask_ = 0x1ffff;
   } else {
