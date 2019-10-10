@@ -114,6 +114,8 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
     return true; \
   }
 
+  unsigned vram_start = vram_start_addr();
+
   //internal
   item("S-PPU1 open bus", string("0x", hex<2>(regs.ppu1_mdr)));
   item("S-PPU2 open bus", string("0x", hex<2>(regs.ppu2_mdr)));
@@ -127,8 +129,8 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
   item("$2101", "");
   item("OAM Base Size", (unsigned)oam.regs.base_size);
   item("OAM Name Select", (unsigned)oam.regs.nameselect);
-  item("OAM Name Base Address", string("0x", hex<4>(oam.regs.tiledata_addr)));
-  item("OAM Second Name Table Address", string("0x", hex<4>(oam_tile_addr(1))));
+  item("OAM Name Base Address", string("0x", hex<4>(oam.regs.tiledata_addr + vram_start)));
+  item("OAM Second Name Table Address", string("0x", hex<4>(oam_tile_addr(1) + vram_start)));
 
   //$2102-$2103
   item("$2102-$2103", "");
@@ -156,33 +158,33 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
 
   //$2107
   item("$2107", "");
-  item("BG1 Screen Address", string("0x", hex<4>(bg1.regs.screen_addr)));
+  item("BG1 Screen Address", string("0x", hex<4>(bg1.regs.screen_addr + vram_start)));
   item("BG1 Screen Size", screen_size[bg1.regs.screen_size & 3]);
 
   //$2108
   item("$2108", "");
-  item("BG2 Screen Address", string("0x", hex<4>(bg2.regs.screen_addr)));
+  item("BG2 Screen Address", string("0x", hex<4>(bg2.regs.screen_addr + vram_start)));
   item("BG2 Screen Size", screen_size[bg2.regs.screen_size & 3]);
 
   //$2109
   item("$2109", "");
-  item("BG3 Screen Address", string("0x", hex<4>(bg3.regs.screen_addr)));
+  item("BG3 Screen Address", string("0x", hex<4>(bg3.regs.screen_addr + vram_start)));
   item("BG3 Screen Size", screen_size[bg3.regs.screen_size & 3]);
 
   //$210a
   item("$210a", "");
-  item("BG4 Screen Address", string("0x", hex<4>(bg4.regs.screen_addr)));
+  item("BG4 Screen Address", string("0x", hex<4>(bg4.regs.screen_addr + vram_start)));
   item("BG4 Screen Size", screen_size[bg4.regs.screen_size & 3]);
 
   //$210b
   item("$210b", "");
-  item("BG1 Name Base Address", string("0x", hex<4>(bg1.regs.tiledata_addr)));
-  item("BG2 Name Base Address", string("0x", hex<4>(bg2.regs.tiledata_addr)));
+  item("BG1 Name Base Address", string("0x", hex<4>(bg1.regs.tiledata_addr + vram_start)));
+  item("BG2 Name Base Address", string("0x", hex<4>(bg2.regs.tiledata_addr + vram_start)));
 
   //$210c
   item("$210c", "");
-  item("BG3 Name Base Address", string("0x", hex<4>(bg3.regs.tiledata_addr)));
-  item("BG4 Name Base Address", string("0x", hex<4>(bg4.regs.tiledata_addr)));
+  item("BG3 Name Base Address", string("0x", hex<4>(bg3.regs.tiledata_addr + vram_start)));
+  item("BG4 Name Base Address", string("0x", hex<4>(bg4.regs.tiledata_addr + vram_start)));
 
   //$210d
   item("$210d", "");

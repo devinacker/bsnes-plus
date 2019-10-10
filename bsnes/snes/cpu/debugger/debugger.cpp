@@ -227,6 +227,10 @@ bool CPUDebugger::property(unsigned id, string &name, string &value) {
   //$4201
   item("$4201", "");
   item("PIO", string("0x", hex<2>(status.pio)));
+  if (PPU::SupportsVRAMExpansion) {
+    item("VRAM Expansion", ((status.pio & 1) || (memory::vram.size() == 1<<16)) ? "Disabled" : "Enabled");
+    item("VRAM Bank Select", string("0x", hex<5>(ppu.vram_start_addr())));
+  }
 
   //$4202
   item("$4202", "");
