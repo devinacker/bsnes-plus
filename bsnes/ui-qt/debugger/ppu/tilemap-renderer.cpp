@@ -138,8 +138,9 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
 }
 
 unsigned TilemapRenderer::characterAddress(unsigned c) const {
-  // keep VRAM addresses limited to 16 bits if VRAM expansion isn't supported
-  const unsigned sizeMask = SNES::PPU::SupportsVRAMExpansion ? 0x1ffff : 0xffff;
+  // keep VRAM addresses limited to 16 bits if VRAM expansion isn't supported (or enabled)
+  const unsigned sizeMask = (SNES::PPU::SupportsVRAMExpansion && !(SNES::cpu.pio() & 1))
+                          ? 0x1ffff : 0xffff;
   
   switch(bitDepth) {
     case BitDepth::BPP8:        return (tileAddr + c * 64) & 0x1ffc0 & sizeMask;
