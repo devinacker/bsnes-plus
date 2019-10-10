@@ -285,7 +285,7 @@ void OamGraphicsScene::drawObject(QImage& buffer, const OamObject& obj) {
   const QSize objSize = dataModel->sizeOfObject(obj);
 
   const QRgb* pal = spritePalette + (obj.palette % N_PALETTES) * 16;
-  const uint8_t *objTileset = SNES::memory::vram.data() + SNES::ppu.oam_tile_addr(obj.table);
+  const uint8_t *objTileset = &SNES::memory::vram[SNES::ppu.oam_tile_addr(obj.table)];
 
   for(unsigned ty = 0; ty < objSize.height() / 8; ty++) {
     for(unsigned tx = 0; tx < objSize.width() / 8; tx++) {

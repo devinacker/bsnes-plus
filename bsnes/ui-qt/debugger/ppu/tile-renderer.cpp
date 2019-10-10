@@ -14,11 +14,14 @@ TileRenderer::TileRenderer()
 
 unsigned TileRenderer::addressMask() const {
   if(source != Source::VRAM) return 0xffffff;
-
+  
+  // keep VRAM addresses limited to 16 bits if VRAM expansion isn't supported
+  const unsigned sizeMask = SNES::PPU::SupportsVRAMExpansion ? 0x1ffff : 0xffff;
+  
   switch (bitDepth) {
-    case BitDepth::BPP8: return 0xffc0;
-    case BitDepth::BPP4: return 0xffe0;
-    case BitDepth::BPP2: return 0xfff0;
+    case BitDepth::BPP8: return 0x1ffc0 & sizeMask;
+    case BitDepth::BPP4: return 0x1ffe0 & sizeMask;
+    case BitDepth::BPP2: return 0x1fff0 & sizeMask;
     case BitDepth::MODE7: return 0;
     case BitDepth::MODE7_EXTBG: return 0;
   }
@@ -31,12 +34,12 @@ unsigned TileRenderer::nTiles() const {
   if(isMode7()) return 256;
 
   unsigned a = address & addressMask();
-  return (0x10000 - a) / bytesInbetweenTiles();
+  return (maxAddress() - a) / bytesInbetweenTiles();
 }
 
 unsigned TileRenderer::maxAddress() const {
   switch(source) {
-    case Source::VRAM:     return 64 * 1024;
+    case Source::VRAM:     return min(1 << 17, SNES::memory::vram.size());
     case Source::CPU_BUS:  return 16 * 1024 * 1024;
     case Source::CART_ROM: return SNES::memory::cartrom.size();
     case Source::CART_RAM: return SNES::memory::cartram.size();
@@ -103,9 +106,10 @@ void TileRenderer::drawVramTileset() {
   QRgb* scanline = (QRgb*)image.scanLine(0);
   const unsigned wordsPerScanline = image.bytesPerLine() / 4;
   const unsigned bytesPerTile = bytesInbetweenTiles();
-
-  const uint8_t *tile = SNES::memory::vram.data() + address;
-  const uint8_t *tileEnd = SNES::memory::vram.data() + SNES::memory::vram.size();
+  
+  // get the absolute address within the current VRAM bank (if expansion is enabled)
+  const uint8_t *tile = &SNES::memory::vram[address];
+  const uint8_t *tileEnd = &SNES::memory::vram[0] + maxAddress();
 
   for(unsigned y = 0; y < height; y++) {
     QRgb* imgBits = scanline;
@@ -133,7 +137,8 @@ void TileRenderer::drawMode7Tileset() {
   QRgb* scanline = (QRgb*)image.scanLine(0);
   const unsigned wordsPerScanline = image.bytesPerLine() / 4;
 
-  const uint8_t *tile = SNES::memory::vram.data() + 1;
+  // get the absolute address within the current VRAM bank (if expansion is enabled)
+  const uint8_t *tile = &SNES::memory::vram[1];
   const uint8_t *tileEnd = tile + 256 * 128;
 
   for(unsigned y = 0; y < height; y++) {

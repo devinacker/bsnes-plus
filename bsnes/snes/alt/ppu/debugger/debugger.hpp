@@ -9,6 +9,7 @@ public:
   uint8 cgram_mmio_read(uint16 addr);
   void cgram_mmio_write(uint16 addr, uint8 data);
 
+  uint16 vram_start_addr() const;
   uint8  bg_mode() const;
   uint16 bg_screen_addr(unsigned index) const;
   uint8  bg_screen_size(unsigned index) const;

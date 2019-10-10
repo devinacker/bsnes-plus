@@ -33,11 +33,16 @@ void PPUDebugger::cgram_write(unsigned addr, uint8 data) {
   PPU::cgram_write(addr, data);
 }
 
+unsigned PPUDebugger::vram_start_addr() const {
+  // get the absolute address of the current VRAM bank (if expansion is enabled)
+  return (unsigned)(&SNES::memory::vram[0] - SNES::memory::vram.data());
+}
+
 uint8 PPUDebugger::bg_mode() const {
   return (uint8)regs.bgmode;
 }
 
-uint16 PPUDebugger::bg_screen_addr(unsigned index) const {
+unsigned PPUDebugger::bg_screen_addr(unsigned index) const {
   switch (index) {
   case 0: return bg1.regs.screen_addr;
   case 1: return bg2.regs.screen_addr;
@@ -59,7 +64,7 @@ uint8 PPUDebugger::bg_screen_size(unsigned index) const {
   return 0;
 }
 
-uint16 PPUDebugger::bg_tile_addr(unsigned index) const {
+unsigned PPUDebugger::bg_tile_addr(unsigned index) const {
   switch (index) {
   case 0: return bg1.regs.tiledata_addr;
   case 1: return bg2.regs.tiledata_addr;
@@ -81,9 +86,9 @@ uint8 PPUDebugger::bg_tile_size(unsigned index) const {
   return 0;
 }
 
-uint16 PPUDebugger::oam_tile_addr(unsigned index) const {
+unsigned PPUDebugger::oam_tile_addr(unsigned index) const {
   return index
-    ? (oam.regs.tiledata_addr + (256 * 32) + (oam.regs.nameselect << 13)) & 0xffff
+    ? (oam.regs.tiledata_addr + (256 * 32) + (oam.regs.nameselect << 13)) & 0x1ffff
     : oam.regs.tiledata_addr;
 }
 

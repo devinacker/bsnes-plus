@@ -33,6 +33,11 @@ void PPUDebugger::cgram_mmio_write(uint16 addr, uint8 data) {
   PPU::cgram_mmio_write(addr, data);
 }
 
+uint16 PPUDebugger::vram_start_addr() const {
+  // VRAM expansion / bank switching not supported
+  return 0;
+}
+  
 uint8 PPUDebugger::bg_mode() const {
   return (uint8)regs.bg_mode;
 }

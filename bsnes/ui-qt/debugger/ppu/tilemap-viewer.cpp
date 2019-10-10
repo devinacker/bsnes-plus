@@ -231,8 +231,8 @@ void TilemapViewer::updateRendererSettings() {
     Depth bd = i >= 0 ? Depth(bitDepth->itemData(i).toInt()) : Depth::NONE;
 
     renderer.bitDepth = bd;
-    renderer.tileAddr = hex(tileAddr->text().toUtf8().data()) & 0xe000;
-    renderer.screenAddr = hex(screenAddr->text().toUtf8().data()) & 0xff80;
+    renderer.tileAddr = hex(tileAddr->text().toUtf8().data()) & 0x1e000;
+    renderer.screenAddr = hex(screenAddr->text().toUtf8().data()) & 0x1ff80;
     renderer.screenSizeX = screenSize->currentIndex() & 1;
     renderer.screenSizeY = screenSize->currentIndex() & 2;
     renderer.tileSize = tileSize->currentIndex();
@@ -279,8 +279,14 @@ void TilemapViewer::updateForm() {
 
     unsigned ss = (renderer.screenSizeY << 1) | int(renderer.screenSizeX);
 
-    screenAddr->setText(string("0x", hex<4>(renderer.screenAddr)));
-    tileAddr->setText(string("0x", hex<4>(renderer.tileAddr)));
+    if (SNES::memory::vram.size() > 1<<16) {
+      unsigned vramStartAddr = SNES::ppu.vram_start_addr();
+      screenAddr->setText(string("0x", hex<5>(renderer.screenAddr + vramStartAddr)));
+      tileAddr->setText(string("0x", hex<5>(renderer.tileAddr + vramStartAddr)));
+    } else {
+      screenAddr->setText(string("0x", hex<4>(renderer.screenAddr)));
+      tileAddr->setText(string("0x", hex<4>(renderer.tileAddr)));
+    }
     screenSize->setCurrentIndex(ss);
     tileSize->setCurrentIndex(renderer.tileSize);
   }
@@ -304,7 +310,8 @@ void TilemapViewer::updateTileInfo() {
 }
 
 void TilemapViewer::updateTileInfoNormal() {
-  const uint8_t *vram = SNES::memory::vram.data();
+  // get the absolute address within the current VRAM bank (if expansion is enabled)
+  const uint8_t *vram = &SNES::memory::vram[0];
 
   unsigned xPos = imageGridWidget->selected().x() & 0x3f;
   unsigned yPos = imageGridWidget->selected().y() & 0x3f;
@@ -316,7 +323,8 @@ void TilemapViewer::updateTileInfoNormal() {
   xPos &= 0x1f;
   yPos &= 0x1f;
 
-  unsigned tileAddr = (renderer.screenAddr + mapId * 0x800 + yPos * 64 + xPos * 2) & 0xfffe;
+  unsigned vramStartAddr = SNES::ppu.vram_start_addr();
+  unsigned tileAddr = (renderer.screenAddr + mapId * 0x800 + yPos * 64 + xPos * 2);
   unsigned tile = vram[tileAddr] | (vram[tileAddr + 1] << 8);
 
   unsigned character = tile & 0x03ff;
@@ -333,11 +341,11 @@ void TilemapViewer::updateTileInfoNormal() {
   text << "<tr><td>Map: </td><td>" << mapId << "</td></tr>";
   text << "<tr><td>Position: </td><td>" << xPos << ", " << yPos << "</td></tr>";
   text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  text << "<tr><td>Address: </td><td>0x" << hex<4>(tileAddr) << "</td></tr>";
+  text << "<tr><td>Address: </td><td>0x" << hex<4>(vramStartAddr + tileAddr) << "</td></tr>";
   text << "<tr><td>Value: </td><td>0x" << hex<4>(tile) << "</td></tr>";
   text << "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
   text << "<tr><td>Character: </td><td>" << character << "</td></tr>";
-  text << "<tr><td>Char Address: </td><td>0x" << hex<4>(charAddr) << "</td></tr>";
+  text << "<tr><td>Char Address: </td><td>0x" << hex<4>(vramStartAddr + charAddr) << "</td></tr>";
   text << "<tr><td>Palette: </td><td>" << pal << "</td></tr>";
   text << "<tr><td>Priority: </td><td>" << (unsigned)priority << "</td></tr>";
   text << "<tr><td>hFlip: </td><td>" << (unsigned)hFlip << "</td></tr>";
@@ -348,7 +356,8 @@ void TilemapViewer::updateTileInfoNormal() {
 }
 
 void TilemapViewer::updateTileInfoMode7() {
-  const uint8_t *vram = SNES::memory::vram.data();
+  // get the absolute address of the current VRAM bank (if expansion is enabled)
+  const uint8_t *vram = &SNES::memory::vram[0];
 
   int xPos = imageGridWidget->selected().x() & 0x7f;
   int yPos = imageGridWidget->selected().y() & 0x7f;

@@ -86,8 +86,9 @@ void TilemapRenderer::drawMap(unsigned mapAddr, unsigned startX, unsigned startY
   unsigned ts = tileSize ? 16 : 8;
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
 
-  mapAddr = mapAddr & 0xf800;
-  const uint8_t *map = SNES::memory::vram.data() + mapAddr;
+  mapAddr = mapAddr & 0x1f800;
+  // get the absolute address within the current VRAM bank (if expansion is enabled)
+  const uint8_t *map = &SNES::memory::vram[mapAddr];
 
   for(unsigned ty = 0; ty < 32; ty++) {
     QRgb* imgBits = (QRgb*)image.scanLine(startY + ty * ts) + startX;
@@ -137,10 +138,13 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
 }
 
 unsigned TilemapRenderer::characterAddress(unsigned c) const {
+  // keep VRAM addresses limited to 16 bits if VRAM expansion isn't supported
+  const unsigned sizeMask = SNES::PPU::SupportsVRAMExpansion ? 0x1ffff : 0xffff;
+  
   switch(bitDepth) {
-    case BitDepth::BPP8:        return (tileAddr + c * 64) & 0xffc0;
-    case BitDepth::BPP4:        return (tileAddr + c * 32) & 0xffe0;
-    case BitDepth::BPP2:        return (tileAddr + c * 16) & 0xfff0;
+    case BitDepth::BPP8:        return (tileAddr + c * 64) & 0x1ffc0 & sizeMask;
+    case BitDepth::BPP4:        return (tileAddr + c * 32) & 0x1ffe0 & sizeMask;
+    case BitDepth::BPP2:        return (tileAddr + c * 16) & 0x1fff0 & sizeMask;
     case BitDepth::MODE7:       return (c & 0xff) * 128 + 1;
     case BitDepth::MODE7_EXTBG: return (c & 0xff) * 128 + 1;
   }
@@ -150,7 +154,8 @@ unsigned TilemapRenderer::characterAddress(unsigned c) const {
 void TilemapRenderer::drawMap8pxTile(QRgb* imgBits, const unsigned wordsPerScanline, unsigned c, unsigned palOffset, bool hFlip, bool vFlip) {
   unsigned addr = characterAddress(c);
 
-  const uint8_t *tile = SNES::memory::vram.data() + addr;
+  // get the absolute address within the current VRAM bank (if expansion is enabled)
+  const uint8_t *tile = &SNES::memory::vram[addr];
 
   draw8pxTile(imgBits, wordsPerScanline, tile, palOffset, hFlip, vFlip);
 }
@@ -161,7 +166,8 @@ void TilemapRenderer::drawMode7Tilemap() {
   QRgb* scanline = (QRgb*)image.scanLine(0);
   unsigned wordsPerScanline = image.bytesPerLine() / 4;
 
-  const uint8_t *map = SNES::memory::vram.data();
+  // get the absolute address of the current VRAM bank (if expansion is enabled)
+  const uint8_t *map = &SNES::memory::vram[0];
 
   for(unsigned ty = 0; ty < 128; ty++) {
     QRgb* imgBits = scanline;
@@ -169,7 +175,7 @@ void TilemapRenderer::drawMode7Tilemap() {
 
     for(unsigned tx = 0; tx < 128; tx++) {
       unsigned c = *map;
-      const uint8_t *tile = SNES::memory::vram.data() + c * 128 + 1;
+      const uint8_t *tile = &SNES::memory::vram[c * 128 + 1];
 
       drawMode7Tile(imgBits, wordsPerScanline, tile);
 

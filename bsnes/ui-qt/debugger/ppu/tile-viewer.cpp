@@ -312,7 +312,10 @@ void TileViewer::stepAdddressField(bool forward) {
   renderer.address &= renderer.addressMask();
 
   if(renderer.source == TileRenderer::VRAM) {
-    address->setText(hex<4>(renderer.address));
+    if(SNES::memory::vram.size() > 1<<16)
+      address->setText(hex<5>(renderer.address + SNES::ppu.vram_start_addr()));
+    else
+      address->setText(hex<4>(renderer.address));
   } else {
     address->setText(hex<6>(renderer.address));
   }
@@ -327,7 +330,7 @@ void TileViewer::updateRendererSettings() {
   int si = source->currentIndex();
   renderer.source = si >= 0 ? Source(source->itemData(si).toInt()) : Source::VRAM;
 
-  renderer.address = hex(address->text().toUtf8().data());
+  renderer.address = hex(address->text().toUtf8().data()) & renderer.addressMask();
 
   int bd = bitDepth->currentIndex();
   renderer.bitDepth = bd >= 0 ? Depth(bitDepth->itemData(bd).toInt()) : Depth::NONE;
@@ -358,10 +361,13 @@ void TileViewer::updateForm() {
   cgramWidget->setPaletteSize(renderer.colorsPerTile());
 
   customBgColorCombo->setEnabled(overrideBackgroundColor->isChecked());
-
+  
   for(unsigned i = 0; i < N_VRAM_BASE_ITEMS; i++) {
     unsigned a = getVramBaseAddress(i);
-    vramBaseAddress[i]->setText(string("0x", hex<4>(a)));
+    if(SNES::memory::vram.size() > 1<<16)
+      vramBaseAddress[i]->setText(string("0x", hex<5>(a + SNES::ppu.vram_start_addr())));
+    else
+      vramBaseAddress[i]->setText(string("0x", hex<4>(a)));
   }
 
   inUpdateFormCall = false;
@@ -375,11 +381,15 @@ void TileViewer::updateTileInfo() {
 
   string text;
   if(tileId < renderer.nTiles()) {
-    unsigned tileAddr = renderer.address + tileId * renderer.bytesInbetweenTiles();
+    unsigned tileAddr = renderer.address + (tileId * renderer.bytesInbetweenTiles());
     if(renderer.isMode7()) tileAddr++;
 
     if(renderer.source == TileRenderer::VRAM) {
-      text = string("Selected Tile Address: 0x", hex<4>(tileAddr & 0xffff));
+      if (SNES::memory::vram.size() > 1<<16) {
+        text = string("Selected Tile Address: 0x", hex<5>(tileAddr + SNES::ppu.vram_start_addr()));
+      } else {
+        text = string("Selected Tile Address: 0x", hex<4>(tileAddr & 0xffff));
+      }
     } else {
       text = string("Selected Tile Address: 0x", hex<6>(tileAddr & 0xffffff));
     }
