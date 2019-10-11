@@ -19,12 +19,17 @@ will also run identically under bsnes-plus.
 
 The "compatibility" (default) profile features slightly decreased emulation accuracy, but with lower system
 requirements. This profile is recommended for most users and is capable of emulating nearly all of the same
-software as the accuracy profile, with little to no issues. The "performance" profile (not currently included
-in official releases) features an even greater speed/accuracy tradeoff, as the name implies.
+software as the accuracy profile, with little to no issues. The "performance" profile features an even greater
+speed/accuracy tradeoff, as the name implies.
 <p>
 
 The debugging tools included with bsnes-plus are fully compatible with all three profiles. See below for more
 information about using bsnes-plus for debugging.
+<p>
+
+(Note: The accuracy profile renders the screen at a higher horizontal resolution than most games normally use. 
+As a result, screenshots will usually be larger, and using filters via the "snesfilter" plugin will have slightly
+different results than with other profiles.)
 <br>
 
 <h3>Modes of Operation</h3><br>
@@ -57,6 +62,23 @@ configuration data.
 The "snesreader" plugin adds additional support for compressed archives and less-common ROM file extensions, 
 and the "supergameboy" plugin adds support for Game Boy and Super Game Boy ROMs (a copy of the actual Super 
 Game Boy BIOS is required). The "snesmusic" plugin adds support for SPC, SNSF, and MiniSNSF music files.
+<br>
+
+<h3>Optional Files</h3><br>
+
+Some games which use expansion chips require firmware files in order to run. By default, these files are searched 
+for in the same directory as the game itself. You can change this from the "Paths" tab in the emulator config window.
+<p>
+
+Currently supported firmware files and their hashes:
+<ul>
+<li>dsp1b.bin (SHA-256: 4d42db0f36faef263d6b93f508e8c1c4ae8fc2605fd35e3390ecc02905cd420c)</li>
+<li>dsp2.bin (SHA-256: 5efbdf96ed0652790855225964f3e90e6a4d466cfa64df25b110933c6cf94ea1)</li>
+<li>dsp3.bin (SHA-256: 2e635f72e4d4681148bc35429421c9b946e4f407590e74e31b93b8987b63ba90)</li>
+<li>dsp4.bin (SHA-256: 63ede17322541c191ed1fdf683872554a0a57306496afc43c59de7c01a6e764a)</li>
+<li>st0010.bin (SHA-256: 55c697e864562445621cdf8a7bf6e84ae91361e393d382a3704e9aa55559041e)</li>
+<li>st0011.bin (SHA-256: 651b82a1e26c4fa8dd549e91e7f923012ed2ca54c1d9fd858655ab30679c2f0e)</li>
+</ul>
 <br>
 
 <h3>Using the Debugger</h3><br>
