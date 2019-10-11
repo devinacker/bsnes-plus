@@ -8,7 +8,6 @@
 #include "hq2x.hpp"
 
 void HQ2xFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
-  if(width > 256 || height > 240) return filter_direct.size(outwidth, outheight, width, height);
   outwidth  = width  * 2;
   outheight = height * 2;
 }
@@ -17,11 +16,6 @@ void HQ2xFilter::render(
   uint32_t *output, unsigned outpitch,
   const uint16_t *input, unsigned pitch, unsigned width, unsigned height
 ) {
-  if(width > 256 || height > 240) {
-    filter_direct.render(output, outpitch, input, pitch, width, height);
-    return;
-  }
-
   pitch >>= 1;
   outpitch >>= 2;
 
@@ -38,7 +32,7 @@ void HQ2xFilter::render(
     *out0++ = 0; *out0++ = 0;
     *out1++ = 0; *out1++ = 0;
 
-    for(unsigned x = 1; x < 256 - 1; x++) {
+    for(unsigned x = 1; x < width - 1; x++) {
       uint16_t A = *(in - prevline - 1);
       uint16_t B = *(in - prevline + 0);
       uint16_t C = *(in - prevline + 1);

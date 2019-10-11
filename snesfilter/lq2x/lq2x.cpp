@@ -1,7 +1,6 @@
 #include "lq2x.hpp"
 
 void LQ2xFilter::size(unsigned &outwidth, unsigned &outheight, unsigned width, unsigned height) {
-  if(width > 256 || height > 240) return filter_direct.size(outwidth, outheight, width, height);
   outwidth  = width  * 2;
   outheight = height * 2;
 }
@@ -10,11 +9,6 @@ void LQ2xFilter::render(
   uint32_t *output, unsigned outpitch,
   const uint16_t *input, unsigned pitch, unsigned width, unsigned height
 ) {
-  if(width > 256 || height > 240) {
-    filter_direct.render(output, outpitch, input, pitch, width, height);
-    return;
-  }
-
   pitch >>= 1;
   outpitch >>= 2;
 
@@ -29,7 +23,7 @@ void LQ2xFilter::render(
       uint16_t A = *(input - prevline);
       uint16_t B = (x >   0) ? *(input - 1) : *input;
       uint16_t C = *input;
-      uint16_t D = (x < 255) ? *(input + 1) : *input;
+      uint16_t D = (x < width - 1) ? *(input + 1) : *input;
       uint16_t E = *(input++ + nextline);
       uint32_t c = colortable[C];
 
@@ -47,7 +41,7 @@ void LQ2xFilter::render(
     }
 
     input += pitch - width;
-    out0 += outpitch + outpitch - 512;
-    out1 += outpitch + outpitch - 512;
+    out0 += outpitch + outpitch - (width << 1);
+    out1 += outpitch + outpitch - (width << 1);
   }
 }

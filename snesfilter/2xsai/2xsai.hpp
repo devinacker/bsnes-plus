@@ -8,6 +8,7 @@ public:
 
 private:
   uint32_t *temp;
+  unsigned _width, _height;
 } filter_2xsai;
 
 class Super2xSaIFilter {
@@ -20,6 +21,7 @@ public:
 
 private:
   uint32_t *temp;
+  unsigned _width, _height;
 } filter_super2xsai;
 
 class SuperEagleFilter {
@@ -32,4 +34,5 @@ public:
 
 private:
   uint32_t *temp;
+  unsigned _width, _height;
 } filter_supereagle;
