@@ -651,10 +651,6 @@ void Debugger::frameTick() {
 }
 
 void Debugger::autoUpdate() {
-  QVectorIterator<MemoryEditor*> i(memoryEditors);
-  while (i.hasNext()) {
-    i.next()->synchronize();
-  }
   propertiesViewer->autoUpdate();
   tileViewer->autoUpdate();
   tilemapViewer->autoUpdate();
