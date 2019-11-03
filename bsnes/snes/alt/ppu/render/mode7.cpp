@@ -41,24 +41,15 @@ void PPU::render_line_mode7(uint8 pri0_pos, uint8 pri1_pos) {
   uint8 *wt_main = window[bg].main;
   uint8 *wt_sub  = window[bg].sub;
 
-  int32 y = (regs.mode7_vflip == false ? line : 255 - line);
+  int32 y = (regs.mode7_vflip == false ? regs.bg_y[bg] : 255 - regs.bg_y[bg]);
 
-  uint16 *mtable_x, *mtable_y;
-  if(bg == BG1) {
-    mtable_x = (uint16*)mosaic_table[(regs.mosaic_enabled[BG1] == true) ? regs.mosaic_size : 0];
-    mtable_y = (uint16*)mosaic_table[(regs.mosaic_enabled[BG1] == true) ? regs.mosaic_size : 0];
-  } else {  //bg == BG2
-    //Mode7 EXTBG BG2 uses BG1 mosaic enable to control vertical mosaic,
-    //and BG2 mosaic enable to control horizontal mosaic...
-    mtable_x = (uint16*)mosaic_table[(regs.mosaic_enabled[BG2] == true) ? regs.mosaic_size : 0];
-    mtable_y = (uint16*)mosaic_table[(regs.mosaic_enabled[BG1] == true) ? regs.mosaic_size : 0];
-  }
+  uint16 *mtable = (uint16*)mosaic_table[(regs.mosaic_enabled[bg] == true) ? regs.mosaic_size : 0];
 
-  int32 psx = ((a * CLIP(hofs - cx)) & ~63) + ((b * CLIP(vofs - cy)) & ~63) + ((b * mtable_y[y]) & ~63) + (cx << 8);
-  int32 psy = ((c * CLIP(hofs - cx)) & ~63) + ((d * CLIP(vofs - cy)) & ~63) + ((d * mtable_y[y]) & ~63) + (cy << 8);
+  int32 psx = ((a * CLIP(hofs - cx)) & ~63) + ((b * CLIP(vofs - cy)) & ~63) + ((b * y) & ~63) + (cx << 8);
+  int32 psy = ((c * CLIP(hofs - cx)) & ~63) + ((d * CLIP(vofs - cy)) & ~63) + ((d * y) & ~63) + (cy << 8);
   for(int32 x = 0; x < 256; x++) {
-    px = psx + (a * mtable_x[x]);
-    py = psy + (c * mtable_x[x]);
+    px = psx + (a * mtable[x]);
+    py = psy + (c * mtable[x]);
 
     //mask floating-point bits (low 8 bits)
     px >>= 8;
