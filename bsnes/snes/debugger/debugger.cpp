@@ -71,6 +71,10 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
     case MemorySource::APURAM: {
       return memory::apuram.read(addr & 0xffff);
     } break;
+    
+    case MemorySource::DSP: {
+      return dsp.read(addr & 0x7f);
+    } break;
 
     case MemorySource::VRAM: {
       return memory::vram.read(addr & 0x3ffff);
@@ -118,6 +122,10 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     case MemorySource::APUBus:
     case MemorySource::APURAM: {
       memory::apuram.write(addr & 0xffff, data);
+    } break;
+
+    case MemorySource::DSP: {
+      dsp.write(addr & 0x7f, data);
     } break;
 
     case MemorySource::VRAM: {

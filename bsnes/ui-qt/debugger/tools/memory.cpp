@@ -34,6 +34,7 @@ MemoryEditor::MemoryEditor() {
   source = new QComboBox;
   source->addItem("S-CPU bus");
   source->addItem("S-APU bus");
+  source->addItem("S-DSP registers");
   source->addItem("S-PPU VRAM");
   source->addItem("S-PPU OAM");
   source->addItem("S-PPU CGRAM");
@@ -156,13 +157,14 @@ void MemoryEditor::sourceChanged(int index) {
   switch(index) { default:
     case 0: memorySource = SNES::Debugger::MemorySource::CPUBus; editor->setEditorSize(16 * 1024 * 1024); break;
     case 1: memorySource = SNES::Debugger::MemorySource::APUBus; editor->setEditorSize(64 * 1024);        break;
-    case 2: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(SNES::memory::vram.size()); break;
-    case 3: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setEditorSize(544);              break;
-    case 4: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setEditorSize(512);              break;
-    case 5: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setEditorSize(SNES::memory::cartrom.size()); break;
-    case 6: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setEditorSize(SNES::memory::cartram.size()); break;
-    case 7: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setEditorSize(16 * 1024 * 1024); break;
-    case 8: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(8 * 1024 * 1024); break;
+    case 2: memorySource = SNES::Debugger::MemorySource::DSP;    editor->setEditorSize(128);              break;
+    case 3: memorySource = SNES::Debugger::MemorySource::VRAM;   editor->setEditorSize(SNES::memory::vram.size()); break;
+    case 4: memorySource = SNES::Debugger::MemorySource::OAM;    editor->setEditorSize(544);              break;
+    case 5: memorySource = SNES::Debugger::MemorySource::CGRAM;  editor->setEditorSize(512);              break;
+    case 6: memorySource = SNES::Debugger::MemorySource::CartROM; editor->setEditorSize(SNES::memory::cartrom.size()); break;
+    case 7: memorySource = SNES::Debugger::MemorySource::CartRAM; editor->setEditorSize(SNES::memory::cartram.size()); break;
+    case 8: memorySource = SNES::Debugger::MemorySource::SA1Bus; editor->setEditorSize(16 * 1024 * 1024); break;
+    case 9: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(8 * 1024 * 1024); break;
   }
 }
 
@@ -201,7 +203,8 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
     ->setEnabled(editor->canRedo());
     
   if (memorySource != SNES::Debugger::MemorySource::CartROM
-      && memorySource != SNES::Debugger::MemorySource::CartRAM) {
+      && memorySource != SNES::Debugger::MemorySource::CartRAM
+      && memorySource != SNES::Debugger::MemorySource::DSP) {
     menu.addSeparator();  
     
     breakpointPos = editor->cursorPosition(pos) / 2;
