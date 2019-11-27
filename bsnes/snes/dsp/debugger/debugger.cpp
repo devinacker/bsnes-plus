@@ -33,17 +33,35 @@ bool DSPDebugger::property(unsigned id, string &name, string &value) {
     item(string("Coefficient ", i), string("0x", hex<2>(read((i << 4) + 0x0f))));
   }
 
+  static const char* const gainModes[] = {
+    "0 (Linear Decrease)",
+    "1 (Exponential Decrease)",
+    "2 (Linear Increase)",
+    "3 (Bent Line Increase)"
+  };
+
   for(unsigned i = 0; i < 8; i++) {
     item(string("Voice ", i), "");
     item("Volume - Left", (unsigned)read((i << 4) + 0x00));
     item("Volume - Right", (unsigned)read((i << 4) + 0x01));
     item("Pitch Height", string("0x", hex<4>(read((i << 4) + 0x02) + (read((i << 4) + 0x03) << 8))));
     item("Source Number", (unsigned)read((i << 4) + 0x04));
-    item("ADSR1", (unsigned)read((i << 4) + 0x05));
-    item("ADSR2", (unsigned)read((i << 4) + 0x06));
-    item("GAIN", (unsigned)read((i << 4) + 0x07));
-    item("ENVX", (unsigned)read((i << 4) + 0x08));
-    item("OUTX", (unsigned)read((i << 4) + 0x09));
+
+    item("ADSR/Gain Select", (read((i << 4) + 0x05) & 0x80) ? "ADSR" : "Gain");
+    item("Attack Rate", (unsigned)read((i << 4) + 0x05) & 0xf);
+    item("Decay Rate", (unsigned)(read((i << 4) + 0x05) & 0x70) >> 4);
+    item("Sustain Rate", (unsigned)read((i << 4) + 0x06) & 0x1f);
+    item("Sustain Level", (unsigned)(read((i << 4) + 0x05) & 0xe0) >> 5);
+
+    item("Gain Mode", (read((i << 4) + 0x07) & 0x80)
+                      ? gainModes[(read((i << 4) + 0x07) & 0x60) >> 5]
+                      : "Fixed Volume");
+    item("Gain Level/Rate", (read((i << 4) + 0x07) & 0x80)
+                            ? ((unsigned)read((i << 4) + 0x07) & 0x1f)
+                            : ((unsigned)read((i << 4) + 0x07) & 0x7f));
+
+    item("Envelope Output", (unsigned)read((i << 4) + 0x08));
+    item("Sample Output", (unsigned)read((i << 4) + 0x09));
   }
 
   #undef item
