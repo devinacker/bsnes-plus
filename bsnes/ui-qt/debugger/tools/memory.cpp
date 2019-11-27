@@ -117,12 +117,9 @@ void MemoryEditor::autoUpdate() {
   }
 }
 
-void MemoryEditor::closeEvent(QCloseEvent*) {
-  int32_t index = memoryEditors.indexOf(this);
-
-  if (index >= 0) {
-    memoryEditors.remove(index);
-  }
+void MemoryEditor::closeEvent(QCloseEvent *ev) {
+  memoryEditors.removeOne(this);
+  Window::closeEvent(ev);
 }
 
 void MemoryEditor::synchronize() {
