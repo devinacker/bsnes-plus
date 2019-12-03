@@ -20,14 +20,14 @@ bool DSPDebugger::property(unsigned id, string &name, string &value) {
   item("Flag - Mute", (bool)(read(0x6c) & 0x40));
   item("Flag - Echo Disable", (bool)(read(0x6c) & 0x20));
   item("Flag - Noise Clock", (unsigned)read(0x6c) & 0x1f);
-  item("Source End Block", (unsigned)read(0x7c));
-  item("Echo Feedback", (unsigned)read(0x0d));
+  item("Voice End Flags", string("0x", hex<2>(read(0x7c))));
   item("Pitch Modulation Enable", string("0x", hex<2>(read(0x2d))));
   item("Noise Enable", string("0x", hex<2>(read(0x3d))));
   item("Echo Enable", string("0x", hex<2>(read(0x4d))));
-  item("Source Directory", (unsigned)read(0x5d));
-  item("Echo Start Address", (unsigned)read(0x6d));
-  item("Echo Directory", (unsigned)read(0x7d));
+  item("Source Directory", string("0x", hex<4>(read(0x5d) << 8)));
+  item("Echo Start Address", string("0x", hex<4>(read(0x6d) << 8)));
+  item("Echo Length", string("0x", hex<4>(read(0x7d) << 11)));
+  item("Echo Feedback", (unsigned)read(0x0d));
 
   for(unsigned i = 0; i < 8; i++) {
     item(string("Coefficient ", i), string("0x", hex<2>(read((i << 4) + 0x0f))));
