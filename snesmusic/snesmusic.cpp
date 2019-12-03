@@ -81,6 +81,13 @@ bsnesexport bool snesmusic_load_spc(string &filename, uint8_t *&dump,
 	spc.seek(0x100);
 	spc.read(dump, 0x10000 + 128);
 	
+	// clear existing echo buffer contents
+	uint16_t echo_base = dump[0x1006d] << 8;
+	uint16_t echo_size = dump[0x1007d] << 11;
+	for (uint32_t addr = echo_base; addr < echo_base + echo_size; addr += 0x100) {
+		memset(dump + (addr & 0xffff), 0, 0x100);
+	}
+
 	info.loaded = true;
 	
 	read_tag_id666(spc);
