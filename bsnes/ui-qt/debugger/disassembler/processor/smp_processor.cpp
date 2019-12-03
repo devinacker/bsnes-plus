@@ -395,7 +395,12 @@ bool SmpDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   setOpcodeParams(result, opcode, address);
   
   if (opcode.isBra() || opcode.isBraWithContinue()) {
-    result.setBra(decode(opcode.optype, opcode.opall(), address));
+    if (opcode.optype == SNESSMP::DirectRelative ||
+        opcode.optype == SNESSMP::DirectIndXRelative) {
+      result.setBra(decode(opcode.optype, opcode.op8(1), address));
+    } else {
+      result.setBra(decode(opcode.optype, opcode.opall(), address));
+    }
   }
   if (opcode.returns()) {
     result.flags |= DisassemblerLine::FLAG_RETURN;

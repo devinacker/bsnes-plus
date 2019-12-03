@@ -158,7 +158,7 @@ void DisassemblerView::updateVisibleLines() {
         rop.flags |= RenderableDisassemblerLine::FLAG_RETURN;
       }
 
-      if (op.isBra()&& op.targetAddress < currentAddress && op.targetAddress >= currentRangeStartAddress) {
+      if (op.isBra() && op.targetAddress < currentAddress && op.targetAddress >= currentRangeStartAddress) {
         createLoopUpwards(index, op.targetAddress);
       }
 

@@ -282,7 +282,7 @@ static const SNESSMP::OpcodeInfo smpOpcodeInfo[256] = {
   { "adc  ", SNESSMP::AAbsoluteY },
   { "adc  ", SNESSMP::AIDirectIndY },
 
-  { "adc  ", SNESSMP::DirectRelative },
+  { "adc  ", SNESSMP::DirectConstant },
   { "adc  ", SNESSMP::IXIY },
   { "subw ", SNESSMP::YaDirect },
   { "dec  ", SNESSMP::DirectIndX },
