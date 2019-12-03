@@ -79,7 +79,7 @@ void DisassemblerView::refresh(uint32_t address) {
   currentPcAddress = processor->getCurrentAddress();
   hasValidAddress = true;
 
-  SNES::cpuAnalyst.performAnalysis(address, SNES::CPUAnalystState(SNES::cpu.regs.e, SNES::cpu.regs.p.m, SNES::cpu.regs.p.x), true);
+  processor->analyze(address);
 
   updateLines();
   viewport()->update();

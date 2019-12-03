@@ -9,6 +9,7 @@ public:
 
   virtual uint32_t findStartLineAddress(uint32_t currentAddress, uint32_t linesBelow) = 0;
   virtual void findKnownRange(uint32_t currentAddress, uint32_t &startAddress, uint32_t &endAddress, uint32_t &currentAddressLine, uint32_t &numLines) = 0;
+  virtual void analyze(uint32_t address) {}
   virtual bool getLine(DisassemblerLine &result, uint32_t &address) = 0;
 
   virtual uint8_t usage(uint32_t address) = 0;

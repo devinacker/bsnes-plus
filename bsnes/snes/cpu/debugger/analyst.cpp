@@ -28,7 +28,7 @@ void CPUAnalyst::performFullAnalysis() {
 
 // ------------------------------------------------------------------------
 void CPUAnalyst::performAnalysisForVector(uint32_t address, bool emulation) {
-  uint16_t vectorAddr = bus.read(address) | bus.read(address + 1) << 8;
+  uint16_t vectorAddr = cpu.dreadw(address);
   if (vectorAddr >= 0x8000) {
     CPUAnalystState state(emulation);
     uint32_t numRoutines = performAnalysis(vectorAddr, state);
@@ -38,12 +38,11 @@ void CPUAnalyst::performAnalysisForVector(uint32_t address, bool emulation) {
 }
 
 // ------------------------------------------------------------------------
-uint32_t CPUAnalyst::performAnalysis(uint32_t address, const CPUAnalystState &_state, bool force) {
+uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, bool force) {
   if (cpu.usage[address] != 0 && !force) {
     return 0;
   }
 
-  CPUAnalystState state = _state;
   CPUDebugger::Opcode op;
   linear_vector<CPUAnalystState> stackP;
   uint32_t maxMethodSize = 0x1000;
@@ -86,6 +85,7 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, const CPUAnalystState &_s
     } else if (op.isBra() && !op.isIndirect()) {
       address = cpu.decode(op.optype, op.opall(), address);
       numRoutines++;
+      force = false; // we might be branching/jumping into already analyzed code
     } else {
       address += op.size();
     }

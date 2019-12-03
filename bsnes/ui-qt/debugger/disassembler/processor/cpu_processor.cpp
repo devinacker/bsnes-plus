@@ -256,16 +256,33 @@ bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
 
   // Advance to next
-  for (uint32_t i=1; i<=4; i++) {
-    if ((usagePointer[(address + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
-      continue;
-    }
-
-    address += i;
-    break;
+  if ((usagePointer[(address + opcode.size()) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) != 0) {
+    address += opcode.size();
   }
 
   return true;
+}
+
+// ------------------------------------------------------------------------
+void CpuDisasmProcessor::analyze(uint32_t address) {
+  // TODO: support this for SA1 as well
+  if (source != CPU) return;
+
+  uint8_t u = usage(address);
+  bool e, m, x;
+
+  if (!u) {
+    e = SNES::cpu.regs.e;
+    m = SNES::cpu.regs.p.m;
+    x = SNES::cpu.regs.p.x;
+  } else {
+    e = u & SNES::CPUDebugger::UsageFlagE;
+    m = u & SNES::CPUDebugger::UsageFlagM;
+    x = u & SNES::CPUDebugger::UsageFlagX;
+  }
+
+  SNES::CPUAnalystState state(e, m, x);
+  SNES::cpuAnalyst.performAnalysis(address, state, true);
 }
 
 // ------------------------------------------------------------------------
