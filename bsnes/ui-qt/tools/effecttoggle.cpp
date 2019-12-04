@@ -143,6 +143,17 @@ EffectToggleWindow::EffectToggleWindow() {
   }
 }
 
+void EffectToggleWindow::synchronize() {
+  channel0->setChecked(SNES::dsp.is_channel_enabled(0));
+  channel1->setChecked(SNES::dsp.is_channel_enabled(1));
+  channel2->setChecked(SNES::dsp.is_channel_enabled(2));
+  channel3->setChecked(SNES::dsp.is_channel_enabled(3));
+  channel4->setChecked(SNES::dsp.is_channel_enabled(4));
+  channel5->setChecked(SNES::dsp.is_channel_enabled(5));
+  channel6->setChecked(SNES::dsp.is_channel_enabled(6));
+  channel7->setChecked(SNES::dsp.is_channel_enabled(7));
+}
+
 void EffectToggleWindow::synchronize_ppu() {
   SNES::ppu.layer_enable(0, 0, bg1pri0->isChecked());
   SNES::ppu.layer_enable(0, 1, bg1pri1->isChecked());

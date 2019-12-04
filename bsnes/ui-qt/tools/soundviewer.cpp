@@ -139,22 +139,79 @@ SoundViewerWindow::SoundViewerWindow() {
 	setLayout(layout);
 	
 	for (int i = 0; i < 8; i++) {
-		noteLabel[i] = new QLabel(QString("Channel %1").arg(i+1));
-		layout->addWidget(noteLabel[i]);
+		QHBoxLayout *channelLayout = new QHBoxLayout;
+		if (SNES::DSP::SupportsChannelEnable) {
+			channelEnable[i] = new QCheckBox(QString("Channel %1").arg(i));
+			channelEnable[i]->setChecked(true);
+			connect(channelEnable[i], SIGNAL(stateChanged(int)), this, SLOT(synchronizeDSP()));
+			channelLayout->addWidget(channelEnable[i]);
+		} else {
+			channelEnable[i] = 0;
+			QLabel *noteLabel = new QLabel(QString("Channel %1").arg(i));
+			channelLayout->addWidget(noteLabel);
+		}
+		
+		QFrame *line = new QFrame;
+		line->setFrameShape(QFrame::VLine);
+		line->setFrameShadow(QFrame::Sunken);
+		channelLayout->addWidget(line);
+		
+		channelSource[i] = new QLabel;
+		channelLayout->addWidget(channelSource[i]);
+		
+		channelLayout->addStretch();
+		
+		channelEcho[i] = new QCheckBox("Echo");
+		channelLayout->addWidget(channelEcho[i]);
+		
+		channelNoise[i] = new QCheckBox("Noise");
+		channelLayout->addWidget(channelNoise[i]);
+		
+		channelPitchMod[i] = new QCheckBox("Pitch Mod.");
+		channelLayout->addWidget(channelPitchMod[i]);
+		
+		layout->addLayout(channelLayout);
+		
 		viewer[i] = new SoundViewerWidget(i);
 		layout->addWidget(viewer[i]);
 	}
 }
 
-void SoundViewerWindow::updateValues() {
+void SoundViewerWindow::synchronize() {
+	uint8_t flg  = SNES::dsp.read(0x6c);
+	uint8_t pmon = SNES::dsp.read(0x2d);
+	uint8_t non  = SNES::dsp.read(0x3d);
+	uint8_t eon  = SNES::dsp.read(0x4d);
+
 	for (int i = 0; i < 8; i++) {
 		viewer[i]->refresh();
-	}	
+		
+		if (SNES::DSP::SupportsChannelEnable) {
+			channelEnable[i]->setChecked(SNES::dsp.is_channel_enabled(i));
+		}
+		
+		uint8_t source = SNES::dsp.read(0x4 + (i << 4));
+		channelSource[i]->setText(QString("Sample #%1").arg(source));
+		
+		channelEcho[i]->setChecked((eon & (1<<i)) && !(flg & 0x20));
+		channelNoise[i]->setChecked(non & (1<<i));
+		channelPitchMod[i]->setChecked(pmon & (1<<i));
+	}
 	
-	if (isVisible()) QTimer::singleShot(15, this, SLOT(updateValues()));
+	if (isVisible()) QTimer::singleShot(15, this, SLOT(synchronize()));
 }
 
 void SoundViewerWindow::setVisible(bool on) {
 	QWidget::setVisible(on);
-	if (on) updateValues();
+	if (on) synchronize();
+}
+
+void SoundViewerWindow::synchronizeDSP() {
+	if (SNES::DSP::SupportsChannelEnable) {
+		for (int i = 0; i < 8; i++) {
+			SNES::dsp.channel_enable(i, channelEnable[i]->isChecked());
+		}
+		
+		effectToggleWindow->synchronize();
+	}
 }

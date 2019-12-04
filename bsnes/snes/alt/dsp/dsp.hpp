@@ -18,11 +18,14 @@ public:
   void reset();
 
   void channel_enable(unsigned channel, bool enable);
+  bool is_channel_enabled(unsigned channel);
 
   void serialize(serializer&);
   DSP();
 
 private:
+  void update_channels();
+
   SPC_DSP spc_dsp;
   int16 samplebuffer[8192];
   bool channel_enabled[8];

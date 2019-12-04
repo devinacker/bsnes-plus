@@ -25,14 +25,21 @@ class SoundViewerWindow : public Window {
 
 public:
 	QVBoxLayout *layout;
-	QLabel *noteLabel[8];
+	QCheckBox *channelEnable[8];
+	QLabel *channelSource[8];
+	QCheckBox *channelEcho[8];
+	QCheckBox *channelNoise[8];
+	QCheckBox *channelPitchMod[8];
 	SoundViewerWidget *viewer[8];
 
 	SoundViewerWindow();
 
 public slots:
-	void updateValues();
+	void synchronize();
 	void setVisible(bool);
+	
+private slots:
+	void synchronizeDSP();
 };
 
 extern SoundViewerWindow *soundViewerWindow;

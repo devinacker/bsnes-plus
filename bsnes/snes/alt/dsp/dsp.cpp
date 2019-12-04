@@ -56,6 +56,7 @@ void DSP::power() {
   spc_dsp.init(memory::apuram.data());
   spc_dsp.reset();
   spc_dsp.set_output(samplebuffer, 8192);
+  update_channels();
 }
 
 void DSP::reset() {
@@ -65,6 +66,14 @@ void DSP::reset() {
 
 void DSP::channel_enable(unsigned channel, bool enable) {
   channel_enabled[channel & 7] = enable;
+  update_channels();
+}
+
+bool DSP::is_channel_enabled(unsigned channel) {
+  return channel_enabled[channel & 7];
+}
+
+void DSP::update_channels() {
   unsigned mask = 0;
   for(unsigned i = 0; i < 8; i++) {
     if(channel_enabled[i] == false) mask |= 1 << i;

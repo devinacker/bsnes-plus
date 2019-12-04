@@ -19,6 +19,7 @@ public:
   void reset();
 
   void channel_enable(unsigned, bool) {}
+  bool is_channel_enabled(unsigned) { return true; }
 
   void serialize(serializer&);
   DSP();

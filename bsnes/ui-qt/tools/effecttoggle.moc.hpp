@@ -29,6 +29,7 @@ public:
   EffectToggleWindow();
 
 public slots:
+  void synchronize();
   void synchronize_ppu();
   void synchronize_dsp();
 };
