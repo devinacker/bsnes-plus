@@ -123,6 +123,8 @@ void SMPcore::disassemble_opcode_ex(SMPcore::Opcode &opcode, uint16 addr) {
       opcode.flags |= Opcode::FLAG_RETURN; break;
     case 0x8e:
       opcode.flags |= Opcode::FLAG_POP_P; break;
+    case 0xef: case 0xff:
+      opcode.flags |= Opcode::FLAG_HALT; break;
   }
 
   if (SNESSMP::getOpcodeIndirect(param[0])) {
