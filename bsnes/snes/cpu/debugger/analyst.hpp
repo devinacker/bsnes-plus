@@ -17,7 +17,6 @@ struct CPUAnalystState {
 
 class CPUAnalyst {
 public:
-  void reset();
   void performFullAnalysis();
   void performAnalysisForVector(uint32_t address, bool emulation=false);
   uint32_t performAnalysis(uint32_t address, CPUAnalystState &state, bool force=false);

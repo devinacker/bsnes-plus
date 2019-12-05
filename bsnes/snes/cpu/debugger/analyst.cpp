@@ -1,18 +1,7 @@
 #ifdef CPU_CPP
 
 // ------------------------------------------------------------------------
-void CPUAnalyst::reset() {
-  uint32_t size = 1 << 24;
-  for (uint32_t i=0; i<size; i++) {
-    cpu.usage[i] = 0;
-    cpu.cart_usage[i] = 0;
-  }
-}
-
-// ------------------------------------------------------------------------
 void CPUAnalyst::performFullAnalysis() {
-  reset();
-
   performAnalysisForVector(0xFFE4);
   performAnalysisForVector(0xFFE6);
   performAnalysisForVector(0xFFE8);
