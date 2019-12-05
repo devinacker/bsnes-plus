@@ -72,7 +72,7 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, b
       stackP.remove(index);
     }
 
-    if (op.breaks()) {
+    if (op.breaks() || op.halts()) {
       break;
     }
 

@@ -139,6 +139,8 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
       if (opcode.op8() & 0x10) opcode.flags |= Opcode::FLAG_RESET_X;
       if (opcode.op8() & 0x20) opcode.flags |= Opcode::FLAG_RESET_M;
       break;
+    case 0xdb:
+      opcode.flags |= Opcode::FLAG_HALT; break;
     case 0xe2:
       if (opcode.op8() & 0x10) opcode.flags |= Opcode::FLAG_SET_X;
       if (opcode.op8() & 0x20) opcode.flags |= Opcode::FLAG_SET_M;
