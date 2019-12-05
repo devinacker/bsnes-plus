@@ -11,7 +11,7 @@ namespace SNES {
   #include "../../cpu/debugger/debugger.cpp"
   CPUDebugger cpu;
   #include "../../cpu/debugger/analyst.cpp"
-  CPUAnalyst cpuAnalyst;
+  CPUAnalyst cpuAnalyst(cpu, cpu.usage);
 #else
   CPU cpu;
 #endif

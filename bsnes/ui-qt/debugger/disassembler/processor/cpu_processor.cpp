@@ -265,24 +265,30 @@ bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
 
 // ------------------------------------------------------------------------
 void CpuDisasmProcessor::analyze(uint32_t address) {
-  // TODO: support this for SA1 as well
-  if (source != CPU) return;
-
   uint8_t u = usage(address);
-  bool e, m, x;
+  bool e = u & SNES::CPUDebugger::UsageFlagE;
+  bool m = u & SNES::CPUDebugger::UsageFlagM;
+  bool x = u & SNES::CPUDebugger::UsageFlagX;
 
-  if (!u) {
-    e = SNES::cpu.regs.e;
-    m = SNES::cpu.regs.p.m;
-    x = SNES::cpu.regs.p.x;
+  if (source == CPU) {
+    if (!u) {
+      e = SNES::cpu.regs.e;
+      m = SNES::cpu.regs.p.m;
+      x = SNES::cpu.regs.p.x;
+    }
+
+    SNES::CPUAnalystState state(e, m, x);
+    SNES::cpuAnalyst.performAnalysis(address, state, true);
   } else {
-    e = u & SNES::CPUDebugger::UsageFlagE;
-    m = u & SNES::CPUDebugger::UsageFlagM;
-    x = u & SNES::CPUDebugger::UsageFlagX;
-  }
+    if (!u) {
+      e = SNES::sa1.regs.e;
+      m = SNES::sa1.regs.p.m;
+      x = SNES::sa1.regs.p.x;
+    }
 
-  SNES::CPUAnalystState state(e, m, x);
-  SNES::cpuAnalyst.performAnalysis(address, state, true);
+    SNES::CPUAnalystState state(e, m, x);
+    SNES::sa1Analyst.performAnalysis(address, state, true);
+  }
 }
 
 // ------------------------------------------------------------------------

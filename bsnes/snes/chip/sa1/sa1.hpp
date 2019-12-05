@@ -42,6 +42,8 @@ public:
   #include "debugger/debugger.hpp"
   extern SA1Debugger sa1;
   extern VBRBus vbrbus;
+  
+  extern CPUAnalyst sa1Analyst;
 #else
   extern SA1 sa1;
 #endif

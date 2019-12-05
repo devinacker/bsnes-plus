@@ -6,6 +6,8 @@ namespace SNES {
 #if defined(DEBUGGER)
   #include "debugger/debugger.cpp"
   SA1Debugger sa1;
+  #include "../../cpu/debugger/analyst.cpp"
+  CPUAnalyst sa1Analyst(sa1, sa1.usage);
 #else
   SA1 sa1;
 #endif

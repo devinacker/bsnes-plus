@@ -17,7 +17,12 @@ struct CPUAnalystState {
 
 class CPUAnalyst {
 public:
+  CPUAnalyst(CPUcore &_core, uint8_t *_usage) : core(_core), usage(_usage) {}
   void performFullAnalysis();
   void performAnalysisForVector(uint32_t address, bool emulation=false);
   uint32_t performAnalysis(uint32_t address, CPUAnalystState &state, bool force=false);
+  
+private:
+  CPUcore &core;
+  uint8_t *usage;
 };

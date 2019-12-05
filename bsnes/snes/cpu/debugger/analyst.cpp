@@ -28,7 +28,7 @@ void CPUAnalyst::performAnalysisForVector(uint32_t address, bool emulation) {
 
 // ------------------------------------------------------------------------
 uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, bool force) {
-  if (cpu.usage[address] != 0 && !force) {
+  if (usage[address] != 0 && !force) {
     return 0;
   }
 
@@ -39,12 +39,12 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, b
 
   while (--maxMethodSize) {
     address = address & 0xFFFFFF;
-    if (cpu.usage[address] != 0 && !force) {
+    if (usage[address] != 0 && !force) {
       break;
     }
 
-    cpu.usage[address] |= CPUDebugger::UsageOpcode | state.mask();
-    cpu.disassemble_opcode_ex(op, address, state.e, state.m, state.x);
+    usage[address] |= CPUDebugger::UsageOpcode | state.mask();
+    core.disassemble_opcode_ex(op, address, state.e, state.m, state.x);
 
     if (op.setsX()) { state.x = true; }
     if (op.setsM()) { state.m = true; }
@@ -66,13 +66,13 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, b
     }
 
     if (op.isBraWithContinue() && !op.isIndirect()) {
-      numRoutines += performAnalysis(cpu.decode(op.optype, op.opall(), address), state);
+      numRoutines += performAnalysis(core.decode(op.optype, op.opall(), address), state);
     }
 
     if (op.returns()) {
       break;
     } else if (op.isBra() && !op.isIndirect()) {
-      address = cpu.decode(op.optype, op.opall(), address);
+      address = core.decode(op.optype, op.opall(), address);
       numRoutines++;
       force = false; // we might be branching/jumping into already analyzed code
     } else {
