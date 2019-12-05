@@ -69,12 +69,12 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, b
       numRoutines += performAnalysis(core.decode(op.optype, op.opall(), address), state);
     }
 
-    if (op.returns()) {
-      break;
-    } else if (op.isBra() && !op.isIndirect()) {
+    if (op.isBra() && !op.isIndirect()) {
       address = core.decode(op.optype, op.opall(), address);
       numRoutines++;
       force = false; // we might be branching/jumping into already analyzed code
+    } else if (op.returns() || op.isBra()) {
+      break;
     } else {
       address += op.size();
     }

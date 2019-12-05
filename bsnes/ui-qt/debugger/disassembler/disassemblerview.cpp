@@ -128,6 +128,7 @@ void DisassemblerView::updateVisibleLines() {
   uint32_t topLine = verticalScrollBar()->value();
   uint32_t maxLines = currentRangeLineNumbers + emptyRowsAround + emptyRowsAround;
   uint32_t address = processor->findStartLineAddress(currentRangeStartAddress, topLine < emptyRowsAround ? 0 : topLine - emptyRowsAround);
+  bool stopped = false;
 
   uint32_t maxDisplayLines = rowsShown;
   if (maxLines - topLine < maxDisplayLines) {
@@ -140,7 +141,7 @@ void DisassemblerView::updateVisibleLines() {
   bool first = true;
   uint32_t line = topLine;
   for (uint32_t index=0; index<maxDisplayLines; index++, line++) {
-    if (line < emptyRowsAround || line >= maxLines - emptyRowsAround) {
+    if (stopped || line < emptyRowsAround || line >= maxLines - emptyRowsAround) {
       lines[index].line.setEmpty();
     } else {
       uint32_t currentAddress = address;
@@ -163,6 +164,10 @@ void DisassemblerView::updateVisibleLines() {
       }
 
       bottomLineAddress = address;
+      
+      if (address == currentAddress) {
+        stopped = true; // no next instruction found
+      }
     }
   }
 }
