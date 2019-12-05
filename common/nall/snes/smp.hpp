@@ -415,7 +415,7 @@ static const SNESSMP::OpcodeInfo smpOpcodeInfo[256] = {
 
   { "inc  ", SNESSMP::Y },
   { "mov  ", SNESSMP::YA },
-  { "dbz  ", SNESSMP::YRelative },
+  { "dbnz ", SNESSMP::YRelative },
   { "stop ", SNESSMP::Implied },
 };
 
