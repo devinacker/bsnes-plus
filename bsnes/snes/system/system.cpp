@@ -17,7 +17,7 @@ System system;
 #include "serialization.cpp"
 
 void System::run() {
-  scheduler.sync = Scheduler::SynchronizeMode::None;
+  scheduler.mode = Scheduler::Mode::Run;
 
   scheduler.enter();
   if(scheduler.exit_reason() == Scheduler::ExitReason::FrameEvent) {
@@ -27,42 +27,47 @@ void System::run() {
 }
 
 void System::runtosave() {
-  if(CPU::Threaded == true) {
-    scheduler.sync = Scheduler::SynchronizeMode::CPU;
-    runthreadtosave();
+  scheduler.mode = Scheduler::Mode::Synchronize;
+ 
+  //run every thread until it cleanly hits a synchronization point
+  //if it fails, start resynchronizing every thread again
+  while (true) {
+    if(SMP::Threaded == true) {
+      if (!runthreadtosave(smp.thread)) continue;
+    }
+    if(CPU::Threaded == true) {
+      if (!runthreadtosave(cpu.thread)) continue;
+    }
+    if(PPU::Threaded == true) {
+      if (!runthreadtosave(ppu.thread)) continue;
+    }
+    if(DSP::Threaded == true) {
+      if (!runthreadtosave(dsp.thread)) continue;
+    }
+	bool synchronized = true;
+    for(unsigned i = 0; i < cpu.coprocessors.size(); i++) {
+      Processor &chip = *cpu.coprocessors[i];
+      synchronized &= runthreadtosave(chip.thread);
+    }
+	if (synchronized) break;
   }
-
-  if(SMP::Threaded == true) {
-    scheduler.thread = smp.thread;
-    runthreadtosave();
-  }
-
-  if(PPU::Threaded == true) {
-    scheduler.thread = ppu.thread;
-    runthreadtosave();
-  }
-
-  if(DSP::Threaded == true) {
-    scheduler.thread = dsp.thread;
-    runthreadtosave();
-  }
-
-  for(unsigned i = 0; i < cpu.coprocessors.size(); i++) {
-    Processor &chip = *cpu.coprocessors[i];
-    scheduler.thread = chip.thread;
-    runthreadtosave();
-  }
+  
+  scheduler.mode = Scheduler::Mode::Run;
+  scheduler.thread = cpu.thread;
 }
 
-void System::runthreadtosave() {
+bool System::runthreadtosave(cothread_t& thread) {
+  scheduler.thread = thread;
   while(true) {
     scheduler.enter();
     if(scheduler.exit_reason() == Scheduler::ExitReason::SynchronizeEvent) break;
+    if(scheduler.exit_reason() == Scheduler::ExitReason::DesynchronizeEvent) return false;
     if(scheduler.exit_reason() == Scheduler::ExitReason::FrameEvent) {
       input.update();
       video.update();
     }
   }
+  return true;
 }
 
 void System::init(Interface *interface_) {

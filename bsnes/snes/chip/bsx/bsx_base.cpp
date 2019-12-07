@@ -6,9 +6,7 @@ void BSXBase::Enter() { bsxbase.enter(); }
 
 void BSXBase::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     // buffer a packet for currently open streams
     for(auto &stream : regs.stream) {

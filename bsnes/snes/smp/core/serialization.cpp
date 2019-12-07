@@ -14,6 +14,7 @@ void SMPcore::core_serialize(serializer &s) {
   s.integer(regs.p.i);
   s.integer(regs.p.z);
   s.integer(regs.p.c);
+  s.integer(regs.wait);
 
   s.integer(dp);
   s.integer(sp);

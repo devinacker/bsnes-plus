@@ -19,7 +19,7 @@ void DSP::step(unsigned clocks) {
 
 void DSP::synchronize_smp() {
   if(SMP::Threaded == true) {
-    if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(smp.thread);
+    if(clock >= 0) scheduler.resume(smp.thread);
   } else {
     while(clock >= 0) smp.enter();
   }

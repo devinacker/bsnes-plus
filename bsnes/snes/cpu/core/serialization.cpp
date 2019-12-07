@@ -23,6 +23,7 @@ void CPUcore::core_serialize(serializer &s) {
   s.integer(regs.e);
   s.integer(regs.irq);
   s.integer(regs.wai);
+  s.integer(regs.stp);
   s.integer(regs.mdr);
 
   s.integer(aa.d);

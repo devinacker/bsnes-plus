@@ -56,14 +56,15 @@ L rd.h = op_readlong(vector + 1);
 }
 
 void CPUcore::op_stp() {
-  while(regs.wai = true) {
+  regs.stp = true;
+  while(regs.stp && !scheduler.synchronizing()) {
 L   op_io();
   }
 }
 
 void CPUcore::op_wai() {
   regs.wai = true;
-  while(regs.wai) {
+  while(regs.wai && !scheduler.synchronizing()) {
 L   op_io();
   }
   op_io();

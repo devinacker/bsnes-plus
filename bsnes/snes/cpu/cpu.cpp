@@ -29,7 +29,7 @@ void CPU::step(unsigned clocks) {
 
 void CPU::synchronize_smp() {
   if(SMP::Threaded == true) {
-    if(smp.clock < 0) co_switch(smp.thread);
+    if(smp.clock < 0) scheduler.resume(smp.thread);
   } else {
     while(smp.clock < 0) smp.enter();
   }
@@ -37,7 +37,7 @@ void CPU::synchronize_smp() {
 
 void CPU::synchronize_ppu() {
   if(PPU::Threaded == true) {
-    if(ppu.clock < 0) co_switch(ppu.thread);
+    if(ppu.clock < 0) scheduler.resume(ppu.thread);
   } else {
     while(ppu.clock < 0) ppu.enter();
   }
@@ -46,7 +46,7 @@ void CPU::synchronize_ppu() {
 void CPU::synchronize_coprocessor() {
   for(unsigned i = 0; i < coprocessors.size(); i++) {
     Processor &chip = *coprocessors[i];
-    if(chip.clock < 0) co_switch(chip.thread);
+    if(chip.clock < 0) scheduler.resume(chip.thread);
   }
 }
 
@@ -54,12 +54,13 @@ void CPU::Enter() { cpu.enter(); }
 
 void CPU::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::CPU) {
-      scheduler.sync = Scheduler::SynchronizeMode::All;
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
-    if(status.interrupt_pending) {
+    if(regs.wai) {
+      op_wai();
+    } else if(regs.stp) {
+      op_stp();
+    } else if(status.interrupt_pending) {
       status.interrupt_pending = false;
       if(status.nmi_pending) {
         status.nmi_pending = false;
@@ -75,9 +76,9 @@ void CPU::enter() {
         regs.pc.l = bus.read(0xfffc);
         regs.pc.h = bus.read(0xfffd);
       }
+    } else {
+      op_step();
     }
-
-    op_step();
   }
 }
 
@@ -129,6 +130,7 @@ void CPU::reset() {
   regs.e    = 1;
   regs.mdr  = 0x00;
   regs.wai  = false;
+  regs.stp  = false;
   update_table();
 
   mmio_reset();

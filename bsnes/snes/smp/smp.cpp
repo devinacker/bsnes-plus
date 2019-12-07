@@ -23,7 +23,7 @@ void SMP::step(unsigned clocks) {
 
 void SMP::synchronize_cpu() {
   if(CPU::Threaded == true) {
-    if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(cpu.thread);
+    if(clock >= 0) scheduler.resume(cpu.thread);
   } else {
     while(clock >= 0) cpu.enter();
   }
@@ -31,7 +31,7 @@ void SMP::synchronize_cpu() {
 
 void SMP::synchronize_dsp() {
   if(DSP::Threaded == true) {
-    if(dsp.clock < 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(dsp.thread);
+    if(dsp.clock < 0) scheduler.resume(dsp.thread);
   } else {
     while(dsp.clock < 0) dsp.enter();
   }
@@ -41,16 +41,16 @@ void SMP::Enter() { smp.enter(); }
 
 void SMP::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
-
+    scheduler.synchronize();
     op_step();
   }
 }
 
 void SMP::op_step() {
-  (this->*opcode_table[op_readpc()])();
+  if(regs.wait)
+    op_wait();
+  else
+    (this->*opcode_table[op_readpc()])();
 }
 
 void SMP::power() {
@@ -71,6 +71,7 @@ void SMP::reset() {
   regs.y = 0x00;
   regs.sp = 0xef;
   regs.p = 0x02;
+  regs.wait = false;
 
   for(unsigned i = 0; i < memory::apuram.size(); i++) {
     memory::apuram.write(i, random(0));

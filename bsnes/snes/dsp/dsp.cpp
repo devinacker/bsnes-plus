@@ -31,7 +31,7 @@ void DSP::step(unsigned clocks) {
 
 void DSP::synchronize_smp() {
   if(SMP::Threaded == true) {
-    if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(smp.thread);
+    if(clock >= 0) scheduler.resume(smp.thread);
   } else {
     while(clock >= 0) smp.enter();
   }
@@ -44,9 +44,7 @@ void DSP::enter() {
   #define PHASE(n)
   #define TICK tick()
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 #else
   #define PHASE(n) case n:
   #define TICK return tick()

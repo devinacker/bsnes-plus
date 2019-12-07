@@ -29,9 +29,10 @@ unsigned SuperFXGSUROM::size() const {
 
 uint8 SuperFXGSUROM::read(unsigned addr) {
   if(!debugger_access()) {
-    while(!superfx.regs.scmr.ron && scheduler.sync != Scheduler::SynchronizeMode::All) {
+    while(!superfx.regs.scmr.ron) {
       superfx.add_clocks(6);
       superfx.synchronize_cpu();
+      if (scheduler.synchronizing()) break;
     }
   }
   return memory::cartrom.read(addr);
@@ -48,9 +49,10 @@ unsigned SuperFXGSURAM::size() const {
 
 uint8 SuperFXGSURAM::read(unsigned addr) {
   if(!debugger_access()) {
-    while(!superfx.regs.scmr.ran && scheduler.sync != Scheduler::SynchronizeMode::All) {
+    while(!superfx.regs.scmr.ran) {
       superfx.add_clocks(6);
       superfx.synchronize_cpu();
+      if (scheduler.synchronizing()) break;
     }
   }
   return memory::cartram.read(addr);
@@ -58,9 +60,10 @@ uint8 SuperFXGSURAM::read(unsigned addr) {
 
 void SuperFXGSURAM::write(unsigned addr, uint8 data) {
   if(!debugger_access()) {
-    while(!superfx.regs.scmr.ran && scheduler.sync != Scheduler::SynchronizeMode::All) {
+    while(!superfx.regs.scmr.ran) {
       superfx.add_clocks(6);
       superfx.synchronize_cpu();
+      if (scheduler.synchronizing()) break;
     }
   }
   memory::cartram.write(addr, data);

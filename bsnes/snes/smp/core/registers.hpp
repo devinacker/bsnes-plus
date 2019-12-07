@@ -40,5 +40,6 @@ struct regs_t {
   uint8_t r[4], &a, &x, &y, &sp;
   regya_t ya;
   flag_t p;
+  bool wait;
   regs_t() : a(r[0]), x(r[1]), y(r[2]), sp(r[3]), ya(r[2], r[0]) {}
 };

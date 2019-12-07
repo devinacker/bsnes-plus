@@ -11,9 +11,7 @@ void MSU1::Enter() { msu1.enter(); }
 
 void MSU1::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     int16 left = 0, right = 0;
 

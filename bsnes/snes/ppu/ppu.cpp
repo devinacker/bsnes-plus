@@ -23,7 +23,7 @@ void PPU::step(unsigned clocks) {
 
 void PPU::synchronize_cpu() {
   if(CPU::Threaded == true) {
-    if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(cpu.thread);
+    if(clock >= 0) scheduler.resume(cpu.thread);
   } else {
     while(clock >= 0) cpu.enter();
   }
@@ -33,9 +33,7 @@ void PPU::Enter() { ppu.enter(); }
 
 void PPU::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     scanline();
     add_clocks(28);

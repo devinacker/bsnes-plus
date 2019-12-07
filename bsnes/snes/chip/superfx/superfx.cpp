@@ -22,9 +22,7 @@ void SuperFX::Enter() { superfx.enter(); }
 
 void SuperFX::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     if(regs.sfr.g == 0) {
       add_clocks(6);

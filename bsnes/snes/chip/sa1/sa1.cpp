@@ -22,9 +22,7 @@ void SA1::Enter() { sa1.enter(); }
 
 void SA1::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     if(mmio.sa1_rdyb || mmio.sa1_resb) {
       //SA-1 co-processor is asleep

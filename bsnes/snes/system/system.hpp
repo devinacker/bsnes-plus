@@ -31,7 +31,7 @@ public:
 
 private:
   Interface *interface;
-  void runthreadtosave();
+  bool runthreadtosave(cothread_t&);
 
   void serialize(serializer&);
   void serialize_all(serializer&);

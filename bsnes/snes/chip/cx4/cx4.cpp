@@ -16,9 +16,7 @@ void Cx4::Enter() { cx4.enter(); }
 
 void Cx4::enter() {
   while (true) {
-    if (scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     bool wasBusy = busy();
     // currently performing DMA

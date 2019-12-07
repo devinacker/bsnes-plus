@@ -12,9 +12,7 @@ void NECDSP::Enter() { necdsp.enter(); }
 
 void NECDSP::enter() {
   while(true) {
-    if(scheduler.sync == Scheduler::SynchronizeMode::All) {
-      scheduler.exit(Scheduler::ExitReason::SynchronizeEvent);
-    }
+    scheduler.synchronize();
 
     uint24 opcode = programROM[regs.pc++];
     switch(opcode >> 22) {

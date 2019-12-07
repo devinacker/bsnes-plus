@@ -5,7 +5,8 @@ void SMPcore::op_nop() {
 }
 
 void SMPcore::op_wait() {
-  while(true) {
+  regs.wait = true;
+  while(regs.wait && !scheduler.synchronizing()) {
     op_io();
     op_io();
   }
