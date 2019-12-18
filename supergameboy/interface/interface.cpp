@@ -21,15 +21,13 @@ void SuperGameBoy::joyp_write(bool p15, bool p14) {
   //===============
 
   if(p15 == 1 && p14 == 1) {
-    if(joyp15lock == 0 && joyp14lock == 0) {
-      joyp15lock = 1;
-      joyp14lock = 1;
-      joyp_id = (joyp_id + 1) & 3;
+    if(joyp_lock == 0) {
+      joyp_lock = 1;
+      joyp_id = (joyp_id + 1) & mmio.mlt_req;
     }
   }
 
-  if(p15 == 0 && p14 == 1) joyp15lock = 0;
-  if(p15 == 1 && p14 == 0) joyp14lock = 0;
+  if(p14 == 1 && p15 == 0) joyp_lock ^= 1;
 
   //===============
   //packet handling
@@ -74,7 +72,7 @@ void SuperGameBoy::joyp_write(bool p15, bool p14) {
       if((joyp_packet[0] >> 3) == 0x11) {
         mmio.mlt_req = joyp_packet[1] & 3;
         if(mmio.mlt_req == 2) mmio.mlt_req = 3;
-        joyp_id = 0;
+        joyp_id &= mmio.mlt_req;
       }
 
       if(packetsize < 64) packet[packetsize++] = joyp_packet;
@@ -149,8 +147,7 @@ void SuperGameBoy::serialize(nall::serializer &s) {
   s.integer(packetsize);
 
   s.integer(joyp_id);
-  s.integer(joyp15lock);
-  s.integer(joyp14lock);
+  s.integer(joyp_lock);
   s.integer(pulselock);
   s.integer(strobelock);
   s.integer(packetlock);
@@ -270,9 +267,8 @@ void SuperGameBoy::mmio_reset() {
   vram_row = 0;
   memset(vram, 0, 320);
 
-  joyp_id = 3;
-  joyp15lock = 0;
-  joyp14lock = 0;
+  joyp_id = 0;
+  joyp_lock = 0;
   pulselock = true;
 }
 
