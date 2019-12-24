@@ -335,12 +335,18 @@ error_input:
 	 we don't have any badly-made SNSF files that mess around with PPU registers)
 */
 
-template <uint16_t color = 0x7fff>
-static void point_shadow(uint16_t *dest, unsigned pitch) {
-	const uint16_t shadow = (color >> 1) & 0x3DEF;
-	*(dest) = color;
-	*(dest + 1) = *(dest + pitch) = *(dest + pitch + 1) = shadow;
-}
+template <uint16_t color>
+class point_shadow {
+	static const uint16_t shadow = (color >> 1) & 0x3DEF;
+
+public:
+	void operator()(uint16_t *dest, unsigned pitch) {
+		*(dest) = color;
+		*(dest + 1) = *(dest + pitch) = *(dest + pitch + 1) = shadow;
+	}
+};
+static point_shadow<0x7fff> point_shadow_white;
+static point_shadow<0x001f> point_shadow_blue;
 
 bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width, unsigned height) {
 #define PAD 8
@@ -353,19 +359,19 @@ bsnesexport void snesmusic_render(uint16_t *data, unsigned pitch, unsigned width
 	
 	// show title
 	BitmapFont::print(PXL(PAD+0, PAD+0), pitch, 
-		point_shadow<0x001f>, string_convert("Title", 40));
+		point_shadow_blue,  string_convert("Title", 40));
 	BitmapFont::print(PXL(PAD+40, PAD+0), pitch, 
-		point_shadow, string_convert(info.title, width-40));
+		point_shadow_white, string_convert(info.title, width-40));
 	// show artist
 	BitmapFont::print(PXL(PAD+0, PAD+BitmapFont::HEIGHT), pitch, 
-		point_shadow<0x001f>, string_convert("Artist", 40));
+		point_shadow_blue,  string_convert("Artist", 40));
 	BitmapFont::print(PXL(PAD+40, PAD+BitmapFont::HEIGHT), pitch, 
-		point_shadow, string_convert(info.artist, width-40));
+		point_shadow_white, string_convert(info.artist, width-40));
 	// show game name
 	BitmapFont::print(PXL(PAD+0, PAD+BitmapFont::HEIGHT*2), pitch, 
-		point_shadow<0x001f>, string_convert("Game", 40));
+		point_shadow_blue,  string_convert("Game", 40));
 	BitmapFont::print(PXL(PAD+40, PAD+BitmapFont::HEIGHT*2), pitch, 
-		point_shadow, string_convert(info.game, width-40));
+		point_shadow_white, string_convert(info.game, width-40));
 	
 #undef PAD
 #undef PXL
