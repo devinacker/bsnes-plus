@@ -311,12 +311,13 @@ void SuperGameBoy::render(unsigned row) {
 unsigned SuperGameBoy::operator()() {
   unsigned inputState = 0x00;
   unsigned data = 0xFF;
-  switch(joyp_id & mmio.mlt_req) {
+  switch(joyp_id) {
     case 0: data = mmio.r6004; break;
     case 1: data = mmio.r6005; break;
     case 2: data = mmio.r6006; break;
     case 3: data = mmio.r6007; break;
   }
+  inputState |= (joyp_id << 8);
 
   if (!(data & 0x80)) inputState |= gambatte::InputGetter::START;
   if (!(data & 0x40)) inputState |= gambatte::InputGetter::SELECT;

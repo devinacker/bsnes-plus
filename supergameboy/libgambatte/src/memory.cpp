@@ -475,14 +475,19 @@ unsigned long Memory::resetCounters(unsigned long cc) {
 void Memory::updateInput() {
 	unsigned state = 0xF;
 
-	if ((ioamhram_[0x100] & 0x30) != 0x30 && getInput_) {
+	if (getInput_) {
 		unsigned input = (*getInput_)();
+		unsigned joypad_id = ~input >> 8;
 		unsigned dpad_state = ~input >> 4;
 		unsigned button_state = ~input;
-		if (!(ioamhram_[0x100] & 0x10))
-			state &= dpad_state;
-		if (!(ioamhram_[0x100] & 0x20))
-			state &= button_state;
+		if ((ioamhram_[0x100] & 0x30) == 0x30 ) {
+			state &= joypad_id;
+		} else {
+			if (!(ioamhram_[0x100] & 0x10))
+				state &= dpad_state;
+			if (!(ioamhram_[0x100] & 0x20))
+				state &= button_state;
+		}
 	}
 
 	if (state != 0xF && (ioamhram_[0x100] & 0xF) == 0xF)
