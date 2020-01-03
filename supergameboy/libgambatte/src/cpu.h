@@ -23,6 +23,8 @@
 
 namespace gambatte {
 
+class DebugHandler;
+
 class CPU {
 public:
 	CPU();
@@ -41,6 +43,11 @@ public:
 	
 	void debugWrite(unsigned p, unsigned data) {
 		mem_.debug_write(p, data);
+	}
+	
+	/** set debug callback interface for single stepping and breakpoints */
+	void setDebugHandler(DebugHandler *debug) {
+		debug_ = debug;
 	}
 	
 	long runFor(unsigned long cycles);
@@ -97,6 +104,8 @@ private:
 	unsigned char a_, b, c, d, e, /*f,*/ h, l;
 	unsigned char opcode_;
 	bool prefetched_;
+
+	DebugHandler *debug_;
 
 	void process(unsigned long cycles);
 };

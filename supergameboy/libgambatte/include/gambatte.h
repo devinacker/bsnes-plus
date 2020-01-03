@@ -22,6 +22,7 @@
 #include "gbint.h"
 #include "inputgetter.h"
 #include "loadres.h"
+#include "debughandler.h"
 #include <cstddef>
 #include <string>
 
@@ -84,6 +85,8 @@ public:
 	unsigned lyCounter();
 	unsigned debugRead(unsigned p);
 	void debugWrite(unsigned p, unsigned data);
+	/** set debug callback interface for single stepping and breakpoints */
+	void setDebugHandler(DebugHandler *debug);
 
 	/**
 	  * Reset to initial state.

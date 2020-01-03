@@ -1,5 +1,22 @@
 SuperGameBoy supergameboy;
 
+#include <nall/snes/sgb.hpp>
+
+static void op_step_default(uint16_t pc) {
+  uint8_t op  = supergameboy.read_gb(pc);
+  uint8_t op1 = supergameboy.read_gb(pc + 1);
+  uint8_t op2 = supergameboy.read_gb(pc + 2);
+  
+  printf("%04x %s\n", pc, GBCPU::disassemble(pc, op, op1, op2)());
+}
+
+static void op_read_default(uint16_t addr, uint8_t data) {
+  printf("op_read  %04x => %02x\n", addr, data);
+}
+static void op_write_default(uint16_t addr, uint8_t data) {
+  printf("op_write %04x <= %02x\n", addr, data);
+}
+
 //====================
 //SuperGameBoy::Packet
 //====================
@@ -103,6 +120,7 @@ bool SuperGameBoy::init(bool version_) {
 
   gambatte_ = new gambatte::GB;
   gambatte_->setInputGetter(this);
+  gambatte_->setDebugHandler(this);
 
   return true;
 }
@@ -347,6 +365,11 @@ SuperGameBoy::SuperGameBoy() : gambatte_(0) {
   romdata = ramdata = rtcdata = 0;
   romsize = ramsize = rtcsize = 0;
   buffer = new uint32_t[160 * 144];
+  
+  op_step = op_step_default;
+  op_read = op_read_default;
+  op_readpc = op_read_default;
+  op_write = op_write_default;
 }
 
 SuperGameBoy::~SuperGameBoy() {

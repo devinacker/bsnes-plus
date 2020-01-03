@@ -14,6 +14,7 @@ string CommonDisasmProcessor::getBreakpointBusName() {
     case SMP: return "smp";
     case SFX: return "sfx";
     case SA1: return "sa1";
+    case SGB: return "sgb";
   }
 
   return "";
@@ -26,6 +27,7 @@ uint32_t CommonDisasmProcessor::getCurrentAddress() {
     case SMP: return SNES::smp.opcode_pc;
     case SFX: return SNES::superfx.opcode_pc;
     case SA1: return SNES::sa1.opcode_pc;
+    case SGB: return SNES::supergameboy.opcode_pc;
   }
   
   return 0;
@@ -58,6 +60,12 @@ void CommonDisasmProcessor::setSource(Source source) {
     usagePointer = SNES::superfx.usage;
     memorySource = SNES::Debugger::MemorySource::SFXBus;
     mask = (1 << 23) - 1;
+    break;
+
+  case SGB:
+    usagePointer = SNES::supergameboy.usage;
+    memorySource = SNES::Debugger::MemorySource::SGBBus;
+    mask = (1 << 16) - 1;
     break;
   }
 }
@@ -106,6 +114,12 @@ bool CommonDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address)
 
   case SFX:
     SNES::superfx.disassemble_opcode(t, address);
+    t[25] = 0;
+    op = &t[7];
+    break;
+
+  case SGB:
+    SNES::supergameboy.disassemble_opcode(t, address);
     t[25] = 0;
     op = &t[7];
     break;

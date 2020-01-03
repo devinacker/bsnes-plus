@@ -49,9 +49,21 @@ void Tracer::stepSfx() {
   }
 }
 
+void Tracer::stepSgb() {
+  if(traceSgb) {
+    unsigned addr = SNES::supergameboy.opcode_pc;
+    if(!traceMask || !(traceMaskSGB[addr >> 3] & (0x80 >> (addr & 7)))) {
+      char text[256];
+      SNES::supergameboy.disassemble_opcode(text, addr);
+      tracefile.print(string() << text << "\n");
+    }
+    traceMaskSGB[addr >> 3] |= 0x80 >> (addr & 7);
+  }
+}
+
 void Tracer::resetTraceState() {
   tracefile.close();
-  setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx);
+  setTraceState(traceCpu || traceSmp || traceSa1 || traceSfx || traceSgb);
 
   // reset trace masks
   if (traceMask)
@@ -63,7 +75,7 @@ void Tracer::setTraceState(bool state) {
     string name = filepath(nall::basename(cartridge.fileName), config().path.data);
     name << "-trace.log";
     tracefile.open(name, file::mode::write);
-  } else if(!traceCpu && !traceSmp && !traceSa1 && !traceSfx && tracefile.open()) {
+  } else if(!traceCpu && !traceSmp && !traceSa1 && !traceSfx && !traceSgb && tracefile.open()) {
     tracefile.close();
   }
 }
@@ -88,6 +100,11 @@ void Tracer::setSfxTraceState(int state) {
   setTraceState(traceSfx);
 }
 
+void Tracer::setSgbTraceState(int state) {
+  traceSgb = (state == Qt::Checked);
+  setTraceState(traceSgb);
+}
+
 void Tracer::setTraceMaskState(bool state) {
   traceMask = state;
   if(traceMask) {
@@ -96,6 +113,7 @@ void Tracer::setTraceMaskState(bool state) {
     memset(traceMaskSMP, 0x00, (1 << 16) >> 3);
     memset(traceMaskSA1, 0x00, (1 << 24) >> 3);
     memset(traceMaskSFX, 0x00, (1 << 23) >> 3);
+    memset(traceMaskSGB, 0x00, (1 << 16) >> 3);
   }
 }
 
@@ -104,17 +122,20 @@ Tracer::Tracer() {
   traceSmp = false;
   traceSa1 = false;
   traceSfx = false;
+  traceSgb = false;
   traceMask = false;
 
   traceMaskCPU = new uint8_t[(1 << 24) >> 3]();
   traceMaskSMP = new uint8_t[(1 << 16) >> 3]();
   traceMaskSA1 = new uint8_t[(1 << 24) >> 3]();
   traceMaskSFX = new uint8_t[(1 << 23) >> 3]();
+  traceMaskSGB = new uint8_t[(1 << 16) >> 3]();
 
   SNES::cpu.step_event = { &Tracer::stepCpu, this };
   SNES::smp.step_event = { &Tracer::stepSmp, this };
   SNES::sa1.step_event = { &Tracer::stepSa1, this };
   SNES::superfx.step_event = { &Tracer::stepSfx, this };
+  SNES::supergameboy.step_event = { &Tracer::stepSgb, this };
 }
 
 Tracer::~Tracer() {
@@ -122,5 +143,6 @@ Tracer::~Tracer() {
   delete[] traceMaskSMP;
   delete[] traceMaskSA1;
   delete[] traceMaskSFX;
+  delete[] traceMaskSGB;
   if(tracefile.open()) tracefile.close();
 }

@@ -33,6 +33,8 @@ public:
   uint8_t read_gb(uint16_t addr);
   void write_gb(uint16_t addr, uint8_t data);
 
+  void disassemble_opcode(char *output, uint16_t addr);
+
   enum Usage {
     UsageRead   = 0x80,
     UsageWrite  = 0x40,
@@ -42,11 +44,18 @@ public:
   uint8 *usage; // currently unused
   uint8 *cart_usage;
   
+  function<void ()> step_event;
+  uint16_t opcode_pc;
+  
   SGBDebugger();
   ~SGBDebugger();
   
 private:
-  function<uint8 (uint16)> sgb_read_gb;
-  function<void (uint16, uint8)> sgb_write_gb;
-
+  function<uint8 (uint16_t)> sgb_read_gb;
+  function<void (uint16_t, uint8_t)> sgb_write_gb;
+  
+  static void op_step(uint16_t pc);
+  static void op_read(uint16_t addr, uint8_t data);
+  static void op_readpc(uint16_t pc, uint8_t data);
+  static void op_write(uint16_t addr, uint8_t data);
 };

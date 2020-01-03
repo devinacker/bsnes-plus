@@ -7,6 +7,7 @@ public:
     SMPStep,
     SA1Step,
     SFXStep,
+    SGBStep,
   } break_event;
 
   enum { SoftBreakCPU = -1,
@@ -25,7 +26,16 @@ public:
     enum class Mode : unsigned { Exec = 1, Read = 2, Write = 4 };
     unsigned mode = 0;
     
-    enum class Source : unsigned { CPUBus, APURAM, VRAM, OAM, CGRAM, SA1Bus, SFXBus } source = Source::CPUBus;
+    enum class Source : unsigned {
+      CPUBus,
+      APURAM,
+      VRAM,
+      OAM,
+      CGRAM,
+      SA1Bus,
+      SFXBus,
+      SGBBus,
+    } source = Source::CPUBus;
     unsigned counter = 0;  //number of times breakpoint has been hit since being set
   };
   linear_vector<Breakpoint> breakpoint;
@@ -36,6 +46,7 @@ public:
   bool step_smp;
   bool step_sa1;
   bool step_sfx;
+  bool step_sgb;
   bool bus_access;
   bool break_on_wdm;
   bool break_on_brk;

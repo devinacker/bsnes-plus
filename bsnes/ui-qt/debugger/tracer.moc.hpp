@@ -6,6 +6,7 @@ public:
   void stepSmp();
   void stepSa1();
   void stepSfx();
+  void stepSgb();
 
   Tracer();
   ~Tracer();
@@ -15,6 +16,7 @@ public slots:
   void setSmpTraceState(int);
   void setSa1TraceState(int);
   void setSfxTraceState(int);
+  void setSgbTraceState(int);
   void setTraceMaskState(bool);
 
   void resetTraceState();
@@ -27,12 +29,14 @@ private:
   bool traceSmp;
   bool traceSa1;
   bool traceSfx;
+  bool traceSgb;
   bool traceMask;
 
   uint8_t *traceMaskCPU;
   uint8_t *traceMaskSMP;
   uint8_t *traceMaskSA1;
   uint8_t *traceMaskSFX;
+  uint8_t *traceMaskSGB;
 };
 
 extern Tracer *tracer;

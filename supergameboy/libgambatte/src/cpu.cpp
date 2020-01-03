@@ -19,6 +19,7 @@
 #include "cpu.h"
 #include "memory.h"
 #include "savestate.h"
+#include "debughandler.h"
 
 namespace gambatte {
 
@@ -40,6 +41,7 @@ CPU::CPU()
 , l(0x4D)
 , opcode_(0)
 , prefetched_(false)
+, debug_(0)
 {
 }
 
@@ -138,12 +140,33 @@ void CPU::loadState(SaveState const &state) {
 #define de() ( d * 0x100u | e )
 #define hl() ( h * 0x100u | l )
 
-#define READ(dest, addr) do { (dest) = mem_.read(addr, cycleCounter); cycleCounter += 4; } while (0)
-#define PC_READ(dest) do { (dest) = mem_.read(pc, cycleCounter); pc = (pc + 1) & 0xFFFF; cycleCounter += 4; } while (0)
-#define FF_READ(dest, addr) do { (dest) = mem_.ff_read(addr, cycleCounter); cycleCounter += 4; } while (0)
+#define READ(dest, addr) do { \
+	(dest) = mem_.read(addr, cycleCounter); \
+	if (debug_) debug_->op_read(addr, (dest)); \
+	cycleCounter += 4; \
+} while (0)
+#define PC_READ(dest) do { \
+	(dest) = mem_.read(pc, cycleCounter); \
+	if (debug_) debug_->op_readpc(pc, (dest)); \
+	pc = (pc + 1) & 0xFFFF; \
+	cycleCounter += 4; \
+} while (0)
+#define FF_READ(dest, addr) do { \
+	(dest) = mem_.ff_read(addr, cycleCounter); \
+	if (debug_) debug_->op_read(addr | 0xff00, (dest)); \
+	cycleCounter += 4; \
+} while (0)
 
-#define WRITE(addr, data) do { mem_.write(addr, data, cycleCounter); cycleCounter += 4; } while (0)
-#define FF_WRITE(addr, data) do { mem_.ff_write(addr, data, cycleCounter); cycleCounter += 4; } while (0)
+#define WRITE(addr, data) do { \
+	if (debug_) debug_->op_write(addr, data); \
+	mem_.write(addr, data, cycleCounter); \
+	cycleCounter += 4; \
+} while (0)
+#define FF_WRITE(addr, data) do { \
+	if (debug_) debug_->op_write(addr | 0xff00, data); \
+	mem_.ff_write(addr, data, cycleCounter); \
+	cycleCounter += 4; \
+} while (0)
 
 #define PC_MOD(data) do { pc = data; cycleCounter += 4; } while (0)
 
@@ -527,8 +550,14 @@ void CPU::process(unsigned long const cycles) {
 			unsigned char opcode;
 
 			if (!prefetched_) {
+				if (debug_)
+					debug_->op_step(pc);
+
 				PC_READ(opcode);
 			} else {
+				if (debug_)
+					debug_->op_step(pc - 1);
+
 				opcode = opcode_;
 				cycleCounter += 4;
 				prefetched_ = false;

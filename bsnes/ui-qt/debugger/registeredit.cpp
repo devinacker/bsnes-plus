@@ -3,6 +3,7 @@
 RegisterEditCPU *registerEditCPU, *registerEditSA1;
 RegisterEditSMP *registerEditSMP;
 RegisterEditSFX *registerEditSFX;
+RegisterEditSGB *registerEditSGB;
 
 #define reg_editor(name, digits) \
 	layout->addWidget(new QLabel(QString(#name).toUpper()), layout->rowCount(), 0); \
@@ -250,6 +251,36 @@ void RegisterEditSFX::synchronize() {
 	flag_sync(SNES::SFXDebugger::FlagN, 9);
 	flag_sync(SNES::SFXDebugger::FlagC, 10);
 	flag_sync(SNES::SFXDebugger::FlagZ, 11);
+}
+
+void RegisterEditSGB::setupUI() {
+	QVBoxLayout *fullLayout = new QVBoxLayout;
+	this->setLayout(fullLayout);
+
+	QGridLayout *layout = new QGridLayout;
+	reg_editor(pc, 4);
+	reg_editor(af, 4);
+	reg_editor(bc, 4);
+	reg_editor(de, 4);
+	reg_editor(hl, 4);
+	reg_editor(sp, 4);
+	fullLayout->addLayout(layout);
+
+	layout = new QGridLayout;
+	for (int i = 0; i < 4; i++) {
+		flag_editor(i["ZNHC"], i, i >> 1, i & 1);
+	}
+	fullLayout->addLayout(layout);
+
+	fullLayout->addStretch();
+}
+
+void RegisterEditSGB::commit() {
+	// TODO
+}
+
+void RegisterEditSGB::synchronize() {
+	// TODO
 }
 
 #undef reg_editor

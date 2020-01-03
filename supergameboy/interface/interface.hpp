@@ -1,4 +1,4 @@
-class SuperGameBoy : public gambatte::InputGetter {
+class SuperGameBoy : public gambatte::InputGetter, public gambatte::DebugHandler {
 public:
   gambatte::GB *gambatte_;
 

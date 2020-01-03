@@ -96,6 +96,7 @@ Debugger::Debugger() {
   registerEditSMP = new RegisterEditSMP;
   registerEditSA1 = new RegisterEditCPU(SNES::sa1);
   registerEditSFX = new RegisterEditSFX;
+  registerEditSGB = new RegisterEditSGB;
 
   QToolBar *toolBar = new QToolBar;
   layout->addWidget(toolBar);
@@ -123,6 +124,7 @@ Debugger::Debugger() {
   debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
   debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
+  debugSGB = new DebuggerView(registerEditSGB, new CommonDisasmProcessor(CommonDisasmProcessor::SGB));
 
   editTabs = new QTabWidget;
   editTabs->addTab(debugCPU, "CPU");
@@ -232,11 +234,13 @@ Debugger::Debugger() {
   connect(debugSMP, SIGNAL(synchronized()), this, SLOT(synchronize()));
   connect(debugSA1, SIGNAL(synchronized()), this, SLOT(synchronize()));
   connect(debugSFX, SIGNAL(synchronized()), this, SLOT(synchronize()));
+  connect(debugSGB, SIGNAL(synchronized()), this, SLOT(synchronize()));
 
   connect(debugCPU, SIGNAL(traceStateChanged(int)), tracer, SLOT(setCpuTraceState(int)));
   connect(debugSMP, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSmpTraceState(int)));
   connect(debugSA1, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSa1TraceState(int)));
   connect(debugSFX, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
+  connect(debugSGB, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSgbTraceState(int)));
   connect(traceMask->defaultAction(), SIGNAL(toggled(bool)), tracer, SLOT(setTraceMaskState(bool)));
 
   frameCounter = 0;
@@ -270,12 +274,17 @@ void Debugger::modifySystemState(unsigned state) {
     
     memset(SNES::sa1.usage, 0x00, 1 << 24);
     memset(SNES::superfx.usage, 0x00, 1 << 23);
+    memset(SNES::supergameboy.usage, 0x00, 1 << 16);
     
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
       fp.read(SNES::smp.usage, 1 << 16);
-      if (SNES::cartridge.has_sa1())     fp.read(SNES::sa1.usage, 1 << 24);
-      if (SNES::cartridge.has_superfx()) fp.read(SNES::superfx.usage, 1 << 23);
+      if (SNES::cartridge.has_sa1())
+        fp.read(SNES::sa1.usage, 1 << 24);
+      if (SNES::cartridge.has_superfx())
+        fp.read(SNES::superfx.usage, 1 << 23);
+      if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
+        fp.read(SNES::supergameboy.usage, 1 << 16);
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
@@ -318,6 +327,9 @@ void Debugger::modifySystemState(unsigned state) {
       editTabs->addTab(debugSFX, "SuperFX");
       symbolsSFX->loadFromFile(nall::basename(symfile), ".sfx.sym");
     }
+    if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
+      editTabs->addTab(debugSGB, "Super GB");
+    }
 
     string data;
     if(config().debugger.saveBreakpoints) {
@@ -340,8 +352,12 @@ void Debugger::modifySystemState(unsigned state) {
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::write)) {
       fp.write(SNES::cpu.usage, 1 << 24);
       fp.write(SNES::smp.usage, 1 << 16);
-      if (SNES::cartridge.has_sa1())     fp.write(SNES::sa1.usage, 1 << 24);
-      if (SNES::cartridge.has_superfx()) fp.write(SNES::superfx.usage, 1 << 23);
+      if (SNES::cartridge.has_sa1())
+        fp.write(SNES::sa1.usage, 1 << 24);
+      if (SNES::cartridge.has_superfx())
+        fp.write(SNES::superfx.usage, 1 << 23);
+      if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
+        fp.write(SNES::supergameboy.usage, 1 << 16);
       fp.close();
     }
     
@@ -378,12 +394,14 @@ void Debugger::synchronize() {
   runBreak->defaultAction()->setIcon(active ? QIcon(":16x16/dbg-run.png") : QIcon(":16x16/dbg-break.png"));
   runBreak->defaultAction()->setText(active ? "Run" : "Break");
 
-  bool stepEnabled = SNES::cartridge.loaded() && active &&
-                     (debugCPU->stepProcessor->isChecked() || debugSMP->stepProcessor->isChecked() ||
-                      debugSA1->stepProcessor->isChecked() || debugSFX->stepProcessor->isChecked());
-  bool stepOtherEnabled = stepEnabled && (debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
-                                          debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() == 1)
-                          && !debugSFX->stepProcessor->isChecked(); // TODO: implement this for superfx
+  unsigned stepChecked = debugCPU->stepProcessor->isChecked() + debugSMP->stepProcessor->isChecked() +
+                         debugSA1->stepProcessor->isChecked() + debugSFX->stepProcessor->isChecked() +
+                         debugSGB->stepProcessor->isChecked();
+
+  bool stepEnabled = SNES::cartridge.loaded() && active && (stepChecked > 0);
+  bool stepOtherEnabled = stepEnabled && (stepChecked == 1)
+                          && !debugSFX->stepProcessor->isChecked()  // TODO: implement this for superfx
+                          && !debugSGB->stepProcessor->isChecked(); // TODO: implement this for sg
   bool stepHVBEnabled = stepEnabled && debugCPU->stepProcessor->isChecked();
   bool stepInterruptEnabled = stepOtherEnabled && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked());
 
@@ -406,12 +424,14 @@ void Debugger::synchronize() {
   SNES::debugger.step_smp = application.debug && debugSMP->stepProcessor->isChecked();
   SNES::debugger.step_sa1 = application.debug && debugSA1->stepProcessor->isChecked();
   SNES::debugger.step_sfx = application.debug && debugSFX->stepProcessor->isChecked();
+  SNES::debugger.step_sgb = application.debug && debugSGB->stepProcessor->isChecked();
 
   if(!active) {
     registerEditCPU->setEnabled(false);
     registerEditSMP->setEnabled(false);
     registerEditSA1->setEnabled(false);
     registerEditSFX->setEnabled(false);
+    registerEditSGB->setEnabled(false);
   }
   QVectorIterator<MemoryEditor*> i(memoryEditors);
   while (i.hasNext()) {
@@ -517,6 +537,7 @@ void Debugger::event() {
   registerEditSMP->setEnabled(false);
   registerEditSA1->setEnabled(false);
   registerEditSFX->setEnabled(false);
+  registerEditSGB->setEnabled(false);
 
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
@@ -619,6 +640,15 @@ void Debugger::event() {
       debugSFX->refresh(SNES::superfx.opcode_pc);
       registerEditSFX->setEnabled(true);
     } break;
+    
+    case SNES::Debugger::BreakEvent::SGBStep: {
+      SNES::supergameboy.disassemble_opcode(t, SNES::supergameboy.opcode_pc);
+      string s = t;
+      s.replace(" ", "&nbsp;");
+      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      debugSGB->refresh(SNES::supergameboy.opcode_pc);
+      registerEditSGB->setEnabled(true);
+    } break;
   }
 
   // disable speedup/slowdown since the main window isn't going to register
@@ -661,6 +691,7 @@ void Debugger::autoUpdate() {
   registerEditSA1->synchronize();
   registerEditSMP->synchronize();
   registerEditSFX->synchronize();
+  registerEditSGB->synchronize();
 }
 
 #endif

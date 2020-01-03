@@ -90,6 +90,10 @@ void GB::debugWrite(unsigned p, unsigned data) {
 	p_->cpu.debugWrite(p, data);
 }
 
+void GB::setDebugHandler(DebugHandler *debug) {
+	p_->cpu.setDebugHandler(debug);
+}
+
 void GB::reset() {
 	if (p_->cpu.loaded()) {
 		p_->cpu.saveSavedata();

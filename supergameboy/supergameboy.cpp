@@ -74,3 +74,20 @@ bsnesexport uint8_t sgb_read_gb(uint16_t addr) {
 bsnesexport void sgb_write_gb(uint16_t addr, uint8_t data) {
   supergameboy.write_gb(addr, data);
 }
+
+bsnesexport void sgb_callback_step(void (*step)(uint16_t)) {
+  supergameboy.op_step = step;
+}
+
+bsnesexport void sgb_callback_read(void (*read)(uint16_t, uint8_t)) {
+  supergameboy.op_read = read;
+}
+
+bsnesexport void sgb_callback_readpc(void (*readpc)(uint16_t, uint8_t)) {
+  supergameboy.op_readpc = readpc;
+}
+
+bsnesexport void sgb_callback_write(void (*write)(uint16_t, uint8_t)) {
+  supergameboy.op_write = write;
+}
+
