@@ -1,115 +1,98 @@
-/***************************************************************************
- *   Copyright (C) 2007 by Sindre Aam�s                                    *
- *   aamas@stud.ntnu.no                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License version 2 as     *
- *   published by the Free Software Foundation.                            *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License version 2 for more details.                *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   version 2 along with this program; if not, write to the               *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+//
+//   Copyright (C) 2007 by sinamas <sinamas at users.sourceforge.net>
+//
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License version 2 as
+//   published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License version 2 for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   version 2 along with this program; if not, write to the
+//   Free Software Foundation, Inc.,
+//   51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+
 #ifndef CPU_H
 #define CPU_H
 
-class SaveState;
-
-#include "int.h"
 #include "memory.h"
 
+namespace gambatte {
+
 class CPU {
-	Memory memory;
-	
-	unsigned long cycleCounter_;
-
-	unsigned short PC_;
-	unsigned short SP;
-	
-	unsigned HF1, HF2, ZF, CF;
-
-	unsigned char A_, B, C, D, E, /*F,*/ H, L;
-
-	bool skip;
-	bool halted;
-	
-	void process(unsigned long cycles);
-	
 public:
-	
 	CPU();
-// 	void halt();
-
-// 	unsigned interrupt(unsigned address, unsigned cycleCounter);
-
-	void updateVideo() { memory.updateVideo(cycleCounter_); }
-	unsigned lyCounter() { return memory.lyCounter(cycleCounter_); }
-	void setAccumulator(unsigned char value) { A_ = value; }
 	
-	void runFor(unsigned long cycles);
+	unsigned lyCounter() { 
+		return mem_.lyCounter(cycleCounter_); 
+	}
+	
+	void setAccumulator(unsigned char value) { 
+		a_ = value; 
+	}
+	
+	long runFor(unsigned long cycles);
 	void setStatePtrs(SaveState &state);
 	void saveState(SaveState &state);
-	void loadState(const SaveState &state);
-	
-	void loadSavedata() { memory.loadSavedata(); }
-	void saveSavedata() { memory.saveSavedata(); }
-	
-	void setVideoBlitter(Gambatte::VideoBlitter *vb) {
-		memory.setVideoBlitter(vb);
+	void loadState(SaveState const &state);
+	void loadSavedata() { mem_.loadSavedata(); }
+	void saveSavedata() { mem_.saveSavedata(); }
+
+	void setVideoBuffer(uint_least32_t *videoBuf, std::ptrdiff_t pitch) {
+		mem_.setVideoBuffer(videoBuf, pitch);
 	}
-	
-	void videoBufferChange() {
-		memory.videoBufferChange();
+
+	void setInputGetter(InputGetter *getInput) {
+		mem_.setInputGetter(getInput);
 	}
-	
-	unsigned int videoWidth() const {
-		return memory.videoWidth();
+
+	void setSaveDir(std::string const &sdir) {
+		mem_.setSaveDir(sdir);
 	}
-	
-	unsigned int videoHeight() const {
-		return memory.videoHeight();
+
+	std::string const saveBasePath() const {
+		return mem_.saveBasePath();
 	}
-	
-	void setVideoFilter(const unsigned int n) {
-		memory.setVideoFilter(n);
+
+	void setOsdElement(transfer_ptr<OsdElement> osdElement) {
+		mem_.setOsdElement(osdElement);
 	}
-	
-	std::vector<const Gambatte::FilterInfo*> filterInfo() const {
-		return memory.filterInfo();
+
+	LoadRes load(bool forceDmg, bool multicartCompat) {
+		return mem_.loadROM(forceDmg, multicartCompat);
 	}
-	
-	void setInputStateGetter(Gambatte::InputStateGetter *getInput) {
-		memory.setInputStateGetter(getInput);
+
+	bool loaded() const { return mem_.loaded(); }
+	char const * romTitle() const { return mem_.romTitle(); }
+	PakInfo const pakInfo(bool multicartCompat) const { return mem_.pakInfo(multicartCompat); }
+	void setSoundBuffer(uint_least32_t *buf) { mem_.setSoundBuffer(buf); }
+	std::size_t fillSoundBuffer() { return mem_.fillSoundBuffer(cycleCounter_); }
+	bool isCgb() const { return mem_.isCgb(); }
+
+	void setDmgPaletteColor(int palNum, int colorNum, unsigned long rgb32) {
+		mem_.setDmgPaletteColor(palNum, colorNum, rgb32);
 	}
-	
-	void set_savedir(const char *sdir) {
-		memory.set_savedir(sdir);
-	}
-	
-	const std::string saveBasePath() const {
-		return memory.saveBasePath();
-	}
-	
-	void setOsdElement(std::auto_ptr<OsdElement> osdElement) {
-		memory.setOsdElement(osdElement);
-	}
-	
-	bool load(bool forceDmg);
-	
-	void setSoundBuffer(Gambatte::uint_least32_t *const buf) { memory.setSoundBuffer(buf); }
-	unsigned fillSoundBuffer() { return memory.fillSoundBuffer(cycleCounter_); }
-	
-	bool isCgb() const { return memory.isCgb(); }
-	
-	void setDmgPaletteColor(unsigned palNum, unsigned colorNum, unsigned rgb32) {
-		memory.setDmgPaletteColor(palNum, colorNum, rgb32);
-	}
+
+	void setGameGenie(std::string const &codes) { mem_.setGameGenie(codes); }
+	void setGameShark(std::string const &codes) { mem_.setGameShark(codes); }
+
+private:
+	Memory mem_;
+	unsigned long cycleCounter_;
+	unsigned short pc_;
+	unsigned short sp;
+	unsigned hf1, hf2, zf, cf;
+	unsigned char a_, b, c, d, e, /*f,*/ h, l;
+	unsigned char opcode_;
+	bool prefetched_;
+
+	void process(unsigned long cycles);
 };
+
+}
 
 #endif

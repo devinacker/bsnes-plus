@@ -1,6 +1,6 @@
-class SuperGameBoy : public Gambatte::VideoBlitter, public Gambatte::InputStateGetter {
+class SuperGameBoy : public gambatte::InputGetter {
 public:
-  Gambatte::GB *gambatte;
+  gambatte::GB *gambatte_;
 
 //SuperGameBoy::MMIO
   unsigned vram_row;
@@ -61,19 +61,11 @@ public:
 
   SuperGameBoy();
   ~SuperGameBoy();
-
-//Gambatte::VideoBlitter
-  unsigned bufferWidth, bufferHeight;
+  
   uint32_t *buffer;
 
-  void setBufferDimensions(unsigned width, unsigned height);
-  const Gambatte::PixelBuffer inBuffer();
-  void blit();
-
-//Gambatte::InputStateGetter
-  Gambatte::InputState inputState;
-
-  const Gambatte::InputState& operator()();
+//gambatte::InputGetter
+  unsigned operator()();
 };
 
 extern SuperGameBoy supergameboy;

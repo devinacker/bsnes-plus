@@ -1,184 +1,222 @@
-/***************************************************************************
- *   Copyright (C) 2007 by Sindre Aam�s                                    *
- *   aamas@stud.ntnu.no                                                    *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License version 2 as     *
- *   published by the Free Software Foundation.                            *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License version 2 for more details.                *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   version 2 along with this program; if not, write to the               *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+//
+//   Copyright (C) 2007 by sinamas <sinamas at users.sourceforge.net>
+//
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License version 2 as
+//   published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License version 2 for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   version 2 along with this program; if not, write to the
+//   Free Software Foundation, Inc.,
+//   51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+
 #include "gambatte.h"
 #include "cpu.h"
-#include "savestate.h"
-#include "statesaver.h"
 #include "initstate.h"
+#include "savestate.h"
 #include "state_osd_elements.h"
-#include <string>
+#include "statesaver.h"
+
+#include <cstring>
 #include <sstream>
 
 #include <supergameboy.hpp>
 
-static const std::string itos(int i) {
+using namespace gambatte;
+
+namespace {
+
+std::string to_string(int i) {
 	std::stringstream ss;
-	
 	ss << i;
-	
-	std::string out;
-	
-	ss >> out;
-	
-	return out;
+	return ss.str();
 }
 
-static const std::string statePath(const std::string &basePath, int stateNo) {
-	return basePath + "_" + itos(stateNo) + ".gqs";
+std::string statePath(std::string const &basePath, int stateNo) {
+	return basePath + '_' + to_string(stateNo) + ".gqs";
 }
 
-namespace Gambatte {
-GB::GB() : z80(new CPU), stateNo(1) {}
+}
+
+struct GB::Priv {
+	CPU cpu;
+	int stateNo;
+	unsigned loadflags;
+
+	Priv() : stateNo(1), loadflags(0) {}
+};
+
+GB::GB() : p_(new Priv) {}
 
 GB::~GB() {
-	delete z80;
+	if (p_->cpu.loaded())
+		p_->cpu.saveSavedata();
+
+	delete p_;
 }
 
-unsigned GB::runFor(Gambatte::uint_least32_t *const soundBuf, const unsigned samples) {
-	z80->setSoundBuffer(soundBuf);
-	z80->runFor(samples * 2);
-	
-	return z80->fillSoundBuffer();
-}
+std::ptrdiff_t GB::runFor(gambatte::uint_least32_t *const videoBuf, std::ptrdiff_t const pitch,
+                          gambatte::uint_least32_t *const soundBuf, std::size_t &samples) {
+	if (!p_->cpu.loaded()) {
+		samples = 0;
+		return -1;
+	}
 
-void GB::updateVideo() {
-	z80->updateVideo();
+	p_->cpu.setVideoBuffer(videoBuf, pitch);
+	p_->cpu.setSoundBuffer(soundBuf);
+
+	long const cyclesSinceBlit = p_->cpu.runFor(samples * 2);
+	samples = p_->cpu.fillSoundBuffer();
+	return cyclesSinceBlit >= 0
+	     ? static_cast<std::ptrdiff_t>(samples) - (cyclesSinceBlit >> 1)
+	     : cyclesSinceBlit;
 }
 
 unsigned GB::lyCounter() {
-	return z80->lyCounter();
+	return p_->cpu.lyCounter();
 }
 
 void GB::reset() {
-	z80->saveSavedata();
-	
-	SaveState state;
-	z80->setStatePtrs(state);
-	setInitState(state, z80->isCgb());
-	z80->loadState(state);
-	z80->loadSavedata();
+	if (p_->cpu.loaded()) {
+		p_->cpu.saveSavedata();
 
-	z80->setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
-	
-// 	z80->reset();
-}
-
-void GB::setVideoBlitter(VideoBlitter *vb) {
-	z80->setVideoBlitter(vb);
-}
-
-void GB::videoBufferChange() {
-	z80->videoBufferChange();
-}
-
-unsigned GB::videoWidth() const {
-	return z80->videoWidth();
-}
-
-unsigned GB::videoHeight() const {
-	return z80->videoHeight();
-}
-
-void GB::setVideoFilter(const unsigned n) {
-	z80->setVideoFilter(n);
-}
-
-std::vector<const FilterInfo*> GB::filterInfo() const {
-	return z80->filterInfo();
-}
-
-void GB::setInputStateGetter(InputStateGetter *getInput) {
-	z80->setInputStateGetter(getInput);
-}
-
-void GB::set_savedir(const char *sdir) {
-	z80->set_savedir(sdir);
-}
-
-bool GB::load(const bool forceDmg) {
-	const bool failed = z80->load(forceDmg);
-	
-	if (!failed) {
 		SaveState state;
-		z80->setStatePtrs(state);
-		setInitState(state, z80->isCgb());
-		z80->loadState(state);
-		z80->loadSavedata();
-
-		z80->setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
-		
-		stateNo = 1;
-		z80->setOsdElement(std::auto_ptr<OsdElement>());
+		p_->cpu.setStatePtrs(state);
+		setInitState(state, p_->cpu.isCgb(), p_->loadflags & GBA_CGB);
+		p_->cpu.loadState(state);
+		p_->cpu.loadSavedata();
+		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
 	}
-	
-	return failed;
+}
+
+void GB::setInputGetter(InputGetter *getInput) {
+	p_->cpu.setInputGetter(getInput);
+}
+
+void GB::setSaveDir(std::string const &sdir) {
+	p_->cpu.setSaveDir(sdir);
+}
+
+LoadRes GB::load(unsigned const flags) {
+	if (p_->cpu.loaded())
+		p_->cpu.saveSavedata();
+
+	LoadRes const loadres = p_->cpu.load(flags & FORCE_DMG,
+	                                     flags & MULTICART_COMPAT);
+	if (loadres == LOADRES_OK) {
+		SaveState state;
+		p_->cpu.setStatePtrs(state);
+		p_->loadflags = flags;
+		setInitState(state, p_->cpu.isCgb(), flags & GBA_CGB);
+		p_->cpu.loadState(state);
+		p_->cpu.loadSavedata();
+		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
+
+		p_->stateNo = 1;
+		p_->cpu.setOsdElement(transfer_ptr<OsdElement>());
+	}
+
+	return loadres;
 }
 
 bool GB::isCgb() const {
-	return z80->isCgb();
+	return p_->cpu.isCgb();
 }
 
-void GB::setDmgPaletteColor(unsigned palNum, unsigned colorNum, unsigned rgb32) {
-	z80->setDmgPaletteColor(palNum, colorNum, rgb32);
+bool GB::isLoaded() const {
+	return p_->cpu.loaded();
 }
 
 void GB::saveSavedata() {
-	z80->saveSavedata();
+	if (p_->cpu.loaded())
+		p_->cpu.saveSavedata();
 }
 
-void GB::loadState(const char *const filepath, const bool osdMessage) {
-	z80->saveSavedata();
-	
-	SaveState state;
-	z80->setStatePtrs(state);
-	
-	if (StateSaver::loadState(state, filepath)) {
-		z80->loadState(state);
-		
-		if (osdMessage)
-			z80->setOsdElement(newStateLoadedOsdElement(stateNo));
+void GB::setDmgPaletteColor(int palNum, int colorNum, unsigned long rgb32) {
+	p_->cpu.setDmgPaletteColor(palNum, colorNum, rgb32);
+}
+
+bool GB::loadState(std::string const &filepath) {
+	if (p_->cpu.loaded()) {
+		p_->cpu.saveSavedata();
+
+		SaveState state = SaveState();
+		p_->cpu.setStatePtrs(state);
+
+		if (StateSaver::loadState(state, filepath)) {
+			p_->cpu.loadState(state);
+			return true;
+		}
 	}
+
+	return false;
 }
 
-void GB::saveState() {
-	saveState(statePath(z80->saveBasePath(), stateNo).c_str());
-	z80->setOsdElement(newStateSavedOsdElement(stateNo));
+bool GB::saveState(gambatte::uint_least32_t const *videoBuf, std::ptrdiff_t pitch) {
+	if (saveState(videoBuf, pitch, statePath(p_->cpu.saveBasePath(), p_->stateNo))) {
+		p_->cpu.setOsdElement(newStateSavedOsdElement(p_->stateNo));
+		return true;
+	}
+
+	return false;
 }
 
-void GB::loadState() {
-	loadState(statePath(z80->saveBasePath(), stateNo).c_str(), true);
+bool GB::loadState() {
+	if (loadState(statePath(p_->cpu.saveBasePath(), p_->stateNo))) {
+		p_->cpu.setOsdElement(newStateLoadedOsdElement(p_->stateNo));
+		return true;
+	}
+
+	return false;
 }
 
-void GB::saveState(const char *filepath) {
-	SaveState state;
-	z80->setStatePtrs(state);
-	z80->saveState(state);
-	StateSaver::saveState(state, filepath);
-}
+bool GB::saveState(gambatte::uint_least32_t const *videoBuf, std::ptrdiff_t pitch,
+                   std::string const &filepath) {
+	if (p_->cpu.loaded()) {
+		SaveState state;
+		p_->cpu.setStatePtrs(state);
+		p_->cpu.saveState(state);
+		return StateSaver::saveState(state, videoBuf, pitch, filepath);
+	}
 
-void GB::loadState(const char *const filepath) {
-	loadState(filepath, false);
+	return false;
 }
 
 void GB::selectState(int n) {
 	n -= (n / 10) * 10;
-	stateNo = n < 0 ? n + 10 : n;
-	z80->setOsdElement(newSaveStateOsdElement(statePath(z80->saveBasePath(), stateNo).c_str(), stateNo));
+	p_->stateNo = n < 0 ? n + 10 : n;
+
+	if (p_->cpu.loaded()) {
+		std::string const &path = statePath(p_->cpu.saveBasePath(), p_->stateNo);
+		p_->cpu.setOsdElement(newSaveStateOsdElement(path, p_->stateNo));
+	}
 }
+
+int GB::currentState() const { return p_->stateNo; }
+
+std::string const GB::romTitle() const {
+	if (p_->cpu.loaded()) {
+		char title[0x11];
+		std::memcpy(title, p_->cpu.romTitle(), 0x10);
+		title[title[0xF] & 0x80 ? 0xF : 0x10] = '\0';
+		return std::string(title);
+	}
+
+	return std::string();
+}
+
+PakInfo const GB::pakInfo() const { return p_->cpu.pakInfo(p_->loadflags & MULTICART_COMPAT); }
+
+void GB::setGameGenie(std::string const &codes) {
+	p_->cpu.setGameGenie(codes);
+}
+
+void GB::setGameShark(std::string const &codes) {
+	p_->cpu.setGameShark(codes);
 }

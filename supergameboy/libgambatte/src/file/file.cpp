@@ -2,6 +2,9 @@
 Copyright (C) 2007 by Nach
 http://nsrt.edgeemu.com
 
+Copyright (C) 2007-2011 by sinamas <sinamas at users.sourceforge.net>
+sinamas@users.sourceforge.net
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
 published by the Free Software Foundation.
@@ -14,60 +17,10 @@ GNU General Public License version 2 for more details.
 You should have received a copy of the GNU General Public License
 version 2 along with this program; if not, write to the
 Free Software Foundation, Inc.,
-59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 ***************************************************************************/
+#include "stdfile.h"
 
-#include "file.h"
-
-using namespace std;
-
-static const unsigned int MAX_FILE_NAME = 512;
-
-File::File(const char *filename) : stream(filename, ios::in | ios::binary), is_zip(false), fsize(0), count(0)
-{
-  if (stream)
-  {
-    stream.seekg(0, ios::end);
-    fsize = stream.tellg();
-    stream.seekg(0, ios::beg);
-  }
-}
-
-File::~File()
-{
-  close();
-}
-
-void File::rewind()
-{
-  if (is_open())
-  {
-    stream.seekg(0, ios::beg);
-  }
-}
-
-bool File::is_open()
-{
-  return(stream.is_open());
-}
-
-void File::close()
-{
-  if (is_open())
-  {
-    stream.close();
-  }
-}
-
-void File::read(char *buffer, size_t amount)
-{
-  if (is_open())
-  {
-    stream.read(buffer, amount);
-    count = stream.gcount();
-  }
-  else
-  {
-    count = 0;
-  }
+transfer_ptr<gambatte::File> gambatte::newFileInstance(std::string const &filepath) {
+	return transfer_ptr<File>(new StdFile(filepath.c_str()));
 }

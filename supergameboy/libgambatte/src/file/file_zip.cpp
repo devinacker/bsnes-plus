@@ -2,6 +2,9 @@
 Copyright (C) 2007 by Nach
 http://nsrt.edgeemu.com
 
+Copyright (C) 2007-2011 by sinamas <sinamas at users.sourceforge.net>
+sinamas@users.sourceforge.net
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
 published by the Free Software Foundation.
@@ -14,46 +17,49 @@ GNU General Public License version 2 for more details.
 You should have received a copy of the GNU General Public License
 version 2 along with this program; if not, write to the
 Free Software Foundation, Inc.,
-59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 ***************************************************************************/
-
-#include "file.h"
-
+#include "stdfile.h"
+#include <cctype>
 #include <cstring>
 
 namespace zlib {
 #include "unzip/unzip.h"
 }
 
+namespace {
+
+class ZipFile : public gambatte::File {
+  private:
+  std::size_t fsize, count;
+  void *zipfile;
+  bool zip_sub_open;
+
+  void zip(const char *filename);
+
+  public:
+  ZipFile(const char *filename);
+  virtual ~ZipFile();
+  virtual void rewind();
+  bool is_open() const;
+  virtual void close();
+  virtual std::size_t size() const { return fsize; };
+  virtual void read(char *buffer, std::size_t amount);
+  std::size_t gcount() const { return count; }
+  virtual bool fail() const { return !is_open(); }
+};
+
 using namespace std;
 using namespace zlib;
 
 static const unsigned int MAX_FILE_NAME = 512;
 
-File::File(const char *filename) : stream(filename, ios::in | ios::binary), is_zip(false), fsize(0), count(0)
+ZipFile::ZipFile(const char *filename) : fsize(0), count(0)
 {
-  if (stream)
-  {
-    char temp[4];
-    stream.read(temp, sizeof(temp));
-
-    //check for standard zip 'magic number'
-    if ((temp[0] == 'P') && (temp[1] == 'K') && (temp[2] == 3) && (temp[3] == 4))
-    {
-      stream.close();
-      is_zip = true;
-      zip(filename);
-    }
-    else
-    {
-      stream.seekg(0, ios::end);
-      fsize = stream.tellg();
-      stream.seekg(0, ios::beg);
-    }
-  }
+  zip(filename);
 }
 
-void File::zip(const char *filename)
+void ZipFile::zip(const char *filename)
 {
   zipfile = unzOpen(filename);
   if (zipfile)
@@ -98,70 +104,119 @@ void File::zip(const char *filename)
   }
 }
 
-File::~File()
+ZipFile::~ZipFile()
 {
   close();
 }
 
-void File::rewind()
+void ZipFile::rewind()
 {
   if (is_open())
   {
-    if (!is_zip)
-    {
-      stream.seekg(0, ios::beg);
-    }
-    else
-    {
-      unzCloseCurrentFile((unzFile)zipfile);
-      unzOpenCurrentFile((unzFile)zipfile);
-    }
+    unzCloseCurrentFile((unzFile)zipfile);
+    unzOpenCurrentFile((unzFile)zipfile);
   }
 }
 
-bool File::is_open()
+bool ZipFile::is_open() const
 {
-  if (!is_zip)
-  {
-    return(stream.is_open());
-  }
   return(zipfile && zip_sub_open);
 }
 
-void File::close()
+void ZipFile::close()
 {
   if (is_open())
   {
-    if (!is_zip)
-    {
-      stream.close();
-    }
-    else
-    {
-      unzOpenCurrentFile((unzFile)zipfile);
-      unzClose((unzFile)zipfile);
-      zipfile = 0;
-      zip_sub_open = false;
-    }
+    unzOpenCurrentFile((unzFile)zipfile);
+    unzClose((unzFile)zipfile);
+    zipfile = 0;
+    zip_sub_open = false;
   }
 }
 
-void File::read(char *buffer, size_t amount)
+void ZipFile::read(char *buffer, size_t amount)
 {
   if (is_open())
   {
-    if (!is_zip)
-    {
-      stream.read(buffer, amount);
-      count = stream.gcount();
-    }
-    else
-    {
-      count = (size_t)unzReadCurrentFile((unzFile)zipfile, buffer, amount);
-    }
+    count = (size_t)unzReadCurrentFile((unzFile)zipfile, buffer, amount);
   }
   else
   {
     count = 0;
   }
+}
+
+class GzFile : public gambatte::File {
+public:
+	explicit GzFile(char const *filename)
+	: file_(gzopen(filename, "rb"))
+	, fsize_(0)
+	{
+		if (file_) {
+			char buf[256];
+			int ret;
+
+			while ((ret = gzread(file_, buf, sizeof buf)) > 0)
+				fsize_ += ret;
+
+			if (ret < 0) {
+				close();
+				fsize_ = 0;
+			}
+		}
+
+		rewind();
+	}
+
+	virtual ~GzFile() { close(); }
+
+	virtual void rewind() {
+		if (file_ && gzrewind(file_) < 0)
+			close();
+	}
+
+	virtual std::size_t size() const { return fsize_; };
+
+	virtual void read(char *buffer, std::size_t amount) {
+		if (file_ && gzread(file_, buffer, amount) < 0)
+			close();
+	}
+
+	virtual bool fail() const { return !file_; }
+
+private:
+	gzFile file_;
+	std::size_t fsize_;
+
+	GzFile(GzFile const &);
+	GzFile & operator=(GzFile const &);
+	void close();
+};
+
+void GzFile::close() {
+	if (file_) {
+		gzclose(file_);
+		file_ = 0;
+	}
+}
+
+}
+
+// Avoid checking magic header values, because there are no values that cannot occur in a GB ROM.
+transfer_ptr<gambatte::File> gambatte::newFileInstance(std::string const &filepath) {
+	std::size_t const extpos = filepath.rfind('.');
+
+	if (extpos != std::string::npos) {
+		std::string const &ext = filepath.substr(extpos + 1);
+
+		if (ext.length() == 3 && std::tolower(ext[0]) == 'z'
+				&& std::tolower(ext[1]) == 'i' && std::tolower(ext[2]) == 'p') {
+			return transfer_ptr<File>(new ZipFile(filepath.c_str()));
+		}
+
+		if (!ext.empty() && std::tolower(ext[ext.length() - 1]) == 'z')
+			return transfer_ptr<File>(new GzFile(filepath.c_str()));
+	}
+
+	return transfer_ptr<File>(new StdFile(filepath.c_str()));
 }

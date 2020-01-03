@@ -101,17 +101,16 @@ bool SuperGameBoy::init(bool version_) {
   if(!romdata) { romdata = null_rom; romsize = 32768; }
   version = version_;
 
-  gambatte = new Gambatte::GB;
-  gambatte->setVideoBlitter(this);
-  gambatte->setInputStateGetter(this);
+  gambatte_ = new gambatte::GB;
+  gambatte_->setInputGetter(this);
 
   return true;
 }
 
 void SuperGameBoy::term() {
-  if(gambatte) {
-    delete gambatte;
-    gambatte = 0;
+  if(gambatte_) {
+    delete gambatte_;
+    gambatte_ = 0;
   }
 }
 
@@ -122,11 +121,13 @@ unsigned SuperGameBoy::run(uint32_t *samplebuffer, unsigned samples) {
     return 1;
   }
 
-  return gambatte->runFor(samplebuffer, samples);
+  size_t samples_ = samples;
+  gambatte_->runFor(buffer, 160, samplebuffer, samples_);
+  return samples_;
 }
 
 void SuperGameBoy::save() {
-  gambatte->saveSavedata();
+  gambatte_->saveSavedata();
 }
 
 void SuperGameBoy::serialize(nall::serializer &s) {
@@ -165,11 +166,11 @@ void SuperGameBoy::serialize(nall::serializer &s) {
       fp.write(savestate, 256 * 1024);
       fp.close();
 
-      gambatte->loadState("supergameboy-state.tmp");
+      gambatte_->loadState("supergameboy-state.tmp");
       unlink("supergameboy-state.tmp");
     }
   } else if(s.mode() == serializer::Save) {
-    gambatte->saveState("supergameboy-state.tmp");
+    gambatte_->saveState(0, 0, "supergameboy-state.tmp");
 
     file fp;
     if(fp.open("supergameboy-state.tmp", file::mode::read)) {
@@ -186,12 +187,12 @@ void SuperGameBoy::serialize(nall::serializer &s) {
 }
 
 void SuperGameBoy::power() {
-  gambatte->load(true);
+  gambatte_->load(gambatte::GB::FORCE_DMG);
   mmio_reset();
 }
 
 void SuperGameBoy::reset() {
-  gambatte->reset();
+  gambatte_->reset();
   mmio_reset();
 }
 
@@ -204,7 +205,7 @@ void SuperGameBoy::row(unsigned row) {
 uint8_t SuperGameBoy::read(uint16_t addr) {
   //LY counter
   if(addr == 0x6000) {
-    return gambatte->lyCounter();
+    return gambatte_->lyCounter();
   }
 
   //command ready port
@@ -288,8 +289,6 @@ void SuperGameBoy::command_1e() {
 }
 
 void SuperGameBoy::render(unsigned row) {
-  gambatte->updateVideo();
-
   uint32_t *source = buffer + row * 160 * 8;
   memset(vram, 0x00, 320);
 
@@ -305,37 +304,13 @@ void SuperGameBoy::render(unsigned row) {
   }
 }
 
-//======================
-//Gambatte::VideoBlitter
-//======================
-
-//should always be 160x144, as no filters are used
-void SuperGameBoy::setBufferDimensions(unsigned width, unsigned height) {
-  if(buffer) delete[] buffer;
-  buffer = new uint32_t[width * height];
-  bufferWidth = width;
-  bufferHeight = height;
-}
-
-const Gambatte::PixelBuffer SuperGameBoy::inBuffer() {
-  Gambatte::PixelBuffer pixelBuffer;
-  pixelBuffer.pixels = (void*)buffer;
-  pixelBuffer.format = Gambatte::PixelBuffer::RGB32;
-  pixelBuffer.pitch = bufferWidth;
-  return pixelBuffer;
-}
-
-void SuperGameBoy::blit() {
-}
-
 //==========================
-//Gambatte::InputStateGetter
+//Gambatte::InputGetter
 //==========================
 
-const Gambatte::InputState& SuperGameBoy::operator()() {
-  inputState.joypadId = 0x0f - (joyp_id & mmio.mlt_req);
-
-  unsigned data = 0x00;
+unsigned SuperGameBoy::operator()() {
+  unsigned inputState = 0x00;
+  unsigned data = 0xFF;
   switch(joyp_id & mmio.mlt_req) {
     case 0: data = mmio.r6004; break;
     case 1: data = mmio.r6005; break;
@@ -343,14 +318,14 @@ const Gambatte::InputState& SuperGameBoy::operator()() {
     case 3: data = mmio.r6007; break;
   }
 
-  inputState.startButton  = !(data & 0x80);
-  inputState.selectButton = !(data & 0x40);
-  inputState.bButton      = !(data & 0x20);
-  inputState.aButton      = !(data & 0x10);
-  inputState.dpadDown     = !(data & 0x08);
-  inputState.dpadUp       = !(data & 0x04);
-  inputState.dpadLeft     = !(data & 0x02);
-  inputState.dpadRight    = !(data & 0x01);
+  if (!(data & 0x80)) inputState |= gambatte::InputGetter::START;
+  if (!(data & 0x40)) inputState |= gambatte::InputGetter::SELECT;
+  if (!(data & 0x20)) inputState |= gambatte::InputGetter::B;
+  if (!(data & 0x10)) inputState |= gambatte::InputGetter::A;
+  if (!(data & 0x08)) inputState |= gambatte::InputGetter::DOWN;
+  if (!(data & 0x04)) inputState |= gambatte::InputGetter::UP;
+  if (!(data & 0x02)) inputState |= gambatte::InputGetter::LEFT;
+  if (!(data & 0x01)) inputState |= gambatte::InputGetter::RIGHT;
 
   return inputState;
 }
@@ -359,11 +334,12 @@ const Gambatte::InputState& SuperGameBoy::operator()() {
 //SuperGameBoy::Construction
 //==========================
 
-SuperGameBoy::SuperGameBoy() : gambatte(0), buffer(0) {
+SuperGameBoy::SuperGameBoy() : gambatte_(0) {
   romdata = ramdata = rtcdata = 0;
   romsize = ramsize = rtcsize = 0;
+  buffer = new uint32_t[160 * 144];
 }
 
 SuperGameBoy::~SuperGameBoy() {
-  if(buffer) delete[] buffer;
+  delete[] buffer;
 }
