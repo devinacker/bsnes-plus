@@ -27,6 +27,10 @@ extern "C" {
   unsigned sgb_run(uint32_t *samplebuffer, unsigned clocks);
   void sgb_save();
   void sgb_serialize(nall::serializer &s);
+  
+  // debugger
+  uint8_t sgb_read_gb(uint16_t addr);
+  void sgb_write_gb(uint16_t addr, uint8_t data);
 }
 
 #endif

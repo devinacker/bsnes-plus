@@ -66,3 +66,11 @@ bsnesexport void sgb_save() {
 bsnesexport void sgb_serialize(nall::serializer &s) {
   supergameboy.serialize(s);
 }
+
+bsnesexport uint8_t sgb_read_gb(uint16_t addr) {
+  return supergameboy.read_gb(addr);
+}
+
+bsnesexport void sgb_write_gb(uint16_t addr, uint8_t data) {
+  supergameboy.write_gb(addr, data);
+}

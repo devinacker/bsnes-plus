@@ -40,4 +40,9 @@ private:
   friend class Cartridge;
 };
 
-extern SuperGameBoy supergameboy;
+#if defined(DEBUGGER)
+  #include "debugger/debugger.hpp"
+  extern SGBDebugger supergameboy;
+#else
+  extern SuperGameBoy supergameboy;
+#endif

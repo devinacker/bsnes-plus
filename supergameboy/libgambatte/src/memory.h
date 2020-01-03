@@ -81,13 +81,23 @@ public:
 		return cart_.rmem(p >> 12) ? cart_.rmem(p >> 12)[p] : nontrivial_read(p, cc);
 	}
 
+	unsigned debug_read(unsigned p) {
+		return cart_.rmem(p >> 12) ? cart_.rmem(p >> 12)[p] : 0xFF;
+	}
+
 	void write(unsigned p, unsigned data, unsigned long cc) {
 		if (cart_.wmem(p >> 12)) {
 			cart_.wmem(p >> 12)[p] = data;
 		} else
 			nontrivial_write(p, data, cc);
 	}
-
+	
+	void debug_write(unsigned p, unsigned data) {
+		if (cart_.wmem(p >> 12)) {
+			cart_.wmem(p >> 12)[p] = data;
+		} 
+	}
+	
 	void ff_write(unsigned p, unsigned data, unsigned long cc) {
 		if (p - 0x80u < 0x7Fu) {
 			ioamhram_[p + 0x100] = data;

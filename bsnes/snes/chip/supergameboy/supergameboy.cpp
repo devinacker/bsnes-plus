@@ -3,7 +3,12 @@
 #define SUPERGAMEBOY_CPP
 namespace SNES {
 
-SuperGameBoy supergameboy;
+#if defined(DEBUGGER)
+  #include "debugger/debugger.cpp"
+  SGBDebugger supergameboy;
+#else
+  SuperGameBoy supergameboy;
+#endif
 
 #include "serialization.cpp"
 

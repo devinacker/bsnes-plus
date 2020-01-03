@@ -82,6 +82,14 @@ unsigned GB::lyCounter() {
 	return p_->cpu.lyCounter();
 }
 
+unsigned GB::debugRead(unsigned p) {
+	return p_->cpu.debugRead(p);
+}
+	
+void GB::debugWrite(unsigned p, unsigned data) {
+	p_->cpu.debugWrite(p, data);
+}
+
 void GB::reset() {
 	if (p_->cpu.loaded()) {
 		p_->cpu.saveSavedata();

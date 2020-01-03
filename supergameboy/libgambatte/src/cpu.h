@@ -35,6 +35,14 @@ public:
 		a_ = value; 
 	}
 	
+	unsigned debugRead(unsigned p) {
+		return mem_.debug_read(p);
+	}
+	
+	void debugWrite(unsigned p, unsigned data) {
+		mem_.debug_write(p, data);
+	}
+	
 	long runFor(unsigned long cycles);
 	void setStatePtrs(SaveState &state);
 	void saveState(SaveState &state);

@@ -233,6 +233,10 @@ uint8_t SuperGameBoy::read(uint16_t addr) {
   return 0x00;
 }
 
+uint8_t SuperGameBoy::read_gb(uint16_t addr) {
+  return gambatte_->debugRead(addr);
+}
+
 void SuperGameBoy::write(uint16_t addr, uint8_t data) {
   //control port
   //d7 = /RESET line (0 = stop, 1 = run)
@@ -250,6 +254,10 @@ void SuperGameBoy::write(uint16_t addr, uint8_t data) {
   if(addr == 0x6005) { mmio.r6005 = data; return; }  //joypad 2 state
   if(addr == 0x6006) { mmio.r6006 = data; return; }  //joypad 3 state
   if(addr == 0x6007) { mmio.r6007 = data; return; }  //joypad 4 state
+}
+
+void SuperGameBoy::write_gb(uint16_t addr, uint8_t data) {
+  gambatte_->debugWrite(addr, data);
 }
 
 void SuperGameBoy::mmio_reset() {

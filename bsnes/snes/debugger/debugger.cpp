@@ -108,6 +108,16 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
       if (cartridge.has_superfx())
         return superfxbus.read(addr & 0xffffff);
     } break;
+    
+    case MemorySource::SGBBus: {
+      if (cartridge.mode() == Cartridge::Mode::SuperGameBoy)
+        return supergameboy.read_gb(addr & 0xffff);
+    } break;
+    
+    case MemorySource::SGBROM: {
+      if (addr < memory::gbrom.size())
+        return memory::gbrom.read(addr & 0xffffff);
+    } break;
   }
 
   return 0x00;
@@ -158,6 +168,16 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     
     case MemorySource::SFXBus: {
       if (cartridge.has_superfx()) superfxbus.write(addr & 0xffffff, data);
+    } break;
+    
+    case MemorySource::SGBBus: {
+      if (cartridge.mode() == Cartridge::Mode::SuperGameBoy)
+        supergameboy.write_gb(addr & 0xffff, data);
+    } break;
+    
+    case MemorySource::SGBROM: {
+      if (addr < memory::gbrom.size())
+        memory::gbrom.write(addr & 0xffffff, data);
     } break;
   }
 }

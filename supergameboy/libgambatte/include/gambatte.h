@@ -82,6 +82,8 @@ public:
 	                      gambatte::uint_least32_t *audioBuf, std::size_t &samples);
 
 	unsigned lyCounter();
+	unsigned debugRead(unsigned p);
+	void debugWrite(unsigned p, unsigned data);
 
 	/**
 	  * Reset to initial state.

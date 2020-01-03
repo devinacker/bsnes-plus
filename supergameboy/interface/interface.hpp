@@ -53,7 +53,9 @@ public:
   void reset();
   void row(unsigned row);
   uint8_t read(uint16_t addr);
+  uint8_t read_gb(uint16_t addr);
   void write(uint16_t addr, uint8_t data);
+  void write_gb(uint16_t addr, uint8_t data);
 
   void mmio_reset();
   void command_1e();
