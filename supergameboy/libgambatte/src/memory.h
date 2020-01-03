@@ -82,7 +82,7 @@ public:
 	}
 
 	unsigned debug_read(unsigned p) {
-		return cart_.rmem(p >> 12) ? cart_.rmem(p >> 12)[p] : 0xFF;
+		return cart_.rmem(p >> 12) ? cart_.rmem(p >> 12)[p] : nontrivial_debug_read(p);
 	}
 
 	void write(unsigned p, unsigned data, unsigned long cc) {
@@ -95,7 +95,8 @@ public:
 	void debug_write(unsigned p, unsigned data) {
 		if (cart_.wmem(p >> 12)) {
 			cart_.wmem(p >> 12)[p] = data;
-		} 
+		} else
+			nontrivial_debug_write(p, data);
 	}
 	
 	void ff_write(unsigned p, unsigned data, unsigned long cc) {
@@ -153,8 +154,10 @@ private:
 	unsigned long dma(unsigned long cc);
 	unsigned nontrivial_ff_read(unsigned p, unsigned long cycleCounter);
 	unsigned nontrivial_read(unsigned p, unsigned long cycleCounter);
+	unsigned nontrivial_debug_read(unsigned p);
 	void nontrivial_ff_write(unsigned p, unsigned data, unsigned long cycleCounter);
 	void nontrivial_write(unsigned p, unsigned data, unsigned long cycleCounter);
+	void nontrivial_debug_write(unsigned p, unsigned data);
 	void updateSerial(unsigned long cc);
 	void updateTimaIrq(unsigned long cc);
 	void updateIrqs(unsigned long cc);

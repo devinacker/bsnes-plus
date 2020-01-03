@@ -60,6 +60,7 @@ public:
     SFXBus,
     SGBBus,
     SGBROM,
+    SGBRAM,
   };
   uint8 read(MemorySource, unsigned addr);
   void write(MemorySource, unsigned addr, uint8 data);

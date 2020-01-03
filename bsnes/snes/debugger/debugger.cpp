@@ -118,6 +118,11 @@ uint8 Debugger::read(Debugger::MemorySource source, unsigned addr) {
       if (addr < memory::gbrom.size())
         return memory::gbrom.read(addr & 0xffffff);
     } break;
+    
+    case MemorySource::SGBRAM: {
+      if (addr < memory::gbram.size())
+        return memory::gbram.read(addr & 0xffffff);
+    } break;
   }
 
   return 0x00;
@@ -178,6 +183,11 @@ void Debugger::write(Debugger::MemorySource source, unsigned addr, uint8 data) {
     case MemorySource::SGBROM: {
       if (addr < memory::gbrom.size())
         memory::gbrom.write(addr & 0xffffff, data);
+    } break;
+    
+    case MemorySource::SGBRAM: {
+      if (addr < memory::gbram.size())
+        memory::gbram.write(addr & 0xffffff, data);
     } break;
   }
 }

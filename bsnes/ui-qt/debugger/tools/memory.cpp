@@ -43,7 +43,8 @@ MemoryEditor::MemoryEditor() {
   source->addItem("SA-1 bus");
   source->addItem("SuperFX bus");
   source->addItem("Super GB bus");
-  source->addItem("Super GB ROM");
+  source->addItem("Super GB cart ROM");
+  source->addItem("Super GB cart RAM");
   controlLayout->addWidget(source);
   controlLayout->addSpacing(2);
 
@@ -166,6 +167,7 @@ void MemoryEditor::sourceChanged(int index) {
     case 9: memorySource = SNES::Debugger::MemorySource::SFXBus; editor->setEditorSize(8 * 1024 * 1024); break;
     case 10: memorySource = SNES::Debugger::MemorySource::SGBBus; editor->setEditorSize(64 * 1024); break;
     case 11: memorySource = SNES::Debugger::MemorySource::SGBROM; editor->setEditorSize(SNES::memory::gbrom.size()); break;
+    case 12: memorySource = SNES::Debugger::MemorySource::SGBRAM; editor->setEditorSize(SNES::memory::gbram.size()); break;
   }
 }
 
@@ -207,7 +209,8 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
       && memorySource != SNES::Debugger::MemorySource::CartRAM
       && memorySource != SNES::Debugger::MemorySource::DSP
       && memorySource != SNES::Debugger::MemorySource::SGBBus
-      && memorySource != SNES::Debugger::MemorySource::SGBROM) {
+      && memorySource != SNES::Debugger::MemorySource::SGBROM
+      && memorySource != SNES::Debugger::MemorySource::SGBRAM) {
     menu.addSeparator();  
     
     breakpointPos = editor->cursorPosition(pos) / 2;

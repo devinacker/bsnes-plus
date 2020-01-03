@@ -670,6 +670,44 @@ unsigned Memory::nontrivial_read(unsigned const p, unsigned long const cc) {
 	return ioamhram_[p - mm_oam_begin];
 }
 
+unsigned Memory::nontrivial_debug_read(unsigned const p) {
+	if (p < mm_hram_begin) {
+		if (lastOamDmaUpdate_ != disabled_time) {
+			if (cart_.isInOamDmaConflictArea(p) && oamDmaPos_ < oam_size) {
+				int const r = isCgb() && cart_.oamDmaSrc() != oam_dma_src_wram && p >= mm_wram_begin
+					? cart_.wramdata(ioamhram_[0x146] >> 4 & 1)[p & 0xFFF]
+					: ioamhram_[oamDmaPos_];
+				return r;
+			}
+		}
+
+		if (p < mm_wram_begin) {
+			if (p < mm_vram_begin)
+				return cart_.romdata(p >> 14)[p];
+
+			if (p < mm_sram_begin)
+				return cart_.vrambankptr()[p];
+
+			if (cart_.rsrambankptr())
+				return cart_.rsrambankptr()[p];
+
+			return cart_.rtcRead();
+		}
+
+		if (p < mm_oam_begin)
+			return cart_.wramdata(p >> 12 & 1)[p & 0xFFF];
+
+		long const ffp = static_cast<long>(p) - mm_io_begin;
+		if (ffp >= 0)
+			return ioamhram_[ffp + 0x100];
+
+		if (oamDmaPos_ < oam_size)
+			return 0xFF;
+	}
+
+	return ioamhram_[p - mm_oam_begin];
+}
+
 void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long const cc) {
 	if (lastOamDmaUpdate_ != disabled_time)
 		updateOamDma(cc);
@@ -1153,6 +1191,25 @@ void Memory::nontrivial_write(unsigned const p, unsigned const data, unsigned lo
 			}
 		} else
 			nontrivial_ff_write(ffp, data, cc);
+	} else
+		ioamhram_[p - mm_oam_begin] = data;
+}
+
+void Memory::nontrivial_debug_write(unsigned const p, unsigned const data) {
+	if (p < mm_oam_begin) {
+		if (p < mm_sram_begin) {
+			if (p < mm_vram_begin) {
+				cart_.mbcWrite(p, data);
+			} else {
+				cart_.vrambankptr()[p] = data;
+			}
+		} else if (p < mm_wram_begin) {
+			if (cart_.wsrambankptr())
+				cart_.wsrambankptr()[p] = data;
+			else
+				cart_.rtcWrite(data);
+		} else
+			cart_.wramdata(p >> 12 & 1)[p & 0xFFF] = data;
 	} else
 		ioamhram_[p - mm_oam_begin] = data;
 }
