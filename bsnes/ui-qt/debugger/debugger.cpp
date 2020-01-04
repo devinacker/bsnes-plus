@@ -699,11 +699,13 @@ void Debugger::autoUpdate() {
   oamViewer->autoUpdate();
   cgramViewer->autoUpdate();
   
-  registerEditCPU->synchronize();
-  registerEditSA1->synchronize();
-  registerEditSMP->synchronize();
-  registerEditSFX->synchronize();
-  registerEditSGB->synchronize();
+  if (isVisible()) {
+    registerEditCPU->synchronize();
+    registerEditSA1->synchronize();
+    registerEditSMP->synchronize();
+    registerEditSFX->synchronize();
+    registerEditSGB->synchronize();
+  }
 }
 
 #endif

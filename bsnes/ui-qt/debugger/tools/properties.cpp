@@ -65,7 +65,7 @@ void PropertiesViewer::show() {
 }
 
 void PropertiesViewer::autoUpdate() {
-  if(autoUpdateBox->isChecked()) refresh();
+  if(isVisible() && autoUpdateBox->isChecked()) refresh();
 }
 
 PropertiesViewer::PropertiesViewer() {

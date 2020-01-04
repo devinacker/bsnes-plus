@@ -41,7 +41,7 @@ void CgramViewer::show() {
 }
 
 void CgramViewer::autoUpdate() {
-  if(autoUpdateBox->isChecked()) refresh();
+  if(isVisible() && autoUpdateBox->isChecked()) refresh();
 }
 
 void CgramViewer::refresh() {
