@@ -12,10 +12,8 @@ public:
     RegisterHL,
     RegisterSP,
   };
-  unsigned getRegister(unsigned id) {
-    return 0; // TODO
-  }
-  void setRegister(unsigned id, unsigned value) {} // TODO
+  unsigned getRegister(unsigned id);
+  void setRegister(unsigned id, unsigned value);
   
   enum {
     FlagZ,
@@ -23,10 +21,8 @@ public:
     FlagH,
     FlagC,
   };
-  bool getFlag(unsigned id) {
-    return false; // TODO
-  }
-  void setFlag(unsigned id, bool value) {} // TODO
+  bool getFlag(unsigned id);
+  void setFlag(unsigned id, bool value);
 
   void init();
 
@@ -51,8 +47,13 @@ public:
   ~SGBDebugger();
   
 private:
-  function<uint8 (uint16_t)> sgb_read_gb;
+  function<uint8_t (uint16_t)> sgb_read_gb;
   function<void (uint16_t, uint8_t)> sgb_write_gb;
+  
+  function<uint16_t (char)> sgb_get_reg;
+  function<void (char, uint16_t)> sgb_set_reg;
+  function<bool (char)> sgb_get_flag;
+  function<void (char, bool)> sgb_set_flag;
   
   static void op_step(uint16_t pc);
   static void op_read(uint16_t addr, uint8_t data);

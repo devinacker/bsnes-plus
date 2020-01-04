@@ -83,6 +83,62 @@ static inline unsigned  zfFromF(unsigned f) { return ~f & 0x80; }
 static inline unsigned hf2FromF(unsigned f) { return f << 4 & (hf2_subf | hf2_hcf); }
 static inline unsigned  cfFromF(unsigned f) { return f << 4 & 0x100; }
 
+unsigned CPU::debugGetRegister(char reg) {
+	switch (reg) {
+	case 'P': case 'p': return pc_;
+	case 'S': case 's': return sp;
+	case 'A': case 'a': return a_;
+	case 'B': case 'b': return b;
+	case 'C': case 'c': return c;
+	case 'D': case 'd': return d;
+	case 'E': case 'e': return e;
+	case 'H': case 'h': return h;
+	case 'L': case 'l': return l;
+	case 'F': case 'f': return toF(hf2, cf, zf);
+	}
+	
+	return 0;
+}
+
+void CPU::debugSetRegister(char reg, unsigned value) {
+	switch (reg) {
+	case 'P': case 'p': pc_ = value; break;
+	case 'S': case 's': sp  = value; break;
+	case 'A': case 'a': a_  = value; break;
+	case 'B': case 'b': b   = value; break;
+	case 'C': case 'c': c   = value; break;
+	case 'D': case 'd': d   = value; break;
+	case 'E': case 'e': e   = value; break;
+	case 'H': case 'h': h   = value; break;
+	case 'L': case 'l': l   = value; break;
+	case 'F': case 'f':
+		zf  = zfFromF(value);
+		hf2 = hf2FromF(value);
+		cf  = cfFromF(value);
+		break;
+	}
+}
+
+bool CPU::debugGetFlag(char flag) {
+	switch (flag) {
+	case 'Z': case 'z': return !zf;
+	case 'N': case 'n': return (hf2 & hf2_subf);
+	case 'H': case 'h': return (hf2 & hf2_hcf);
+	case 'C': case 'c': return (cf & 0x100);
+	}
+	
+	return false;
+}
+
+void CPU::debugSetFlag(char flag, bool value) {
+	switch (flag) {
+	case 'Z': case 'z': zf = !value; break;
+	case 'N': case 'n': hf2 = (hf2 & ~hf2_subf) | (value ? hf2_subf : 0); break;
+	case 'H': case 'h': hf2 = (hf2 & ~hf2_hcf)  | (value ? hf2_hcf : 0); break;
+	case 'C': case 'c': cf = value << 8; break;
+	}
+}
+
 void CPU::setStatePtrs(SaveState &state) {
 	mem_.setStatePtrs(state);
 }
@@ -535,18 +591,18 @@ void CPU::process(unsigned long const cycles) {
 	mem_.setEndtime(cycleCounter_, cycles);
 	mem_.updateInput();
 
-	unsigned char a = a_;
 	unsigned long cycleCounter = cycleCounter_;
 
 	while (mem_.isActive()) {
-		unsigned short pc = pc_;
-
 		if (mem_.halted()) {
 			if (cycleCounter < mem_.nextEventTime()) {
 				unsigned long cycles = mem_.nextEventTime() - cycleCounter;
 				cycleCounter += cycles + (-cycles & 3);
 			}
 		} else while (cycleCounter < mem_.nextEventTime()) {
+		    unsigned char &a = a_;
+			unsigned short &pc = pc_;
+
 			unsigned char opcode;
 
 			if (!prefetched_) {
@@ -555,8 +611,8 @@ void CPU::process(unsigned long const cycles) {
 
 				PC_READ(opcode);
 			} else {
-				if (debug_)
-					debug_->op_step(pc - 1);
+//				if (debug_)
+//					debug_->op_step(pc - 1);
 
 				opcode = opcode_;
 				cycleCounter += 4;
@@ -2030,11 +2086,9 @@ void CPU::process(unsigned long const cycles) {
 			}
 		}
 
-		pc_ = pc;
 		cycleCounter = mem_.event(cycleCounter);
 	}
-
-	a_ = a;
+	
 	cycleCounter_ = cycleCounter;
 }
 

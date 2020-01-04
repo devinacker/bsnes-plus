@@ -90,6 +90,22 @@ void GB::debugWrite(unsigned p, unsigned data) {
 	p_->cpu.debugWrite(p, data);
 }
 
+unsigned GB::debugGetRegister(char reg) {
+	return p_->cpu.debugGetRegister(reg);
+}
+
+void GB::debugSetRegister(char reg, unsigned value) {
+	p_->cpu.debugSetRegister(reg, value);
+}
+
+bool GB::debugGetFlag(char flag) {
+	return p_->cpu.debugGetFlag(flag);
+}
+
+void GB::debugSetFlag(char flag, bool value) {
+	p_->cpu.debugSetFlag(flag, value);
+}
+
 void GB::setDebugHandler(DebugHandler *debug) {
 	p_->cpu.setDebugHandler(debug);
 }

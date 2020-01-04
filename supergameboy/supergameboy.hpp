@@ -30,7 +30,12 @@ extern "C" {
   
   // debugger
   uint8_t sgb_read_gb(uint16_t addr);
-  void sgb_write_gb(uint16_t addr, uint8_t data);
+  void    sgb_write_gb(uint16_t addr, uint8_t data);
+  
+  uint16_t sgb_get_reg(char reg);
+  void     sgb_set_reg(char reg, uint16_t value);
+  bool     sgb_get_flag(char flag);
+  void     sgb_set_flag(char flag, bool value);
   
   void sgb_callback_step(void (*step)(uint16_t));
   void sgb_callback_read(void (*read)(uint16_t, uint8_t));

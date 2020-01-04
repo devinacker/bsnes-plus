@@ -45,6 +45,11 @@ public:
 		mem_.debug_write(p, data);
 	}
 	
+	unsigned debugGetRegister(char reg);
+	void     debugSetRegister(char reg, unsigned value);
+	bool     debugGetFlag(char flag);
+	void     debugSetFlag(char flag, bool value);
+	
 	/** set debug callback interface for single stepping and breakpoints */
 	void setDebugHandler(DebugHandler *debug) {
 		debug_ = debug;

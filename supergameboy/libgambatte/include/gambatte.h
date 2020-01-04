@@ -84,7 +84,11 @@ public:
 
 	unsigned lyCounter();
 	unsigned debugRead(unsigned p);
-	void debugWrite(unsigned p, unsigned data);
+	void     debugWrite(unsigned p, unsigned data);
+	unsigned debugGetRegister(char reg);
+	void     debugSetRegister(char reg, unsigned value);
+	bool     debugGetFlag(char flag);
+	void     debugSetFlag(char flag, bool value);
 	/** set debug callback interface for single stepping and breakpoints */
 	void setDebugHandler(DebugHandler *debug);
 
