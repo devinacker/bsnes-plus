@@ -72,18 +72,24 @@ bsnesexport uint8_t sgb_read_gb(uint16_t addr) {
 }
 
 bsnesexport void sgb_write_gb(uint16_t addr, uint8_t data) {
-  supergameboy.write_gb(addr, data);
+  if (supergameboy.gambatte_)
+    supergameboy.write_gb(addr, data);
 }
 
 bsnesexport uint16_t sgb_get_reg(char reg) {
+  if (!supergameboy.gambatte_) return 0;
+
   return supergameboy.gambatte_->debugGetRegister(reg);
 }
 
 bsnesexport void sgb_set_reg(char reg, uint16_t value) {
-  supergameboy.gambatte_->debugSetRegister(reg, value);
+  if (supergameboy.gambatte_)
+    supergameboy.gambatte_->debugSetRegister(reg, value);
 }
 
 bsnesexport bool sgb_get_flag(char flag) {
+  if (!supergameboy.gambatte_) return false;
+
   return supergameboy.gambatte_->debugGetFlag(flag);
 }
 
