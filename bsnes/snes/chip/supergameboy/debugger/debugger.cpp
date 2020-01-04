@@ -19,10 +19,10 @@ void SGBDebugger::init() {
   if (opened()) {
     sgb_read_gb  = sym("sgb_read_gb");
     sgb_write_gb = sym("sgb_write_gb");
-	sgb_get_reg  = sym("sgb_get_reg");
-	sgb_set_reg  = sym("sgb_set_reg");
-	sgb_get_flag = sym("sgb_get_flag");
-	sgb_set_flag = sym("sgb_set_flag");
+    sgb_get_reg  = sym("sgb_get_reg");
+    sgb_set_reg  = sym("sgb_set_reg");
+    sgb_get_flag = sym("sgb_get_flag");
+    sgb_set_flag = sym("sgb_set_flag");
     
     // set up debugger callbacks
     function<void (void(*)(uint16_t))> stepcb = sym("sgb_callback_step");
@@ -61,26 +61,26 @@ void SGBDebugger::setRegister(unsigned id, unsigned value) {
   if (sgb_set_reg) switch (id) {
   case RegisterPC:
     sgb_set_reg('P', value);
-	break;
+    break;
   case RegisterAF:
     sgb_set_reg('A', value >> 8);
-	sgb_set_reg('F', value);
-	break;
+    sgb_set_reg('F', value);
+    break;
   case RegisterBC:
     sgb_set_reg('B', value >> 8);
-	sgb_set_reg('C', value);
-	break;
+    sgb_set_reg('C', value);
+    break;
   case RegisterDE:
     sgb_set_reg('D', value >> 8);
-	sgb_set_reg('E', value);
-	break;
+    sgb_set_reg('E', value);
+    break;
   case RegisterHL:
     sgb_set_reg('H', value >> 8);
-	sgb_set_reg('L', value);
-	break;
+    sgb_set_reg('L', value);
+    break;
   case RegisterSP:
-	sgb_set_reg('S', value);
-	break;
+    sgb_set_reg('S', value);
+    break;
   }
 }
 
@@ -156,7 +156,20 @@ void SGBDebugger::disassemble_opcode(char *output, uint16_t addr) {
   uint8 op0 = sgb_read_gb(addr + 1);
   uint8 op1 = sgb_read_gb(addr + 2);
   
-  sprintf(t, "%-14s ", nall::GBCPU::disassemble(addr, op, op0, op1)());
+  sprintf(t, "%-23s ", nall::GBCPU::disassemble(addr, op, op0, op1)());
+  strcat(s, t);
+  
+  uint16_t af = getRegister(RegisterAF);
+  uint16_t bc = getRegister(RegisterBC);
+  uint16_t de = getRegister(RegisterDE);
+  uint16_t hl = getRegister(RegisterHL);
+  uint16_t sp = getRegister(RegisterSP);
+  sprintf(t, "AF:%.4x BC:%.4x DE:%.4x HL:%.4x SP:%.4x ", af, bc, de, hl, sp);
+  strcat(s, t);
+  
+  sprintf(t, "%c%c%c%c ",
+    (af & 0x80) ? 'Z' : '.', (af & 0x40) ? 'N' : '.',
+    (af & 0x20) ? 'H' : '.', (af & 0x10) ? 'C' : '.');
   strcat(s, t);
 }
 
