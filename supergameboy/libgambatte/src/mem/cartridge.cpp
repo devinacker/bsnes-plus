@@ -669,7 +669,7 @@ void Cartridge::loadSavedata() {
 	if (hasBattery(memptrs_.romdata()[0x147])) {
 		if (supergameboy.ramdata) {
 			memcpy(reinterpret_cast<char*>(memptrs_.rambankdata()),
-			       supergameboy.ramdata, std::min((long long)supergameboy.ramsize, memptrs_.rambankdataend() - memptrs_.rambankdata()));
+			       supergameboy.ramdata, std::min((std::ptrdiff_t)supergameboy.ramsize, memptrs_.rambankdataend() - memptrs_.rambankdata()));
 			enforce8bit(memptrs_.rambankdata(), memptrs_.rambankdataend() - memptrs_.rambankdata());
 		}
 	}
@@ -689,7 +689,7 @@ void Cartridge::saveSavedata() {
 	if (hasBattery(memptrs_.romdata()[0x147])) {
 		if (supergameboy.ramdata) {
 			memcpy(supergameboy.ramdata, reinterpret_cast<char const *>(memptrs_.rambankdata()), 
-			       std::min((long long)supergameboy.ramsize, memptrs_.rambankdataend() - memptrs_.rambankdata()));
+			       std::min((std::ptrdiff_t)supergameboy.ramsize, memptrs_.rambankdataend() - memptrs_.rambankdata()));
 	   }
 	}
 
