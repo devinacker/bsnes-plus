@@ -603,6 +603,18 @@ void Debugger::event() {
         editTabs->setCurrentIndex(editTabs->indexOf(debugSFX));
         break;
       }
+      
+      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SGBBus) {
+        SNES::debugger.step_sgb = true;
+        SNES::supergameboy.disassemble_opcode(t, SNES::supergameboy.opcode_pc);
+        string s = t;
+        s.replace(" ", "&nbsp;");
+        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        debugSGB->refresh(SNES::supergameboy.opcode_pc);
+        registerEditSGB->setEnabled(true);
+        editTabs->setCurrentIndex(editTabs->indexOf(debugSGB));
+        break;
+      }
     } break;
 
     case SNES::Debugger::BreakEvent::CPUStep: {
