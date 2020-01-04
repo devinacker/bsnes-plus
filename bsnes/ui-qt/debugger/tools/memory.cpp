@@ -208,7 +208,6 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
   if (memorySource != SNES::Debugger::MemorySource::CartROM
       && memorySource != SNES::Debugger::MemorySource::CartRAM
       && memorySource != SNES::Debugger::MemorySource::DSP
-      && memorySource != SNES::Debugger::MemorySource::SGBBus
       && memorySource != SNES::Debugger::MemorySource::SGBROM
       && memorySource != SNES::Debugger::MemorySource::SGBRAM) {
     menu.addSeparator();  
@@ -238,6 +237,7 @@ void MemoryEditor::addBreakpoint(const string& mode) {
   case SNES::Debugger::MemorySource::CGRAM:  source = "cgram"; break;
   case SNES::Debugger::MemorySource::SA1Bus: source = "sa1"; break;
   case SNES::Debugger::MemorySource::SFXBus: source = "sfx"; break;
+  case SNES::Debugger::MemorySource::SGBBus: source = "sgb"; break;
   default: return; // cart ROM/RAM breakpoints not supported
   }
   
