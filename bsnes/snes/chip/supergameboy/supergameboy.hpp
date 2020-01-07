@@ -22,6 +22,9 @@ public:
 private:
   uint32_t samplebuffer[4096];
   unsigned row;
+  unsigned speed;
+
+  void update_speed();
 
   function<void (uint8_t*, unsigned)> sgb_rom;
   function<void (uint8_t*, unsigned)> sgb_ram;
