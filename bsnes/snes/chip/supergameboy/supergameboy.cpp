@@ -35,7 +35,7 @@ void SuperGameBoy::enter() {
       audio.coprocessor_sample(left / 3, right / 3);
     }
 
-    step(samples);
+    step(samples * speed * 2);
     synchronize_cpu();
   }
 }
@@ -78,7 +78,18 @@ uint8 SuperGameBoy::read(unsigned addr) {
 }
 
 void SuperGameBoy::write(unsigned addr, uint8 data) {
-  if(sgb_write && !Memory::debugger_access()) sgb_write(addr, data);
+  if (!Memory::debugger_access()) {
+    if(sgb_write) sgb_write(addr, data);
+    if(addr == 0x6003) {
+      switch(data & 3) {
+      case 0: speed = 4; break;
+      case 1: speed = 5; break;
+      case 2: speed = 7; break;
+      case 3: speed = 9; break;
+      }
+      update_speed();
+    }
+  }
 }
 
 void SuperGameBoy::init() {
@@ -109,11 +120,10 @@ void SuperGameBoy::enable() {
 }
 
 void SuperGameBoy::power() {
-  unsigned frequency = (cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1 ? system.cpu_frequency() / 10 : 2097152);
-  create(SuperGameBoy::Enter, frequency);
+  unsigned frequency_ = (cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1 ? system.cpu_frequency() : 20971520);
+  create(SuperGameBoy::Enter, frequency_);
 
   audio.coprocessor_enable(true);
-  audio.coprocessor_frequency(cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1 ? 2147727.0 : 2097152.0);
 
   sgb_rom(memory::gbrom.data(), memory::gbrom.size());
   sgb_ram(memory::gbram.data(), memory::gbram.size());
@@ -122,10 +132,13 @@ void SuperGameBoy::power() {
   bool version = (cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1) ? 0 : 1;
   if(sgb_init) sgb_init(version);
   if(sgb_power) sgb_power();
+  
+  row = 0;
+  speed = 1;
+  update_speed();
 }
 
 void SuperGameBoy::reset() {
-  unsigned frequency = (cartridge.supergameboy_version() == Cartridge::SuperGameBoyVersion::Version1 ? system.cpu_frequency() / 10 : 2097152);
   create(SuperGameBoy::Enter, frequency);
 
   if(sgb_reset) sgb_reset();
@@ -133,6 +146,10 @@ void SuperGameBoy::reset() {
 
 void SuperGameBoy::unload() {
   if(sgb_term) sgb_term();
+}
+
+void SuperGameBoy::update_speed() {
+  audio.coprocessor_frequency((double)frequency / (speed * 2));
 }
 
 }
