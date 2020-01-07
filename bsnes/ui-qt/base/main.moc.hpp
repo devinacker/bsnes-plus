@@ -39,6 +39,7 @@ public:
       RadioAction *system_port1_asciipad;
       RadioAction *system_port1_multitap;
       RadioAction *system_port1_mouse;
+      RadioAction *system_port1_sgbcommander;
       RadioAction *system_port1_nttdatakeypad;
     QMenu *system_port2;
       RadioAction *system_port2_none;
@@ -127,6 +128,7 @@ public slots:
   void setPort1Asciipad();
   void setPort1Multitap();
   void setPort1Mouse();
+  void setPort1SGBCommander();
   void setPort1NTTDataKeypad();
   void setPort2None();
   void setPort2Gamepad();
