@@ -67,10 +67,17 @@ struct SGBMacroInput : DigitalInput {
   SGBMacroInput(const char*, const char*, const unsigned*, unsigned);
 };
 
+struct SGBSpeedSwitch : DigitalInput {
+  SGBMacroInput *macro;
+  void cache();
+  SGBSpeedSwitch(const char*, const char*, SGBMacroInput*);
+};
+
 struct SGBCommander : InputGroup {
   DigitalInput up, down, left, right, b, a, color, window, select, start;
   SGBMacroInput speed, mute;
   TurboInput turboB, turboA;
+  SGBSpeedSwitch speedSwitch;
   int16_t status(unsigned, unsigned) const;
   SGBCommander(unsigned, const char*, const char*);
 };

@@ -361,7 +361,8 @@ port1(port1_), port2(port2_) {
 //
 
 void SGBMacroInput::cache() {
-  if (state && !cachedState) {
+  DigitalInput::cache();
+  if (previousState != state && state) {
     counter = 0;
   } else if (counter < count) {
     counter++;
@@ -377,6 +378,24 @@ SGBMacroInput::SGBMacroInput(const char *label, const char *configName, const un
 DigitalInput(label, configName) {
   counter = 0;
   count = count_;
+  macro = macro_;
+}
+
+void SGBSpeedSwitch::cache() {
+  DigitalInput::cache();
+  if (previousState != state && state) {
+    if (macro->count == 8) {
+      macro->count = 9;
+      utility.showMessage("Speed mode: normal/fast/slower/slow");
+    } else {
+      macro->count = 8;
+      utility.showMessage("Speed mode: normal/slower/slow");
+    }
+  }
+}
+
+SGBSpeedSwitch::SGBSpeedSwitch(const char *label, const char *configName, SGBMacroInput *macro_) :
+DigitalInput(label, configName) {
   macro = macro_;
 }
 
@@ -423,16 +442,18 @@ b("B", string() << "input." << configName << ".b"),
 a("A", string() << "input." << configName << ".a"),
 window("Window", string() << "input." << configName << ".window"),
 color("Color", string() << "input." << configName << ".color"),
-speed("Speed", string() << "input." << configName << ".speed", speedMacro, 9),
+speed("Speed", string() << "input." << configName << ".speed", speedMacro, 8),
 mute("Mute", string() << "input." << configName << ".mute", muteMacro, 8),
 select("Select", string() << "input." << configName << ".select"),
 start("Start", string() << "input." << configName << ".start"),
 turboB("Turbo B", string() << "input." << configName << ".turboB"),
-turboA("Turbo A", string() << "input." << configName << ".turboA") {
+turboA("Turbo A", string() << "input." << configName << ".turboA"),
+speedSwitch("Set Speed Mode", string() << "input." << configName << ".speedMode", &speed) {
   attach(&up); attach(&down); attach(&left); attach(&right);
   attach(&b); attach(&a);
-  attach(&window); attach(&color); attach(&speed); attach(&mute);
   attach(&select); attach(&start);
+  attach(&window); attach(&color); attach(&mute);
+  attach(&speed); attach(&speedSwitch);
   attach(&turboB); attach(&turboA);
 
   if(this == &sgbcommander1) {
