@@ -30,6 +30,7 @@ void SuperGameBoy::enter() {
     for(unsigned i = 0; i < samples; i++) {
       int16 left  = samplebuffer[i] >>  0;
       int16 right = samplebuffer[i] >> 16;
+      if(dsp.mute()) left = 0, right = 0;
 
       //SNES audio is notoriously quiet; lower Game Boy samples to match SGB sound effects
       audio.coprocessor_sample(left / 3, right / 3);
