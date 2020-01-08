@@ -86,12 +86,6 @@ void SuperGameBoy::joyp_write(bool p15, bool p14) {
 
   if(packetlock) {
     if(p15 == 1 && p14 == 0) {
-      if((joyp_packet[0] >> 3) == 0x11) {
-        mmio.mlt_req = joyp_packet[1] & 3;
-        if(mmio.mlt_req == 2) mmio.mlt_req = 3;
-        joyp_id &= mmio.mlt_req;
-      }
-
       if(packetsize < 64) packet[packetsize++] = joyp_packet;
       packetlock = false;
       pulselock = true;
@@ -258,11 +252,16 @@ uint8_t SuperGameBoy::read_gb(uint16_t addr) {
 void SuperGameBoy::write(uint16_t addr, uint8_t data) {
   //control port
   //d7 = /RESET line (0 = stop, 1 = run)
+  //d5..4 = multiplayer select
   if(addr == 0x6003) {
     if((mmio.r6003 & 0x80) == 0x00 && (data & 0x80) == 0x80) {
       reset();
       command_1e();
     }
+
+    mmio.mlt_req = (data & 0x30) >> 4;
+    if(mmio.mlt_req == 2) mmio.mlt_req = 3;
+    joyp_id &= mmio.mlt_req;
 
     mmio.r6003 = data;
     return;
