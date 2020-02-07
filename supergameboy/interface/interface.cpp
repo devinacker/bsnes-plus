@@ -366,6 +366,9 @@ SuperGameBoy::SuperGameBoy() : gambatte_(0) {
   buffer = new uint32_t[160 * 144];
   
   op_step = op_step_default;
+  op_call = op_step_default;
+  op_ret  = op_step_default;
+  op_irq  = op_step_default;
   op_read = op_read_default;
   op_readpc = op_read_default;
   op_write = op_write_default;

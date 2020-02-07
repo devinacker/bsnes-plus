@@ -55,7 +55,11 @@ private:
   function<bool (char)> sgb_get_flag;
   function<void (char, bool)> sgb_set_flag;
   
+  static void op_call(uint16_t addr);
+  static void op_irq(uint16_t addr);
+  static void op_ret(uint16_t addr);
   static void op_step(uint16_t pc);
+  
   static void op_read(uint16_t addr, uint8_t data);
   static void op_readpc(uint16_t pc, uint8_t data);
   static void op_write(uint16_t addr, uint8_t data);

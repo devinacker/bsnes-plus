@@ -38,6 +38,9 @@ extern "C" {
   void     sgb_set_flag(char flag, bool value);
   
   void sgb_callback_step(void (*step)(uint16_t));
+  void sgb_callback_call(void (*step)(uint16_t));
+  void sgb_callback_ret(void (*step)(uint16_t));
+  void sgb_callback_irq(void (*step)(uint16_t));
   void sgb_callback_read(void (*read)(uint16_t, uint8_t));
   void sgb_callback_readpc(void (*readpc)(uint16_t, uint8_t));
   void sgb_callback_write(void (*write)(uint16_t, uint8_t));

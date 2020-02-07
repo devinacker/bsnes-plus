@@ -31,10 +31,11 @@ struct GsCode {
 };
 
 class Memory;
+class DebugHandler;
 
 class Interrupter {
 public:
-	Interrupter(unsigned short &sp, unsigned short &pc, unsigned char &opcode, bool &prefetched);
+	Interrupter(unsigned short &sp, unsigned short &pc, unsigned char &opcode, bool &prefetched, DebugHandler *&debug);
 	void prefetch(unsigned long cc, Memory &mem);
 	unsigned long interrupt(unsigned long cycleCounter, Memory &memory);
 	void setGameShark(std::string const &codes);
@@ -44,6 +45,8 @@ private:
 	unsigned short &pc_;
 	unsigned char &opcode_;
 	bool &prefetched_;
+	DebugHandler *&debug_;
+	
 	std::vector<GsCode> gsCodes_;
 
 	void applyVblankCheats(unsigned long cc, Memory &mem);

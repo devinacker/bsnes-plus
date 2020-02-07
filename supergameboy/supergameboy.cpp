@@ -101,6 +101,18 @@ bsnesexport void sgb_callback_step(void (*step)(uint16_t)) {
   supergameboy.op_step = step;
 }
 
+bsnesexport void sgb_callback_call(void (*call)(uint16_t)) {
+  supergameboy.op_call = call;
+}
+
+bsnesexport void sgb_callback_ret(void (*ret)(uint16_t)) {
+  supergameboy.op_ret = ret;
+}
+
+bsnesexport void sgb_callback_irq(void (*irq)(uint16_t)) {
+  supergameboy.op_irq = irq;
+}
+
 bsnesexport void sgb_callback_read(void (*read)(uint16_t, uint8_t)) {
   supergameboy.op_read = read;
 }

@@ -400,10 +400,11 @@ void Debugger::synchronize() {
 
   bool stepEnabled = SNES::cartridge.loaded() && active && (stepChecked > 0);
   bool stepOtherEnabled = stepEnabled && (stepChecked == 1)
-                          && !debugSFX->stepProcessor->isChecked()  // TODO: implement this for superfx
-                          && !debugSGB->stepProcessor->isChecked(); // TODO: implement this for sg
+                          && !debugSFX->stepProcessor->isChecked();  // TODO: implement this for superfx
   bool stepHVBEnabled = stepEnabled && debugCPU->stepProcessor->isChecked();
-  bool stepInterruptEnabled = stepOtherEnabled && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked());
+  bool stepInterruptEnabled = stepOtherEnabled
+                              && (debugCPU->stepProcessor->isChecked() || debugSA1->stepProcessor->isChecked()
+                                  || debugSGB->stepProcessor->isChecked());
 
   stepInstruction->setEnabled(stepEnabled);
   stepOver->setEnabled(stepOtherEnabled);

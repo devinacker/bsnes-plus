@@ -25,8 +25,15 @@ void SGBDebugger::init() {
     sgb_set_flag = sym("sgb_set_flag");
     
     // set up debugger callbacks
-    function<void (void(*)(uint16_t))> stepcb = sym("sgb_callback_step");
+    function<void (void(*)(uint16_t))> stepcb;
+    stepcb = sym("sgb_callback_step");
     if (stepcb) stepcb(op_step);
+    stepcb = sym("sgb_callback_call");
+    if (stepcb) stepcb(op_call);
+    stepcb = sym("sgb_callback_ret");
+    if (stepcb) stepcb(op_ret);
+    stepcb = sym("sgb_callback_irq");
+    if (stepcb) stepcb(op_irq);
     
     function<void (void(*)(uint16_t, uint8_t))> memcb;
     memcb = sym("sgb_callback_read");
@@ -113,12 +120,36 @@ void SGBDebugger::write_gb(uint16_t addr, uint8_t data) {
   if (sgb_write_gb) sgb_write_gb(addr, data);
 }
 
+void SGBDebugger::op_call(uint16_t addr) {
+  if (debugger.step_sgb) {
+    debugger.call_count++;
+  }
+}
+
+void SGBDebugger::op_irq(uint16_t addr) {
+  if (debugger.step_sgb) {
+    debugger.call_count++;
+    
+    if (debugger.step_type == Debugger::StepType::StepToIRQ) {
+      // break on next instruction after interrupt
+      debugger.step_type = Debugger::StepType::StepInto;
+    }
+  }
+}
+
+void SGBDebugger::op_ret(uint16_t addr) {
+  if (debugger.step_sgb) {
+    debugger.call_count--;
+  }
+}
+
 void SGBDebugger::op_step(uint16_t pc) {
   supergameboy.usage[pc] |= UsageOpcode;
   supergameboy.opcode_pc = pc;
   
   if(debugger.step_sgb &&
-     (debugger.step_type == Debugger::StepType::StepInto)) {
+     (debugger.step_type == Debugger::StepType::StepInto ||
+       (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
     debugger.break_event = Debugger::BreakEvent::SGBStep;
     debugger.step_type = Debugger::StepType::None;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
@@ -127,6 +158,15 @@ void SGBDebugger::op_step(uint16_t pc) {
   }
   
   if (supergameboy.step_event) supergameboy.step_event();
+  
+  // adjust call count if this is a call or return
+  // (or if we're stepping over and no call occurred)
+  if (debugger.step_sgb) {
+    if (debugger.step_over_new && debugger.call_count == 0) {
+      debugger.call_count = -1;
+      debugger.step_over_new = false;
+    }
+  }
 }
 
 void SGBDebugger::op_read(uint16_t addr, uint8_t data) {

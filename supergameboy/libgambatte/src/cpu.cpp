@@ -24,7 +24,7 @@
 namespace gambatte {
 
 CPU::CPU()
-: mem_(Interrupter(sp, pc_, opcode_, prefetched_))
+: mem_(Interrupter(sp, pc_, opcode_, prefetched_, debug_))
 , cycleCounter_(0)
 , pc_(0x100)
 , sp(0xFFFE)
@@ -554,6 +554,7 @@ void CPU::loadState(SaveState const &state) {
 // Jump to 16-bit immediate operand and push return address onto stack:
 #define call_nn() do { \
 	unsigned const npc = (pc + 2) & 0xFFFF; \
+	if (debug_) debug_->op_call(npc); \
 	jp_nn(); \
 	PUSH(npc >> 8, npc & 0xFF); \
 } while (0)
@@ -561,6 +562,7 @@ void CPU::loadState(SaveState const &state) {
 // rst n (16 Cycles):
 // Push present address onto stack, jump to address n (one of 00h,08h,10h,18h,20h,28h,30h,38h):
 #define rst_n(n) do { \
+	if (debug_) debug_->op_call(n); \
 	push_rr(pc >> 8, pc & 0xFF); \
 	pc = (n); \
 } while (0)
@@ -569,6 +571,7 @@ void CPU::loadState(SaveState const &state) {
 // Pop two bytes from the stack and jump to that address:
 #define ret() do { \
 	unsigned low, high; \
+	if (debug_) debug_->op_ret(0); \
 	pop_rr(high, low); \
 	PC_MOD(high << 8 | low); \
 } while (0)
@@ -1830,6 +1833,7 @@ void CPU::process(unsigned long const cycles) {
 			case 0xD9:
 				{
 					unsigned sl, sh;
+					if (debug_) debug_->op_ret(0);
 					pop_rr(sh, sl);
 					mem_.ei(cycleCounter);
 					PC_MOD(sh << 8 | sl);
