@@ -121,7 +121,7 @@ void System::power() {
   memory::mmio.map(0x4200, 0x421f, cpu);
   memory::mmio.map(0x4300, 0x437f, cpu);
 
-  audio.coprocessor_enable(false);
+  audio.init();
   if(expansion == ExpansionPortDevice::BSX) bsxbase.enable();
   if(cartridge.bsxpack_type() == Cartridge::BSXPackType::FlashROM) bsxflash.enable();
   if(cartridge.mode() == Cartridge::Mode::Bsx) bsxcart.enable();

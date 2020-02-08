@@ -1,4 +1,4 @@
-class SuperGameBoy : public Coprocessor, public MMIO, public Memory, public library {
+class SuperGameBoy : public Coprocessor, public MMIO, public Stream, public Memory, public library {
 public:
   static void Enter();
   void enter();

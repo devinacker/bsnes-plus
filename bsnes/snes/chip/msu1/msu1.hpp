@@ -1,4 +1,4 @@
-class MSU1 : public Coprocessor, public MMIO {
+class MSU1 : public Coprocessor, public MMIO, public Stream {
 public:
   static void Enter();
   void enter();
