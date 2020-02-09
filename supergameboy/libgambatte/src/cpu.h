@@ -66,6 +66,10 @@ public:
 		mem_.setVideoBuffer(videoBuf, pitch);
 	}
 
+	void setScanlineCallback(void (*callback)(unsigned)) {
+		mem_.setScanlineCallback(callback);
+	}
+
 	void setInputGetter(InputGetter *getInput) {
 		mem_.setInputGetter(getInput);
 	}

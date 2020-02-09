@@ -115,6 +115,7 @@ bool SuperGameBoy::init(bool version_) {
   gambatte_ = new gambatte::GB;
   gambatte_->setInputGetter(this);
   gambatte_->setDebugHandler(this);
+  gambatte_->setScanlineCallback(SuperGameBoy::scanline);
 
   return true;
 }
@@ -138,6 +139,15 @@ unsigned SuperGameBoy::run(uint32_t *samplebuffer, unsigned samples) {
   return samples_;
 }
 
+/* static */
+void SuperGameBoy::scanline(unsigned line) {
+  if (line < 144 && line >> 3 != supergameboy.vram_row) {
+    supergameboy.render();
+    supergameboy.vram_row = line >> 3;
+    supergameboy.mmio.write_buf = (supergameboy.mmio.write_buf + 1) & 3;
+  }
+}
+
 void SuperGameBoy::save() {
   gambatte_->saveSavedata();
 }
@@ -146,14 +156,15 @@ void SuperGameBoy::serialize(nall::serializer &s) {
   s.integer(vram_row);
   s.array(vram);
 
-  s.integer(mmio.r6000);
+  s.integer(mmio.write_buf);
+  s.integer(mmio.read_buf);
   s.integer(mmio.r6003);
   s.integer(mmio.r6004);
   s.integer(mmio.r6005);
   s.integer(mmio.r6006);
   s.integer(mmio.r6007);
   s.array(mmio.r7000);
-  s.integer(mmio.r7800);
+  s.integer(mmio.read_pos);
   s.integer(mmio.mlt_req);
 
   for(unsigned i = 0; i < 64; i++) s.array(packet[i].data);
@@ -208,16 +219,10 @@ void SuperGameBoy::reset() {
   mmio_reset();
 }
 
-void SuperGameBoy::row(unsigned row) {
-  mmio.r7800 = 0;
-  vram_row = row;
-  render(vram_row);
-}
-
 uint8_t SuperGameBoy::read(uint16_t addr) {
   //LY counter
   if(addr == 0x6000) {
-    return gambatte_->lyCounter();
+    return (vram_row << 3) | mmio.write_buf;
   }
 
   //command ready port
@@ -237,8 +242,8 @@ uint8_t SuperGameBoy::read(uint16_t addr) {
   }
 
   if(addr == 0x7800) {
-    uint8_t data = vram[mmio.r7800];
-    mmio.r7800 = (mmio.r7800 + 1) % 320;
+    uint8_t data = vram[mmio.read_buf*320 + mmio.read_pos];
+    mmio.read_pos = (mmio.read_pos + 1) % 320;
     return data;
   }
 
@@ -250,6 +255,11 @@ uint8_t SuperGameBoy::read_gb(uint16_t addr) {
 }
 
 void SuperGameBoy::write(uint16_t addr, uint8_t data) {
+  if(addr == 0x6001) {
+    mmio.read_buf = data & 3;
+    mmio.read_pos = 0;
+  }
+
   //control port
   //d7 = /RESET line (0 = stop, 1 = run)
   //d5..4 = multiplayer select
@@ -278,20 +288,21 @@ void SuperGameBoy::write_gb(uint16_t addr, uint8_t data) {
 }
 
 void SuperGameBoy::mmio_reset() {
-  mmio.r6000 = 0x00;
+  mmio.write_buf = 0;
+  mmio.read_buf = 0;
   mmio.r6003 = 0x00;
   mmio.r6004 = 0xff;
   mmio.r6005 = 0xff;
   mmio.r6006 = 0xff;
   mmio.r6007 = 0xff;
   for(unsigned n = 0; n < 16; n++) mmio.r7000[n] = 0;
-  mmio.r7800 = 0;
+  mmio.read_pos = 0;
   mmio.mlt_req = 0;
 
   packetsize = 0;
 
   vram_row = 0;
-  memset(vram, 0, 320);
+  memset(vram, 0, 320*4);
 
   joyp_id = 0;
   joyp_lock = 0;
@@ -313,18 +324,19 @@ void SuperGameBoy::command_1e() {
   }
 }
 
-void SuperGameBoy::render(unsigned row) {
-  uint32_t *source = buffer + row * 160 * 8;
-  memset(vram, 0x00, 320);
+void SuperGameBoy::render() {
+  uint32_t *source = buffer + vram_row * 160 * 8;
+  uint8_t *dest = vram + (mmio.write_buf * 320);
+  memset(dest, 0x00, 320);
 
-  for(unsigned y = row * 8; y < row * 8 + 8; y++) {
+  for(unsigned y = vram_row * 8; y < vram_row * 8 + 8; y++) {
     for(unsigned x = 0; x < 160; x++) {
       unsigned pixel = *source++ / 0x555555;
       pixel ^= 3;
 
       unsigned addr = (x / 8 * 16) + ((y & 7) * 2);
-      vram[addr + 0] |= ((pixel & 1) >> 0) << (7 - (x & 7));
-      vram[addr + 1] |= ((pixel & 2) >> 1) << (7 - (x & 7));
+      dest[addr + 0] |= ((pixel & 1) >> 0) << (7 - (x & 7));
+      dest[addr + 1] |= ((pixel & 2) >> 1) << (7 - (x & 7));
     }
   }
 }

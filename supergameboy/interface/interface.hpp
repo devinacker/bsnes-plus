@@ -3,18 +3,20 @@ public:
   gambatte::GB *gambatte_;
 
 //SuperGameBoy::MMIO
+  static void scanline(unsigned line);
   unsigned vram_row;
-  uint8_t vram[320];
+  uint8_t vram[320*4];
 
   struct MMIO {
-    uint8_t r6000;
+    uint8_t write_buf;
+    uint8_t read_buf;
     uint8_t r6003;
     uint8_t r6004;
     uint8_t r6005;
     uint8_t r6006;
     uint8_t r6007;
     uint8_t r7000[16];
-    unsigned r7800;
+    unsigned read_pos;
     uint8_t mlt_req;
   } mmio;
 
@@ -51,7 +53,6 @@ public:
   void serialize(nall::serializer &s);
   void power();
   void reset();
-  void row(unsigned row);
   uint8_t read(uint16_t addr);
   uint8_t read_gb(uint16_t addr);
   void write(uint16_t addr, uint8_t data);
@@ -59,7 +60,7 @@ public:
 
   void mmio_reset();
   void command_1e();
-  void render(unsigned row);
+  void render();
 
   SuperGameBoy();
   ~SuperGameBoy();

@@ -119,6 +119,10 @@ public:
 		lcd_.setVideoBuffer(videoBuf, pitch);
 	}
 
+	void setScanlineCallback(void (*callback)(unsigned)) {
+		lcd_.setScanlineCallback(callback);
+	}
+
 	void setDmgPaletteColor(int palNum, int colorNum, unsigned long rgb32) {
 		lcd_.setDmgPaletteColor(palNum, colorNum, rgb32);
 	}

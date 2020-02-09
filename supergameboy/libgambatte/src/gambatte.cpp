@@ -123,6 +123,10 @@ void GB::reset() {
 	}
 }
 
+void GB::setScanlineCallback(void (*callback)(unsigned)) {
+	p_->cpu.setScanlineCallback(callback);
+}
+
 void GB::setInputGetter(InputGetter *getInput) {
 	p_->cpu.setInputGetter(getInput);
 }

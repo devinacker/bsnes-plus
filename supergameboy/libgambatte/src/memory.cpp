@@ -56,7 +56,7 @@ Memory::Memory(Interrupter const &interrupter)
 , blanklcd_(false)
 , haltHdmaState_(hdma_low)
 {
-	intreq_.setEventTime<intevent_blit>(1l * lcd_vres * lcd_cycles_per_line);
+	intreq_.setEventTime<intevent_blit>(1l * lcd_cycles_per_line);
 	intreq_.setEventTime<intevent_end>(0);
 }
 
@@ -144,7 +144,7 @@ void Memory::loadState(SaveState const &state) {
 void Memory::setEndtime(unsigned long cc, unsigned long inc) {
 	if (intreq_.eventTime(intevent_blit) <= cc) {
 		intreq_.setEventTime<intevent_blit>(intreq_.eventTime(intevent_blit)
-			+ (lcd_cycles_per_frame << isDoubleSpeed()));
+			+ (lcd_cycles_per_line << isDoubleSpeed()));
 	}
 
 	intreq_.setEventTime<intevent_end>(cc + (inc << isDoubleSpeed()));
@@ -215,7 +215,7 @@ unsigned long Memory::event(unsigned long cc) {
 				while (cc >= intreq_.minEventTime())
 					cc = event(cc);
 			} else
-				blitTime += lcd_cycles_per_frame << isDoubleSpeed();
+				blitTime += lcd_cycles_per_line << isDoubleSpeed();
 
 			blanklcd_ = lcden ^ 1;
 			intreq_.setEventTime<intevent_blit>(blitTime);
@@ -417,7 +417,7 @@ unsigned long Memory::stop(unsigned long cc, bool &skip) {
 		// TODO: perhaps make this a bit nicer?
 		intreq_.setEventTime<intevent_blit>(ioamhram_[0x140] & lcdc_en
 			? lcd_.nextMode1IrqTime()
-			: cc + (lcd_cycles_per_frame << isDoubleSpeed()));
+			: cc + (lcd_cycles_per_line << isDoubleSpeed()));
 		if (intreq_.eventTime(intevent_end) > cc_) {
 			intreq_.setEventTime<intevent_end>(cc_
 				+ (isDoubleSpeed()
@@ -972,7 +972,7 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 
 					intreq_.setEventTime<intevent_blit>(blanklcd_
 						? lcd_.nextMode1IrqTime()
-						: lcd_.nextMode1IrqTime() + (lcd_cycles_per_frame << isDoubleSpeed()));
+						: lcd_.nextMode1IrqTime() + (lcd_cycles_per_line << isDoubleSpeed()));
 				} else {
 					ioamhram_[0x141] |= stat & lcdstat_lycflag;
 					intreq_.setEventTime<intevent_blit>(

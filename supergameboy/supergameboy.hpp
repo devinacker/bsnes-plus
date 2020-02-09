@@ -21,7 +21,6 @@ extern "C" {
   void sgb_term();
   void sgb_power();
   void sgb_reset();
-  void sgb_row(unsigned row);
   uint8_t sgb_read(uint16_t addr);
   void sgb_write(uint16_t addr, uint8_t data);
   unsigned sgb_run(uint32_t *samplebuffer, unsigned clocks);

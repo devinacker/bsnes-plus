@@ -53,10 +53,7 @@ public:
 
 	/**
 	  * Emulates until at least 'samples' audio samples are produced in the
-	  * supplied audio buffer, or until a video frame has been drawn.
-	  *
-	  * There are 35112 audio (stereo) samples in a video frame.
-	  * May run for up to 2064 audio samples too long.
+	  * supplied audio buffer, or until a video line has been drawn.
 	  *
 	  * An audio sample consists of two native endian 2s complement 16-bit PCM samples,
 	  * with the left sample preceding the right one. Usually casting audioBuf to
@@ -65,10 +62,12 @@ public:
 	  * libgambatte is strictly c++98, so fixed-width types are not an option (and even
 	  * c99/c++11 cannot guarantee their availability).
 	  *
-	  * Returns early when a new video frame has finished drawing in the video buffer,
+	  * Returns early when a new video line has finished drawing in the video buffer,
 	  * such that the caller may update the video output before the frame is overwritten.
-	  * The return value indicates whether a new video frame has been drawn, and the
+	  * The return value indicates whether a new video line has been drawn, and the
 	  * exact time (in number of samples) at which it was completed.
+	  *
+	  * Modified from upstream to return after drawing single scanlines, not just full frames.
 	  *
 	  * @param videoBuf 160x144 RGB32 (native endian) video frame buffer or 0
 	  * @param pitch distance in number of pixels (not bytes) from the start of one line
@@ -76,8 +75,8 @@ public:
 	  * @param audioBuf buffer with space >= samples + 2064
 	  * @param samples  in: number of stereo samples to produce,
 	  *                out: actual number of samples produced
-	  * @return sample offset in audioBuf at which the video frame was completed, or -1
-	  *         if no new video frame was completed.
+	  * @return sample offset in audioBuf at which the video line was completed, or -1
+	  *         if no new video line was completed.
 	  */
 	std::ptrdiff_t runFor(gambatte::uint_least32_t *videoBuf, std::ptrdiff_t pitch,
 	                      gambatte::uint_least32_t *audioBuf, std::size_t &samples);
@@ -103,6 +102,8 @@ public:
 	  * @param colorNum 0 <= colorNum < 4
 	  */
 	void setDmgPaletteColor(int palNum, int colorNum, unsigned long rgb32);
+
+	void setScanlineCallback(void (*callback)(unsigned));
 
 	/** Sets the callback used for getting input state. */
 	void setInputGetter(InputGetter *getInput);

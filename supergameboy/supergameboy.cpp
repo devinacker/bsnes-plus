@@ -43,10 +43,6 @@ bsnesexport void sgb_reset() {
   supergameboy.reset();
 }
 
-bsnesexport void sgb_row(unsigned row) {
-  supergameboy.row(row);
-}
-
 bsnesexport uint8_t sgb_read(uint16_t addr) {
   return supergameboy.read(addr);
 }
