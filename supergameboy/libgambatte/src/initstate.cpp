@@ -1168,17 +1168,17 @@ void gambatte::setInitState(SaveState &state, bool const cgb, bool const gbaCgbM
 		0x83, 0x40, 0x0B, 0x77
 	};
 
-	state.cpu.cycleCounter = cgb ? 0x102A0 : 0x102A0 + 0x8D2C;
-	state.cpu.pc = 0x100;
+	state.cpu.cycleCounter = 0; //cgb ? 0x102A0 : 0x102A0 + 0x8D2C;
+	state.cpu.pc = 0x0000; //0x100;
 	state.cpu.sp = 0xFFFE;
-	state.cpu.a = cgb * 0x10 | 0x01;
-	state.cpu.b = cgb & gbaCgbMode;
-	state.cpu.c = 0x13;
+	state.cpu.a = 0x00; //cgb * 0x10 | 0x01;
+	state.cpu.b = 0x00; //cgb & gbaCgbMode;
+	state.cpu.c = 0x00; //0x13;
 	state.cpu.d = 0x00;
-	state.cpu.e = 0xD8;
-	state.cpu.f = 0xB0;
-	state.cpu.h = 0x01;
-	state.cpu.l = 0x4D;
+	state.cpu.e = 0x00; //0xD8;
+	state.cpu.f = 0x00; //0xB0;
+	state.cpu.h = 0x00; //0x01;
+	state.cpu.l = 0x00; //0x4D;
 	state.cpu.opcode = 0x00;
 	state.cpu.prefetched = false;
 	state.cpu.skip = false;
@@ -1220,6 +1220,7 @@ void gambatte::setInitState(SaveState &state, bool const cgb, bool const gbaCgbM
 	state.mem.enableRam = false;
 	state.mem.rambankMode = false;
 	state.mem.hdmaTransfer = false;
+	state.mem.bootROM = true;
 
 	for (int i = 0x00; i < 0x40; i += 0x02) {
 		state.ppu.bgpData.ptr[i    ] = 0xFF;
@@ -1266,29 +1267,23 @@ void gambatte::setInitState(SaveState &state, bool const cgb, bool const gbaCgbM
 	state.ppu.pendingLcdstatIrq = false;
 
 	// spu.cycleCounter >> 12 & 7 represents the frame sequencer position.
-	state.spu.cycleCounter = (cgb ? 0x1E00 : 0x2400) | (state.cpu.cycleCounter >> 1 & 0x1FF);
+	state.spu.cycleCounter = 0; //(cgb ? 0x1E00 : 0x2400) | (state.cpu.cycleCounter >> 1 & 0x1FF);
 	state.spu.lastUpdate = 0;
 
 	state.spu.ch1.sweep.counter = SoundUnit::counter_disabled;
 	state.spu.ch1.sweep.shadow = 0;
 	state.spu.ch1.sweep.nr0 = 0;
 	state.spu.ch1.sweep.neg = false;
-	if (cgb) {
-		state.spu.ch1.duty.nextPosUpdate = (state.spu.cycleCounter & ~1ul) + 37 * 2;
-		state.spu.ch1.duty.pos = 6;
-		state.spu.ch1.duty.high = true;
-	} else {
-		state.spu.ch1.duty.nextPosUpdate = (state.spu.cycleCounter & ~1ul) + 69 * 2;
-		state.spu.ch1.duty.pos = 3;
-		state.spu.ch1.duty.high = false;
-	}
+	state.spu.ch2.duty.nextPosUpdate = SoundUnit::counter_disabled;
 	state.spu.ch1.duty.nr3 = 0xC1;
+	state.spu.ch2.duty.pos = 0;
+	state.spu.ch2.duty.high = false;
 	state.spu.ch1.env.counter = SoundUnit::counter_disabled;
 	state.spu.ch1.env.volume = 0;
 	state.spu.ch1.lcounter.counter = SoundUnit::counter_disabled;
 	state.spu.ch1.lcounter.lengthCounter = 0x40;
-	state.spu.ch1.nr4 = 0x07;
-	state.spu.ch1.master = true;
+	state.spu.ch1.nr4 = 0;
+	state.spu.ch1.master = false;
 
 	state.spu.ch2.duty.nextPosUpdate = SoundUnit::counter_disabled;
 	state.spu.ch2.duty.nr3 = 0;

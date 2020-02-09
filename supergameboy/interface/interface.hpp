@@ -44,10 +44,12 @@ public:
 //SuperGameBoy::Core
   uint8_t *romdata, *ramdata, *rtcdata;
   unsigned romsize,  ramsize,  rtcsize;
+  static const uint8_t bootroms[2][256];
   bool version;
 
   bool init(bool version);
   void term();
+  const uint8_t* bootrom();
   unsigned run(uint32_t *samplebuffer, unsigned samples);
   void save();
   void serialize(nall::serializer &s);
@@ -59,7 +61,6 @@ public:
   void write_gb(uint16_t addr, uint8_t data);
 
   void mmio_reset();
-  void command_1e();
   void render();
 
   SuperGameBoy();

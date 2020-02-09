@@ -82,6 +82,7 @@ struct SaveState {
 		unsigned char /*bool*/ enableRam;
 		unsigned char /*bool*/ rambankMode;
 		unsigned char /*bool*/ hdmaTransfer;
+		unsigned char /*bool*/ bootROM;
 	} mem;
 
 	struct PPU {

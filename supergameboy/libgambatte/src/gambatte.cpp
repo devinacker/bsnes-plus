@@ -119,7 +119,6 @@ void GB::reset() {
 		setInitState(state, p_->cpu.isCgb(), p_->loadflags & GBA_CGB);
 		p_->cpu.loadState(state);
 		p_->cpu.loadSavedata();
-		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
 	}
 }
 
@@ -148,7 +147,6 @@ LoadRes GB::load(unsigned const flags) {
 		setInitState(state, p_->cpu.isCgb(), flags & GBA_CGB);
 		p_->cpu.loadState(state);
 		p_->cpu.loadSavedata();
-		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
 
 		p_->stateNo = 1;
 		p_->cpu.setOsdElement(transfer_ptr<OsdElement>());

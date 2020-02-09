@@ -71,6 +71,7 @@ public:
 	char const * romTitle() const { return reinterpret_cast<char const *>(memptrs_.romdata() + 0x134); }
 	class PakInfo const pakInfo(bool multicartCompat) const;
 	void setGameGenie(std::string const &codes);
+	void setBootROM(bool);
 
 private:
 	struct AddrData {

@@ -44,7 +44,8 @@ int serialCntFrom(unsigned long cyclesUntilDone, bool cgbFast) {
 } // unnamed namespace.
 
 Memory::Memory(Interrupter const &interrupter)
-: getInput_(0)
+: bootROM_(false)
+, getInput_(0)
 , lastOamDmaUpdate_(disabled_time)
 , lcd_(ioamhram_, 0, VideoInterruptRequester(intreq_))
 , interrupter_(interrupter)
@@ -75,6 +76,8 @@ unsigned long Memory::saveState(SaveState &state, unsigned long cc) {
 	nontrivial_ff_read(0x0F, cc);
 	nontrivial_ff_read(0x26, cc);
 
+	state.mem.bootROM = bootROM();
+
 	state.mem.nextSerialtime = intreq_.eventTime(intevent_serial);
 	state.mem.unhaltTime = intreq_.eventTime(intevent_unhalt);
 	state.mem.lastOamDmaUpdate = oamDmaStartPos_
@@ -100,6 +103,8 @@ void Memory::loadState(SaveState const &state) {
 	tima_.loadState(state, TimaInterruptRequester(intreq_));
 	cart_.loadState(state);
 	intreq_.loadState(state);
+
+	setBootROM(state.mem.bootROM);
 
 	intreq_.setEventTime<intevent_serial>(state.mem.nextSerialtime > state.cpu.cycleCounter
 		? state.mem.nextSerialtime
@@ -1045,6 +1050,9 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 			ioamhram_[0x14F] = 0xFE | data;
 		}
 
+		return;
+	case 0x50:
+		setBootROM(false);
 		return;
 	case 0x51:
 		dmaSource_ = data << 8 | (dmaSource_ & 0xFF);
