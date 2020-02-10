@@ -44,7 +44,8 @@ int serialCntFrom(unsigned long cyclesUntilDone, bool cgbFast) {
 } // unnamed namespace.
 
 Memory::Memory(Interrupter const &interrupter)
-: getInput_(0)
+: bootROM_(false)
+, getInput_(0)
 , lastOamDmaUpdate_(disabled_time)
 , lcd_(ioamhram_, 0, VideoInterruptRequester(intreq_))
 , interrupter_(interrupter)
@@ -56,7 +57,7 @@ Memory::Memory(Interrupter const &interrupter)
 , blanklcd_(false)
 , haltHdmaState_(hdma_low)
 {
-	intreq_.setEventTime<intevent_blit>(1l * lcd_vres * lcd_cycles_per_line);
+	intreq_.setEventTime<intevent_blit>(1l * lcd_cycles_per_line);
 	intreq_.setEventTime<intevent_end>(0);
 }
 
@@ -74,6 +75,8 @@ unsigned long Memory::saveState(SaveState &state, unsigned long cc) {
 	nontrivial_ff_read(0x05, cc);
 	nontrivial_ff_read(0x0F, cc);
 	nontrivial_ff_read(0x26, cc);
+
+	state.mem.bootROM = bootROM();
 
 	state.mem.nextSerialtime = intreq_.eventTime(intevent_serial);
 	state.mem.unhaltTime = intreq_.eventTime(intevent_unhalt);
@@ -100,6 +103,8 @@ void Memory::loadState(SaveState const &state) {
 	tima_.loadState(state, TimaInterruptRequester(intreq_));
 	cart_.loadState(state);
 	intreq_.loadState(state);
+
+	setBootROM(state.mem.bootROM);
 
 	intreq_.setEventTime<intevent_serial>(state.mem.nextSerialtime > state.cpu.cycleCounter
 		? state.mem.nextSerialtime
@@ -144,7 +149,7 @@ void Memory::loadState(SaveState const &state) {
 void Memory::setEndtime(unsigned long cc, unsigned long inc) {
 	if (intreq_.eventTime(intevent_blit) <= cc) {
 		intreq_.setEventTime<intevent_blit>(intreq_.eventTime(intevent_blit)
-			+ (lcd_cycles_per_frame << isDoubleSpeed()));
+			+ (lcd_cycles_per_line << isDoubleSpeed()));
 	}
 
 	intreq_.setEventTime<intevent_end>(cc + (inc << isDoubleSpeed()));
@@ -215,7 +220,7 @@ unsigned long Memory::event(unsigned long cc) {
 				while (cc >= intreq_.minEventTime())
 					cc = event(cc);
 			} else
-				blitTime += lcd_cycles_per_frame << isDoubleSpeed();
+				blitTime += lcd_cycles_per_line << isDoubleSpeed();
 
 			blanklcd_ = lcden ^ 1;
 			intreq_.setEventTime<intevent_blit>(blitTime);
@@ -417,7 +422,7 @@ unsigned long Memory::stop(unsigned long cc, bool &skip) {
 		// TODO: perhaps make this a bit nicer?
 		intreq_.setEventTime<intevent_blit>(ioamhram_[0x140] & lcdc_en
 			? lcd_.nextMode1IrqTime()
-			: cc + (lcd_cycles_per_frame << isDoubleSpeed()));
+			: cc + (lcd_cycles_per_line << isDoubleSpeed()));
 		if (intreq_.eventTime(intevent_end) > cc_) {
 			intreq_.setEventTime<intevent_end>(cc_
 				+ (isDoubleSpeed()
@@ -714,8 +719,8 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 
 	switch (p & 0xFF) {
 	case 0x00:
-		supergameboy.joyp_write(data & 0x20, data & 0x10);
 		if ((data ^ ioamhram_[0x100]) & 0x30) {
+			supergameboy.joyp_write(data & 0x20, data & 0x10);
 			ioamhram_[0x100] = (ioamhram_[0x100] & ~0x30u) | (data & 0x30);
 			updateInput();
 		}
@@ -972,7 +977,7 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 
 					intreq_.setEventTime<intevent_blit>(blanklcd_
 						? lcd_.nextMode1IrqTime()
-						: lcd_.nextMode1IrqTime() + (lcd_cycles_per_frame << isDoubleSpeed()));
+						: lcd_.nextMode1IrqTime() + (lcd_cycles_per_line << isDoubleSpeed()));
 				} else {
 					ioamhram_[0x141] |= stat & lcdstat_lycflag;
 					intreq_.setEventTime<intevent_blit>(
@@ -1045,6 +1050,9 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 			ioamhram_[0x14F] = 0xFE | data;
 		}
 
+		return;
+	case 0x50:
+		setBootROM(false);
 		return;
 	case 0x51:
 		dmaSource_ = data << 8 | (dmaSource_ & 0xFF);

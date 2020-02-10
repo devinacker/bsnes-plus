@@ -108,6 +108,6 @@ void Application::printArguments() {
        "\n"
        "Breakpoint format: <addr>[-<addr end>][=<value>][:<rwx>[:<source>]]\n"
        "                   rwx = read / write / execute flags\n"
-       "                   source = cpu, smp, vram, oam, cgram, sa1, sfx");
+       "                   source = cpu, smp, vram, oam, cgram, sa1, sfx, sgb");
   #endif
 }

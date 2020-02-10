@@ -77,6 +77,7 @@ const QStringList BreakpointModel::sources = {
   "S-PPU CGRAM",
   "SA-1 bus",
   "SuperFX bus",
+  "Super GB bus",
 };
 
 const QStringList BreakpointModel::compares = {
@@ -304,6 +305,7 @@ const QStringList BreakpointEditor::sources = {
   "cgram",
   "sa1",
   "sfx",
+  "sgb",
 };
 
 BreakpointEditor::BreakpointEditor() {

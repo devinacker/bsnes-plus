@@ -12,10 +12,8 @@ public:
     RegisterHL,
     RegisterSP,
   };
-  unsigned getRegister(unsigned id) {
-    return 0; // TODO
-  }
-  void setRegister(unsigned id, unsigned value) {} // TODO
+  unsigned getRegister(unsigned id);
+  void setRegister(unsigned id, unsigned value);
   
   enum {
     FlagZ,
@@ -23,15 +21,15 @@ public:
     FlagH,
     FlagC,
   };
-  bool getFlag(unsigned id) {
-    return false; // TODO
-  }
-  void setFlag(unsigned id, bool value) {} // TODO
+  bool getFlag(unsigned id);
+  void setFlag(unsigned id, bool value);
 
   void init();
 
   uint8_t read_gb(uint16_t addr);
   void write_gb(uint16_t addr, uint8_t data);
+
+  void disassemble_opcode(char *output, uint16_t addr);
 
   enum Usage {
     UsageRead   = 0x80,
@@ -42,11 +40,27 @@ public:
   uint8 *usage; // currently unused
   uint8 *cart_usage;
   
+  function<void ()> step_event;
+  uint16_t opcode_pc;
+  
   SGBDebugger();
   ~SGBDebugger();
   
 private:
-  function<uint8 (uint16)> sgb_read_gb;
-  function<void (uint16, uint8)> sgb_write_gb;
-
+  function<uint8_t (uint16_t)> sgb_read_gb;
+  function<void (uint16_t, uint8_t)> sgb_write_gb;
+  
+  function<uint16_t (char)> sgb_get_reg;
+  function<void (char, uint16_t)> sgb_set_reg;
+  function<bool (char)> sgb_get_flag;
+  function<void (char, bool)> sgb_set_flag;
+  
+  static void op_call(uint16_t addr);
+  static void op_irq(uint16_t addr);
+  static void op_ret(uint16_t addr);
+  static void op_step(uint16_t pc);
+  
+  static void op_read(uint16_t addr, uint8_t data);
+  static void op_readpc(uint16_t pc, uint8_t data);
+  static void op_write(uint16_t addr, uint8_t data);
 };

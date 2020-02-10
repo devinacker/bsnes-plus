@@ -19,11 +19,12 @@
 #include "cpu.h"
 #include "memory.h"
 #include "savestate.h"
+#include "debughandler.h"
 
 namespace gambatte {
 
 CPU::CPU()
-: mem_(Interrupter(sp, pc_, opcode_, prefetched_))
+: mem_(Interrupter(sp, pc_, opcode_, prefetched_, debug_))
 , cycleCounter_(0)
 , pc_(0x100)
 , sp(0xFFFE)
@@ -40,6 +41,7 @@ CPU::CPU()
 , l(0x4D)
 , opcode_(0)
 , prefetched_(false)
+, debug_(0)
 {
 }
 
@@ -80,6 +82,62 @@ static inline unsigned toF(unsigned hf2, unsigned cf, unsigned zf) {
 static inline unsigned  zfFromF(unsigned f) { return ~f & 0x80; }
 static inline unsigned hf2FromF(unsigned f) { return f << 4 & (hf2_subf | hf2_hcf); }
 static inline unsigned  cfFromF(unsigned f) { return f << 4 & 0x100; }
+
+unsigned CPU::debugGetRegister(char reg) {
+	switch (reg) {
+	case 'P': case 'p': return pc_;
+	case 'S': case 's': return sp;
+	case 'A': case 'a': return a_;
+	case 'B': case 'b': return b;
+	case 'C': case 'c': return c;
+	case 'D': case 'd': return d;
+	case 'E': case 'e': return e;
+	case 'H': case 'h': return h;
+	case 'L': case 'l': return l;
+	case 'F': case 'f': return toF(hf2, cf, zf);
+	}
+	
+	return 0;
+}
+
+void CPU::debugSetRegister(char reg, unsigned value) {
+	switch (reg) {
+	case 'P': case 'p': pc_ = value; break;
+	case 'S': case 's': sp  = value; break;
+	case 'A': case 'a': a_  = value; break;
+	case 'B': case 'b': b   = value; break;
+	case 'C': case 'c': c   = value; break;
+	case 'D': case 'd': d   = value; break;
+	case 'E': case 'e': e   = value; break;
+	case 'H': case 'h': h   = value; break;
+	case 'L': case 'l': l   = value; break;
+	case 'F': case 'f':
+		zf  = zfFromF(value);
+		hf2 = hf2FromF(value);
+		cf  = cfFromF(value);
+		break;
+	}
+}
+
+bool CPU::debugGetFlag(char flag) {
+	switch (flag) {
+	case 'Z': case 'z': return !zf;
+	case 'N': case 'n': return (hf2 & hf2_subf);
+	case 'H': case 'h': return (hf2 & hf2_hcf);
+	case 'C': case 'c': return (cf & 0x100);
+	}
+	
+	return false;
+}
+
+void CPU::debugSetFlag(char flag, bool value) {
+	switch (flag) {
+	case 'Z': case 'z': zf = !value; break;
+	case 'N': case 'n': hf2 = (hf2 & ~hf2_subf) | (value ? hf2_subf : 0); break;
+	case 'H': case 'h': hf2 = (hf2 & ~hf2_hcf)  | (value ? hf2_hcf : 0); break;
+	case 'C': case 'c': cf = value << 8; break;
+	}
+}
 
 void CPU::setStatePtrs(SaveState &state) {
 	mem_.setStatePtrs(state);
@@ -138,12 +196,33 @@ void CPU::loadState(SaveState const &state) {
 #define de() ( d * 0x100u | e )
 #define hl() ( h * 0x100u | l )
 
-#define READ(dest, addr) do { (dest) = mem_.read(addr, cycleCounter); cycleCounter += 4; } while (0)
-#define PC_READ(dest) do { (dest) = mem_.read(pc, cycleCounter); pc = (pc + 1) & 0xFFFF; cycleCounter += 4; } while (0)
-#define FF_READ(dest, addr) do { (dest) = mem_.ff_read(addr, cycleCounter); cycleCounter += 4; } while (0)
+#define READ(dest, addr) do { \
+	(dest) = mem_.read(addr, cycleCounter); \
+	if (debug_) debug_->op_read(addr, (dest)); \
+	cycleCounter += 4; \
+} while (0)
+#define PC_READ(dest) do { \
+	(dest) = mem_.read(pc, cycleCounter); \
+	if (debug_) debug_->op_readpc(pc, (dest)); \
+	pc = (pc + 1) & 0xFFFF; \
+	cycleCounter += 4; \
+} while (0)
+#define FF_READ(dest, addr) do { \
+	(dest) = mem_.ff_read(addr, cycleCounter); \
+	if (debug_) debug_->op_read(addr | 0xff00, (dest)); \
+	cycleCounter += 4; \
+} while (0)
 
-#define WRITE(addr, data) do { mem_.write(addr, data, cycleCounter); cycleCounter += 4; } while (0)
-#define FF_WRITE(addr, data) do { mem_.ff_write(addr, data, cycleCounter); cycleCounter += 4; } while (0)
+#define WRITE(addr, data) do { \
+	if (debug_) debug_->op_write(addr, data); \
+	mem_.write(addr, data, cycleCounter); \
+	cycleCounter += 4; \
+} while (0)
+#define FF_WRITE(addr, data) do { \
+	if (debug_) debug_->op_write(addr | 0xff00, data); \
+	mem_.ff_write(addr, data, cycleCounter); \
+	cycleCounter += 4; \
+} while (0)
 
 #define PC_MOD(data) do { pc = data; cycleCounter += 4; } while (0)
 
@@ -475,6 +554,7 @@ void CPU::loadState(SaveState const &state) {
 // Jump to 16-bit immediate operand and push return address onto stack:
 #define call_nn() do { \
 	unsigned const npc = (pc + 2) & 0xFFFF; \
+	if (debug_) debug_->op_call(npc); \
 	jp_nn(); \
 	PUSH(npc >> 8, npc & 0xFF); \
 } while (0)
@@ -482,6 +562,7 @@ void CPU::loadState(SaveState const &state) {
 // rst n (16 Cycles):
 // Push present address onto stack, jump to address n (one of 00h,08h,10h,18h,20h,28h,30h,38h):
 #define rst_n(n) do { \
+	if (debug_) debug_->op_call(n); \
 	push_rr(pc >> 8, pc & 0xFF); \
 	pc = (n); \
 } while (0)
@@ -490,6 +571,7 @@ void CPU::loadState(SaveState const &state) {
 // Pop two bytes from the stack and jump to that address:
 #define ret() do { \
 	unsigned low, high; \
+	if (debug_) debug_->op_ret(0); \
 	pop_rr(high, low); \
 	PC_MOD(high << 8 | low); \
 } while (0)
@@ -512,23 +594,29 @@ void CPU::process(unsigned long const cycles) {
 	mem_.setEndtime(cycleCounter_, cycles);
 	mem_.updateInput();
 
-	unsigned char a = a_;
 	unsigned long cycleCounter = cycleCounter_;
 
 	while (mem_.isActive()) {
-		unsigned short pc = pc_;
-
 		if (mem_.halted()) {
 			if (cycleCounter < mem_.nextEventTime()) {
 				unsigned long cycles = mem_.nextEventTime() - cycleCounter;
 				cycleCounter += cycles + (-cycles & 3);
 			}
 		} else while (cycleCounter < mem_.nextEventTime()) {
+		    unsigned char &a = a_;
+			unsigned short &pc = pc_;
+
 			unsigned char opcode;
 
 			if (!prefetched_) {
+				if (debug_)
+					debug_->op_step(pc);
+
 				PC_READ(opcode);
 			} else {
+//				if (debug_)
+//					debug_->op_step(pc - 1);
+
 				opcode = opcode_;
 				cycleCounter += 4;
 				prefetched_ = false;
@@ -1745,6 +1833,7 @@ void CPU::process(unsigned long const cycles) {
 			case 0xD9:
 				{
 					unsigned sl, sh;
+					if (debug_) debug_->op_ret(0);
 					pop_rr(sh, sl);
 					mem_.ei(cycleCounter);
 					PC_MOD(sh << 8 | sl);
@@ -2001,11 +2090,9 @@ void CPU::process(unsigned long const cycles) {
 			}
 		}
 
-		pc_ = pc;
 		cycleCounter = mem_.event(cycleCounter);
 	}
-
-	a_ = a;
+	
 	cycleCounter_ = cycleCounter;
 }
 

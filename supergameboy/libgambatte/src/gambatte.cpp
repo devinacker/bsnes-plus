@@ -90,6 +90,26 @@ void GB::debugWrite(unsigned p, unsigned data) {
 	p_->cpu.debugWrite(p, data);
 }
 
+unsigned GB::debugGetRegister(char reg) {
+	return p_->cpu.debugGetRegister(reg);
+}
+
+void GB::debugSetRegister(char reg, unsigned value) {
+	p_->cpu.debugSetRegister(reg, value);
+}
+
+bool GB::debugGetFlag(char flag) {
+	return p_->cpu.debugGetFlag(flag);
+}
+
+void GB::debugSetFlag(char flag, bool value) {
+	p_->cpu.debugSetFlag(flag, value);
+}
+
+void GB::setDebugHandler(DebugHandler *debug) {
+	p_->cpu.setDebugHandler(debug);
+}
+
 void GB::reset() {
 	if (p_->cpu.loaded()) {
 		p_->cpu.saveSavedata();
@@ -99,8 +119,11 @@ void GB::reset() {
 		setInitState(state, p_->cpu.isCgb(), p_->loadflags & GBA_CGB);
 		p_->cpu.loadState(state);
 		p_->cpu.loadSavedata();
-		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
 	}
+}
+
+void GB::setScanlineCallback(void (*callback)(unsigned)) {
+	p_->cpu.setScanlineCallback(callback);
 }
 
 void GB::setInputGetter(InputGetter *getInput) {
@@ -124,7 +147,6 @@ LoadRes GB::load(unsigned const flags) {
 		setInitState(state, p_->cpu.isCgb(), flags & GBA_CGB);
 		p_->cpu.loadState(state);
 		p_->cpu.loadSavedata();
-		p_->cpu.setAccumulator(supergameboy.version == 0 ? 0x01 : 0xff);
 
 		p_->stateNo = 1;
 		p_->cpu.setOsdElement(transfer_ptr<OsdElement>());

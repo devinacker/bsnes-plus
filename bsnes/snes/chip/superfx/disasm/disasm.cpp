@@ -173,10 +173,10 @@ void SuperFX::disassemble_opcode(char *output, uint32 addr, bool track_regs) {
   // status register and some flags (TODO: other flags?)
   sprintf(t, "S:%.4x %c%c%c%c ",
       (unsigned) regs.sfr,
-      (unsigned) regs.sfr & 2 ? 'Z' : 'z',
-      (unsigned) regs.sfr & 4 ? 'C' : 'c',
-      (unsigned) regs.sfr & 8 ? 'N' : 'n',
-      (unsigned) regs.sfr & 16 ? 'V' : 'v');
+      (unsigned) regs.sfr & 2 ? 'Z' : '.',
+      (unsigned) regs.sfr & 4 ? 'C' : '.',
+      (unsigned) regs.sfr & 8 ? 'N' : '.',
+      (unsigned) regs.sfr & 16 ? 'V' : '.');
   strcat(output, t);
   
   // print all current and past used registers

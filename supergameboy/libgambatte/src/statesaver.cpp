@@ -250,6 +250,7 @@ SaverList::SaverList()
 	{ static char const label[] = { s,r,a,m,o,n,   NUL }; ADD(mem.enableRam); }
 	{ static char const label[] = { r,a,m,b,m,o,d, NUL }; ADD(mem.rambankMode); }
 	{ static char const label[] = { h,d,m,a,       NUL }; ADD(mem.hdmaTransfer); }
+	{ static char const label[] = { b,o,o,t,r,o,m, NUL }; ADD(mem.bootROM); }
 	{ static char const label[] = { b,g,p,         NUL }; ADDPTR(ppu.bgpData); }
 	{ static char const label[] = { o,b,j,p,       NUL }; ADDPTR(ppu.objpData); }
 	{ static char const label[] = { s,p,o,s,b,u,f, NUL }; ADDPTR(ppu.oamReaderBuf); }

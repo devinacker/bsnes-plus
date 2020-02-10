@@ -23,6 +23,8 @@
 
 namespace gambatte {
 
+class DebugHandler;
+
 class CPU {
 public:
 	CPU();
@@ -43,6 +45,16 @@ public:
 		mem_.debug_write(p, data);
 	}
 	
+	unsigned debugGetRegister(char reg);
+	void     debugSetRegister(char reg, unsigned value);
+	bool     debugGetFlag(char flag);
+	void     debugSetFlag(char flag, bool value);
+	
+	/** set debug callback interface for single stepping and breakpoints */
+	void setDebugHandler(DebugHandler *debug) {
+		debug_ = debug;
+	}
+	
 	long runFor(unsigned long cycles);
 	void setStatePtrs(SaveState &state);
 	void saveState(SaveState &state);
@@ -52,6 +64,10 @@ public:
 
 	void setVideoBuffer(uint_least32_t *videoBuf, std::ptrdiff_t pitch) {
 		mem_.setVideoBuffer(videoBuf, pitch);
+	}
+
+	void setScanlineCallback(void (*callback)(unsigned)) {
+		mem_.setScanlineCallback(callback);
 	}
 
 	void setInputGetter(InputGetter *getInput) {
@@ -97,6 +113,8 @@ private:
 	unsigned char a_, b, c, d, e, /*f,*/ h, l;
 	unsigned char opcode_;
 	bool prefetched_;
+
+	DebugHandler *debug_;
 
 	void process(unsigned long cycles);
 };

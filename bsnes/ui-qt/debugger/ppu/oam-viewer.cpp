@@ -174,7 +174,7 @@ void OamViewer::show() {
 }
 
 void OamViewer::autoUpdate() {
-  if(autoUpdateBox->isChecked()) refresh();
+  if(isVisible() && autoUpdateBox->isChecked()) refresh();
 }
 
 void OamViewer::refresh() {

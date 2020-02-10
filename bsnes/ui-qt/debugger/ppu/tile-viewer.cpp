@@ -201,7 +201,7 @@ TileViewer::TileViewer() {
 }
 
 void TileViewer::autoUpdate() {
-  if(autoUpdateBox->isChecked()) refresh();
+  if(isVisible() && autoUpdateBox->isChecked()) refresh();
 }
 
 void TileViewer::show() {

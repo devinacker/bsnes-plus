@@ -208,7 +208,6 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
   if (memorySource != SNES::Debugger::MemorySource::CartROM
       && memorySource != SNES::Debugger::MemorySource::CartRAM
       && memorySource != SNES::Debugger::MemorySource::DSP
-      && memorySource != SNES::Debugger::MemorySource::SGBBus
       && memorySource != SNES::Debugger::MemorySource::SGBROM
       && memorySource != SNES::Debugger::MemorySource::SGBRAM) {
     menu.addSeparator();  
@@ -238,6 +237,7 @@ void MemoryEditor::addBreakpoint(const string& mode) {
   case SNES::Debugger::MemorySource::CGRAM:  source = "cgram"; break;
   case SNES::Debugger::MemorySource::SA1Bus: source = "sa1"; break;
   case SNES::Debugger::MemorySource::SFXBus: source = "sfx"; break;
+  case SNES::Debugger::MemorySource::SGBBus: source = "sgb"; break;
   default: return; // cart ROM/RAM breakpoints not supported
   }
   
@@ -308,6 +308,8 @@ void MemoryEditor::gotoPrevious(int type) {
   } 
   else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
     usage = SNES::superfx.usage;
+  } else if (memorySource == SNES::Debugger::MemorySource::SGBBus) {
+    usage = SNES::supergameboy.usage;
   } else return;
   
   while (--offset >= 0) {
@@ -350,6 +352,8 @@ void MemoryEditor::gotoNext(int type) {
   } 
   else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
     usage = SNES::superfx.usage;
+  } else if (memorySource == SNES::Debugger::MemorySource::SGBBus) {
+    usage = SNES::supergameboy.usage;
   } else return;
   
   while (++offset < size) {
@@ -545,6 +549,9 @@ uint8_t MemoryEditor::usage(unsigned addr) {
   }
   else if (memorySource == SNES::Debugger::MemorySource::SFXBus && addr < 1 << 23) {
     return SNES::superfx.usage[addr];
+  }
+  else if (memorySource == SNES::Debugger::MemorySource::SGBBus && addr < 1 << 16) {
+    return SNES::supergameboy.usage[addr];
   }
   
   return 0;

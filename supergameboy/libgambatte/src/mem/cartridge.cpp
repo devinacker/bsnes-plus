@@ -746,6 +746,14 @@ void Cartridge::setGameGenie(std::string const &codes) {
 	}
 }
 
+void Cartridge::setBootROM(bool on) {
+	if (on) {
+		memcpy(reinterpret_cast<char*>(memptrs_.romdata()), supergameboy.bootrom(), 256);
+	} else {
+		memcpy(reinterpret_cast<char*>(memptrs_.romdata()), supergameboy.romdata, 256);
+	}
+}
+
 PakInfo const Cartridge::pakInfo(bool const multipakCompat) const {
 	if (loaded()) {
 		unsigned const rombs = rombanks(memptrs_);

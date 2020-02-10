@@ -153,14 +153,14 @@ void SMPcore::disassemble_opcode(char *output, uint16 addr) {
   strcat(s, t);
 
   sprintf(t, "%c%c%c%c%c%c%c%c",
-    regs.p.n ? 'N' : 'n',
-    regs.p.v ? 'V' : 'v',
-    regs.p.p ? 'P' : 'p',
-    regs.p.b ? 'B' : 'b',
-    regs.p.h ? 'H' : 'h',
-    regs.p.i ? 'I' : 'i',
-    regs.p.z ? 'Z' : 'z',
-    regs.p.c ? 'C' : 'c');
+    regs.p.n ? 'N' : '.',
+    regs.p.v ? 'V' : '.',
+    regs.p.p ? 'P' : '.',
+    regs.p.b ? 'B' : '.',
+    regs.p.h ? 'H' : '.',
+    regs.p.i ? 'I' : '.',
+    regs.p.z ? 'Z' : '.',
+    regs.p.c ? 'C' : '.');
   strcat(s, t);
 }
 

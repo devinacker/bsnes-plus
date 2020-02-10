@@ -193,16 +193,16 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr, bool hclocks) {
 
   if(regs.e) {
     sprintf(t, "%c%c%c%c%c%c%c%c ",
-      regs.p.n ? 'N' : 'n', regs.p.v ? 'V' : 'v',
-      regs.p.m ? '1' : '0', regs.p.x ? 'B' : 'b',
-      regs.p.d ? 'D' : 'd', regs.p.i ? 'I' : 'i',
-      regs.p.z ? 'Z' : 'z', regs.p.c ? 'C' : 'c');
+      regs.p.n ? 'N' : '.', regs.p.v ? 'V' : '.',
+      regs.p.m ? '1' : '.', regs.p.x ? 'B' : '.',
+      regs.p.d ? 'D' : '.', regs.p.i ? 'I' : '.',
+      regs.p.z ? 'Z' : '.', regs.p.c ? 'C' : '.');
   } else {
     sprintf(t, "%c%c%c%c%c%c%c%c ",
-      regs.p.n ? 'N' : 'n', regs.p.v ? 'V' : 'v',
-      regs.p.m ? 'M' : 'm', regs.p.x ? 'X' : 'x',
-      regs.p.d ? 'D' : 'd', regs.p.i ? 'I' : 'i',
-      regs.p.z ? 'Z' : 'z', regs.p.c ? 'C' : 'c');
+      regs.p.n ? 'N' : '.', regs.p.v ? 'V' : '.',
+      regs.p.m ? 'M' : '.', regs.p.x ? 'X' : '.',
+      regs.p.d ? 'D' : '.', regs.p.i ? 'I' : '.',
+      regs.p.z ? 'Z' : '.', regs.p.c ? 'C' : '.');
   }
   strcat(s, t);
 

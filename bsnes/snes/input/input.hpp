@@ -8,6 +8,7 @@ public:
     SuperScope,
     Justifier,
     Justifiers,
+    SGBCommander,
     NTTDataKeypad,
   };
 

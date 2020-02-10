@@ -58,6 +58,10 @@ public:
 	void setVideoBuffer(uint_least32_t *videoBuf, std::ptrdiff_t pitch);
 	void setOsdElement(transfer_ptr<OsdElement> osdElement) { osdElement_ = osdElement; }
 
+	void setScanlineCallback(void (*callback)(unsigned)) {
+		scanlineCallback_ = callback;
+	}
+
 	void dmgBgPaletteChange(unsigned data, unsigned long cycleCounter) {
 		update(cycleCounter);
 		bgpData_[0] = data;
@@ -209,6 +213,7 @@ private:
 	NextM0Time nextM0Time_;
 	scoped_ptr<OsdElement> osdElement_;
 	unsigned char statReg_;
+	void (*scanlineCallback_)(unsigned);
 
 	static void setDmgPalette(unsigned long palette[],
 	                          unsigned long const dmgColors[],

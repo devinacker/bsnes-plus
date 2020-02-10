@@ -360,6 +360,120 @@ port1(port1_), port2(port2_) {
 
 //
 
+void SGBMacroInput::cache() {
+  DigitalInput::cache();
+  if (previousState != state && state) {
+    counter = 0;
+  } else if (counter < count) {
+    counter++;
+  }
+  cachedState = state;
+}
+
+bool SGBMacroInput::operator()(unsigned id) const {
+  return (counter < count) && (macro[counter] & (1 << (15-id)));
+}
+
+SGBMacroInput::SGBMacroInput(const char *label, const char *configName, const unsigned *macro_, unsigned count_) :
+DigitalInput(label, configName) {
+  counter = 0;
+  count = count_;
+  macro = macro_;
+}
+
+void SGBSpeedSwitch::cache() {
+  DigitalInput::cache();
+  if (previousState != state && state) {
+    if (macro->count == 8) {
+      macro->count = 9;
+      utility.showMessage("Speed mode: normal/fast/slower/slow");
+    } else {
+      macro->count = 8;
+      utility.showMessage("Speed mode: normal/slower/slow");
+    }
+  }
+}
+
+SGBSpeedSwitch::SGBSpeedSwitch(const char *label, const char *configName, SGBMacroInput *macro_) :
+DigitalInput(label, configName) {
+  macro = macro_;
+}
+
+int16_t SGBCommander::status(unsigned index, unsigned id) const {
+  if(config().input.allowInvalidInput == false) {
+    //block up+down and left+right combinations:
+    //a real gamepad has a pivot in the D-pad that makes this impossible;
+    //some software titles will crash if up+down or left+right are detected
+    if(id == (unsigned)SNES::Input::JoypadID::Down && up.cachedState) return 0;
+    if(id == (unsigned)SNES::Input::JoypadID::Right && left.cachedState) return 0;
+  }
+
+  if (speed(id) || mute(id)) return true;
+
+  switch((SNES::Input::JoypadID)id) {
+    case SNES::Input::JoypadID::Up: return up.cachedState;
+    case SNES::Input::JoypadID::Down: return down.cachedState;
+    case SNES::Input::JoypadID::Left: return left.cachedState;
+    case SNES::Input::JoypadID::Right: return right.cachedState;
+    case SNES::Input::JoypadID::A: return a.cachedState | turboA.cachedState;
+    case SNES::Input::JoypadID::B: return b.cachedState | turboB.cachedState;
+    case SNES::Input::JoypadID::X: return color.cachedState;
+    case SNES::Input::JoypadID::Y: return 0;
+    case SNES::Input::JoypadID::L: return window.cachedState;
+    case SNES::Input::JoypadID::R: return window.cachedState;
+    case SNES::Input::JoypadID::Select: return select.cachedState;
+    case SNES::Input::JoypadID::Start: return start.cachedState;
+  }
+  return 0;
+}
+
+/* L, R, none, R, L, none, L, R, Y+Right */
+static const unsigned speedMacro[] = {0x20, 0x10, 0, 0x10, 0x20, 0, 0x20, 0x10, 0x4100};
+/* R, L, none, L, R, none, R, L */
+static const unsigned muteMacro[]  = {0x10, 0x20, 0, 0x20, 0x10, 0, 0x10, 0x20};
+
+SGBCommander::SGBCommander(unsigned category, const char *label, const char *configName) :
+InputGroup(category, label),
+up("Up", string() << "input." << configName << ".up"),
+down("Down", string() << "input." << configName << ".down"),
+left("Left", string() << "input." << configName << ".left"),
+right("Right", string() << "input." << configName << ".right"),
+b("B", string() << "input." << configName << ".b"),
+a("A", string() << "input." << configName << ".a"),
+window("Window", string() << "input." << configName << ".window"),
+color("Color", string() << "input." << configName << ".color"),
+speed("Speed", string() << "input." << configName << ".speed", speedMacro, 8),
+mute("Mute", string() << "input." << configName << ".mute", muteMacro, 8),
+select("Select", string() << "input." << configName << ".select"),
+start("Start", string() << "input." << configName << ".start"),
+turboB("Turbo B", string() << "input." << configName << ".turboB"),
+turboA("Turbo A", string() << "input." << configName << ".turboA"),
+speedSwitch("Set Speed Mode", string() << "input." << configName << ".speedMode", &speed) {
+  attach(&up); attach(&down); attach(&left); attach(&right);
+  attach(&b); attach(&a);
+  attach(&select); attach(&start);
+  attach(&window); attach(&color); attach(&mute);
+  attach(&speed); attach(&speedSwitch);
+  attach(&turboB); attach(&turboA);
+
+  if(this == &sgbcommander1) {
+    up.name = "KB0::Up";
+    down.name = "KB0::Down";
+    left.name = "KB0::Left";
+    right.name = "KB0::Right";
+    b.name = "KB0::Z";
+    a.name = "KB0::X";
+    speed.name = "KB0::A";
+    color.name = "KB0::S";
+    mute.name = "KB0::D";
+    window.name = "KB0::C";
+    select.name = "KB0::Apostrophe";
+    start.name = "KB0::Return";
+  }
+}
+
+//
+
 int16_t NTTDataKeypad::status(unsigned index, unsigned id) const {
   if(config().input.allowInvalidInput == false) {
     //block up+down and left+right combinations:
@@ -488,6 +602,7 @@ Gamepad multitap1c(InputCategory::Port1, "Multitap - Port 3", "multitap1c");
 Gamepad multitap1d(InputCategory::Port1, "Multitap - Port 4", "multitap1d");
 Multitap multitap1(multitap1a, multitap1b, multitap1c, multitap1d);
 Mouse mouse1(InputCategory::Port1, "Mouse", "mouse1");
+SGBCommander sgbcommander1(InputCategory::Port1, "SGB Commander", "sgbcommander1");
 NTTDataKeypad nttdatakeypad1(InputCategory::Port1, "NTT Data Keypad", "nttdatakeypad1");
 
 Gamepad gamepad2(InputCategory::Port2, "Gamepad", "gamepad2");

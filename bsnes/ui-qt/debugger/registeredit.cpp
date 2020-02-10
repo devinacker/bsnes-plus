@@ -3,6 +3,7 @@
 RegisterEditCPU *registerEditCPU, *registerEditSA1;
 RegisterEditSMP *registerEditSMP;
 RegisterEditSFX *registerEditSFX;
+RegisterEditSGB *registerEditSGB;
 
 #define reg_editor(name, digits) \
 	layout->addWidget(new QLabel(QString(#name).toUpper()), layout->rowCount(), 0); \
@@ -250,6 +251,56 @@ void RegisterEditSFX::synchronize() {
 	flag_sync(SNES::SFXDebugger::FlagN, 9);
 	flag_sync(SNES::SFXDebugger::FlagC, 10);
 	flag_sync(SNES::SFXDebugger::FlagZ, 11);
+}
+
+void RegisterEditSGB::setupUI() {
+	QVBoxLayout *fullLayout = new QVBoxLayout;
+	this->setLayout(fullLayout);
+
+	QGridLayout *layout = new QGridLayout;
+	reg_editor(pc, 4);
+	reg_editor(af, 4);
+	reg_editor(bc, 4);
+	reg_editor(de, 4);
+	reg_editor(hl, 4);
+	reg_editor(sp, 4);
+	fullLayout->addLayout(layout);
+
+	layout = new QGridLayout;
+	for (int i = 0; i < 4; i++) {
+		flag_editor(i["ZNHC"], i, i >> 1, i & 1);
+	}
+	fullLayout->addLayout(layout);
+
+	fullLayout->addStretch();
+}
+
+void RegisterEditSGB::commit() {
+	reg_commit(pc, SNES::SGBDebugger::RegisterPC);
+	reg_commit(af, SNES::SGBDebugger::RegisterAF);
+	reg_commit(bc, SNES::SGBDebugger::RegisterBC);
+	reg_commit(de, SNES::SGBDebugger::RegisterDE);
+	reg_commit(hl, SNES::SGBDebugger::RegisterHL);
+	reg_commit(sp, SNES::SGBDebugger::RegisterSP);
+	
+	flag_commit(SNES::SGBDebugger::FlagZ, 0);
+	flag_commit(SNES::SGBDebugger::FlagN, 1);
+	flag_commit(SNES::SGBDebugger::FlagH, 2);
+	flag_commit(SNES::SGBDebugger::FlagC, 3);
+}
+
+void RegisterEditSGB::synchronize() {
+	reg_sync(pc, SNES::SGBDebugger::RegisterPC);
+	reg_sync(af, SNES::SGBDebugger::RegisterAF);
+	reg_sync(bc, SNES::SGBDebugger::RegisterBC);
+	reg_sync(de, SNES::SGBDebugger::RegisterDE);
+	reg_sync(hl, SNES::SGBDebugger::RegisterHL);
+	reg_sync(sp, SNES::SGBDebugger::RegisterSP);
+	
+	flag_sync(SNES::SGBDebugger::FlagZ, 0);
+	flag_sync(SNES::SGBDebugger::FlagN, 1);
+	flag_sync(SNES::SGBDebugger::FlagH, 2);
+	flag_sync(SNES::SGBDebugger::FlagC, 3);
 }
 
 #undef reg_editor

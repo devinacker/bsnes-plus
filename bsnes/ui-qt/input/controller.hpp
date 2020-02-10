@@ -1,4 +1,4 @@
-struct ControllerPort1 { enum { None, Gamepad, Asciipad, Multitap, Mouse, NTTDataKeypad }; };
+struct ControllerPort1 { enum { None, Gamepad, Asciipad, Multitap, Mouse, SGBCommander, NTTDataKeypad }; };
 struct ControllerPort2 { enum { None, Gamepad, Asciipad, Multitap, Mouse, SuperScope, Justifier, Justifiers }; };
 
 namespace Controllers {
@@ -59,6 +59,29 @@ struct Asciipad : InputGroup {
   Asciipad(unsigned, const char*, const char*);
 };
 
+struct SGBMacroInput : DigitalInput {
+  const unsigned *macro;
+  unsigned counter, count;
+  void cache();
+  bool operator()(unsigned) const;
+  SGBMacroInput(const char*, const char*, const unsigned*, unsigned);
+};
+
+struct SGBSpeedSwitch : DigitalInput {
+  SGBMacroInput *macro;
+  void cache();
+  SGBSpeedSwitch(const char*, const char*, SGBMacroInput*);
+};
+
+struct SGBCommander : InputGroup {
+  DigitalInput up, down, left, right, b, a, color, window, select, start;
+  SGBMacroInput speed, mute;
+  TurboInput turboB, turboA;
+  SGBSpeedSwitch speedSwitch;
+  int16_t status(unsigned, unsigned) const;
+  SGBCommander(unsigned, const char*, const char*);
+};
+
 struct NTTDataKeypad : InputGroup {
   DigitalInput up, down, left, right, b, a, y, x, l, r, select, start;
   DigitalInput digit0, digit1, digit2, digit3, digit4, digit5, digit6, digit7;
@@ -105,6 +128,7 @@ extern Gamepad multitap1c;
 extern Gamepad multitap1d;
 extern Multitap multitap1;
 extern Mouse mouse1;
+extern SGBCommander sgbcommander1;
 extern NTTDataKeypad nttdatakeypad1;
 
 extern Gamepad gamepad2;

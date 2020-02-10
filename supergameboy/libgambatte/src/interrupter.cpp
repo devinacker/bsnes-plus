@@ -18,14 +18,16 @@
 
 #include "interrupter.h"
 #include "memory.h"
+#include "debughandler.h"
 
 namespace gambatte {
 
-Interrupter::Interrupter(unsigned short &sp, unsigned short &pc, unsigned char &opcode, bool &prefetched)
+Interrupter::Interrupter(unsigned short &sp, unsigned short &pc, unsigned char &opcode, bool &prefetched, DebugHandler *&debug)
 : sp_(sp)
 , pc_(pc)
 , opcode_(opcode)
 , prefetched_(prefetched)
+, debug_(debug)
 {
 }
 
@@ -62,6 +64,8 @@ unsigned long Interrupter::interrupt(unsigned long cc, Memory &memory) {
 	memory.ackIrq(n, cc);
 	pc_ = address;
 	cc += 4;
+	
+	if (debug_) debug_->op_irq(address);
 
 	if (address == 0x40 && !gsCodes_.empty())
 		applyVblankCheats(cc, memory);

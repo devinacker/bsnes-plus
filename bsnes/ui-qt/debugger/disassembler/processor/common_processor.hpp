@@ -1,6 +1,6 @@
 class CommonDisasmProcessor : public DisasmProcessor {
 public:
-  enum Source { CPU, SMP, SA1, SFX };
+  enum Source { CPU, SMP, SA1, SFX, SGB };
 
   CommonDisasmProcessor(Source);
 

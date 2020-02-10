@@ -119,16 +119,23 @@ public:
 		lcd_.setVideoBuffer(videoBuf, pitch);
 	}
 
+	void setScanlineCallback(void (*callback)(unsigned)) {
+		lcd_.setScanlineCallback(callback);
+	}
+
 	void setDmgPaletteColor(int palNum, int colorNum, unsigned long rgb32) {
 		lcd_.setDmgPaletteColor(palNum, colorNum, rgb32);
 	}
 
 	void setGameGenie(std::string const &codes) { cart_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { interrupter_.setGameShark(codes); }
+	void setBootROM(bool on) { cart_.setBootROM(bootROM_ = on); }
+	bool bootROM() { return bootROM_; }
 	void updateInput();
 
 private:
 	Cartridge cart_;
+	bool bootROM_;
 	unsigned char ioamhram_[0x200];
 	InputGetter *getInput_;
 	unsigned long lastOamDmaUpdate_;

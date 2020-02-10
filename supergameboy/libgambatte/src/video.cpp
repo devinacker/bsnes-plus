@@ -122,6 +122,7 @@ LCD::LCD(unsigned char const *oamram, unsigned char const *vram,
 , objpData_()
 , eventTimes_(memEventRequester)
 , statReg_(0)
+, scanlineCallback_(0)
 {
 	for (std::size_t pno = 0; pno < sizeof dmgColorsRgb32_ / sizeof dmgColorsRgb32_[0]; ++pno)
 	for (std::size_t i = 0; i < num_palette_entries; ++i)
@@ -850,6 +851,8 @@ inline void LCD::event() {
 	case event_ly:
 		ppu_.doLyCountEvent();
 		eventTimes_.set<event_ly>(ppu_.lyCounter().time());
+		if (scanlineCallback_)
+			scanlineCallback_(ppu_.lyCounter().ly());
 		break;
 	}
 }

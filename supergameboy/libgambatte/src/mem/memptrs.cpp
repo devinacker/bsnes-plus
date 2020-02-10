@@ -125,19 +125,22 @@ void MemPtrs::setRombank(unsigned bank) {
 }
 
 void MemPtrs::setRambank(unsigned const flags, unsigned const rambank) {
-	unsigned char *srambankptr = 0;
-	if (!(flags & rtc_en)) {
-		srambankptr = rambankdata() != rambankdataend()
+	if (flags & rtc_en) {
+	 	rsrambankptr_ = 0;
+		wsrambankptr_ = 0;
+	} else {
+		unsigned char *srambankptr = rambankdata() != rambankdataend()
 			? rambankdata_ + rambank * rambank_size()
 			: wdisabledRam();
+		
+		rsrambankptr_ = (flags & read_en) && srambankptr != wdisabledRam()
+			? srambankptr - mm_sram_begin
+			: rdisabledRamw() - mm_sram_begin;
+		wsrambankptr_ = flags & write_en
+			? srambankptr - mm_sram_begin
+			: wdisabledRam() - mm_sram_begin;
 	}
 
-	rsrambankptr_ = (flags & read_en) && srambankptr != wdisabledRam()
-		? srambankptr - mm_sram_begin
-		: rdisabledRamw() - mm_sram_begin;
-	wsrambankptr_ = flags & write_en
-		? srambankptr - mm_sram_begin
-		: wdisabledRam() - mm_sram_begin;
 	rmem_[0xB] = rmem_[0xA] = rsrambankptr_;
 	wmem_[0xB] = wmem_[0xA] = wsrambankptr_;
 	disconnectOamDmaAreas();

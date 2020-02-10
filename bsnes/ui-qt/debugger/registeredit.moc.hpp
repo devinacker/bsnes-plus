@@ -79,6 +79,28 @@ public:
 	}
 };
 
+class RegisterEditSGB : public RegisterEdit {
+	Q_OBJECT
+	
+	QLineEdit *edit_pc, *edit_af, *edit_bc, *edit_de, *edit_hl, *edit_sp;
+	QCheckBox *flag_btn[4];
+	
+protected slots:
+	void setupUI();
+	void commit();
+
+public slots:
+	void synchronize();
+	
+public:
+	RegisterEditSGB(QWidget *parent = 0)
+		: RegisterEdit(SNES::supergameboy, parent)
+	{
+		setupUI();
+	}
+};
+
 extern RegisterEditCPU *registerEditCPU, *registerEditSA1;
 extern RegisterEditSMP *registerEditSMP;
 extern RegisterEditSFX *registerEditSFX;
+extern RegisterEditSGB *registerEditSGB;
