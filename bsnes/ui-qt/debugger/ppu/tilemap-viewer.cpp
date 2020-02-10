@@ -313,7 +313,7 @@ void TilemapViewer::updateTileInfoNormal() {
   // get the absolute address within the current VRAM bank (if expansion is enabled)
   const uint8_t *vram = &SNES::memory::vram[0];
 
-  unsigned xPos = imageGridWidget->selected().x() & 0x3f;
+  unsigned xPos = (imageGridWidget->selected().x() >> renderer.hires) & 0x3f;
   unsigned yPos = imageGridWidget->selected().y() & 0x3f;
 
   unsigned mapId = 0;

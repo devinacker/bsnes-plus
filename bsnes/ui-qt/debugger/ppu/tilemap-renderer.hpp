@@ -1,6 +1,7 @@
 struct TilemapRenderer : public BaseRenderer {
   unsigned screenMode;
   unsigned layer;
+  bool hires;
 
   unsigned tileAddr;
   unsigned screenAddr;

@@ -4,6 +4,7 @@ TilemapRenderer::TilemapRenderer()
 {
   screenMode = 0;
   layer = 0;
+  hires = false;
   tileAddr = 0;
   screenAddr = 0;
   screenSizeX = false;
@@ -46,6 +47,7 @@ void TilemapRenderer::loadTilemapSettings() {
   if(screenMode < 7) {
     unsigned ss = SNES::ppu.bg_screen_size(layer);
 
+    hires = (screenMode == 5 || screenMode == 6);
     screenAddr = SNES::ppu.bg_screen_addr(layer);
     tileAddr = SNES::ppu.bg_tile_addr(layer);
     screenSizeX = ss & 1;
@@ -53,6 +55,7 @@ void TilemapRenderer::loadTilemapSettings() {
     tileSize = SNES::ppu.bg_tile_size(layer);
   }
   else {
+    hires = false;
     screenAddr = 0;
     tileAddr = 0;
     screenSizeX = false;
@@ -67,15 +70,16 @@ void TilemapRenderer::drawTilemap() {
   if(isMode7()) { drawMode7Tilemap(); return; }
   if(bitDepth == BitDepth::NONE) { invalidateImage(); return; }
 
-  unsigned mapSize = tileSize ? 512 : 256;
-  unsigned width = mapSize * (screenSizeX + 1);
-  unsigned height = mapSize * (screenSizeY + 1);
+  unsigned mapSizeY = tileSize ? 512 : 256;
+  unsigned mapSizeX = mapSizeY << hires;
+  unsigned width = mapSizeX * (screenSizeX + 1);
+  unsigned height = mapSizeY * (screenSizeY + 1);
 
   initImage(width, height);
 
   unsigned addr = screenAddr;
-  for(unsigned y = 0; y < height; y += mapSize) {
-    for(unsigned x = 0; x < width; x += mapSize) {
+  for(unsigned y = 0; y < height; y += mapSizeY) {
+    for(unsigned x = 0; x < width; x += mapSizeX) {
       drawMap(addr, x, y);
       addr += 0x800;
     }
@@ -95,7 +99,7 @@ void TilemapRenderer::drawMap(unsigned mapAddr, unsigned startX, unsigned startY
 
     for(unsigned tx = 0; tx < 32; tx++) {
       drawMapTile(imgBits, wordsPerScanline, map);
-      imgBits += ts;
+      imgBits += (ts << hires);
       map += 2;
     }
   }
@@ -130,10 +134,10 @@ void TilemapRenderer::drawMapTile(QRgb* imgBits, const unsigned wordsPerScanline
     if (vFlip) { swap(c1, c3); swap(c2, c4); }
 
     QRgb* row2Bits = imgBits + wordsPerScanline * 8;
-    drawMap8pxTile(imgBits  + 0, wordsPerScanline, c1, pal, hFlip, vFlip);
-    drawMap8pxTile(imgBits  + 8, wordsPerScanline, c2, pal, hFlip, vFlip);
-    drawMap8pxTile(row2Bits + 0, wordsPerScanline, c3, pal, hFlip, vFlip);
-    drawMap8pxTile(row2Bits + 8, wordsPerScanline, c4, pal, hFlip, vFlip);
+    drawMap8pxTile(imgBits  + 0,            wordsPerScanline, c1, pal, hFlip, vFlip);
+    drawMap8pxTile(imgBits  + (8 << hires), wordsPerScanline, c2, pal, hFlip, vFlip);
+    drawMap8pxTile(row2Bits + 0,            wordsPerScanline, c3, pal, hFlip, vFlip);
+    drawMap8pxTile(row2Bits + (8 << hires), wordsPerScanline, c4, pal, hFlip, vFlip);
   }
 }
 
@@ -158,7 +162,16 @@ void TilemapRenderer::drawMap8pxTile(QRgb* imgBits, const unsigned wordsPerScanl
   // get the absolute address within the current VRAM bank (if expansion is enabled)
   const uint8_t *tile = &SNES::memory::vram[addr];
 
-  draw8pxTile(imgBits, wordsPerScanline, tile, palOffset, hFlip, vFlip);
+  if(hires) {
+    unsigned addr2 = characterAddress(c + 1);
+    const uint8_t *tile2 = &SNES::memory::vram[addr2];
+    if (hFlip) { swap(tile, tile2); }
+
+    draw8pxTile(imgBits,     wordsPerScanline, tile,  palOffset, hFlip, vFlip);
+    draw8pxTile(imgBits + 8, wordsPerScanline, tile2, palOffset, hFlip, vFlip);
+  } else {
+    draw8pxTile(imgBits, wordsPerScanline, tile, palOffset, hFlip, vFlip);
+  }
 }
 
 void TilemapRenderer::drawMode7Tilemap() {
