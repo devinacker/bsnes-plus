@@ -719,8 +719,8 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 
 	switch (p & 0xFF) {
 	case 0x00:
-		supergameboy.joyp_write(data & 0x20, data & 0x10);
 		if ((data ^ ioamhram_[0x100]) & 0x30) {
+			supergameboy.joyp_write(data & 0x20, data & 0x10);
 			ioamhram_[0x100] = (ioamhram_[0x100] & ~0x30u) | (data & 0x30);
 			updateInput();
 		}

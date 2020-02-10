@@ -31,7 +31,8 @@ public:
   unsigned packetsize;
 
   unsigned joyp_id;
-  bool joyp_lock;
+  bool joyp15lock;
+  bool joyp14lock;
   bool pulselock;
   bool strobelock;
   bool packetlock;
