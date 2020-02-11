@@ -687,6 +687,14 @@ int DisassemblerView::renderValue(QPainter &painter, int x, int y, uint8_t type,
       text = QString("$%1").arg(value, size, 16, QChar('0'));
       break;
 
+    case 'D':
+      text = QString("%1").arg((int32_t)value, size, 10, QChar('0'));
+      break;
+    
+    case 'U':
+      text = QString("%1").arg(value, size, 10, QChar('0'));
+      break;
+
     default:
       text = "???";
       break;

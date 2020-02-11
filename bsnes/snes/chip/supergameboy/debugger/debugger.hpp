@@ -1,5 +1,8 @@
 class SGBDebugger : public SuperGameBoy, public ChipDebugger {
 public:
+
+#include "disassembler.hpp"
+
   bool property(unsigned id, string &name, string &value) {
     return false; // no properties for now
   }
@@ -28,8 +31,6 @@ public:
 
   uint8_t read_gb(uint16_t addr);
   void write_gb(uint16_t addr, uint8_t data);
-
-  void disassemble_opcode(char *output, uint16_t addr);
 
   enum Usage {
     UsageRead   = 0x80,

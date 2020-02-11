@@ -4,6 +4,7 @@
 
 #include <nall/snes/cpu.hpp>
 #include <nall/snes/smp.hpp>
+#include <nall/snes/sgb.hpp>
 
 #include "debugger.moc"
 Debugger *debugger;
@@ -17,6 +18,7 @@ Debugger *debugger;
 #include "disassembler/processor/cpu_processor.cpp"
 #include "disassembler/processor/smp_processor.cpp"
 #include "disassembler/processor/sfx_processor.cpp"
+#include "disassembler/processor/sgb_processor.cpp"
 
 #include "registeredit.cpp"
 #include "debuggerview.cpp"
@@ -108,6 +110,7 @@ Debugger::Debugger() {
   symbolsSA1 = new SymbolMap();
   symbolsSMP = new SymbolMap();
   symbolsSFX = new SymbolMap();
+  symbolsSGB = new SymbolMap();
   
   application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
   application.locateFile(defaultSymbolsCPUWithSA1 = "default_sa1.cpu.sym", true, true);
@@ -124,7 +127,7 @@ Debugger::Debugger() {
   debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
   debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
-  debugSGB = new DebuggerView(registerEditSGB, new CommonDisasmProcessor(CommonDisasmProcessor::SGB));
+  debugSGB = new DebuggerView(registerEditSGB, new SgbDisasmProcessor(symbolsSGB));
 
   editTabs = new QTabWidget;
   editTabs->addTab(debugCPU, "CPU");

@@ -46,6 +46,7 @@ public:
   class SymbolMap *symbolsSFX;
   class SymbolMap *symbolsSA1;
   class SymbolMap *symbolsSMP;
+  class SymbolMap *symbolsSGB;
 
   void modifySystemState(unsigned);
   void echo(const char *message);

@@ -1,6 +1,9 @@
 #ifdef SUPERGAMEBOY_CPP
 
 #include <nall/snes/sgb.hpp>
+using namespace nall;
+
+#include "disassembler.cpp"
 
 SGBDebugger::SGBDebugger() {
   usage = new uint8_t[1 << 16](); // TODO
@@ -182,35 +185,6 @@ void SGBDebugger::op_write(uint16_t addr, uint8_t data) {
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SGBBus, Debugger::Breakpoint::Mode::Write, addr, data);
   supergameboy.usage[addr] |= UsageWrite;
   supergameboy.usage[addr] &= ~UsageExec;
-}
-
-void SGBDebugger::disassemble_opcode(char *output, uint16_t addr) {
-  char t[256];
-  char *s = output;
-
-  if (!sgb_read_gb) return;
-
-  sprintf(s, "..%.4x ", addr);
-
-  uint8 op  = sgb_read_gb(addr);
-  uint8 op0 = sgb_read_gb(addr + 1);
-  uint8 op1 = sgb_read_gb(addr + 2);
-  
-  sprintf(t, "%-23s ", nall::GBCPU::disassemble(addr, op, op0, op1)());
-  strcat(s, t);
-  
-  uint16_t af = getRegister(RegisterAF);
-  uint16_t bc = getRegister(RegisterBC);
-  uint16_t de = getRegister(RegisterDE);
-  uint16_t hl = getRegister(RegisterHL);
-  uint16_t sp = getRegister(RegisterSP);
-  sprintf(t, "AF:%.4x BC:%.4x DE:%.4x HL:%.4x SP:%.4x ", af, bc, de, hl, sp);
-  strcat(s, t);
-  
-  sprintf(t, "%c%c%c%c ",
-    (af & 0x80) ? 'Z' : '.', (af & 0x40) ? 'N' : '.',
-    (af & 0x20) ? 'H' : '.', (af & 0x10) ? 'C' : '.');
-  strcat(s, t);
 }
 
 #endif
