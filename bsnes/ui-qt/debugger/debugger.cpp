@@ -117,6 +117,7 @@ Debugger::Debugger() {
   application.locateFile(defaultSymbolsCPUWithSFX = "default_sfx.cpu.sym", true, true);
   application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
   application.locateFile(defaultSymbolsSA1 = "default.sa1.sym", true, true);
+  application.locateFile(defaultSymbolsSGB = "default.sgb.sym", true, true);
   
   if (config().debugger.loadDefaultSymbols) {
     symbolsCPU->loadFromFile(defaultSymbolsCPU);
@@ -288,6 +289,7 @@ void Debugger::modifySystemState(unsigned state) {
         fp.read(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
         fp.read(SNES::supergameboy.usage, 1 << 16);
+      // TODO: save SGB usage
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
@@ -332,6 +334,10 @@ void Debugger::modifySystemState(unsigned state) {
     }
     if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
       editTabs->addTab(debugSGB, "Super GB");
+      if (!symbolsSA1->loadFromFile(nall::basename(symfile), ".sgb.sym") &&
+          config().debugger.loadDefaultSymbols) {
+        symbolsSGB->loadFromFile(defaultSymbolsSGB);  
+      }
     }
 
     string data;
@@ -361,6 +367,7 @@ void Debugger::modifySystemState(unsigned state) {
         fp.write(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
         fp.write(SNES::supergameboy.usage, 1 << 16);
+      // TODO: save SGB usage
       fp.close();
     }
     
@@ -371,6 +378,8 @@ void Debugger::modifySystemState(unsigned state) {
         symbolsSA1->saveToFile(nall::basename(symfile), ".sa1.sym");
       if (SNES::cartridge.has_superfx())
         symbolsSFX->saveToFile(nall::basename(symfile), ".sfx.sym");
+      if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
+        symbolsSGB->saveToFile(nall::basename(symfile), ".sgb.sym");
     }
 
     if(config().debugger.saveBreakpoints) {

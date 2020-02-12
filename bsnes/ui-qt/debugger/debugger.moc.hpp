@@ -78,6 +78,7 @@ private:
   string defaultSymbolsCPUWithSFX;
   string defaultSymbolsSMP;
   string defaultSymbolsSA1;
+  string defaultSymbolsSGB;
 };
 
 extern Debugger *debugger;
