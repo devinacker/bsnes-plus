@@ -14,7 +14,9 @@ const char *WlaSymbolFile::getDescription() const {
 uint32_t WlaSymbolFile::getFeatures() const {
   return 0
     | SymbolFileInterface::Readable
+    | SymbolFileInterface::Writable
     | SymbolFileInterface::Symbols
+    | SymbolFileInterface::Comments
   ;
 }
 
@@ -66,6 +68,7 @@ int32_t WlaSymbolFile::scoreReadString(const lstring &rows) const {
   return -1;
 }
 
+// ------------------------------------------------------------------------
 bool WlaSymbolFile::read(const lstring &rows, SymbolMap *map) const {
   enum Section {
     SECTION_UNKNOWN,
@@ -104,6 +107,37 @@ bool WlaSymbolFile::read(const lstring &rows, SymbolMap *map) const {
 
     case SECTION_UNKNOWN:
       break;
+    }
+  }
+
+  return true;
+}
+
+// ------------------------------------------------------------------------
+string WlaSymbolFile::writeAddress(uint32_t address) const {
+  return string(hex<2,'0'>(address>>16), ":" , hex<4,'0'>(address&0xFFFF));
+}
+
+// ------------------------------------------------------------------------
+bool WlaSymbolFile::write(nall::file &f, SymbolMap *map) const {
+  uint32_t i;
+  Symbol s;
+
+  f.print("[labels]\n");
+  for (i=0; i<map->symbols.size(); i++) {
+    s = map->symbols[i].getSymbol();
+
+    if (!s.isInvalid()) {
+      f.print(writeAddress(s.address), " ", s.name, "\n");
+    }
+  }
+
+  f.print("\n");
+  f.print("[comments]\n");
+  for (i=0; i<map->symbols.size(); i++) {
+    s = map->symbols[i].getComment();
+    if (!s.isInvalid()) {
+      f.print(writeAddress(s.address), " ", s.name, "\n");
     }
   }
 

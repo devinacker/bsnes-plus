@@ -6,9 +6,9 @@
 
 // ------------------------------------------------------------------------
 SymbolFileAdapters::SymbolFileAdapters() {
-  registerAdapter(new FmaSymbolFile());
-  registerAdapter(new WlaSymbolFile());
   registerAdapter(new ViceLabelFile());
+  registerAdapter(new WlaSymbolFile());
+  registerAdapter(new FmaSymbolFile());
 }
 
 // ------------------------------------------------------------------------
@@ -40,25 +40,17 @@ SymbolFileInterface *SymbolFileAdapters::findBestAdapter(const nall::lstring &ro
 }
 
 // ------------------------------------------------------------------------
-SymbolFileInterface *SymbolFileAdapters::fetchAdapter(uint32_t requiredFeatures, uint32_t optionalFeatures) {
-  SymbolFileInterface *current = NULL;
+SymbolFileInterface *SymbolFileAdapters::fetchAdapter(uint32_t requiredFeatures, uint32_t optionalFeatures,
+                                                      SymbolFileInterface *current) {
   uint32_t currentScore = 0;
+  if (current != NULL) {
+    // prioritize the adapter currently in use if it has all the features we need
+	currentScore = scoreFeatures(current, requiredFeatures, optionalFeatures);
+  }
 
   for (uint32_t i=0; i<adapters.size(); i++) {
     SymbolFileInterface *adapter = adapters[i];
-    uint32_t features = adapter->getFeatures();
-    uint32_t score = 0;
-
-    if ((features & requiredFeatures) != requiredFeatures) {
-      continue;
-    }
-
-    features &= optionalFeatures;
-    for (; features; features >>= 1) {
-      if (features & 1) {
-        score++;
-      }
-    }
+    uint32_t score = scoreFeatures(adapter, requiredFeatures, optionalFeatures);
 
     if (score > currentScore || current == NULL) {
       current = adapter;
@@ -67,6 +59,26 @@ SymbolFileInterface *SymbolFileAdapters::fetchAdapter(uint32_t requiredFeatures,
   }
 
   return current;
+}
+
+// ------------------------------------------------------------------------
+uint32_t SymbolFileAdapters::scoreFeatures(const SymbolFileInterface *adapter,
+                                           uint32_t requiredFeatures, uint32_t optionalFeatures) const {
+  uint32_t features = adapter->getFeatures();
+  uint32_t score = 0;
+
+  if ((features & requiredFeatures) != requiredFeatures) {
+    return 0;
+  }
+
+  features &= optionalFeatures;
+  for (; features; features >>= 1) {
+    if (features & 1) {
+      score++;
+    }
+  }
+
+  return score;
 }
 
 // ------------------------------------------------------------------------

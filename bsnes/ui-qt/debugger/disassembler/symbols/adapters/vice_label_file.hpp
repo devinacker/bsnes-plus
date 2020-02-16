@@ -13,5 +13,7 @@ public:
   int32_t scoreReadString(const nall::lstring &rows) const;
   bool read(const nall::lstring &rows, SymbolMap *map) const;
 
+  bool write(nall::file &file, SymbolMap *map) const;
+
   uint32_t getFeatures() const;
 };

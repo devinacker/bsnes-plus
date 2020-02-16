@@ -15,5 +15,10 @@ public:
 
   nall::string filteredRow(const nall::string &input) const;
 
+  bool write(nall::file &file, SymbolMap *map) const;
+
   uint32_t getFeatures() const;
+
+protected:
+  string writeAddress(uint32_t address) const;
 };

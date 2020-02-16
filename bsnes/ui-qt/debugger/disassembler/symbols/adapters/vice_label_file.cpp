@@ -14,6 +14,7 @@ const char *ViceLabelFile::getDescription() const {
 uint32_t ViceLabelFile::getFeatures() const {
   return 0
     | SymbolFileInterface::Readable
+    | SymbolFileInterface::Writable
     | SymbolFileInterface::Symbols
   ;
 }
@@ -57,6 +58,19 @@ bool ViceLabelFile::read(const lstring &rows, SymbolMap *map) const {
       hex(substr(row, 3, 6)),
       substr(row, 10, row.length() - 10)
     );
+  }
+
+  return true;
+}
+
+// ------------------------------------------------------------------------
+bool ViceLabelFile::write(nall::file &f, SymbolMap *map) const {
+  for (uint32_t i=0; i<map->symbols.size(); i++) {
+    Symbol s = map->symbols[i].getSymbol();
+
+    if (!s.isInvalid()) {
+      f.print("al ", hex<6>(s.address), " ", s.name, "\n");
+    }
   }
 
   return true;

@@ -28,6 +28,7 @@ SymbolMap::SymbolMap() {
   isValid = false;
   isModified = false;
   adapters = new SymbolFileAdapters();
+  adapter = NULL;
 }
 
 // ------------------------------------------------------------------------
@@ -154,14 +155,20 @@ bool SymbolMap::saveToFile(const string &baseName, const string &ext) {
     return false;
   }
 
-  SymbolFileInterface *adapter = adapters->fetchAdapter(
-    SymbolFileInterface::Writable,
-    0
-    | SymbolFileInterface::Symbols
-    | SymbolFileInterface::Comments
-    | SymbolFileInterface::DebugInterface
-    | SymbolFileInterface::Files
-    | SymbolFileInterface::LineMap
+  uint32_t features = SymbolFileInterface::Symbols;
+  for (uint32_t i = 0; i < symbols.size(); i++) {
+    if (!symbols[i].getComment().isInvalid()) {
+      features |= SymbolFileInterface::Comments;
+      break;
+    }
+  }
+
+//features |= SymbolFileInterface::DebugInterface;
+//features |= SymbolFileInterface::Files;
+//features |= SymbolFileInterface::LineMap;
+
+  SymbolFileInterface *adapter_ = adapters->fetchAdapter(
+    SymbolFileInterface::Writable, features, adapter
   );
 
   string fileName = baseName;
@@ -172,7 +179,8 @@ bool SymbolMap::saveToFile(const string &baseName, const string &ext) {
     return false;
   }
 
-  adapter->write(f, this);
+  adapter_->write(f, this);
+  adapter = adapter_;
 
   f.close();
   
@@ -198,15 +206,16 @@ bool SymbolMap::loadFromString(const string &file) {
   nall::lstring rows;
   rows.split("\n", file);
 
-  SymbolFileInterface *adapter = adapters->findBestAdapter(rows);
-  if (adapter == NULL) {
+  SymbolFileInterface *adapter_ = adapters->findBestAdapter(rows);
+  if (adapter_ == NULL) {
     return false;
   }
 
   bool wasModified = isModified;
-  if (adapter->read(rows, this)) {
+  if (adapter_->read(rows, this)) {
     finishUpdates();
     isModified = wasModified;
+    adapter = adapter_;
     return true;
   }
   

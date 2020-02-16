@@ -2,6 +2,7 @@
 #define __SYMBOL_MAP__H__
 
 class SymbolFileAdapters;
+class SymbolFileInterface;
 
 struct Symbol {
   enum Type { INVALID, LOCATION, COMMENT };
@@ -91,6 +92,7 @@ public:
   bool isModified;
   SymbolsLists symbols;
   SymbolFileAdapters *adapters;
+  SymbolFileInterface *adapter;
 
 signals:
   void updated();
