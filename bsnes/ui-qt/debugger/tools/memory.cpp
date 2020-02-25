@@ -207,7 +207,6 @@ void MemoryEditor::showContextMenu(const QPoint& pos) {
     
   if (memorySource != SNES::Debugger::MemorySource::CartROM
       && memorySource != SNES::Debugger::MemorySource::CartRAM
-      && memorySource != SNES::Debugger::MemorySource::DSP
       && memorySource != SNES::Debugger::MemorySource::SGBROM
       && memorySource != SNES::Debugger::MemorySource::SGBRAM) {
     menu.addSeparator();  
@@ -232,6 +231,7 @@ void MemoryEditor::addBreakpoint(const string& mode) {
   switch (memorySource) {
   case SNES::Debugger::MemorySource::CPUBus: source = "cpu"; break;
   case SNES::Debugger::MemorySource::APUBus: source = "smp"; break;
+  case SNES::Debugger::MemorySource::DSP:    source = "dsp"; break;
   case SNES::Debugger::MemorySource::VRAM:   source = "vram"; break;
   case SNES::Debugger::MemorySource::OAM:    source = "oam"; break;
   case SNES::Debugger::MemorySource::CGRAM:  source = "cgram"; break;
