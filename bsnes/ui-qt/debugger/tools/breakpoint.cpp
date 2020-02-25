@@ -112,6 +112,9 @@ QString BreakpointModel::displayAddr(unsigned addr, SNES::Debugger::Breakpoint::
   case SNES::Debugger::Breakpoint::Source::APURAM:
     symbolMap = debugger->symbolsSMP;
     break;
+  case SNES::Debugger::Breakpoint::Source::DSP:
+    symbolMap = debugger->symbolsDSP;
+    break;
   case SNES::Debugger::Breakpoint::Source::SA1Bus:
     symbolMap = debugger->symbolsSA1;
     break;
@@ -167,13 +170,15 @@ QVariant BreakpointModel::data(const QModelIndex &index, int role) const {
     
   } else if (role == SymbolMapRole) {
     switch (b.source) {
-    case SNES::Debugger::Breakpoint::Source::CPUBus: 
+    case SNES::Debugger::Breakpoint::Source::CPUBus:
       return QVariant::fromValue(debugger->symbolsCPU);
-    case SNES::Debugger::Breakpoint::Source::APURAM: 
+    case SNES::Debugger::Breakpoint::Source::APURAM:
       return QVariant::fromValue(debugger->symbolsSMP);
-    case SNES::Debugger::Breakpoint::Source::SA1Bus: 
+    case SNES::Debugger::Breakpoint::Source::DSP:
+      return QVariant::fromValue(debugger->symbolsDSP);
+    case SNES::Debugger::Breakpoint::Source::SA1Bus:
       return QVariant::fromValue(debugger->symbolsSA1);
-    case SNES::Debugger::Breakpoint::Source::SFXBus: 
+    case SNES::Debugger::Breakpoint::Source::SFXBus:
       return QVariant::fromValue(debugger->symbolsSFX);
     }
   }

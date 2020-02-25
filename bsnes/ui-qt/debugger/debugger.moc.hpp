@@ -47,6 +47,7 @@ public:
   class SymbolMap *symbolsSA1;
   class SymbolMap *symbolsSMP;
   class SymbolMap *symbolsSGB;
+  class SymbolMap *symbolsDSP;
 
   void modifySystemState(unsigned);
   void echo(const char *message);
@@ -77,6 +78,7 @@ private:
   string defaultSymbolsCPUWithSA1;
   string defaultSymbolsCPUWithSFX;
   string defaultSymbolsSMP;
+  string defaultSymbolsDSP;
   string defaultSymbolsSA1;
   string defaultSymbolsSGB;
 };
