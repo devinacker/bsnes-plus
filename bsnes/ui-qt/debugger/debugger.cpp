@@ -107,17 +107,20 @@ Debugger::Debugger() {
   symbolsCPU = new SymbolMap();
   symbolsSA1 = new SymbolMap();
   symbolsSMP = new SymbolMap();
+  symbolsDSP = new SymbolMap();
   symbolsSFX = new SymbolMap();
   
   application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
   application.locateFile(defaultSymbolsCPUWithSA1 = "default_sa1.cpu.sym", true, true);
   application.locateFile(defaultSymbolsCPUWithSFX = "default_sfx.cpu.sym", true, true);
   application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
+  application.locateFile(defaultSymbolsDSP = "default.dsp.sym", true, true);
   application.locateFile(defaultSymbolsSA1 = "default.sa1.sym", true, true);
   
   if (config().debugger.loadDefaultSymbols) {
     symbolsCPU->loadFromFile(defaultSymbolsCPU);
     symbolsSMP->loadFromFile(defaultSymbolsSMP);
+    symbolsDSP->loadFromFile(defaultSymbolsDSP);
   }
   
   debugCPU = new DebuggerView(registerEditCPU, new CpuDisasmProcessor(CpuDisasmProcessor::CPU, symbolsCPU), true);
