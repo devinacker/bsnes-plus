@@ -45,7 +45,7 @@ SymbolFileInterface *SymbolFileAdapters::fetchAdapter(uint32_t requiredFeatures,
   uint32_t currentScore = 0;
   if (current != NULL) {
     // prioritize the adapter currently in use if it has all the features we need
-	currentScore = scoreFeatures(current, requiredFeatures, optionalFeatures);
+    currentScore = scoreFeatures(current, requiredFeatures, optionalFeatures);
   }
 
   for (uint32_t i=0; i<adapters.size(); i++) {

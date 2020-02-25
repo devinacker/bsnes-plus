@@ -581,7 +581,8 @@ void Debugger::event() {
         break;
       }
 
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM) {
+      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM
+           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::DSP) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;

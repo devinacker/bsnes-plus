@@ -34,6 +34,8 @@ alwaysinline uint8 SMP::op_busread(uint16 addr) {
       case 0xf3: {  //DSPDATA
         //0x80-0xff are read-only mirrors of 0x00-0x7f
         r = dsp.read(status.dsp_addr & 0x7f);
+        if (!Memory::debugger_access())
+          debugger.breakpoint_test(Debugger::Breakpoint::Source::DSP, Debugger::Breakpoint::Mode::Read, status.dsp_addr & 0x7f, r);
       } break;
 
       case 0xf4:    //CPUIO0
@@ -142,6 +144,7 @@ alwaysinline void SMP::op_buswrite(uint16 addr, uint8 data) {
       case 0xf3: {  //DSPDATA
         //0x80-0xff are read-only mirrors of 0x00-0x7f
         if(!(status.dsp_addr & 0x80)) {
+          debugger.breakpoint_test(Debugger::Breakpoint::Source::DSP, Debugger::Breakpoint::Mode::Write, status.dsp_addr & 0x7f, data);
           dsp.write(status.dsp_addr & 0x7f, data);
         }
         

@@ -29,6 +29,7 @@ public:
     enum class Source : unsigned {
       CPUBus,
       APURAM,
+      DSP,
       VRAM,
       OAM,
       CGRAM,
