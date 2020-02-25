@@ -72,6 +72,7 @@ void SymbolDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, co
 const QStringList BreakpointModel::sources = {
   "S-CPU bus",
   "S-SMP bus",
+  "S-DSP registers",
   "S-PPU VRAM",
   "S-PPU OAM",
   "S-PPU CGRAM",
@@ -300,6 +301,7 @@ bool BreakpointModel::removeRows(int row, int count, const QModelIndex &parent) 
 const QStringList BreakpointEditor::sources = {
   "cpu",
   "smp",
+  "dsp",
   "vram",
   "oam",
   "cgram",
