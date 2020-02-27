@@ -59,9 +59,9 @@ struct Opcode {
   const char *opcode;
 };
 
-void disassemble_opcode(char *output, uint16 addr);
-void disassemble_opcode_ex(Opcode &opcode, uint16 addr);
+void disassemble_opcode(char *output, uint24 addr);
+void disassemble_opcode_ex(Opcode &opcode, uint24 addr);
 inline uint8 dreadb(uint16 addr);
 inline uint16 dreadw(uint16 addr);
 inline uint16 relb(int8 offset, int op_len, uint16 pc);
-uint16 decode(uint8 offset_type, uint16 addr, uint16 pc);
+uint24 decode(uint8 offset_type, uint16 addr, uint16 pc);

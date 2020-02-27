@@ -309,7 +309,7 @@ void MemoryEditor::gotoPrevious(int type) {
   else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
     usage = SNES::superfx.usage;
   } else if (memorySource == SNES::Debugger::MemorySource::SGBBus) {
-    usage = SNES::supergameboy.usage;
+    usage = SNES::supergameboy.usage_;
   } else return;
   
   while (--offset >= 0) {
@@ -353,7 +353,7 @@ void MemoryEditor::gotoNext(int type) {
   else if (memorySource == SNES::Debugger::MemorySource::SFXBus) {
     usage = SNES::superfx.usage;
   } else if (memorySource == SNES::Debugger::MemorySource::SGBBus) {
-    usage = SNES::supergameboy.usage;
+    usage = SNES::supergameboy.usage_;
   } else return;
   
   while (++offset < size) {
@@ -551,7 +551,7 @@ uint8_t MemoryEditor::usage(unsigned addr) {
     return SNES::superfx.usage[addr];
   }
   else if (memorySource == SNES::Debugger::MemorySource::SGBBus && addr < 1 << 16) {
-    return SNES::supergameboy.usage[addr];
+    return SNES::supergameboy.usage(addr);
   }
   
   return 0;

@@ -281,7 +281,7 @@ void Debugger::modifySystemState(unsigned state) {
     
     memset(SNES::sa1.usage, 0x00, 1 << 24);
     memset(SNES::superfx.usage, 0x00, 1 << 23);
-    memset(SNES::supergameboy.usage, 0x00, 1 << 16);
+    memset(SNES::supergameboy.usage_, 0x00, 1 << 24);
     
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
@@ -291,8 +291,7 @@ void Debugger::modifySystemState(unsigned state) {
       if (SNES::cartridge.has_superfx())
         fp.read(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
-        fp.read(SNES::supergameboy.usage, 1 << 16);
-      // TODO: save SGB usage
+        fp.read(SNES::supergameboy.usage_, 1 << 24);
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
@@ -369,8 +368,7 @@ void Debugger::modifySystemState(unsigned state) {
       if (SNES::cartridge.has_superfx())
         fp.write(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
-        fp.write(SNES::supergameboy.usage, 1 << 16);
-      // TODO: save SGB usage
+        fp.write(SNES::supergameboy.usage_, 1 << 24);
       fp.close();
     }
     

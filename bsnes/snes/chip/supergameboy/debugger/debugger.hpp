@@ -38,11 +38,14 @@ public:
     UsageExec   = 0x20,
     UsageOpcode = 0x10,
   };
-  uint8 *usage; // currently unused
-  uint8 *cart_usage;
   
+  uint8_t& usage(uint16_t addr);
+
+  uint8 *usage_;
+  uint8 *cart_usage; // currently unused
+
   function<void ()> step_event;
-  uint16_t opcode_pc;
+  uint32_t opcode_pc;
   
   SGBDebugger();
   ~SGBDebugger();
@@ -51,17 +54,19 @@ private:
   function<uint8_t (uint16_t)> sgb_read_gb;
   function<void (uint16_t, uint8_t)> sgb_write_gb;
   
+  function<uint32_t (uint16_t)> sgb_addr_with_bank;
+
   function<uint16_t (char)> sgb_get_reg;
   function<void (char, uint16_t)> sgb_set_reg;
   function<bool (char)> sgb_get_flag;
   function<void (char, bool)> sgb_set_flag;
   
-  static void op_call(uint16_t addr);
-  static void op_irq(uint16_t addr);
-  static void op_ret(uint16_t addr);
-  static void op_step(uint16_t pc);
+  static void op_call(uint32_t addr);
+  static void op_irq(uint32_t addr);
+  static void op_ret(uint32_t addr);
+  static void op_step(uint32_t pc);
   
-  static void op_read(uint16_t addr, uint8_t data);
-  static void op_readpc(uint16_t pc, uint8_t data);
-  static void op_write(uint16_t addr, uint8_t data);
+  static void op_read(uint32_t addr, uint8_t data);
+  static void op_readpc(uint32_t pc, uint8_t data);
+  static void op_write(uint32_t addr, uint8_t data);
 };

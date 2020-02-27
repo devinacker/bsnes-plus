@@ -27,7 +27,7 @@ uint32_t SgbDisasmProcessor::findStartLineAddress(uint32_t currentAddress, uint3
 
   for (line=0; line<linesBelow; line++) {
     for (i=1; i<=4; i++) {
-      if ((SNES::supergameboy.usage[(currentAddress + i) & 0xFFFFFF] & SNES::SGBDebugger::UsageOpcode) == 0) {
+      if ((usage(currentAddress + i) & SNES::SGBDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -40,12 +40,12 @@ uint32_t SgbDisasmProcessor::findStartLineAddress(uint32_t currentAddress, uint3
 }
 
 // ------------------------------------------------------------------------
-uint16_t SgbDisasmProcessor::decode(unsigned type, uint16_t address, uint16_t pc) {
+uint32_t SgbDisasmProcessor::decode(unsigned type, uint16_t address, uint16_t pc) {
   return SNES::supergameboy.decode(type, address, pc);
 }
 
 // ------------------------------------------------------------------------
-uint16_t SgbDisasmProcessor::decode(SNES::SGBDebugger::Opcode &opcode, uint16_t pc) {
+uint32_t SgbDisasmProcessor::decode(SNES::SGBDebugger::Opcode &opcode, uint16_t pc) {
   if (opcode.optype[1]) {
     return decode(opcode.optype[1], opcode.opall(), pc);
   } else {
@@ -255,7 +255,7 @@ bool SgbDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
 
   // Advance to next
-  if ((SNES::supergameboy.usage[(address + opcode.size()) & 0xFFFF] & SNES::SGBDebugger::UsageOpcode) != 0) {
+  if ((usage(address + opcode.size()) & SNES::SGBDebugger::UsageOpcode) != 0) {
     address += opcode.size();
   }
 
@@ -267,27 +267,36 @@ void SgbDisasmProcessor::analyze(uint32_t address) {
   SNES::SGBDebugger::Opcode op;
   uint32_t maxMethodSize = 0x1000;
   bool force = true;
-  uint8_t *usage = SNES::supergameboy.usage;
 
   while (--maxMethodSize) {
-    address = address & 0xFFFF;
-    if (usage[address] != 0 && !force) {
+    if (usage(address) != 0 && !force) {
       break;
     }
 
-    usage[address] |= SNES::SGBDebugger::UsageOpcode;
+    SNES::supergameboy.usage(address) |= SNES::SGBDebugger::UsageOpcode;
     SNES::supergameboy.disassemble_opcode_ex(op, address);
 
     if (op.isBraWithContinue() && !op.isIndirect()) {
-      uint16_t target = decode(op, address);
-      if (usage[target] == 0) {
-        analyze(target);
+      uint32_t target = decode(op, address);
+      if (usage(target) == 0) {
+        // hack: if jumping from fixed to swappable ROM bank, don't continue
+        // (in case a bank switch may occur)
+        if ((uint16_t)address >= 0x4000 || target < 0x4000) {
+          analyze(target);
+        }
       }
     }
 
     if (op.isBra() && !op.isIndirect()) {
-      address = decode(op, address);
-      force = false; // we might be branching/jumping into already analyzed code
+      uint32_t target = decode(op, address);
+      // hack: if jumping from fixed to swappable ROM bank, don't continue
+      // (in case a bank switch may occur)
+      if ((uint16_t)address >= 0x4000 || target < 0x4000) {
+        address = target;
+        force = false; // we might be branching/jumping into already analyzed code
+      } else {
+        break;
+      }
     } else if (op.returns() || op.isBra()) {
       break;
     } else {
@@ -311,7 +320,7 @@ void SgbDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((SNES::supergameboy.usage[(startAddress - i) & 0xFFFF] & SNES::SGBDebugger::UsageOpcode) == 0) {
+      if ((usage(startAddress - i) & SNES::SGBDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -332,7 +341,7 @@ void SgbDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
     result = false;
 
     for (i=1; i<=4; i++) {
-      if ((SNES::supergameboy.usage[(endAddress + i) & 0xFFFF] & SNES::SGBDebugger::UsageOpcode) == 0) {
+      if ((usage(endAddress + i) & SNES::SGBDebugger::UsageOpcode) == 0) {
         continue;
       }
 
@@ -351,7 +360,7 @@ void SgbDisasmProcessor::findKnownRange(uint32_t currentAddress, uint32_t &start
 
 // ------------------------------------------------------------------------
 uint8_t SgbDisasmProcessor::usage(uint32_t address) {
-  return SNES::supergameboy.usage[address & 0xFFFF];
+  return SNES::supergameboy.usage(address);
 }
 
 // ------------------------------------------------------------------------
@@ -379,5 +388,5 @@ void SgbDisasmProcessor::write(uint32_t address, uint8_t data) {
 
 // ------------------------------------------------------------------------
 uint32_t SgbDisasmProcessor::getBusSize() {
-  return 0x10000;
+  return 0x1000000;
 }

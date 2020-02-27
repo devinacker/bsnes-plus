@@ -37,6 +37,8 @@ public:
 	virtual void saveState(SaveState::Mem &ss) const = 0;
 	virtual void loadState(SaveState::Mem const &ss) = 0;
 	virtual bool isAddressWithinAreaRombankCanBeMappedTo(unsigned address, unsigned rombank) const = 0;
+
+	virtual unsigned addrWithBank(unsigned addr) const { return addr; }
 };
 
 class Cartridge {
@@ -72,6 +74,7 @@ public:
 	class PakInfo const pakInfo(bool multicartCompat) const;
 	void setGameGenie(std::string const &codes);
 	void setBootROM(bool);
+	unsigned addrWithBank(unsigned addr) const { return mbc_->addrWithBank(addr); }
 
 private:
 	struct AddrData {

@@ -6,14 +6,14 @@ using namespace nall;
 #include "disassembler.cpp"
 
 SGBDebugger::SGBDebugger() {
-  usage = new uint8_t[1 << 16](); // TODO
-  cart_usage = 0;
+  usage_ = new uint8_t[1 << 24]();
+  cart_usage = 0; // TODO
   
   opcode_pc = 0;
 }
 
 SGBDebugger::~SGBDebugger() {
-  delete[] usage;
+  delete[] usage_;
 //  delete[] cart_usage;
 }
 
@@ -26,9 +26,11 @@ void SGBDebugger::init() {
     sgb_set_reg  = sym("sgb_set_reg");
     sgb_get_flag = sym("sgb_get_flag");
     sgb_set_flag = sym("sgb_set_flag");
-    
+
+    sgb_addr_with_bank = sym("sgb_addr_with_bank");
+
     // set up debugger callbacks
-    function<void (void(*)(uint16_t))> stepcb;
+    function<void (void(*)(uint32_t))> stepcb;
     stepcb = sym("sgb_callback_step");
     if (stepcb) stepcb(op_step);
     stepcb = sym("sgb_callback_call");
@@ -38,7 +40,7 @@ void SGBDebugger::init() {
     stepcb = sym("sgb_callback_irq");
     if (stepcb) stepcb(op_irq);
     
-    function<void (void(*)(uint16_t, uint8_t))> memcb;
+    function<void (void(*)(uint32_t, uint8_t))> memcb;
     memcb = sym("sgb_callback_read");
     if (memcb) memcb(op_read);
     memcb = sym("sgb_callback_readpc");
@@ -123,13 +125,18 @@ void SGBDebugger::write_gb(uint16_t addr, uint8_t data) {
   if (sgb_write_gb) sgb_write_gb(addr, data);
 }
 
-void SGBDebugger::op_call(uint16_t addr) {
+uint8_t& SGBDebugger::usage(uint16_t addr) {
+  if (sgb_addr_with_bank) return usage_[sgb_addr_with_bank(addr)];
+  return usage_[addr];
+}
+
+void SGBDebugger::op_call(uint32_t addr) {
   if (debugger.step_sgb) {
     debugger.call_count++;
   }
 }
 
-void SGBDebugger::op_irq(uint16_t addr) {
+void SGBDebugger::op_irq(uint32_t addr) {
   if (debugger.step_sgb) {
     debugger.call_count++;
     
@@ -140,14 +147,14 @@ void SGBDebugger::op_irq(uint16_t addr) {
   }
 }
 
-void SGBDebugger::op_ret(uint16_t addr) {
+void SGBDebugger::op_ret(uint32_t addr) {
   if (debugger.step_sgb) {
     debugger.call_count--;
   }
 }
 
-void SGBDebugger::op_step(uint16_t pc) {
-  supergameboy.usage[pc] |= UsageOpcode;
+void SGBDebugger::op_step(uint32_t pc) {
+  supergameboy.usage_[pc] |= UsageOpcode;
   supergameboy.opcode_pc = pc;
   
   if(debugger.step_sgb &&
@@ -172,19 +179,19 @@ void SGBDebugger::op_step(uint16_t pc) {
   }
 }
 
-void SGBDebugger::op_read(uint16_t addr, uint8_t data) {
-  supergameboy.usage[addr] |= UsageRead;
+void SGBDebugger::op_read(uint32_t addr, uint8_t data) {
+  supergameboy.usage_[addr] |= UsageRead;
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SGBBus, Debugger::Breakpoint::Mode::Read, addr, data);
 }
 
-void SGBDebugger::op_readpc(uint16_t pc, uint8_t data) {
-  supergameboy.usage[pc] |= UsageExec;
+void SGBDebugger::op_readpc(uint32_t pc, uint8_t data) {
+  supergameboy.usage_[pc] |= UsageExec;
 }
 
-void SGBDebugger::op_write(uint16_t addr, uint8_t data) {
+void SGBDebugger::op_write(uint32_t addr, uint8_t data) {
   debugger.breakpoint_test(Debugger::Breakpoint::Source::SGBBus, Debugger::Breakpoint::Mode::Write, addr, data);
-  supergameboy.usage[addr] |= UsageWrite;
-  supergameboy.usage[addr] &= ~UsageExec;
+  supergameboy.usage_[addr] |= UsageWrite;
+  supergameboy.usage_[addr] &= ~UsageExec;
 }
 
 #endif

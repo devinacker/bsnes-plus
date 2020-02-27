@@ -17,8 +17,8 @@ uint16 SGBDebugger::dreadw(uint16 addr) {
   return r;
 }
 
-uint16 SGBDebugger::decode(uint8 offset_type, uint16 addr, uint16 pc) {
-  uint16 r = 0;
+uint24 SGBDebugger::decode(uint8 offset_type, uint16 addr, uint16 pc) {
+  uint24 r = 0;
   uint16 dp = 0xff00;
 
   switch(offset_type) {
@@ -55,10 +55,13 @@ uint16 SGBDebugger::decode(uint8 offset_type, uint16 addr, uint16 pc) {
     break;
   }
 
+  if (r > 0x4000 && sgb_addr_with_bank) {
+    r = sgb_addr_with_bank(r);
+  }
   return r;
 }
 
-void SGBDebugger::disassemble_opcode_ex(SGBDebugger::Opcode &opcode, uint16 addr) {
+void SGBDebugger::disassemble_opcode_ex(SGBDebugger::Opcode &opcode, uint24 addr) {
   uint8 param[3];
 
   SNES::debugger.bus_access = true;
@@ -92,17 +95,17 @@ void SGBDebugger::disassemble_opcode_ex(SGBDebugger::Opcode &opcode, uint16 addr
   }
 }
 
-void SGBDebugger::disassemble_opcode(char *output, uint16_t addr) {
+void SGBDebugger::disassemble_opcode(char *output, uint24 addr) {
   char t[256];
   char *s = output;
 
-  sprintf(s, "..%.4x ", addr);
+  sprintf(s, "%.6x ", addr);
 
   uint8 op  = read_gb(addr);
   uint8 op0 = read_gb(addr + 1);
   uint8 op1 = read_gb(addr + 2);
   
-  sprintf(t, "%-23s ", nall::GBCPU::disassemble(addr, op, op0, op1)());
+  sprintf(t, "%-23s ", nall::GBCPU::disassemble((uint16)addr, op, op0, op1)());
   strcat(s, t);
   
   uint16_t af = getRegister(RegisterAF);

@@ -88,6 +88,7 @@ public:
 	void     debugSetRegister(char reg, unsigned value);
 	bool     debugGetFlag(char flag);
 	void     debugSetFlag(char flag, bool value);
+	unsigned addrWithBank(unsigned addr) const;
 	/** set debug callback interface for single stepping and breakpoints */
 	void setDebugHandler(DebugHandler *debug);
 

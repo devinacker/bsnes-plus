@@ -2,19 +2,19 @@ SuperGameBoy supergameboy;
 
 #include <nall/snes/sgb.hpp>
 
-static void op_step_default(uint16_t pc) {
+static void op_step_default(uint32_t pc) {
   uint8_t op  = supergameboy.read_gb(pc);
   uint8_t op1 = supergameboy.read_gb(pc + 1);
   uint8_t op2 = supergameboy.read_gb(pc + 2);
   
-  printf("%04x %s\n", pc, GBCPU::disassemble(pc, op, op1, op2)());
+  printf("%06x %s\n", pc, GBCPU::disassemble(pc, op, op1, op2)());
 }
 
-static void op_read_default(uint16_t addr, uint8_t data) {
-  printf("op_read  %04x => %02x\n", addr, data);
+static void op_read_default(uint32_t addr, uint8_t data) {
+  printf("op_read  %06x => %02x\n", addr, data);
 }
-static void op_write_default(uint16_t addr, uint8_t data) {
-  printf("op_write %04x <= %02x\n", addr, data);
+static void op_write_default(uint32_t addr, uint8_t data) {
+  printf("op_write %06x <= %02x\n", addr, data);
 }
 
 const uint8_t SuperGameBoy::bootroms[2][256] =

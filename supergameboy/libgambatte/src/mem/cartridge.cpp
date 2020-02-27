@@ -124,12 +124,24 @@ public:
 	}
 
 	virtual void loadState(SaveState::Mem const &ss) {
-		rombank_ = ss.rombank;
-		rambank_ = ss.rambank;
+		rombank_ = ss.rombank & 0x7f;
+		rambank_ = ss.rambank & 3;
 		enableRam_ = ss.enableRam;
 		rambankMode_ = ss.rambankMode;
 		setRambank();
 		setRombank();
+	}
+
+	virtual unsigned addrWithBank(unsigned addr) const {
+		switch (addr >> 13) {
+		default:
+			return addr;
+		case 2:
+		case 3: // $4000-7fff
+			return addr | (rombank_ << 16);
+		case 5: // $a000-bfff
+			return addr | (rambank_ << 16);
+		}
 	}
 
 private:
@@ -248,10 +260,20 @@ public:
 	}
 
 	virtual void loadState(SaveState::Mem const &ss) {
-		rombank_ = ss.rombank;
+		rombank_ = ss.rombank & 0xF;
 		enableRam_ = ss.enableRam;
 		memptrs_.setRambank(enableRam_ ? MemPtrs::read_en | MemPtrs::write_en : 0, 0);
 		memptrs_.setRombank(rombank_ & (rombanks(memptrs_) - 1));
+	}
+
+	virtual unsigned addrWithBank(unsigned addr) const {
+		switch (addr >> 13) {
+		default:
+			return addr;
+		case 2:
+		case 3: // $4000-7fff
+			return addr | (rombank_ << 16);
+		}
 	}
 
 private:
@@ -300,11 +322,23 @@ public:
 	}
 
 	virtual void loadState(SaveState::Mem const &ss) {
-		rombank_ = ss.rombank;
+		rombank_ = ss.rombank & 0x7f;
 		rambank_ = ss.rambank;
 		enableRam_ = ss.enableRam;
 		setRambank();
 		setRombank();
+	}
+
+	virtual unsigned addrWithBank(unsigned addr) const {
+		switch (addr >> 13) {
+		default:
+			return addr;
+		case 2:
+		case 3: // $4000-7fff
+			return addr | (rombank_ << 16);
+		case 5: // $a000-bfff
+			return addr | (rambank_ << 16);
+		}
 	}
 
 private:
@@ -373,12 +407,24 @@ public:
 	}
 
 	virtual void loadState(SaveState::Mem const &ss) {
-		rombank_ = ss.rombank;
-		rambank_ = ss.rambank;
+		rombank_ = ss.rombank & 0x3f;
+		rambank_ = ss.rambank & 3;
 		enableRam_ = ss.enableRam;
 		rambankMode_ = ss.rambankMode;
 		setRambank();
 		setRombank();
+	}
+
+	virtual unsigned addrWithBank(unsigned addr) const {
+		switch (addr >> 13) {
+		default:
+			return addr;
+		case 2:
+		case 3: // $4000-7fff
+			return addr | (rombank_ << 16);
+		case 5: // $a000-bfff
+			return addr | (rambank_ << 16);
+		}
 	}
 
 private:
@@ -437,11 +483,23 @@ public:
 	}
 
 	virtual void loadState(SaveState::Mem const &ss) {
-		rombank_ = ss.rombank;
-		rambank_ = ss.rambank;
+		rombank_ = ss.rombank & 0x1ff;
+		rambank_ = ss.rambank & 0xf;
 		enableRam_ = ss.enableRam;
 		setRambank();
 		setRombank();
+	}
+
+	virtual unsigned addrWithBank(unsigned addr) const {
+		switch (addr >> 13) {
+		default:
+			return addr;
+		case 2:
+		case 3: // $4000-7fff (only pass lower 8 bits of bank to debugger for now)
+			return addr | ((unsigned char)rombank_ << 16);
+		case 5: // $a000-bfff
+			return addr | (rambank_ << 16);
+		}
 	}
 
 private:

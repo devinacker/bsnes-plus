@@ -20,8 +20,8 @@ private:
   SymbolMap *symbols;
   uint8_t *usagePointer;
 
-  uint16_t decode(unsigned type, uint16_t address, uint16_t pc);
-  uint16_t decode(SNES::SGBDebugger::Opcode &opcode, uint16_t pc);
+  uint32_t decode(unsigned type, uint16_t address, uint16_t pc);
+  uint32_t decode(SNES::SGBDebugger::Opcode &opcode, uint16_t pc);
   void setOpcodePartParams(DisassemblerLine &result, unsigned part, SNES::SGBDebugger::Opcode &opcode, uint16_t address);
   void setOpcodeParams(DisassemblerLine &result, SNES::SGBDebugger::Opcode &opcode, uint16_t address);
 
