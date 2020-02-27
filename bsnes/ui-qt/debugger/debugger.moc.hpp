@@ -48,7 +48,6 @@ public:
   class SymbolMap *symbolsSMP;
   class SymbolMap *symbolsSGB;
   class SymbolMap *symbolsDSP;
-  class SymbolMap *symbolsSGB;
 
   void modifySystemState(unsigned);
   void echo(const char *message);
