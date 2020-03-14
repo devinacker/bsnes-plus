@@ -546,20 +546,23 @@ void Debugger::event() {
   switch(SNES::debugger.break_event) {
     case SNES::Debugger::BreakEvent::BreakpointHit: {
       unsigned n = SNES::debugger.breakpoint_hit;
+      SNES::Debugger::Breakpoint::Source source;
       
-      if (n == SNES::Debugger::SoftBreakCPU)
+      if (n == SNES::Debugger::SoftBreakCPU) {
+        source = SNES::Debugger::Breakpoint::Source::CPUBus;
         echo(string() << "Software breakpoint hit (CPU).<br>");
-      else if (n == SNES::Debugger::SoftBreakSA1)
+      } else if (n == SNES::Debugger::SoftBreakSA1) {
+        source = SNES::Debugger::Breakpoint::Source::SA1Bus;
         echo(string() << "Software breakpoint hit (SA-1).<br>");
-      else if (n < SNES::debugger.breakpoint.size())
+      } else if (n < SNES::debugger.breakpoint.size()) {
+        source = SNES::debugger.breakpoint[n].source;
         echo(string() << "Breakpoint " << n << " hit (" << SNES::debugger.breakpoint[n].counter << ").<br>");
-      else break;
+      } else break;
         
-      if(n == SNES::Debugger::SoftBreakCPU
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CPUBus
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::VRAM
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::OAM
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::CGRAM) {
+      if(source == SNES::Debugger::Breakpoint::Source::CPUBus
+           || source == SNES::Debugger::Breakpoint::Source::VRAM
+           || source == SNES::Debugger::Breakpoint::Source::OAM
+           || source == SNES::Debugger::Breakpoint::Source::CGRAM) {
         SNES::debugger.step_cpu = true;
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
         string s = t;
@@ -571,8 +574,7 @@ void Debugger::event() {
         break;
       }
 
-      if(n == SNES::Debugger::SoftBreakSA1
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
+      if(source == SNES::Debugger::Breakpoint::Source::SA1Bus) {
         SNES::debugger.step_sa1 = true;
         SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
         string s = t;
@@ -584,8 +586,8 @@ void Debugger::event() {
         break;
       }
 
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::APURAM
-           || SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::DSP) {
+      if(source == SNES::Debugger::Breakpoint::Source::APURAM
+           || source == SNES::Debugger::Breakpoint::Source::DSP) {
         SNES::debugger.step_smp = true;
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
@@ -597,7 +599,7 @@ void Debugger::event() {
         break;
       }
 
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SFXBus) {
+      if(source == SNES::Debugger::Breakpoint::Source::SFXBus) {
         SNES::debugger.step_sfx = true;
         SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
         string s = t;
@@ -609,7 +611,7 @@ void Debugger::event() {
         break;
       }
       
-      if(SNES::debugger.breakpoint[n].source == SNES::Debugger::Breakpoint::Source::SGBBus) {
+      if(source == SNES::Debugger::Breakpoint::Source::SGBBus) {
         SNES::debugger.step_sgb = true;
         SNES::supergameboy.disassemble_opcode(t, SNES::supergameboy.opcode_pc);
         string s = t;
