@@ -194,8 +194,15 @@ void SMP::op_io() {
 }
 
 uint8 SMP::op_read(uint16 addr) {
-  wait(addr);
-  return op_busread(addr);
+  if((addr & 0xfffc) == 0xf4) {
+    wait(addr, 1);
+    uint8 data = op_busread(addr);
+    wait(addr, 1);
+    return data;
+  } else {
+    wait(addr);
+	return op_busread(addr);
+  }
 }
 
 void SMP::op_write(uint16 addr, uint8 data) {

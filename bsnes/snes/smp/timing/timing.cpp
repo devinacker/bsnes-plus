@@ -8,7 +8,7 @@
 //sometimes the SMP will run far slower than expected
 //other times (and more likely), the SMP will deadlock until the system is reset
 //the timers are not affected by this and advance by their expected values
-void SMP::wait(uint16 addr) {
+void SMP::wait(uint16 addr, bool half) {
   static const unsigned cycleWaitStates[4] = {2, 4, 10, 20};
   static const unsigned timerWaitStates[4] = {2, 4,  8, 16};
 
@@ -18,8 +18,8 @@ void SMP::wait(uint16 addr) {
   else if(addr >= 0xffc0 && status.iplrom_enabled) 
     waitStates = status.internal_speed;  //IPLROM
 
-  add_clocks(12 * cycleWaitStates[waitStates]);
-  step_timers(timerWaitStates[waitStates]);
+  add_clocks(12 * cycleWaitStates[waitStates] >> half);
+  step_timers(timerWaitStates[waitStates] >> half);
 }
 
 void SMP::add_clocks(unsigned clocks) {

@@ -17,6 +17,6 @@ sSMPTimer<128> t0;
 sSMPTimer<128> t1;
 sSMPTimer< 16> t2;
 
-alwaysinline void wait(uint16 addr);
+alwaysinline void wait(uint16 addr, bool half = false);
 alwaysinline void add_clocks(unsigned clocks);
 alwaysinline void step_timers(unsigned clocks);
