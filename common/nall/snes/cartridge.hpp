@@ -560,8 +560,15 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   ram_size = 1024 << (data[index + RamSize] & 7);
   if(ram_size == 1024) ram_size = 0;  //no RAM present
 
-  //0, 1, 13 = NTSC; 2 - 12 = PAL
-  region = (regionid <= 1 || regionid >= 13) ? NTSC : PAL;
+  //0, 1, 11, 13, 15, 16 = NTSC; others = PAL
+  switch (regionid) {
+  case 0: case 1: case 11: case 13: case 15: case 16:
+    region = NTSC;
+    break;
+  default:
+    region = PAL;
+    break;
+  }
 
   //=======================
   //detect BS-X flash carts
