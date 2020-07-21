@@ -46,6 +46,23 @@ void CPU::add_clocks(unsigned clocks) {
       alu_edge();
     }
   }
+
+  if(status.hdma_init_triggered == false && hcounter() >= status.hdma_init_position) {
+    status.hdma_init_triggered = true;
+    hdma_init_reset();
+    if(hdma_enabled_channels()) {
+      status.hdma_pending = true;
+      status.hdma_mode = 0;
+    }
+  }
+
+  if(status.hdma_triggered == false && hcounter() >= status.hdma_position) {
+    status.hdma_triggered = true;
+    if(hdma_active_channels()) {
+      status.hdma_pending = true;
+      status.hdma_mode = 1;
+    }
+  }
 }
 
 //called by ppu.tick() when Hcounter=0
@@ -130,23 +147,6 @@ void CPU::dma_edge() {
         add_clocks(status.clock_count - (dma_clocks() % status.clock_count));
         status.dma_active = false;
       }
-    }
-  }
-
-  if(status.hdma_init_triggered == false && hcounter() >= status.hdma_init_position) {
-    status.hdma_init_triggered = true;
-    hdma_init_reset();
-    if(hdma_enabled_channels()) {
-      status.hdma_pending = true;
-      status.hdma_mode = 0;
-    }
-  }
-
-  if(status.hdma_triggered == false && hcounter() >= status.hdma_position) {
-    status.hdma_triggered = true;
-    if(hdma_active_channels()) {
-      status.hdma_pending = true;
-      status.hdma_mode = 1;
     }
   }
 
