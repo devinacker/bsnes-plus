@@ -15,7 +15,7 @@ else
 endif
 
 # silence warnings
-flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
+flags += -Wno-switch -Wno-parentheses
 
 ifeq ($(platform),x)
   flags := -fPIC $(flags)

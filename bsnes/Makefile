@@ -50,7 +50,7 @@ flags += -DNDEBUG
 # link += -lgcov
 
 # silence warnings
-flags += -Wno-switch -Wno-absolute-value -Wno-parentheses
+flags += -Wno-switch -Wno-parentheses
 
 # platform
 ifeq ($(platform),x)
