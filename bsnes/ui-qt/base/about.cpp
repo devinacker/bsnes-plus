@@ -36,7 +36,7 @@ AboutWindow::AboutWindow() {
 #endif
     "</b></td></tr><tr>"
     "<td align='left'><b>Project homepage:</b></td>"
-    "<td align='right'><a href='http://bsnes.revenant1.net'>http://bsnes.revenant1.net</a></td>"
+    "<td align='right'><a href='https://bsnes.revenant1.net'>https://bsnes.revenant1.net</a></td>"
     "</tr><tr>"
     "<td align='left'><b>Based on bsnes-classic:</b></td>"
     "<td align='right'><a href='https://github.com/awjackson/bsnes-classic'>https://github.com/awjackson/bsnes-classic</a></td>"
