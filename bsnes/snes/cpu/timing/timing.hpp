@@ -14,7 +14,8 @@ void timing_power();
 void timing_reset();
 
 //irq.cpp
-alwaysinline void poll_interrupts();
+alwaysinline void poll_nmi();
+alwaysinline void poll_irq();
 void nmitimen_update(uint8 data);
 bool rdnmi();
 bool timeup();

@@ -5,7 +5,7 @@
 //
 //ppu.(vh)counter(n) returns the value of said counters n-clocks before current time;
 //it is used to emulate hardware communication delay between opcode and interrupt units.
-void CPU::poll_interrupts() {
+void CPU::poll_nmi() {
   //NMI hold
   if(status.nmi_hold) {
     status.nmi_hold = false;
@@ -23,7 +23,9 @@ void CPU::poll_interrupts() {
     status.nmi_line = false;
   }
   status.nmi_valid = nmi_valid;
+}
 
+void CPU::poll_irq() {
   //IRQ hold
   status.irq_hold = false;
   if(status.irq_line) {

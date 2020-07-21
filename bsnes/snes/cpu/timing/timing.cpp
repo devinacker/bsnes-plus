@@ -27,7 +27,8 @@ void CPU::add_clocks(unsigned clocks) {
     tick();
     if(hcounter() & 2) {
       input.tick();
-      poll_interrupts();
+      poll_nmi();
+      poll_irq();
     }
     if(joypad_counter() == 0) {
       joypad_edge();

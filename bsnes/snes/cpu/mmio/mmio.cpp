@@ -118,21 +118,25 @@ void CPU::mmio_w4206(uint8 data) {
 //HTIMEL
 void CPU::mmio_w4207(uint8 data) {
   status.hirq_pos = (status.hirq_pos & 0x0100) | (data << 0);
+  poll_irq();
 }
 
 //HTIMEH
 void CPU::mmio_w4208(uint8 data) {
   status.hirq_pos = (status.hirq_pos & 0x00ff) | (data << 8);
+  poll_irq();
 }
 
 //VTIMEL
 void CPU::mmio_w4209(uint8 data) {
   status.virq_pos = (status.virq_pos & 0x0100) | (data << 0);
+  poll_irq();
 }
 
 //VTIMEH
 void CPU::mmio_w420a(uint8 data) {
   status.virq_pos = (status.virq_pos & 0x00ff) | (data << 8);
+  poll_irq();
 }
 
 //DMAEN
