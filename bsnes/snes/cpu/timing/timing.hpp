@@ -1,5 +1,4 @@
 //timing.cpp
-unsigned dma_clocks();
 unsigned dma_counter();
 unsigned joypad_counter();
 

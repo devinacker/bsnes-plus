@@ -3,14 +3,6 @@
 #include "irq.cpp"
 #include "joypad.cpp"
 
-unsigned CPU::dma_clocks() {
-  if(counter.cpu >= counter.dma) {
-    return counter.cpu - counter.dma;
-  } else {
-    return 0 - counter.cpu + counter.dma;
-  }
-}
-
 unsigned CPU::dma_counter() {
   return counter.cpu & 7;
 }
@@ -127,12 +119,12 @@ void CPU::dma_edge() {
       status.hdma_pending = false;
       if(hdma_enabled_channels()) {
         if(!dma_enabled_channels()) {
-          counter.dma = counter.cpu;
-          add_clocks(8 - dma_counter());
+          counter.dma = 8 - dma_counter();
+          add_clocks(counter.dma);
         }
         status.hdma_mode == 0 ? hdma_init() : hdma_run();
         if(!dma_enabled_channels()) {
-          add_clocks(status.clock_count - (dma_clocks() % status.clock_count));
+          add_clocks(status.clock_count - (counter.dma % status.clock_count));
           status.dma_active = false;
         }
       }
@@ -141,10 +133,10 @@ void CPU::dma_edge() {
     if(status.dma_pending) {
       status.dma_pending = false;
       if(dma_enabled_channels()) {
-        counter.dma = counter.cpu;
-        add_clocks(8 - dma_counter());
+        counter.dma = 8 - dma_counter();
+        add_clocks(counter.dma);
         dma_run();
-        add_clocks(status.clock_count - (dma_clocks() % status.clock_count));
+        add_clocks(status.clock_count - (counter.dma % status.clock_count));
         status.dma_active = false;
       }
     }

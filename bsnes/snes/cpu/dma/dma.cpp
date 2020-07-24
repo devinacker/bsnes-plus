@@ -4,6 +4,11 @@
 //memory access
 //=============
 
+void CPU::dma_add_clocks(unsigned clocks) {
+  counter.dma += clocks;
+  add_clocks(clocks);
+}
+
 bool CPU::dma_transfer_valid(uint8 bbus, uint32 abus) {
   //transfers from WRAM to WRAM are invalid; chip only has one address bus
   if(bbus == 0x80 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000)) return false;
@@ -26,14 +31,14 @@ uint8 CPU::dma_read(uint32 abus) {
 
 void CPU::dma_transfer(bool direction, uint8 bbus, uint32 abus) {
   if(direction == 0) {
-    add_clocks(4);
+    dma_add_clocks(4);
     regs.mdr = dma_read(abus);
-    add_clocks(4);
+    dma_add_clocks(4);
     if (dma_transfer_valid(bbus, abus)) bus.write(0x2100 | bbus, regs.mdr);
   } else {
-    add_clocks(4);
+    dma_add_clocks(4);
     regs.mdr = dma_transfer_valid(bbus, abus) ? bus.read(0x2100 | bbus) : 0x00;
-    add_clocks(4);
+    dma_add_clocks(4);
     if (dma_addr_valid(abus)) bus.write(abus, regs.mdr);
   }
 }
@@ -121,13 +126,13 @@ inline uint8 CPU::hdma_active_channels() {
 //==============
 
 void CPU::dma_run() {
-  add_clocks(8);
+  dma_add_clocks(8);
   dma_edge();
 
   for(unsigned i = 0; i < 8; i++) {
     if(channel[i].dma_enabled == false) continue;
     
-    add_clocks(8);
+    dma_add_clocks(8);
     dma_edge();
 
     unsigned index = 0;
@@ -143,9 +148,9 @@ void CPU::dma_run() {
 }
 
 void CPU::hdma_update(unsigned i) {
-  add_clocks(4);
+  dma_add_clocks(4);
   regs.mdr = dma_read((channel[i].source_bank << 16) | channel[i].hdma_addr);
-  add_clocks(4);
+  dma_add_clocks(4);
 
   if((channel[i].line_counter & 0x7f) == 0) {
     channel[i].line_counter = regs.mdr;
@@ -155,15 +160,15 @@ void CPU::hdma_update(unsigned i) {
     channel[i].hdma_do_transfer = !channel[i].hdma_completed;
 
     if(channel[i].indirect) {
-      add_clocks(4);
+      dma_add_clocks(4);
       regs.mdr = dma_read(hdma_addr(i));
-      add_clocks(4);
+      dma_add_clocks(4);
       channel[i].indirect_addr = regs.mdr << 8;
 
       if(!channel[i].hdma_completed || hdma_active_after(i)) {
-        add_clocks(4);
+        dma_add_clocks(4);
         regs.mdr = dma_read(hdma_addr(i));
-        add_clocks(4);
+        dma_add_clocks(4);
         channel[i].indirect_addr >>= 8;
         channel[i].indirect_addr |= regs.mdr << 8;
       }
@@ -172,7 +177,7 @@ void CPU::hdma_update(unsigned i) {
 }
 
 void CPU::hdma_run() {
-  add_clocks(8);
+  dma_add_clocks(8);
   
   for(unsigned i = 0; i < 8; i++) {
     if(hdma_active(i) == false) continue;
@@ -207,7 +212,7 @@ void CPU::hdma_init_reset() {
 }
 
 void CPU::hdma_init() {
-  add_clocks(8);
+  dma_add_clocks(8);
 
   for(unsigned i = 0; i < 8; i++) {
     if(!channel[i].hdma_enabled) continue;
