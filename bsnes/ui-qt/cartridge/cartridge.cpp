@@ -524,12 +524,8 @@ bool Cartridge::loadMemory(const char *filename, const char *extension, SNES::Ma
   file fp;
   if(fp.open(name, file::mode::read) == false) return false;
 
-  unsigned size = fp.size();
-  uint8_t *data = new uint8_t[size];
-  fp.read(data, size);
+  fp.read(memory.data(), memory.size());
   fp.close();
-
-  memory.map(data, size);
   return true;
 }
 
