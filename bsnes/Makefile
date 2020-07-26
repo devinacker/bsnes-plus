@@ -150,6 +150,7 @@ endif
 
 clean: ui_clean plugins_clean
 	-@$(call delete,$(objdir)/*.o)
+	-@$(call delete,$(objdir)/*/*.o)
 	-@$(call delete,$(objdir)/*.a)
 	-@$(call delete,$(objdir)/*.so)
 	-@$(call delete,$(objdir)/*.dylib)
