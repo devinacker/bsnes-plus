@@ -218,11 +218,16 @@ void PPU::mmio_w2105(uint8 data) {
 
 //MOSAIC
 void PPU::mmio_w2106(uint8 data) {
-  unsigned mosaic_size = (data >> 4) & 15;
-  bg4.regs.mosaic = (data & 0x08 ? mosaic_size : 0);
-  bg3.regs.mosaic = (data & 0x04 ? mosaic_size : 0);
-  bg2.regs.mosaic = (data & 0x02 ? mosaic_size : 0);
-  bg1.regs.mosaic = (data & 0x01 ? mosaic_size : 0);
+  bool enable = mosaic_enable();
+
+  regs.mosaic_size = (data >> 4) + 1;
+  if (!enable && (data & 0x0f)) {
+    regs.mosaic_vcounter = regs.mosaic_size + 1;
+  }
+  bg4.regs.mosaic = (data & 0x08);
+  bg3.regs.mosaic = (data & 0x04);
+  bg2.regs.mosaic = (data & 0x02);
+  bg1.regs.mosaic = (data & 0x01);
 }
 
 //BG1SC
@@ -797,6 +802,10 @@ void PPU::mmio_reset() {
   //$2105  BGMODE
   regs.bg3_priority = false;
   regs.bgmode = 0;
+
+  //$2106  MOSAIC
+  regs.mosaic_size = (random(0) & 15) + 1;
+  regs.mosaic_vcounter = 0;
 
   //$210d  BG1HOFS
   regs.mode7_hoffset = random(0x0000);

@@ -38,6 +38,9 @@ private:
     bool overscan;
   } display;
 
+  bool mosaic_enable() const;
+  unsigned mosaic_vcounter() const;
+
   #include "background/background.hpp"
   #include "mmio/mmio.hpp"
   #include "screen/screen.hpp"

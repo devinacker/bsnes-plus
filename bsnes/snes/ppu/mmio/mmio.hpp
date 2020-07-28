@@ -29,6 +29,10 @@ struct {
   bool bg3_priority;
   uint8 bgmode;
 
+  //$2106  MOSAIC
+  unsigned mosaic_size;
+  unsigned mosaic_vcounter;
+
   //$210d  BG1HOFS
   uint16 mode7_hoffset;
 

@@ -6,7 +6,7 @@ namespace SNES {
     #endif
     static const char Version[] = BSNES_VERSION;
     static const unsigned SerializerSignature = 0x43545342; //'BSTC'
-    static const unsigned SerializerVersion = 14;
+    static const unsigned SerializerVersion = 15;
   }
 }
 

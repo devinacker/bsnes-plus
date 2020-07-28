@@ -11,7 +11,7 @@ class Background {
     unsigned tiledata_addr;
     unsigned screen_addr;
     unsigned screen_size;
-    unsigned mosaic;
+    bool mosaic;
     bool tile_size;
 
     unsigned mode;
@@ -37,8 +37,6 @@ class Background {
     signed x;
     signed y;
 
-    unsigned mosaic_vcounter;
-    unsigned mosaic_voffset;
     unsigned mosaic_hcounter;
     unsigned mosaic_hoffset;
 

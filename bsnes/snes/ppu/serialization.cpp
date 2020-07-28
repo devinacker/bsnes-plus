@@ -38,6 +38,9 @@ void PPU::serialize(serializer &s) {
   s.integer(regs.bg3_priority);
   s.integer(regs.bgmode);
 
+  s.integer(regs.mosaic_size);
+  s.integer(regs.mosaic_vcounter);
+
   s.integer(regs.mode7_hoffset);
   s.integer(regs.mode7_voffset);
 
@@ -107,8 +110,6 @@ void PPU::Background::serialize(serializer &s) {
   s.integer(x);
   s.integer(y);
 
-  s.integer(mosaic_vcounter);
-  s.integer(mosaic_voffset);
   s.integer(mosaic_hcounter);
   s.integer(mosaic_hoffset);
 

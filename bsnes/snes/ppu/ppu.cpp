@@ -29,6 +29,14 @@ void PPU::synchronize_cpu() {
   }
 }
 
+bool PPU::mosaic_enable() const {
+  return bg1.regs.mosaic || bg2.regs.mosaic || bg3.regs.mosaic || bg4.regs.mosaic;
+}
+
+unsigned PPU::mosaic_vcounter() const {
+  return regs.mosaic_size - regs.mosaic_vcounter;
+}
+
 void PPU::Enter() { ppu.enter(); }
 
 void PPU::enter() {
@@ -116,6 +124,12 @@ void PPU::scanline() {
     bg4.frame();
   }
 
+  if(vcounter() == 1) {
+    regs.mosaic_vcounter = mosaic_enable() ? regs.mosaic_size + 1 : 0;
+  }
+  if(regs.mosaic_vcounter && !--regs.mosaic_vcounter) {
+    regs.mosaic_vcounter = mosaic_enable() ? regs.mosaic_size : 0;
+  }
   bg1.scanline();
   bg2.scanline();
   bg3.scanline();

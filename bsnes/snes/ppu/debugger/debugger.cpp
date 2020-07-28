@@ -148,10 +148,11 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
 
   //$2106
   item("$2106", "");
-  item("BG1 Mosaic Size", bg1.regs.mosaic);
-  item("BG2 Mosaic Size", bg2.regs.mosaic);
-  item("BG3 Mosaic Size", bg3.regs.mosaic);
-  item("BG4 Mosaic Size", bg4.regs.mosaic);
+  item("Mosaic Size", regs.mosaic_size);
+  item("BG1 Mosaic Enable", bg1.regs.mosaic);
+  item("BG2 Mosaic Enable", bg2.regs.mosaic);
+  item("BG3 Mosaic Enable", bg3.regs.mosaic);
+  item("BG4 Mosaic Enable", bg4.regs.mosaic);
 
   // Width x Height
   static char screen_size[4][8] = { "32x32", "64x32", "32x64", "64x64" };

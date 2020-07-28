@@ -146,7 +146,7 @@ bool PPUDebugger::property(unsigned id, string &name, string &value) {
 
   //$2106
   item("$2106", "");
-  item("Mosaic Size", (unsigned)regs.mosaic_size);
+  item("Mosaic Size", (unsigned)regs.mosaic_size + 1);
   item("BG1 Mosaic Enable", regs.mosaic_enabled[BG1]);
   item("BG2 Mosaic Enable", regs.mosaic_enabled[BG2]);
   item("BG3 Mosaic Enable", regs.mosaic_enabled[BG3]);

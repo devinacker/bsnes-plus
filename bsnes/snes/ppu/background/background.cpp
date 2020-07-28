@@ -12,15 +12,7 @@ void PPU::Background::scanline() {
   tile_counter = (7 - (regs.hoffset & 7)) << hires;
   for(unsigned n = 0; n < 8; n++) data[n] = 0;
 
-  if(self.vcounter() == 1) {
-    mosaic_vcounter = regs.mosaic + 1;
-    mosaic_voffset = 1;
-  } else if(--mosaic_vcounter == 0) {
-    mosaic_vcounter = regs.mosaic + 1;
-    mosaic_voffset += regs.mosaic + 1;
-  }
-
-  mosaic_hcounter = regs.mosaic + 1;
+  mosaic_hcounter = self.regs.mosaic_size;
   mosaic_hoffset = 0;
 }
 
@@ -46,13 +38,17 @@ void PPU::Background::get_tile() {
   mask_y--;
 
   unsigned px = x << hires;
-  unsigned py = (regs.mosaic == 0 ? y : mosaic_voffset);
+  unsigned py = y;
+  if(regs.mosaic) py -= self.mosaic_vcounter();
 
   unsigned hscroll = regs.hoffset;
   unsigned vscroll = regs.voffset;
   if(hires) {
     hscroll <<= 1;
-    if(self.regs.interlace) py = (py << 1) + self.field();
+    if(self.regs.interlace) {
+      py = (py << 1) + self.field();
+      if(regs.mosaic) py -= (self.mosaic_vcounter() + self.field());
+    }
   }
 
   unsigned hoffset = hscroll + px;
@@ -154,7 +150,7 @@ void PPU::Background::run(bool screen) {
   uint8 palette = get_tile_color();
   if(x == 0) mosaic_hcounter = 1;
   if(x >= 0 && --mosaic_hcounter == 0) {
-    mosaic_hcounter = regs.mosaic + 1;
+    mosaic_hcounter = regs.mosaic ? self.regs.mosaic_size : 1;
     mosaic_priority = priority;
     mosaic_palette = palette ? palette_index + palette : 0;
     mosaic_tile = tile;
@@ -233,8 +229,6 @@ void PPU::Background::reset() {
   x = 0;
   y = 0;
 
-  mosaic_vcounter = 0;
-  mosaic_voffset = 0;
   mosaic_hcounter = 0;
   mosaic_hoffset = 0;
 
