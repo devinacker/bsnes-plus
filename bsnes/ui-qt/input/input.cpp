@@ -214,6 +214,15 @@ void InputMapper::poll() {
     if(state(keyboard(i)[Keyboard::Control])) modifier |= InputModifier::Control;
     if(state(keyboard(i)[Keyboard::Alt])) modifier |= InputModifier::Alt;
     if(state(keyboard(i)[Keyboard::Super])) modifier |= InputModifier::Super;
+
+    if(config().input.focusPolicy != Configuration::Input::FocusPolicyIgnoreInput || mainWindow->isActive()) {
+      for(unsigned j = 0; j < Keyboard::Limit; j++) {
+        auto key = keyboard(i)[(Keyboard::Scancode)j];
+        if(state(key) != previousState(key)) {
+          SNES::dos.send_key(j, state(key));
+        }
+      }
+    }
   }
 
   for(unsigned i = 0; i < size(); i++) {

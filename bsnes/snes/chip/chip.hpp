@@ -16,6 +16,7 @@ struct Coprocessor : Processor {
 #include <chip/st0018/st0018.hpp>
 #include <chip/msu1/msu1.hpp>
 #include <chip/serial/serial.hpp>
+#include <chip/dos/dos.hpp>
 
 void Coprocessor::step(unsigned clocks) {
   clock += clocks * (uint64)cpu.frequency;

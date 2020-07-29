@@ -76,6 +76,8 @@ void System::serialize_all(serializer &s) {
   if(cartridge.has_obc1()) obc1.serialize(s);
   if(cartridge.has_msu1()) msu1.serialize(s);
   if(cartridge.has_serial()) serial.serialize(s);
+  
+  dos.serialize(s);
 }
 
 //called once upon cartridge load event: perform dry-run state save.
