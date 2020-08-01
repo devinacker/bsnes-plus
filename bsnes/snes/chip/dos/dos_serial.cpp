@@ -34,7 +34,7 @@ uint8 DOSSerial::read(uint3 addr) {
 
       if (!channel.rx_count)
         channel.rx_irq_pending = false;
-      irq_process();
+      dos.irq_process();
     }
   } else {
     // reading register
@@ -83,7 +83,7 @@ void DOSSerial::write(uint3 addr, uint8 data) {
       break;
     
     case 7: // interrupt reset
-      irq_process();
+      dos.irq_process();
       break;
     }
     
@@ -107,6 +107,7 @@ void DOSSerial::write(uint3 addr, uint8 data) {
       irq_enable = (data & 0x8);
       if (data & 0x80) reset(0);
       if (data & 0x40) reset(1);
+      dos.irq_process();
       break;
     }
 
@@ -125,7 +126,7 @@ void DOSSerial::send_data(bool num, uint8 data) {
     }
     if (channel.rx_irq_enable) {
       channel.rx_irq_pending = true;
-      irq_process();
+      dos.irq_process();
     }
   }
 }
@@ -135,10 +136,6 @@ uint8 DOSSerial::irq_status() const {
        | (channels[1].rx_irq_pending << 2)
        | (channels[0].tx_irq_pending << 4)
        | (channels[0].rx_irq_pending << 5);
-}
-
-void DOSSerial::irq_process() {
-  cpu.regs.irq = (irq_enable && irq_status());
 }
 
 #endif

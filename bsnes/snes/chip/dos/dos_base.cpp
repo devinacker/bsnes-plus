@@ -38,7 +38,7 @@ void DOS::power() {
 
 void DOS::reset() {
   serial.reset();
-  fdc_dio = 0;
+  floppy.reset();
 }
 
 uint8 DOS::read(unsigned addr) {
@@ -52,9 +52,9 @@ uint8 DOS::read(unsigned addr) {
   case 1: // parallel controller (printer) (TODO)
     return 0;
 
-  case 2: // floppy disk controller (TODO)
-    if (!(addr & 1))
-      return 0x80 | (fdc_dio << 6); // always keep RQM bit set for now so we can boot
+  case 2: // floppy disk controller
+    if (!(addr & 1) || !Memory::debugger_access()) // don't read FDC FIFO from debugger
+      return floppy.read(addr & 1);
     break;
   
   case 3: // floppy disk controller, terminal count (TODO)
@@ -76,11 +76,8 @@ void DOS::write(unsigned addr, uint8 data) {
   case 1: // parallel controller (printer) (TODO)
     break;
 
-  case 2: // floppy disk controller (TODO)
-    if (data == 0x36)
-      fdc_dio = false; // software reset
-    else
-      fdc_dio = true; // other commands
+  case 2: // floppy disk controller
+    floppy.write(addr & 1, data);
     break;
   
   case 3: // floppy disk controller, terminal count (TODO)
@@ -128,6 +125,11 @@ void DOS::send_key(unsigned scancode, bool on) {
     if (on) serial.send_data(0, key);
     else    serial.send_data(0, key | 0x80);
   }
+}
+
+void DOS::irq_process() {
+  cpu.regs.irq = (serial.irq_enable && serial.irq_status())
+               || floppy.irq_status();
 }
 
 #endif

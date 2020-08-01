@@ -37,9 +37,43 @@ private:
   
   void  reset(bool channel);
   uint8 irq_status() const;
-  void  irq_process();
   
+  friend class DOS;
 };
+
+class DOSFloppy {
+public:
+  void reset();
+
+  // CPU interface ($5f2x)
+  uint8 read(bool addr);
+  void write(bool addr, uint8 data);
+  
+  void serialize(serializer&);
+  
+  DOSFloppy();
+  ~DOSFloppy();
+
+private:
+  struct upd765_t *upd;
+
+  // uPD765 callbacks
+  static int seek_track(int drive, int track, void* user_data);
+  int seek_track(int drive, int track);
+  static int seek_sector(int drive, struct upd765_sectorinfo_t* info, void* user_data);
+  int seek_sector(int drive, struct upd765_sectorinfo_t* info);
+  static int read_sector(int drive, uint8_t h, void* user_data, uint8_t* data);
+  int read_sector(int drive, uint8_t h, uint8_t* data);
+  static int track_info(int drive, int side, void* user_data, struct upd765_sectorinfo_t* info);
+  int track_info(int drive, int side, struct upd765_sectorinfo_t* info);
+  static void drive_info(int drive, void* user_data, struct upd765_driveinfo_t* info);
+  void drive_info(int drive, struct upd765_driveinfo_t* info);
+
+  bool irq_status() const;
+  
+  friend class DOS;
+};
+
 
 class DOS : public Memory {
 public:
@@ -56,13 +90,15 @@ public:
   // see nall::Keyboard::Scancode
   void send_key(unsigned scancode, bool on);
 
+  // update pending serial/floppy IRQs
+  void irq_process();
+
   DOS();
   ~DOS();
 
 private:
   DOSSerial serial;
-  
-  bool fdc_dio;
+  DOSFloppy floppy;
 };
 
 extern DOS dos;
