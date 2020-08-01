@@ -49,6 +49,7 @@ void DOSFloppy::serialize(serializer& s) {
   s.integer(upd->drive_info.write_protected);
   s.integer(upd->drive_info.fault);
 
+  s.array(upd->st);
   s.integer(upd->pins);
   s.integer(upd->status);
 }
