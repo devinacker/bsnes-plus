@@ -79,16 +79,15 @@ void PPU::render_line_bg(uint8 pri0_pos, uint8 pri1_pos) {
   const uint16 mask_x      = bg_info[bg].mx;  //screen width  mask
   const uint16 mask_y      = bg_info[bg].my;  //screen height mask
 
-  uint16 y       = regs.bg_y[bg];
-  uint16 hscroll = regs.bg_hofs[bg];
-  uint16 vscroll = regs.bg_vofs[bg];
-
   const unsigned hires = (mode == 5 || mode == 6);
   const unsigned width = (!hires ? 256 : 512);
 
-  if(hires) {
-    hscroll <<= 1;
-    if(regs.interlace) y = (y << 1) + field();
+  uint16 y       = regs.bg_y[bg];
+  uint16 hscroll = regs.bg_hofs[bg] << hires;
+  uint16 vscroll = regs.bg_vofs[bg];
+
+  if(hires && regs.interlace) {
+    y = (y << 1) | (field() && !regs.mosaic_enabled[bg]);
   }
 
   uint16 hval, vval;
@@ -108,7 +107,8 @@ void PPU::render_line_bg(uint8 pri0_pos, uint8 pri1_pos) {
 
   uint16 prev_x = 0xffff, prev_y = 0xffff, prev_optx = 0xffff;
   for(uint16 x = 0; x < width; x++) {
-    hoffset = mtable[x] + hscroll;
+    bool hires_mosaic = hires && regs.mosaic_enabled[bg];
+    hoffset = (mtable[x >> hires_mosaic] << hires_mosaic) + hscroll;
     voffset = y + vscroll;
 
     if(is_opt_mode) {

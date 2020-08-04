@@ -39,16 +39,14 @@ void PPU::Background::get_tile() {
 
   unsigned px = x << hires;
   unsigned py = y;
-  if(regs.mosaic) py -= self.mosaic_vcounter();
 
-  unsigned hscroll = regs.hoffset;
+  unsigned hscroll = regs.hoffset << hires;
   unsigned vscroll = regs.voffset;
-  if(hires) {
-    hscroll <<= 1;
-    if(self.regs.interlace) {
-      py = (py << 1) + self.field();
-      if(regs.mosaic) py -= (self.mosaic_vcounter() + self.field());
-    }
+  if(hires && self.regs.interlace) {
+    py = (py << 1) | (self.field() && !regs.mosaic);
+  }
+  if(regs.mosaic) {
+    py -= (self.mosaic_vcounter() << (hires && self.regs.interlace));
   }
 
   unsigned hoffset = hscroll + px;
@@ -148,8 +146,10 @@ void PPU::Background::run(bool screen) {
   if(regs.mode == Mode::Mode7) return run_mode7();
   
   uint8 palette = get_tile_color();
+  bool update_mosaic = !hires || screen == Screen::Sub;
   if(x == 0) mosaic_hcounter = 1;
-  if(x >= 0 && --mosaic_hcounter == 0) {
+  if((x == 0 && update_mosaic)
+     || (x > 0 && update_mosaic && --mosaic_hcounter == 0)) {
     mosaic_hcounter = regs.mosaic ? self.regs.mosaic_size : 1;
     mosaic_priority = priority;
     mosaic_palette = palette ? palette_index + palette : 0;
@@ -159,25 +159,15 @@ void PPU::Background::run(bool screen) {
   if(mosaic_palette == 0) return;
 
   if(regs.mode == Mode::Inactive) return;
-  if(hires == false) {
+  if(!hires || screen == Screen::Main) {
     if(regs.main_enable) {
       output.main.priority = mosaic_priority;
       output.main.palette = mosaic_palette;
       output.main.tile = mosaic_tile;
     }
+  }
 
-    if(regs.sub_enable) {
-      output.sub.priority = mosaic_priority;
-      output.sub.palette = mosaic_palette;
-      output.sub.tile = mosaic_tile;
-    }
-  } else if(screen == Screen::Main) {
-    if(regs.main_enable) {
-      output.main.priority = mosaic_priority;
-      output.main.palette = mosaic_palette;
-      output.main.tile = mosaic_tile;
-    }
-  } else if(screen == Screen::Sub) {
+  if(!hires || screen == Screen::Sub) {
     if(regs.sub_enable) {
       output.sub.priority = mosaic_priority;
       output.sub.palette = mosaic_palette;
