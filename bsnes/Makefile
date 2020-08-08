@@ -61,7 +61,7 @@ else ifeq ($(platform),osx)
   link += -F/usr/local/lib -mmacosx-version-min=10.10
 else ifeq ($(platform),$(filter $(platform),win msys))
   link += -mwindows
-# link += -mconsole
+  link += -mconsole
   link += -mthreads -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32 -lole32
   link += -Wl,-enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
 else

@@ -28,30 +28,30 @@ void DOSSerial::serialize(serializer& s) {
 }
 
 void DOSFloppy::serialize(serializer& s) {
-  s.integer(upd->phase);
-  s.integer(upd->cmd);
-  s.integer(upd->fifo_pos);
-  s.integer(upd->fifo_num);
-  s.array(upd->fifo);
+  s.integer(fdc.phase);
+  s.integer(fdc.cmd);
+  s.integer(fdc.fifo_pos);
+  s.integer(fdc.fifo_num);
+  s.array(fdc.fifo);
 
-  s.integer(upd->sector_info.physical_track);
-  s.integer(upd->sector_info.c);
-  s.integer(upd->sector_info.h);
-  s.integer(upd->sector_info.r);
-  s.integer(upd->sector_info.n);
-  s.integer(upd->sector_info.st1);
-  s.integer(upd->sector_info.st2);
+  s.integer(fdc.sector_info.physical_track);
+  s.integer(fdc.sector_info.c);
+  s.integer(fdc.sector_info.h);
+  s.integer(fdc.sector_info.r);
+  s.integer(fdc.sector_info.n);
+  s.integer(fdc.sector_info.st1);
+  s.integer(fdc.sector_info.st2);
 
-  s.integer(upd->drive_info.physical_track);
-  s.integer(upd->drive_info.sides);
-  s.integer(upd->drive_info.head);
-  s.integer(upd->drive_info.ready);
-  s.integer(upd->drive_info.write_protected);
-  s.integer(upd->drive_info.fault);
+  s.integer(fdc.drive_info.physical_track);
+  s.integer(fdc.drive_info.sides);
+  s.integer(fdc.drive_info.head);
+  s.integer(fdc.drive_info.ready);
+  s.integer(fdc.drive_info.write_protected);
+  s.integer(fdc.drive_info.fault);
 
-  s.array(upd->st);
-  s.integer(upd->pins);
-  s.integer(upd->status);
+  s.array(fdc.st);
+  s.integer(fdc.pins);
+  s.integer(fdc.status);
 }
 
 #endif

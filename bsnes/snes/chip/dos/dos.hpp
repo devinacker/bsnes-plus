@@ -1,3 +1,9 @@
+#define CHIPS_IMPL
+//#define CHIPS_ASSERT(...) // dummy
+#include "fdd.h"
+#include "fdd_dos.h"
+#include "upd765.h"
+
 class DOSSerial {
 public:
   void reset();
@@ -55,7 +61,9 @@ public:
   ~DOSFloppy();
 
 private:
-  struct upd765_t *upd;
+  upd765_t fdc;
+  fdd_t fdd[4];
+  uint8_t data[4][FDD_MAX_DISC_SIZE];
 
   // uPD765 callbacks
   static int seek_track(int drive, int track, void* user_data);
@@ -64,11 +72,16 @@ private:
   int seek_sector(int drive, struct upd765_sectorinfo_t* info);
   static int read_sector(int drive, uint8_t h, void* user_data, uint8_t* data);
   int read_sector(int drive, uint8_t h, uint8_t* data);
+  static int write_sector(int drive, uint8_t h, void* user_data, uint8_t data);
+  int write_sector(int drive, uint8_t h, uint8_t data);
   static int track_info(int drive, int side, void* user_data, struct upd765_sectorinfo_t* info);
   int track_info(int drive, int side, struct upd765_sectorinfo_t* info);
   static void drive_info(int drive, void* user_data, struct upd765_driveinfo_t* info);
   void drive_info(int drive, struct upd765_driveinfo_t* info);
+  static void irq_set(void* user_data, bool status);
+  void irq_set(bool status);
 
+  bool irq_pending;
   bool irq_status() const;
   
   friend class DOS;
