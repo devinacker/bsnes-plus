@@ -44,6 +44,7 @@ void DOS::reset() {
 uint8 DOS::read(unsigned addr) {
   if(!Memory::debugger_access())
     cpu.synchronize_coprocessor();
+  else return cpu.regs.mdr;
 
   switch ((addr & 0x30) >> 4) {
   case 0: // serial controller (keyboard, RS-232)
@@ -53,8 +54,7 @@ uint8 DOS::read(unsigned addr) {
     return 0;
 
   case 2: // floppy disk controller
-    if (!(addr & 1) || !Memory::debugger_access()) // don't read FDC FIFO from debugger
-      return floppy.read(addr & 1);
+    return floppy.read(addr & 1);
     break;
   
   case 3: // floppy disk controller, terminal count (TODO)
@@ -67,6 +67,7 @@ uint8 DOS::read(unsigned addr) {
 void DOS::write(unsigned addr, uint8 data) {
   if(!Memory::debugger_access())
     cpu.synchronize_coprocessor();
+  else return;
 
   switch ((addr & 0x30) >> 4) {
   case 0: // serial controller (keyboard, RS-232)

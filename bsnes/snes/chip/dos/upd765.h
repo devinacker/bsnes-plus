@@ -99,7 +99,7 @@ extern "C" {
 #define UPD765_ST0_SE       (1<<5)      /* seek end */
 #define UPD765_ST0_RES      ((1<<7)|(1<<6)) /* command result bitmask */
 #define UPD765_ST0_NT       (0)         /* D7=0,D6=0: normal termination of command */
-#define UPD765_ST0_AT       (1<<6)      /* D7=0,D6=0: abnormal termination of command */
+#define UPD765_ST0_AT       (1<<6)      /* D7=0,D6=1: abnormal termination of command */
 #define UPD765_ST0_IC       (1<<7)      /* D7=1,D6=0: invalid command issue */
 #define UPD765_ST0_ATRM     ((1<<7)|(1<<6)) /* D7=1,D6=1: abormal termination */
 
@@ -155,6 +155,10 @@ extern "C" {
 #define UPD72069_AUX_RESET                  ((1<<5)|(1<<4)|(1<<2)|(1<<1))
 #define UPD72069_AUX_SET_STANDBY            ((1<<5)|(1<<4)|(1<<2)|(1<<0))
 #define UPD72069_AUX_START_CLOCK            ((1<<6)|(1<<2)|(1<<1)|(1<<0))
+#define UPD72069_AUX_INTERNAL_MODE_250      ((1<<3)|(1<<1)|(1<<0))
+#define UPD72069_AUX_INTERNAL_MODE_300      ((1<<7)|(1<<6)|(1<<3)|(1<<1)|(1<<0))
+#define UPD72069_AUX_INTERNAL_MODE_500      ((1<<6)|(1<<3)|(1<<1)|(1<<0))
+#define UPD72069_AUX_SELECT_FORMAT          ((1<<6)|(1<<3)|(1<<2)|(1<<1)|(1<<0))
 
 /* internal phases */
 #define UPD765_PHASE_IDLE    (0)
@@ -200,18 +204,24 @@ typedef int (*upd765_seektrack_cb)(int drive, int track, void* user_data);
 typedef int (*upd765_seeksector_cb)(int drive, upd765_sectorinfo_t* inout_info, void* user_data);
 /* callback to read the next sector data byte */
 typedef int (*upd765_read_cb)(int drive, uint8_t h, void* user_data, uint8_t* out_data);
+/* callback to write the next sector data byte */
+typedef int (*upd765_write_cb)(int drive, uint8_t h, void* user_data, uint8_t in_data);
 /* callback to read info about first sector on current reack */
 typedef int (*upd765_trackinfo_cb)(int drive, int side, void* user_data, upd765_sectorinfo_t* out_info);
 /* callback to get info about disk drive (called on SENSE_DRIVE_STATUS command) */
 typedef void (*upd765_driveinfo_cb)(int drive, void* user_data, upd765_driveinfo_t* out_info);
+/* callback to set an interrupt request */
+typedef void (*upd765_irq_cb)(void* user_data, bool status);
 
 /* upd765 initialization parameters */
 typedef struct upd765_desc_t {
     upd765_seektrack_cb seektrack_cb;
     upd765_seeksector_cb seeksector_cb;
     upd765_read_cb read_cb;
+    upd765_write_cb write_cb;
     upd765_trackinfo_cb trackinfo_cb;
     upd765_driveinfo_cb driveinfo_cb;
+    upd765_irq_cb irq_cb;
     void* user_data;
 } upd765_desc_t;
 
@@ -224,17 +234,28 @@ typedef struct upd765_t {
     int fifo_num;               /* number of valid items in fifo */
     uint8_t fifo[UPD765_FIFO_SIZE];
 
+    bool dio;                  /* current data input/output mode */
+    bool st0_sent;             /* current data input/output mode */
+
     /* current status */
     upd765_sectorinfo_t sector_info;
     upd765_driveinfo_t drive_info;      /* only valid after SENSE_DRIVE_CMD */
     uint8_t st[4];
 
+    /* interrupt request status */
+    bool irq;
+    bool data_irq;
+    bool other_irq;
+    bool internal_drq;
+
     /* callback functions */
     upd765_seektrack_cb seektrack_cb;
     upd765_seeksector_cb seeksector_cb;
     upd765_read_cb read_cb;
+    upd765_write_cb write_cb;
     upd765_trackinfo_cb trackinfo_cb;
     upd765_driveinfo_cb driveinfo_cb;
+    upd765_irq_cb irq_cb;
     void* user_data;
 
     /* debug inspection */
@@ -260,6 +281,10 @@ uint64_t upd765_iorq(upd765_t* upd, uint64_t pins);
     #include <assert.h>
     #define CHIPS_ASSERT(c) assert(c)
 #endif
+
+static int _upd765_calc_sector_size(uint8_t size) {
+    return size > 7 ? 16384 : 128 << size;
+}
 
 /* internal argument/result fifo helpers */
 static inline void _upd765_fifo_reset(upd765_t* upd, int num) {
@@ -314,24 +339,88 @@ static void _upd765_to_phase_command(upd765_t* upd, uint8_t data) {
     }
     _upd765_fifo_reset(upd, num_cmd_bytes);
     _upd765_fifo_wr(upd, data);
+
+    if(num_cmd_bytes > 0) upd->dio = true;
+
+    // debug
+    printf("DEBUG: Executing ");
+    switch(upd->cmd){
+        case UPD765_CMD_INVALID: printf("UPD765_CMD_INVALID\n"); break;
+        case UPD765_CMD_READ_DATA: printf("UPD765_CMD_READ_DATA\n"); break;
+        case UPD765_CMD_READ_DELETED_DATA: printf("UPD765_CMD_READ_DELETED_DATA\n"); break;
+        case UPD765_CMD_WRITE_DATA: printf("UPD765_CMD_WRITE_DATA\n"); break;
+        case UPD765_CMD_WRITE_DELETED_DATA: printf("UPD765_CMD_WRITE_DELETED_DATA\n"); break;
+        case UPD765_CMD_READ_A_TRACK: printf("UPD765_CMD_READ_A_TRACK\n"); break;
+        case UPD765_CMD_READ_ID: printf("UPD765_CMD_READ_ID\n"); break;
+        case UPD765_CMD_FORMAT_A_TRACK: printf("UPD765_CMD_FORMAT_A_TRACK\n"); break;
+        case UPD765_CMD_SCAN_EQUAL: printf("UPD765_CMD_SCAN_EQUAL\n"); break;
+        case UPD765_CMD_SCAN_LOW_OR_EQUAL: printf("UPD765_CMD_SCAN_LOW_OR_EQUAL\n"); break;
+        case UPD765_CMD_SCAN_HIGH_OR_EQUAL: printf("UPD765_CMD_SCAN_HIGH_OR_EQUAL\n"); break;
+        case UPD765_CMD_RECALIBRATE: printf("UPD765_CMD_RECALIBRATE\n"); break;
+        case UPD765_CMD_SENSE_INTERRUPT_STATUS: printf("UPD765_CMD_SENSE_INTERRUPT_STATUS\n"); break;
+        case UPD765_CMD_SPECIFY: printf("UPD765_CMD_SPECIFY\n"); break;
+        case UPD765_CMD_SENSE_DRIVE_STATUS: printf("UPD765_CMD_SENSE_DRIVE_STATUS\n"); break;
+        case UPD765_CMD_SEEK: printf("UPD765_CMD_SEEK\n"); break;
+        default: printf("INVALID_CMD: %02x\n", upd->cmd); break;
+    }
+}
+
+static void _upd765_check_irq(upd765_t* upd) {
+    //CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
+    bool last_irq = upd->irq;
+    upd->irq = upd->data_irq || upd->other_irq || upd->internal_drq;
+    //upd->cur_irq = upd->cur_irq && (dor & 4) && (mode != mode_t::AT || (dor & 8));
+    if(upd->irq != last_irq) {
+        upd->irq_cb(upd->user_data, upd->irq);
+        printf("irqq\n");
+    }
+}
+
+static void _upd765_cmd_finish(upd765_t* upd, bool data_finished) {
+    //CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
+    if(data_finished)
+        upd->data_irq = true;
+    else {
+        upd->other_irq = true;
+    }
+    _upd765_check_irq(upd);
 }
 
 /* may be called from _upd765_cmd() to transition to EXEC phase */
 static void _upd765_to_phase_exec(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
     upd->phase = UPD765_PHASE_EXEC;
+    _upd765_cmd_finish(upd, true);
+    //upd->dio = true;
 }
 
 /* called from any other phase to transition to IDLE phase (ready for new command */
 static void _upd765_to_phase_idle(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase != UPD765_PHASE_IDLE);
     upd->phase = UPD765_PHASE_IDLE;
+    upd->dio = false;
+
+    switch (upd->cmd) {
+        //case UPD765_CMD_SPECIFY:
+        case UPD765_CMD_SEEK:
+        case UPD765_CMD_RECALIBRATE:
+            upd->st0_sent = false;
+            _upd765_cmd_finish(upd, false);
+        break;
+        case UPD765_CMD_SENSE_INTERRUPT_STATUS:
+            upd->st0_sent = true;
+            upd->dio = false;
+            upd->other_irq = false;
+            _upd765_check_irq(upd);
+        break;
+    }
 }
 
 /* may be called from _upd765_cmd() or during EXEC phase to prepare command result */
 static void _upd765_to_phase_result(upd765_t* upd) {
     CHIPS_ASSERT((upd->phase == UPD765_PHASE_COMMAND) || (upd->phase == UPD765_PHASE_EXEC));
     upd->phase = UPD765_PHASE_RESULT;
+    //upd->dio = false;
     switch (upd->cmd) {
         case UPD765_CMD_READ_DATA:
         case UPD765_CMD_READ_DELETED_DATA:
@@ -351,10 +440,11 @@ static void _upd765_to_phase_result(upd765_t* upd) {
             upd->fifo[4] = upd->sector_info.h;
             upd->fifo[5] = upd->sector_info.r;
             upd->fifo[6] = upd->sector_info.n;
+            _upd765_cmd_finish(upd, false);
             break;
         case UPD765_CMD_SENSE_INTERRUPT_STATUS:
             _upd765_fifo_reset(upd, 2);
-            upd->fifo[0] = upd->st[0];
+            upd->fifo[0] = upd->st0_sent ? UPD765_ST0_IC : upd->st[0];
             upd->fifo[1] = upd->sector_info.physical_track;
             break;
         case UPD765_CMD_SENSE_DRIVE_STATUS:
@@ -365,6 +455,7 @@ static void _upd765_to_phase_result(upd765_t* upd) {
         case UPD765_CMD_SPECIFY:
         case UPD765_CMD_SEEK:
             /* this shouldn't actually happen */
+            //upd->irq = true;
             _upd765_to_phase_idle(upd);
             break;
         default:
@@ -379,8 +470,16 @@ static void _upd765_to_phase_result(upd765_t* upd) {
 */
 static void _upd765_cmd(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
+
+    upd->other_irq = false;
+    upd->data_irq = false;
+    _upd765_check_irq(upd);
+
     switch (upd->cmd) {
         case UPD765_CMD_READ_DATA:
+        case UPD765_CMD_READ_DELETED_DATA:
+        case UPD765_CMD_WRITE_DATA:
+        case UPD765_CMD_WRITE_DELETED_DATA:
             {
                 upd->st[0] = upd->fifo[1] & 7;      /* HD, US1, US0 */
                 upd->sector_info.c = upd->fifo[2];
@@ -389,16 +488,15 @@ static void _upd765_cmd(upd765_t* upd) {
                 upd->sector_info.n = upd->fifo[5];
                 upd->sector_info.st1 = 0;
                 upd->sector_info.st2 = 0;
-                /* FIXME: handle length of read data via n=0 and DTL!=0xFF */
+                /* FIXME: handle length of read/write data via n=0 and DTL!=0xFF */
                 CHIPS_ASSERT((upd->sector_info.n != 0) && (upd->fifo[8] == 0xFF));
-                /* FIXME: handle read several sectors at a time via EOT arg */
+                /* FIXME: handle read/write several sectors at a time via EOT arg */
                 CHIPS_ASSERT(upd->sector_info.r == upd->fifo[6]);
                 const int fdd_index = upd->st[0] & 3;
                 const int res = upd->seeksector_cb(fdd_index, &upd->sector_info, upd->user_data);
                 if (UPD765_RESULT_SUCCESS == res) {
                     _upd765_to_phase_exec(upd);
-                }
-                else {
+                } else {
                     upd->st[0] |= UPD765_ST0_AT;
                     if (UPD765_RESULT_NOT_READY & res) {
                         upd->st[0] |= UPD765_ST0_NR;
@@ -447,16 +545,18 @@ static void _upd765_cmd(upd765_t* upd) {
             break;
 
         case UPD765_CMD_SENSE_INTERRUPT_STATUS:
-            if (upd->st[0] & UPD765_ST0_SE) {
-                /* on seek-end, return current track */
-                const int fdd_index = upd->st[0] & 3;
-                upd->trackinfo_cb(fdd_index, 0, upd->user_data, &upd->sector_info);
+            {
+
+                if (upd->st[0] & UPD765_ST0_SE) {
+                    const int fdd_index = upd->st[0] & 3;
+                    /* on seek-end, return current track */
+                    upd->trackinfo_cb(fdd_index, 0, upd->user_data, &upd->sector_info);
+                } else {
+                    /* FIXME??? */
+                    upd->st[0] |= UPD765_ST0_ATRM;
+                }
+                _upd765_to_phase_result(upd);
             }
-            else {
-                /* FIXME??? */
-                upd->st[0] |= UPD765_ST0_ATRM;
-            }
-            _upd765_to_phase_result(upd);
             break;
 
         case UPD765_CMD_SENSE_DRIVE_STATUS:
@@ -512,11 +612,13 @@ static void _upd765_cmd(upd765_t* upd) {
             }
             break;
 
-        case UPD765_CMD_READ_DELETED_DATA:
-        case UPD765_CMD_WRITE_DATA:
-        case UPD765_CMD_WRITE_DELETED_DATA:
-        case UPD765_CMD_READ_A_TRACK:
         case UPD765_CMD_FORMAT_A_TRACK:
+            {
+                _upd765_to_phase_result(upd);
+            }
+            break;
+
+        case UPD765_CMD_READ_A_TRACK:
         case UPD765_CMD_SCAN_EQUAL:
         case UPD765_CMD_SCAN_LOW_OR_EQUAL:
         case UPD765_CMD_SCAN_HIGH_OR_EQUAL:
@@ -537,6 +639,7 @@ static uint8_t _upd765_exec_rd(upd765_t* upd) {
     uint8_t data = 0xFF;
     switch (upd->cmd) {
         case UPD765_CMD_READ_DATA:
+        case UPD765_CMD_READ_DELETED_DATA:
             {
                 /* read next sector data byte from FDD */
                 const int fdd_index = upd->st[0] & 3;
@@ -559,9 +662,27 @@ static uint8_t _upd765_exec_rd(upd765_t* upd) {
 
 /* called when a byte is written during the exec phase */
 static void _upd765_exec_wr(upd765_t* upd, uint8_t data) {
-    // FIXME
-    (void)upd;
-    (void)data;
+    CHIPS_ASSERT(upd->phase == UPD765_PHASE_EXEC);
+    switch (upd->cmd) {
+        case UPD765_CMD_WRITE_DATA:
+        case UPD765_CMD_WRITE_DELETED_DATA:
+            {
+                /* read next sector data byte from FDD */
+                const int fdd_index = upd->st[0] & 3;
+                const int res = upd->write_cb(fdd_index, upd->sector_info.h, upd->user_data, data);
+                if (res != UPD765_RESULT_SUCCESS) {
+                    if (res & UPD765_RESULT_NOT_READY) {
+                        upd->st[0] |= UPD765_ST0_NR;
+                    }
+                    _upd765_to_phase_result(upd);
+                }
+            }
+            break;
+        default:
+            /* shouldn't happen */
+            CHIPS_ASSERT(false);
+            break;
+    }
 }
 
 /* write a data byte to the upd765 */
@@ -589,6 +710,21 @@ static void _upd765_write_data(upd765_t* upd, uint8_t data) {
 
 /* write an auxiliary command to the uPD72069 */
 static void _upd765_write_aux(upd765_t* upd, uint8_t data) {
+    
+    // debug
+    printf("DEBUG: Executing ");
+    switch (data) {
+        case UPD72069_AUX_RESET: printf("UPD72069_AUX_RESET\n"); break;
+        case UPD72069_AUX_SET_STANDBY: printf("UPD72069_AUX_SET_STANDBY\n"); break;
+        case UPD72069_AUX_START_CLOCK: printf("UPD72069_AUX_START_CLOCK\n"); break;
+        case UPD72069_AUX_INTERNAL_MODE_250: printf("UPD72069_AUX_INTERNAL_MODE_250\n"); break;
+        case UPD72069_AUX_INTERNAL_MODE_300: printf("UPD72069_AUX_INTERNAL_MODE_300\n"); break;
+        case UPD72069_AUX_INTERNAL_MODE_500: printf("UPD72069_AUX_INTERNAL_MODE_500\n"); break;
+        case UPD72069_AUX_SELECT_FORMAT: printf("UPD72069_AUX_SELECT_FORMAT\n"); break;
+        default: printf("UNKNOWN_AUX_CMD\n"); break;
+    }
+
+    upd->dio = true;
     if (UPD765_PHASE_IDLE == upd->phase) {
         switch (data) {
         case UPD72069_AUX_RESET:
@@ -598,7 +734,12 @@ static void _upd765_write_aux(upd765_t* upd, uint8_t data) {
         case UPD72069_AUX_SET_STANDBY:
         case UPD72069_AUX_START_CLOCK:
             break;
-        
+
+        case UPD72069_AUX_INTERNAL_MODE_250:
+        case UPD72069_AUX_INTERNAL_MODE_300:
+        case UPD72069_AUX_INTERNAL_MODE_500:
+        case UPD72069_AUX_SELECT_FORMAT:
+
         default:
             upd->phase = UPD765_PHASE_RESULT;
             _upd765_fifo_reset(upd, 1);
@@ -632,23 +773,25 @@ static inline uint8_t _upd765_read_status(upd765_t* upd) {
         for between 2us and 50us, for now just indicate
         that we're always ready during the command and result phase
     */
-    /* FIXME: data direction is currently always set as FDC->CPU,
-       since the emulation doesn't support write operations
-    */
+
+    if(upd->dio && upd->phase != UPD765_PHASE_IDLE)
+        status |= UPD765_STATUS_DIO;
+
     switch (upd->phase) {
         case UPD765_PHASE_IDLE:
             status |= UPD765_STATUS_RQM;
             break;
         case UPD765_PHASE_COMMAND:
-            status |= UPD765_STATUS_CB|UPD765_STATUS_RQM;
+            status |= UPD765_STATUS_RQM;
             break;
         case UPD765_PHASE_EXEC:
-            status |= UPD765_STATUS_CB|UPD765_STATUS_EXM|UPD765_STATUS_DIO|UPD765_STATUS_RQM;
+            status |= UPD765_STATUS_EXM|UPD765_STATUS_RQM|UPD765_STATUS_DIO;
             break;
         case UPD765_PHASE_RESULT:
-            status |= UPD765_STATUS_CB|UPD765_STATUS_DIO|UPD765_STATUS_RQM;
+            status |= UPD765_STATUS_RQM|UPD765_STATUS_DIO;
             break;
     }
+
     return status;
 }
 
@@ -657,14 +800,18 @@ void upd765_init(upd765_t* upd, const upd765_desc_t* desc) {
     CHIPS_ASSERT(desc->seektrack_cb);
     CHIPS_ASSERT(desc->seeksector_cb);
     CHIPS_ASSERT(desc->read_cb);
+    CHIPS_ASSERT(desc->write_cb);
     CHIPS_ASSERT(desc->trackinfo_cb);
     CHIPS_ASSERT(desc->driveinfo_cb);
+    CHIPS_ASSERT(desc->irq_cb);
     memset(upd, 0, sizeof(upd765_t));
     upd->seektrack_cb = desc->seektrack_cb;
     upd->seeksector_cb = desc->seeksector_cb;
     upd->read_cb = desc->read_cb;
+    upd->write_cb = desc->write_cb;
     upd->trackinfo_cb = desc->trackinfo_cb;
     upd->driveinfo_cb = desc->driveinfo_cb;
+    upd->irq_cb = desc->irq_cb;
     upd->user_data = desc->user_data;
     upd765_reset(upd);
 }
@@ -672,7 +819,13 @@ void upd765_init(upd765_t* upd, const upd765_desc_t* desc) {
 void upd765_reset(upd765_t* upd) {
     CHIPS_ASSERT(upd);
     upd->phase = UPD765_PHASE_IDLE;
+    upd->dio = false;
+    upd->data_irq = false;
+    upd->other_irq = false;
+    upd->internal_drq = false;
+
     _upd765_fifo_reset(upd, 0);
+    _upd765_check_irq(upd);
 }
 
 uint64_t upd765_iorq(upd765_t* upd, uint64_t pins) {
