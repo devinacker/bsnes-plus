@@ -56,7 +56,7 @@ bool fdd_dos_insert_img(fdd_t* fdd, const uint8_t* data, int data_size);
 
     https://thestarman.pcministry.com/asm/mbr/DOS50FDB.htm
 */
-typedef struct {
+typedef struct _fdd_dos_img_header {
     uint16_t code_ptr;
     uint8_t nop;      /* MV - dosEMU.... */
     uint8_t magic[8];      /* MSDOS5.0 */
@@ -81,7 +81,7 @@ typedef struct {
 
 } _fdd_dos_img_header;
 
-typedef struct {
+typedef struct _fdd_dos_img_track_info {
     uint8_t magic[12];      /* Track-Info\r\n */
     uint8_t unused_0[4];
     uint8_t track_number;
@@ -93,7 +93,7 @@ typedef struct {
     uint8_t filler_byte;
 } _fdd_dos_img_track_info;
 
-typedef struct {
+typedef struct _fdd_dos_img_sector_info {
     uint8_t track;
     uint8_t side;
     uint8_t sector_id;

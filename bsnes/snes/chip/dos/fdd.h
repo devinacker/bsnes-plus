@@ -59,7 +59,7 @@ extern "C" {
 #define FDD_RESULT_END_OF_SECTOR (1<<2)
 
 /* UPD765 disc controller overlay of the sector info bytes */
-typedef struct {
+typedef struct fdd_upd765_sectorinfo_t {
     uint8_t c;      /* cylinder number (track number) */
     uint8_t h;      /* head address (side) */
     uint8_t r;      /* record (sector number) */
@@ -69,7 +69,7 @@ typedef struct {
 } fdd_upd765_sectorinfo_t;
 
 /* a sector description */
-typedef struct {
+typedef struct fdd_sector_t {
     union {
         fdd_upd765_sectorinfo_t upd765;
         uint8_t raw[8];
@@ -79,7 +79,7 @@ typedef struct {
 } fdd_sector_t;
 
 /* a track description */
-typedef struct {
+typedef struct fdd_track_t {
     int data_offset;    /* offset of track data in disc data blob */
     int data_size;      /* track data size in bytes */
     int num_sectors;    /* number of sectors in track */
@@ -87,7 +87,7 @@ typedef struct {
 } fdd_track_t;
 
 /* a disc description */
-typedef struct {
+typedef struct fdd_disc_t {
     bool formatted;         /* disc is formatted */
     bool write_protected;   /* disc is write protected */
     int num_sides;
@@ -96,7 +96,7 @@ typedef struct {
 } fdd_disc_t;
 
 /* a floppy disc drive description */
-typedef struct {
+typedef struct fdd_t {
     int cur_side;
     int cur_track_index;
     int cur_sector_index;

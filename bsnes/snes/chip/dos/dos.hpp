@@ -1,9 +1,3 @@
-#define CHIPS_IMPL
-//#define CHIPS_ASSERT(...) // dummy
-#include "fdd.h"
-#include "fdd_dos.h"
-#include "upd765.h"
-
 class DOSSerial {
 public:
   void reset();
@@ -61,9 +55,8 @@ public:
   ~DOSFloppy();
 
 private:
-  upd765_t fdc;
-  fdd_t fdd[4];
-  uint8_t data[4][FDD_MAX_DISC_SIZE];
+  struct upd765_t *fdc;
+  struct fdd_t *fdd;
 
   // uPD765 callbacks
   static int seek_track(int drive, int track, void* user_data);

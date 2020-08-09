@@ -1,5 +1,11 @@
 #ifdef DOS_CPP
 
+#define CHIPS_IMPL
+//#define CHIPS_ASSERT(...) // dummy
+#include "fdd.h"
+#include "fdd_dos.h"
+#include "upd765.h"
+
 DOSFloppy::DOSFloppy() {
   upd765_desc_t desc;
   desc.seektrack_cb = seek_track;
@@ -10,17 +16,21 @@ DOSFloppy::DOSFloppy() {
   desc.driveinfo_cb = drive_info;
   desc.irq_cb = irq_set;
   desc.user_data = this;
-  upd765_init(&fdc, &desc);
-  reset();
+  
+  fdc = new upd765_t;
+  fdd = new fdd_t[4];
+  
+  upd765_init(fdc, &desc);
 }
 
 DOSFloppy::~DOSFloppy() {
-  delete &fdc;
+  delete fdc;
+  delete[] fdd;
 }
 
 void DOSFloppy::reset() {
 
-  upd765_reset(&fdc);
+  upd765_reset(fdc);
 
   file discimage;
   for(int i; i < 4; i++){
@@ -32,7 +42,6 @@ void DOSFloppy::reset() {
       fdd_init(&fdd[i]);
       if(discimage.size() > 0){
         fdd_dos_insert_empty(&fdd[i], discimage.size());
-        //fdd_dos_insert_img(&fdd[i], (const uint8_t *) data[i], discimage.size());
         discimage.read(fdd[i].data, discimage.size());
         printf("%d\n", discimage.size());
       } else {
@@ -41,7 +50,6 @@ void DOSFloppy::reset() {
     }
     discimage.close();
   }
-//  delete &discimage;
 }
 
 int DOSFloppy::seek_track(int drive, int track, void* user_data) {
@@ -159,8 +167,8 @@ uint8 DOSFloppy::read(bool addr) {
   uint64_t pins = UPD765_CS | UPD765_RD;
   if (addr) pins |= UPD765_A0;
   
-  pins = upd765_iorq(&fdc, pins);
-  printf("[%06x] read 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, UPD765_GET_DATA(pins), irq_pending, fdc.phase);
+  pins = upd765_iorq(fdc, pins);
+  printf("[%06x] read 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, UPD765_GET_DATA(pins), irq_pending, fdc->phase);
   return UPD765_GET_DATA(pins);
 }
 
@@ -169,8 +177,8 @@ void DOSFloppy::write(bool addr, uint8 data) {
   if (addr) pins |= UPD765_A0;
   UPD765_SET_DATA(pins, data);
   
-  upd765_iorq(&fdc, pins);
-  printf("[%06x] write 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, data, irq_pending, fdc.phase);
+  upd765_iorq(fdc, pins);
+  printf("[%06x] write 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, data, irq_pending, fdc->phase);
 }
 
 bool DOSFloppy::irq_status() const {
