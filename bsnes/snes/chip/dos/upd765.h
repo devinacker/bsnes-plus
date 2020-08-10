@@ -30,6 +30,11 @@
         - DOCS!
         - cleanup callbacks
 
+    ## Modifications for bsnes-plus SFX-DOS emulation
+        - Interrupt support
+        - Write command support
+        - Basic support for uPD72069 "auxiliary" commands
+
     ## zlib/libpng license
 
     Copyright (c) 2018 Andre Weissflog
@@ -235,7 +240,6 @@ typedef struct upd765_t {
     uint8_t fifo[UPD765_FIFO_SIZE];
 
     bool dio;                  /* current data input/output mode */
-    bool st0_sent;             /* current data input/output mode */
 
     /* current status */
     upd765_sectorinfo_t sector_info;
@@ -340,8 +344,6 @@ static void _upd765_to_phase_command(upd765_t* upd, uint8_t data) {
     _upd765_fifo_reset(upd, num_cmd_bytes);
     _upd765_fifo_wr(upd, data);
 
-    if(num_cmd_bytes > 0) upd->dio = true;
-
     // debug
     printf("DEBUG: Executing ");
     switch(upd->cmd){
@@ -369,10 +371,8 @@ static void _upd765_check_irq(upd765_t* upd) {
     //CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
     bool last_irq = upd->irq;
     upd->irq = upd->data_irq || upd->other_irq || upd->internal_drq;
-    //upd->cur_irq = upd->cur_irq && (dor & 4) && (mode != mode_t::AT || (dor & 8));
     if(upd->irq != last_irq) {
         upd->irq_cb(upd->user_data, upd->irq);
-        printf("irqq\n");
     }
 }
 
@@ -391,25 +391,27 @@ static void _upd765_to_phase_exec(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
     upd->phase = UPD765_PHASE_EXEC;
     _upd765_cmd_finish(upd, true);
-    //upd->dio = true;
+
+    if(upd->cmd == UPD765_CMD_WRITE_DATA
+       || upd->cmd == UPD765_CMD_WRITE_DELETED_DATA) {
+      upd->dio = false;
+    } else {
+      upd->dio = true;
+    }
 }
 
 /* called from any other phase to transition to IDLE phase (ready for new command */
 static void _upd765_to_phase_idle(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase != UPD765_PHASE_IDLE);
     upd->phase = UPD765_PHASE_IDLE;
-    upd->dio = false;
 
     switch (upd->cmd) {
         //case UPD765_CMD_SPECIFY:
         case UPD765_CMD_SEEK:
         case UPD765_CMD_RECALIBRATE:
-            upd->st0_sent = false;
             _upd765_cmd_finish(upd, false);
         break;
         case UPD765_CMD_SENSE_INTERRUPT_STATUS:
-            upd->st0_sent = true;
-            upd->dio = false;
             upd->other_irq = false;
             _upd765_check_irq(upd);
         break;
@@ -420,7 +422,6 @@ static void _upd765_to_phase_idle(upd765_t* upd) {
 static void _upd765_to_phase_result(upd765_t* upd) {
     CHIPS_ASSERT((upd->phase == UPD765_PHASE_COMMAND) || (upd->phase == UPD765_PHASE_EXEC));
     upd->phase = UPD765_PHASE_RESULT;
-    //upd->dio = false;
     switch (upd->cmd) {
         case UPD765_CMD_READ_DATA:
         case UPD765_CMD_READ_DELETED_DATA:
@@ -444,7 +445,7 @@ static void _upd765_to_phase_result(upd765_t* upd) {
             break;
         case UPD765_CMD_SENSE_INTERRUPT_STATUS:
             _upd765_fifo_reset(upd, 2);
-            upd->fifo[0] = upd->st0_sent ? UPD765_ST0_IC : upd->st[0];
+            upd->fifo[0] = upd->irq ? upd->st[0] : UPD765_ST0_IC;
             upd->fifo[1] = upd->sector_info.physical_track;
             break;
         case UPD765_CMD_SENSE_DRIVE_STATUS:
@@ -455,7 +456,6 @@ static void _upd765_to_phase_result(upd765_t* upd) {
         case UPD765_CMD_SPECIFY:
         case UPD765_CMD_SEEK:
             /* this shouldn't actually happen */
-            //upd->irq = true;
             _upd765_to_phase_idle(upd);
             break;
         default:
@@ -471,7 +471,6 @@ static void _upd765_to_phase_result(upd765_t* upd) {
 static void _upd765_cmd(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase == UPD765_PHASE_COMMAND);
 
-    upd->other_irq = false;
     upd->data_irq = false;
     _upd765_check_irq(upd);
 
@@ -724,7 +723,6 @@ static void _upd765_write_aux(upd765_t* upd, uint8_t data) {
         default: printf("UNKNOWN_AUX_CMD\n"); break;
     }
 
-    upd->dio = true;
     if (UPD765_PHASE_IDLE == upd->phase) {
         switch (data) {
         case UPD72069_AUX_RESET:
@@ -774,21 +772,19 @@ static inline uint8_t _upd765_read_status(upd765_t* upd) {
         that we're always ready during the command and result phase
     */
 
-    if(upd->dio && upd->phase != UPD765_PHASE_IDLE)
-        status |= UPD765_STATUS_DIO;
-
     switch (upd->phase) {
         case UPD765_PHASE_IDLE:
             status |= UPD765_STATUS_RQM;
             break;
         case UPD765_PHASE_COMMAND:
-            status |= UPD765_STATUS_RQM;
+            status |= UPD765_STATUS_CB|UPD765_STATUS_RQM;
             break;
         case UPD765_PHASE_EXEC:
-            status |= UPD765_STATUS_EXM|UPD765_STATUS_RQM|UPD765_STATUS_DIO;
+            status |= UPD765_STATUS_CB|UPD765_STATUS_EXM|UPD765_STATUS_RQM;
+            if(upd->dio) status |= UPD765_STATUS_DIO;
             break;
         case UPD765_PHASE_RESULT:
-            status |= UPD765_STATUS_RQM|UPD765_STATUS_DIO;
+            status |= UPD765_STATUS_CB|UPD765_STATUS_DIO|UPD765_STATUS_RQM;
             break;
     }
 

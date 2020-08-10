@@ -126,7 +126,7 @@ int DOSFloppy::track_info(int drive, int side, upd765_sectorinfo_t* info) {
     info->n = sector->info.upd765.n;
     info->st1 = sector->info.upd765.st1;
     info->st2 = sector->info.upd765.st2;
-    printf("ok\n");
+    //printf("ok\n");
     return FDD_RESULT_SUCCESS;
   }
   return FDD_RESULT_NOT_READY;
@@ -168,7 +168,7 @@ uint8 DOSFloppy::read(bool addr) {
   if (addr) pins |= UPD765_A0;
   
   pins = upd765_iorq(fdc, pins);
-  printf("[%06x] read 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, UPD765_GET_DATA(pins), irq_pending, fdc->phase);
+  //printf("[%06x] read 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, UPD765_GET_DATA(pins), irq_pending, fdc->phase);
   return UPD765_GET_DATA(pins);
 }
 
@@ -178,7 +178,7 @@ void DOSFloppy::write(bool addr, uint8 data) {
   UPD765_SET_DATA(pins, data);
   
   upd765_iorq(fdc, pins);
-  printf("[%06x] write 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, data, irq_pending, fdc->phase);
+  //printf("[%06x] write 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, data, irq_pending, fdc->phase);
 }
 
 bool DOSFloppy::irq_status() const {

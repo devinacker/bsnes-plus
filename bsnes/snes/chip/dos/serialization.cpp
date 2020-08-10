@@ -34,6 +34,8 @@ void DOSFloppy::serialize(serializer& s) {
   s.integer(fdc->fifo_num);
   s.array(fdc->fifo);
 
+  s.integer(fdc->dio);
+
   s.integer(fdc->sector_info.physical_track);
   s.integer(fdc->sector_info.c);
   s.integer(fdc->sector_info.h);
@@ -50,6 +52,11 @@ void DOSFloppy::serialize(serializer& s) {
   s.integer(fdc->drive_info.fault);
 
   s.array(fdc->st);
+  s.integer(fdc->irq);
+  s.integer(fdc->data_irq);
+  s.integer(fdc->other_irq);
+  s.integer(fdc->internal_drq);
+
   s.integer(fdc->pins);
   s.integer(fdc->status);
 }
