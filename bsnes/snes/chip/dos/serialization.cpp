@@ -59,6 +59,14 @@ void DOSFloppy::serialize(serializer& s) {
 
   s.integer(fdc->pins);
   s.integer(fdc->status);
+
+  for (int i = 0; i < 4; i++) {
+    s.integer(fdd[i].cur_side);
+    s.integer(fdd[i].cur_track_index);
+    s.integer(fdd[i].cur_sector_index);
+    s.integer(fdd[i].cur_sector_pos);
+    // TODO: also serialize state of inserted disk?
+  }
 }
 
 #endif

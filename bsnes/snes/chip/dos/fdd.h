@@ -20,6 +20,9 @@
 
     FIXME: DOCS
 
+    ## Modifications for bsnes-plus SFX-DOS emulation
+        - Modified values for maximum sector count and size
+
     ## zlib/libpng license
 
     Copyright (c) 2018 Andre Weissflog
@@ -47,8 +50,8 @@ extern "C" {
 
 #define FDD_MAX_SIDES (2)           /* max number of disc sides */
 #define FDD_MAX_TRACKS (80)         /* max number of tracks per side */
-#define FDD_MAX_SECTORS (12)        /* max sectors per track */
-#define FDD_MAX_SECTOR_SIZE (512)   /* max size of a sector in bytes */
+#define FDD_MAX_SECTORS (9)         /* max sectors per track */
+#define FDD_MAX_SECTOR_SIZE (1024)  /* max size of a sector in bytes */
 #define FDD_MAX_TRACK_SIZE (FDD_MAX_SECTORS*FDD_MAX_SECTOR_SIZE)
 #define FDD_MAX_DISC_SIZE (FDD_MAX_SIDES*FDD_MAX_TRACKS*FDD_MAX_TRACK_SIZE)
 
