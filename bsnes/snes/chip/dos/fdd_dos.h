@@ -225,8 +225,8 @@ static bool fdd_dos_insert_empty(fdd_t* fdd, int data_size) {
                 sector->info.upd765.st1 = 0;
                 sector->info.upd765.st2 = 0;
                 sector->data_offset = sector_data_offset;
-                sector->data_size = 0xFF;
-                sector_data_offset += 0xFF;
+                sector->data_size = FDD_MAX_SECTOR_SIZE;
+                sector_data_offset += FDD_MAX_SECTOR_SIZE;
             }
             data_offset += FDD_MAX_TRACK_SIZE;
             CHIPS_ASSERT(data_offset == sector_data_offset);
