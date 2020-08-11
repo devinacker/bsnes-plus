@@ -181,6 +181,10 @@ void DOSFloppy::write(bool addr, uint8 data) {
   //printf("[%06x] write 5f2%d > %02x (irq: %x, phase: %d)\n", cpu.regs.pc, addr, data, irq_pending, fdc->phase);
 }
 
+void DOSFloppy::terminate() {
+  upd765_iorq(fdc, UPD765_CS | UPD765_TC);
+}
+
 bool DOSFloppy::irq_status() const {
   return irq_pending;
 }

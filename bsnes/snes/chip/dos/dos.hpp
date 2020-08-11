@@ -48,6 +48,7 @@ public:
   // CPU interface ($5f2x)
   uint8 read(bool addr);
   void write(bool addr, uint8 data);
+  void terminate();
   
   void serialize(serializer&);
   

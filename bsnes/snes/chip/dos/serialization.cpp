@@ -41,6 +41,8 @@ void DOSFloppy::serialize(serializer& s) {
   s.integer(fdc->sector_info.h);
   s.integer(fdc->sector_info.r);
   s.integer(fdc->sector_info.n);
+  s.integer(fdc->sector_info.eot);
+  s.integer(fdc->sector_info.mt);
   s.integer(fdc->sector_info.st1);
   s.integer(fdc->sector_info.st2);
 

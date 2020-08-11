@@ -34,6 +34,7 @@
         - Interrupt support
         - Write command support
         - Basic support for uPD72069 "auxiliary" commands
+        - Support for multi-sector read/write via MT, EOT, and TC
 
     ## zlib/libpng license
 
@@ -79,6 +80,7 @@ extern "C" {
 
 /* control pins */
 #define UPD765_CS   (1ULL<<40)  /* in: chip select */
+#define UPD765_TC   (1ULL<<41)  /* in: terminal count */
 
 /* extract 8-bit data bus from 64-bit pins */
 #define UPD765_GET_DATA(p) ((uint8_t)((p&0xFF0000ULL)>>16))
@@ -183,6 +185,8 @@ typedef struct upd765_sectorinfo_t {
     uint8_t h;              /* head address (logical side) */
     uint8_t r;              /* record (sector id byte) */
     uint8_t n;              /* number (sector size byte) */
+    uint8_t eot;            /* end of track (sector id) */
+    bool mt;                /* multi track read/write */
     uint8_t st1;            /* return status 1 */
     uint8_t st2;            /* return status 2 */
 } upd765_sectorinfo_t;
@@ -480,17 +484,17 @@ static void _upd765_cmd(upd765_t* upd) {
         case UPD765_CMD_WRITE_DATA:
         case UPD765_CMD_WRITE_DELETED_DATA:
             {
+                upd->sector_info.mt = upd->fifo[0] & (1<<7);
                 upd->st[0] = upd->fifo[1] & 7;      /* HD, US1, US0 */
                 upd->sector_info.c = upd->fifo[2];
                 upd->sector_info.h = upd->fifo[3];
                 upd->sector_info.r = upd->fifo[4];
                 upd->sector_info.n = upd->fifo[5];
+                upd->sector_info.eot = upd->fifo[6];
                 upd->sector_info.st1 = 0;
                 upd->sector_info.st2 = 0;
                 /* FIXME: handle length of read/write data via n=0 and DTL!=0xFF */
                 CHIPS_ASSERT((upd->sector_info.n != 0) && (upd->fifo[8] == 0xFF));
-                /* FIXME: handle read/write several sectors at a time via EOT arg */
-                CHIPS_ASSERT(upd->sector_info.r == upd->fifo[6]);
                 const int fdd_index = upd->st[0] & 3;
                 const int res = upd->seeksector_cb(fdd_index, &upd->sector_info, upd->user_data);
                 if (UPD765_RESULT_SUCCESS == res) {
@@ -632,6 +636,27 @@ static void _upd765_cmd(upd765_t* upd) {
     }
 }
 
+/* called when reaching the end of a sector during read/write */
+static int _upd765_update_eot(upd765_t* upd, int fdd_index) {
+    if (upd->sector_info.r < upd->sector_info.eot) {
+        // next sector in track
+        upd->sector_info.r++;
+    } else {
+        upd->sector_info.r = 1;
+        if (upd->sector_info.mt) {
+            // if MT=1, move to opposite head
+            upd->sector_info.h ^= 1;
+        }
+        if (!upd->sector_info.mt || upd->sector_info.h == 0) {
+            // reached end of track
+            upd->sector_info.c++;
+            return UPD765_RESULT_END_OF_SECTOR;
+        }
+    }
+
+    return upd->seeksector_cb(fdd_index, &upd->sector_info, upd->user_data);
+}
+
 /* called when a byte is read during the exec phase */
 static uint8_t _upd765_exec_rd(upd765_t* upd) {
     CHIPS_ASSERT(upd->phase == UPD765_PHASE_EXEC);
@@ -642,7 +667,10 @@ static uint8_t _upd765_exec_rd(upd765_t* upd) {
             {
                 /* read next sector data byte from FDD */
                 const int fdd_index = upd->st[0] & 3;
-                const int res = upd->read_cb(fdd_index, upd->sector_info.h, upd->user_data, &data);
+                int res = upd->read_cb(fdd_index, upd->sector_info.h, upd->user_data, &data);
+                if (res == UPD765_RESULT_END_OF_SECTOR) {
+                    res = _upd765_update_eot(upd, fdd_index);
+                }
                 if (res != UPD765_RESULT_SUCCESS) {
                     if (res & UPD765_RESULT_NOT_READY) {
                         upd->st[0] |= UPD765_ST0_NR;
@@ -666,9 +694,12 @@ static void _upd765_exec_wr(upd765_t* upd, uint8_t data) {
         case UPD765_CMD_WRITE_DATA:
         case UPD765_CMD_WRITE_DELETED_DATA:
             {
-                /* read next sector data byte from FDD */
+                /* write next sector data byte to FDD */
                 const int fdd_index = upd->st[0] & 3;
-                const int res = upd->write_cb(fdd_index, upd->sector_info.h, upd->user_data, data);
+                int res = upd->write_cb(fdd_index, upd->sector_info.h, upd->user_data, data);
+                if (res == UPD765_RESULT_END_OF_SECTOR) {
+                    res = _upd765_update_eot(upd, fdd_index);
+                }
                 if (res != UPD765_RESULT_SUCCESS) {
                     if (res & UPD765_RESULT_NOT_READY) {
                         upd->st[0] |= UPD765_ST0_NR;
@@ -791,6 +822,12 @@ static inline uint8_t _upd765_read_status(upd765_t* upd) {
     return status;
 }
 
+static void _upd765_terminal_count(upd765_t* upd) {
+    if (upd->phase == UPD765_PHASE_EXEC) {
+        _upd765_to_phase_result(upd);
+    }
+}
+
 void upd765_init(upd765_t* upd, const upd765_desc_t* desc) {
     CHIPS_ASSERT(upd && desc);
     CHIPS_ASSERT(desc->seektrack_cb);
@@ -826,7 +863,10 @@ void upd765_reset(upd765_t* upd) {
 
 uint64_t upd765_iorq(upd765_t* upd, uint64_t pins) {
     if (pins & UPD765_CS) {
-        if (pins & UPD765_RD) {
+        if (pins & UPD765_TC) {
+            _upd765_terminal_count(upd);
+        }
+        else if (pins & UPD765_RD) {
             if (pins & UPD765_A0) {
                 UPD765_SET_DATA(pins, _upd765_read_data(upd));
             }

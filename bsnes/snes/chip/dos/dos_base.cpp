@@ -55,9 +55,9 @@ uint8 DOS::read(unsigned addr) {
 
   case 2: // floppy disk controller
     return floppy.read(addr & 1);
-    break;
   
-  case 3: // floppy disk controller, terminal count (TODO)
+  case 3: // floppy disk controller, terminal count
+    floppy.terminate();
     break;
   }
 
@@ -81,7 +81,8 @@ void DOS::write(unsigned addr, uint8 data) {
     floppy.write(addr & 1, data);
     break;
   
-  case 3: // floppy disk controller, terminal count (TODO)
+  case 3: // floppy disk controller, terminal count
+    floppy.terminate();
     break;
   }
 }
