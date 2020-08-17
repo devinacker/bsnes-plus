@@ -178,6 +178,8 @@ void OamViewer::autoUpdate() {
 }
 
 void OamViewer::refresh() {
+  if(!SNES::cartridge.loaded()) { return; }
+
   // Required to prevent the occasional infinite signal call loop.
   if(inRefreshCall) return;
   inRefreshCall = true;
