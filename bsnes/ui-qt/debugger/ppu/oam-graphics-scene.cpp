@@ -132,7 +132,7 @@ QImage OamGraphicsScene::renderToImage() {
   return image;
 }
 
-void OamGraphicsScene::setBackrgoundType(BackgroundType type) {
+void OamGraphicsScene::setBackgroundType(BackgroundType type) {
   if(backgroundType != type) {
     backgroundType = type;
     refreshRectItemColors();

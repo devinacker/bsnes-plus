@@ -61,7 +61,7 @@ public:
 
   QImage renderToImage();
 
-  void setBackrgoundType(BackgroundType type);
+  void setBackgroundType(BackgroundType type);
 
 protected:
   virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

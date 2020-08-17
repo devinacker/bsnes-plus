@@ -217,7 +217,7 @@ void OamViewer::onZoomChanged(int index)
 void OamViewer::onBackgroundChanged(int index)
 {
   int t = backgroundCombo->itemData(index).toInt();
-  graphicsScene->setBackrgoundType(static_cast<OamGraphicsScene::BackgroundType>(t));
+  graphicsScene->setBackgroundType(static_cast<OamGraphicsScene::BackgroundType>(t));
 }
 
 void OamViewer::onTreeViewSelectionChanged() {
