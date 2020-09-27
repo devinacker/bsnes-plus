@@ -31,7 +31,7 @@ struct Interface : public SNES::Interface {
   }
 };
 
-static Interface interface;
+static Interface intf;
 
 unsigned snes_library_revision_major(void) {
   return 1;
@@ -42,19 +42,19 @@ unsigned snes_library_revision_minor(void) {
 }
 
 void snes_set_video_refresh(snes_video_refresh_t video_refresh) {
-  interface.pvideo_refresh = video_refresh;
+  intf.pvideo_refresh = video_refresh;
 }
 
 void snes_set_audio_sample(snes_audio_sample_t audio_sample) {
-  interface.paudio_sample = audio_sample;
+  intf.paudio_sample = audio_sample;
 }
 
 void snes_set_input_poll(snes_input_poll_t input_poll) {
-  interface.pinput_poll = input_poll;
+  intf.pinput_poll = input_poll;
 }
 
 void snes_set_input_state(snes_input_state_t input_state) {
-  interface.pinput_state = input_state;
+  intf.pinput_state = input_state;
 }
 
 void snes_set_controller_port_device(bool port, unsigned device) {
@@ -66,7 +66,7 @@ void snes_set_cartridge_basename(const char *basename) {
 }
 
 void snes_init(void) {
-  SNES::system.init(&interface);
+  SNES::system.init(&intf);
   SNES::input.port_set_device(0, SNES::Input::Device::Joypad);
   SNES::input.port_set_device(1, SNES::Input::Device::Joypad);
 }

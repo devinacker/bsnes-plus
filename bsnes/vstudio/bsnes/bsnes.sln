@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsnes", "bsnes.vcxproj", "{42D864F9-AFDA-4EF7-99C3-218E982AA46E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug-Accuracy|x64 = Debug-Accuracy|x64
+		Debug-Accuracy|x86 = Debug-Accuracy|x86
+		Debug-Compatibility|x64 = Debug-Compatibility|x64
+		Debug-Compatibility|x86 = Debug-Compatibility|x86
+		Debug-Performance|x64 = Debug-Performance|x64
+		Debug-Performance|x86 = Debug-Performance|x86
+		Release-Accuracy|x64 = Release-Accuracy|x64
+		Release-Accuracy|x86 = Release-Accuracy|x86
+		Release-Compatibility|x64 = Release-Compatibility|x64
+		Release-Compatibility|x86 = Release-Compatibility|x86
+		Release-Performance|x64 = Release-Performance|x64
+		Release-Performance|x86 = Release-Performance|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x64.ActiveCfg = Debug-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x64.Build.0 = Debug-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x86.ActiveCfg = Debug-Accuracy|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x86.Build.0 = Debug-Accuracy|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Compatibility|x64.ActiveCfg = Debug-Compatibility|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Compatibility|x64.Build.0 = Debug-Compatibility|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Compatibility|x86.ActiveCfg = Debug-Compatibility|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Compatibility|x86.Build.0 = Debug-Compatibility|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Performance|x64.ActiveCfg = Debug-Performance|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Performance|x64.Build.0 = Debug-Performance|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Performance|x86.ActiveCfg = Debug-Performance|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Performance|x86.Build.0 = Debug-Performance|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x64.ActiveCfg = Release-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x64.Build.0 = Release-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x86.ActiveCfg = Release-Accuracy|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x86.Build.0 = Release-Accuracy|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Compatibility|x64.ActiveCfg = Release-Compatibility|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Compatibility|x64.Build.0 = Release-Compatibility|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Compatibility|x86.ActiveCfg = Release-Compatibility|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Compatibility|x86.Build.0 = Release-Compatibility|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Performance|x64.ActiveCfg = Release-Performance|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Performance|x64.Build.0 = Release-Performance|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Performance|x86.ActiveCfg = Release-Performance|Win32
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Performance|x86.Build.0 = Release-Performance|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79215649-444D-4FCC-97DD-3CD012E031FA}
+	EndGlobalSection
+EndGlobal

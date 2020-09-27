@@ -15,4 +15,4 @@ public:
   unsigned framesExecuted;
 };
 
-extern Interface interface;
+extern Interface intf;

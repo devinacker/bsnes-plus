@@ -78,10 +78,11 @@ bool bpspatch::modify(const uint8_t *data, unsigned size) {
   modifyTargetSize = decode();
   modifyMarkupSize = decode();
 
-  char buffer[modifyMarkupSize + 1];
+  char *buffer = new char[modifyMarkupSize + 1];
   for(unsigned n = 0; n < modifyMarkupSize; n++) buffer[n] = modifyData[offset++];
   buffer[modifyMarkupSize] = 0;
-  metadataString = (const char*)buffer;
+  metadataString.assign((const char*)buffer);
+  delete[] buffer;
 
   return true;
 }

@@ -235,7 +235,7 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
       for(unsigned n = 0; n < dromsize; n++) necdsp.dataROM[n] = fp.readm(2);
 
       fp.seek(0);
-      uint8_t data[filesize];
+      uint8_t *data = new uint8_t[filesize];
       fp.read(data, filesize);
 
       sha256_ctx sha;
@@ -245,6 +245,8 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
       sha256_final(&sha);
       sha256_hash(&sha, shahash);
       foreach(n, shahash) programhash.append(hex<2>(n));
+
+      delete[] data;
     }
     fp.close();
   }
@@ -281,9 +283,9 @@ void Cartridge::xml_parse_necdsp(xml_element &root) {
   }
 
   if(programhash == "") {
-    system.interface->message({ "Warning: NEC DSP program ", program, " is missing." });
+    system.intf->message({ "Warning: NEC DSP program ", program, " is missing." });
   } else if(sha256 != "" && sha256 != programhash) {
-    system.interface->message({
+    system.intf->message({
       "Warning: NEC DSP program ", program, " SHA256 is incorrect.\n\n"
       "Expected:\n", sha256, "\n\n"
       "Actual:\n", programhash

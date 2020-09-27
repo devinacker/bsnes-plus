@@ -80,7 +80,7 @@ void Audio::add_stream(Stream* stream) {
   
 void Audio::sample(int16 left, int16 right) {
   if(!streams.size()) {
-    system.interface->audio_sample(left, right);
+    system.intf->audio_sample(left, right);
   } else {
     dsp_buffer[dsp_wroffset] = ((uint16)left << 0) + ((uint16)right << 16);
     dsp_wroffset = (dsp_wroffset + 1) & 32767;
@@ -108,7 +108,7 @@ void Audio::flush() {
       right += (int16)(sample >> 16);
     }
 
-    system.interface->audio_sample(
+    system.intf->audio_sample(
       sclamp<16>(left / 2),
       sclamp<16>(right / 2)
     );
