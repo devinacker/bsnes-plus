@@ -1,5 +1,7 @@
 common := ../common
 nall   := $(common)/nall
+zlib   := $(common)/zlib
+
 include $(nall)/Makefile
 snes := snes
 ifeq ($(ui),)
@@ -86,7 +88,26 @@ all: build plugins;
 include $(snes)/Makefile
 include $(ui)/Makefile
 
+
+############
+### zlib ###
+############
+
+$(objdir)/adler32.o : $(zlib)/adler32.c $(zlib)/*
+$(objdir)/crc32.o   : $(zlib)/crc32.c $(zlib)/*
+$(objdir)/inffast.o : $(zlib)/inffast.c $(zlib)/*
+$(objdir)/inflate.o : $(zlib)/inflate.c $(zlib)/*
+$(objdir)/inftrees.o: $(zlib)/inftrees.c $(zlib)/*
+$(objdir)/zutil.o   : $(zlib)/zutil.c $(zlib)/*
+$(objdir)/compress.o   : $(zlib)/compress.c $(zlib)/*
+$(objdir)/deflate.o   : $(zlib)/deflate.c $(zlib)/*
+$(objdir)/trees.o   : $(zlib)/trees.c $(zlib)/*
+
+# zlib
+objects += adler32 crc32 inffast inflate inftrees zutil compress deflate trees
+
 objects := $(patsubst %,$(objdir)/%.o,$(objects))
+
 
 # targets
 build: ui_build $(objects)
