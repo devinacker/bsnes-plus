@@ -557,7 +557,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   const uint8_t company  = data[index + Company];
   const uint8_t regionid = data[index + CartRegion] & 0x7f;
 
-  ram_size = 1024 << (data[index + RamSize] & 7);
+  ram_size = 1024 << min(8, data[index + RamSize] & 15);
   if(ram_size == 1024) ram_size = 0;  //no RAM present
 
   //0, 1, 11, 13, 15, 16 = NTSC; others = PAL
@@ -700,8 +700,13 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
 
   if(mapperid == 0x20 && (rom_type == 0x13 || rom_type == 0x14 || rom_type == 0x15 || rom_type == 0x1a)) {
     mapper = SuperFXROM;
-    ram_size = 1024 << (data[index - 3] & 7);
-    if(ram_size == 1024) ram_size = 0;
+    if(company == 0x33) {
+      ram_size = 1024 << min(8, data[index - 3] & 15);
+      if(ram_size == 1024) ram_size = 0;
+    } else {
+      // Star Fox has no extended header but still needs RAM
+      ram_size = 0x8000;
+    }
   }
 
   if(mapperid == 0x23 && (rom_type == 0x32 || rom_type == 0x34 || rom_type == 0x35 || rom_type == 0x36)) {
