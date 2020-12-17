@@ -62,7 +62,11 @@ uint32_t CpuDisasmProcessor::findStartLineAddress(uint32_t currentAddress, uint3
 
 // ------------------------------------------------------------------------
 uint32_t CpuDisasmProcessor::decode(uint32_t type, uint32_t address, uint32_t pc) {
-  return SNES::cpu.decode(type, address, pc);
+  switch (source) {
+  case CPU: return SNES::cpu.decode(type, address, pc);
+  case SA1: return SNES::sa1.decode(type, address, pc);
+  }
+  return 0;
 }
 
 // ------------------------------------------------------------------------
