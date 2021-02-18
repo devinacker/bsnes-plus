@@ -85,7 +85,7 @@ void ImageGridWidget::setSelected(const QPoint& cell) {
 }
 
 void ImageGridWidget::scrollToCell(const QPoint& cell) {
-  QPoint p = matrix().map(cell * int(gridSize));
+  QPoint p = transform().map(cell * int(gridSize));
 
   horizontalScrollBar()->setValue(p.x());
   verticalScrollBar()->setValue(p.y());

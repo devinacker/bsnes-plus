@@ -60,7 +60,7 @@ void CgramWidget::setSelected(int s) {
 
 void CgramWidget::paintEvent(QPaintEvent*) {
   QPainter painter(this);
-  painter.setRenderHints(0);
+  painter.setRenderHints({});
   painter.drawImage(0, 0, image->scaled(image->width() * scale, image->height() * scale, Qt::IgnoreAspectRatio, Qt::FastTransformation));
 
   if(selected >= 0 && selected < 256) {

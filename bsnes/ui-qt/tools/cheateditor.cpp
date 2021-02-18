@@ -14,7 +14,7 @@ CheatEditorWindow::CheatEditorWindow() {
   list = new QTreeWidget;
   list->setColumnCount(3);
   list->setHeaderLabels(QStringList() << "Slot" << "Code" << "Description");
-  list->setColumnWidth(1, list->fontMetrics().width("  89AB-CDEF+...  "));
+  list->setColumnWidth(1, list->fontMetrics().horizontalAdvance("  89AB-CDEF+...  "));
   list->setAllColumnsShowFocus(true);
   list->sortByColumn(0, Qt::AscendingOrder);
   list->setRootIsDecorated(false);

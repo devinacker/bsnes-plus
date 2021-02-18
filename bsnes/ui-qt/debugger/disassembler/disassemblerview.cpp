@@ -34,7 +34,7 @@ void DisassemblerView::init() {
 void DisassemblerView::setFont(const QFont &font) {
   QWidget::setFont(font);
 
-  charWidth = fontMetrics().width(QLatin1Char('2'));
+  charWidth = fontMetrics().horizontalAdvance(QLatin1Char('2'));
   charHeight = fontMetrics().height() + 1;
   charPadding = charWidth / 2;
   headerHeight = charHeight + 3;

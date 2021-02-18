@@ -141,7 +141,7 @@ Debugger::Debugger() {
   console->setReadOnly(true);
   console->setFont(QFont(Style::Monospace));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
+  console->setMinimumWidth((98 + 4) * console->fontMetrics().horizontalAdvance(' '));
   console->setMinimumHeight((6 + 1) * console->fontMetrics().height());
   consoleLayout->addWidget(console);
 
