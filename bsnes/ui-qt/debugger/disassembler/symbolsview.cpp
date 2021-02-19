@@ -20,7 +20,7 @@ SymbolsView::SymbolsView(DisasmProcessor *processor) : processor(processor) {
   list = new QTreeWidget;
   list->setColumnCount(3);
   list->setHeaderLabels(QStringList() << "Address" << "Name" << "Description");
-  list->setColumnWidth(1, list->fontMetrics().width("  123456789  "));
+  list->setColumnWidth(1, list->fontMetrics().horizontalAdvance("  123456789  "));
   list->setAllColumnsShowFocus(true);
   list->sortByColumn(0, Qt::AscendingOrder);
   list->setRootIsDecorated(false);

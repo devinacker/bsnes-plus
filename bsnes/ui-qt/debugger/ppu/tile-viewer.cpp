@@ -82,7 +82,7 @@ TileViewer::TileViewer() {
 
   address = new QLineEdit;
   address->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
-  address->setMinimumWidth(7 * address->fontMetrics().width('0'));
+  address->setMinimumWidth(7 * address->fontMetrics().horizontalAdvance('0'));
   addressLayout->addWidget(address, 1);
 
   nextAddressButton = new QToolButton;
@@ -148,7 +148,7 @@ TileViewer::TileViewer() {
 
     vramBaseAddress[i] = new QLineEdit;
     vramBaseAddress[i]->setReadOnly(true);
-    vramBaseAddress[i]->setFixedWidth(9 * vramBaseAddress[i]->fontMetrics().width('0'));
+    vramBaseAddress[i]->setFixedWidth(9 * vramBaseAddress[i]->fontMetrics().horizontalAdvance('0'));
     vramBaseLayout->addWidget(vramBaseAddress[i], i, 2);
 
     vramBaseButton[i] = new QToolButton;

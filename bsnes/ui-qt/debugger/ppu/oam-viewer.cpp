@@ -53,7 +53,7 @@ OamViewer::OamViewer() {
   treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
   layout->addWidget(treeView);
 
-  unsigned dw = treeView->fontMetrics().width('0');
+  unsigned dw = treeView->fontMetrics().horizontalAdvance('0');
   treeView->setColumnWidth(0, dw * 6);
   treeView->setColumnWidth(1, dw * 8);
   treeView->setColumnWidth(2, dw * 6);
@@ -129,7 +129,7 @@ OamViewer::OamViewer() {
   firstSprite = new QLineEdit;
   firstSprite->setReadOnly(true);
   firstSprite->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
-  firstSprite->setMinimumWidth(5 * firstSprite->fontMetrics().width('0'));
+  firstSprite->setMinimumWidth(5 * firstSprite->fontMetrics().horizontalAdvance('0'));
   sidebarLayout->addRow("First Sprite:", firstSprite);
 
 
@@ -299,7 +299,7 @@ void OamCanvas::paintEvent(QPaintEvent*e) {
 
   if(!pixmap.isNull()) {
     QPainter painter(this);
-    painter.setRenderHints(0);
+    painter.setRenderHints({});
 
     unsigned x = (width() - pixmapScale * pixmap.width()) / 2;
     unsigned y = (height() - pixmapScale * pixmap.height()) / 2;

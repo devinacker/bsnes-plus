@@ -393,7 +393,7 @@ void BreakpointEditor::add() {
 
 void BreakpointEditor::remove() {
   QModelIndexList selected = table->selectionModel()->selectedRows();
-  qSort(selected);
+  std::sort(selected.begin(), selected.end());
   if (selected.count() > 0) {
     model->removeRows(selected[0].row(), selected.count());
   }
