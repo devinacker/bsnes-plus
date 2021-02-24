@@ -89,35 +89,41 @@ bsnesexport bool sgb_get_flag(char flag) {
   return supergameboy.gambatte_->debugGetFlag(flag);
 }
 
+bsnesexport uint32_t sgb_addr_with_bank(uint16_t addr) {
+  if (!supergameboy.gambatte_) return addr;
+
+  return supergameboy.gambatte_->addrWithBank(addr);
+}
+
 bsnesexport void sgb_set_flag(char flag, bool value) {
   supergameboy.gambatte_->debugSetFlag(flag, value);
 }
 
-bsnesexport void sgb_callback_step(void (*step)(uint16_t)) {
+bsnesexport void sgb_callback_step(void (*step)(uint32_t)) {
   supergameboy.op_step = step;
 }
 
-bsnesexport void sgb_callback_call(void (*call)(uint16_t)) {
+bsnesexport void sgb_callback_call(void (*call)(uint32_t)) {
   supergameboy.op_call = call;
 }
 
-bsnesexport void sgb_callback_ret(void (*ret)(uint16_t)) {
+bsnesexport void sgb_callback_ret(void (*ret)(uint32_t)) {
   supergameboy.op_ret = ret;
 }
 
-bsnesexport void sgb_callback_irq(void (*irq)(uint16_t)) {
+bsnesexport void sgb_callback_irq(void (*irq)(uint32_t)) {
   supergameboy.op_irq = irq;
 }
 
-bsnesexport void sgb_callback_read(void (*read)(uint16_t, uint8_t)) {
+bsnesexport void sgb_callback_read(void (*read)(uint32_t, uint8_t)) {
   supergameboy.op_read = read;
 }
 
-bsnesexport void sgb_callback_readpc(void (*readpc)(uint16_t, uint8_t)) {
+bsnesexport void sgb_callback_readpc(void (*readpc)(uint32_t, uint8_t)) {
   supergameboy.op_readpc = readpc;
 }
 
-bsnesexport void sgb_callback_write(void (*write)(uint16_t, uint8_t)) {
+bsnesexport void sgb_callback_write(void (*write)(uint32_t, uint8_t)) {
   supergameboy.op_write = write;
 }
 

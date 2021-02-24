@@ -63,7 +63,7 @@ void CommonDisasmProcessor::setSource(Source source) {
     break;
 
   case SGB:
-    usagePointer = SNES::supergameboy.usage;
+    usagePointer = SNES::supergameboy.usage_;
     memorySource = SNES::Debugger::MemorySource::SGBBus;
     mask = (1 << 16) - 1;
     break;

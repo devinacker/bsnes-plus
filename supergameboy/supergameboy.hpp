@@ -36,13 +36,15 @@ extern "C" {
   bool     sgb_get_flag(char flag);
   void     sgb_set_flag(char flag, bool value);
   
-  void sgb_callback_step(void (*step)(uint16_t));
-  void sgb_callback_call(void (*step)(uint16_t));
-  void sgb_callback_ret(void (*step)(uint16_t));
-  void sgb_callback_irq(void (*step)(uint16_t));
-  void sgb_callback_read(void (*read)(uint16_t, uint8_t));
-  void sgb_callback_readpc(void (*readpc)(uint16_t, uint8_t));
-  void sgb_callback_write(void (*write)(uint16_t, uint8_t));
+  uint32_t sgb_addr_with_bank(uint16_t addr);
+  
+  void sgb_callback_step(void (*step)(uint32_t));
+  void sgb_callback_call(void (*step)(uint32_t));
+  void sgb_callback_ret(void (*step)(uint32_t));
+  void sgb_callback_irq(void (*step)(uint32_t));
+  void sgb_callback_read(void (*read)(uint32_t, uint8_t));
+  void sgb_callback_readpc(void (*readpc)(uint32_t, uint8_t));
+  void sgb_callback_write(void (*write)(uint32_t, uint8_t));
 }
 
 #endif
