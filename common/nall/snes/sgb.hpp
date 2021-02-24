@@ -57,7 +57,7 @@ private:
   static string disassembleMode(unsigned pc, unsigned mode, uint8_t opcode = 0, uint8_t pl = 0, uint8_t ph = 0);
 };
 
-static const GBCPU::OpcodeInfo cpuOpcodeInfo[256] = {
+static const GBCPU::OpcodeInfo gbOpcodeInfo[256] = {
   //0x00 - 0x0f
   {"nop " },
   {"ld  ", GBCPU::RegBC, GBCPU::Imm16 },
@@ -347,7 +347,7 @@ static const GBCPU::OpcodeInfo cpuOpcodeInfo[256] = {
   {"rst ", GBCPU::RST },
 };
 
-static const char cpuPrefixName[32][5] = {
+static const char gbPrefixName[32][5] = {
   "rlc ",
   "rrc ",
   "rl  ",
@@ -382,7 +382,7 @@ static const char cpuPrefixName[32][5] = {
   "set "
 };
 
-static const unsigned cpuPrefixMode[8] = {
+static const unsigned gbPrefixMode[8] = {
   GBCPU::RegB,
   GBCPU::RegC,
   GBCPU::RegD,
@@ -412,7 +412,7 @@ inline unsigned GBCPU::getModeLength(unsigned mode) {
 }
 
 inline unsigned GBCPU::getOpcodeLength(uint8_t opcode) {
-  const OpcodeInfo &op = cpuOpcodeInfo[opcode];
+  const OpcodeInfo &op = gbOpcodeInfo[opcode];
   return 1 + getModeLength(op.mode0) + getModeLength(op.mode1);
 }
 
@@ -429,12 +429,12 @@ inline bool GBCPU::getModeIndirect(unsigned mode, uint8_t pl) {
     case RegHLPtrDec:
       return true;
     case PrefixCB:
-      return getModeIndirect(cpuPrefixMode[pl & 0x7]);
+      return getModeIndirect(gbPrefixMode[pl & 0x7]);
   }
 }
 
 inline bool GBCPU::getOpcodeIndirect(uint8_t opcode, uint8_t pl) {
-  const OpcodeInfo &op = cpuOpcodeInfo[opcode];
+  const OpcodeInfo &op = gbOpcodeInfo[opcode];
   return getModeIndirect(op.mode0, pl) || getModeIndirect(op.mode1, pl);
 }
 
@@ -478,14 +478,14 @@ inline string GBCPU::disassembleMode(unsigned pc, unsigned mode, uint8_t opcode,
       return { " sp+", integer((int8_t)pl) };
   case PrefixCB:
     if (pl > 0x40)
-      return { cpuPrefixName[pl >> 3], " ", ((pl & 0x38) >> 3), ",", disassembleMode(pc, cpuPrefixMode[pl & 0x7]) };
+      return { gbPrefixName[pl >> 3], " ", ((pl & 0x38) >> 3), ",", disassembleMode(pc, gbPrefixMode[pl & 0x7]) };
     else
-      return { cpuPrefixName[pl >> 3], disassembleMode(pc, cpuPrefixMode[pl & 0x7]) };
+      return { gbPrefixName[pl >> 3], disassembleMode(pc, gbPrefixMode[pl & 0x7]) };
   }
 }
 
 inline string GBCPU::disassemble(unsigned pc, uint8_t opcode, uint8_t pl, uint8_t ph) {
-  const OpcodeInfo &op = cpuOpcodeInfo[opcode];
+  const OpcodeInfo &op = gbOpcodeInfo[opcode];
 
   if (op.mode1 == Implied) {
     return { op.name, disassembleMode(pc, op.mode0, opcode, pl, ph) };

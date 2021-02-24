@@ -131,6 +131,7 @@ public:
 	void setGameShark(std::string const &codes) { interrupter_.setGameShark(codes); }
 	void setBootROM(bool on) { cart_.setBootROM(bootROM_ = on); }
 	bool bootROM() { return bootROM_; }
+	unsigned addrWithBank(unsigned addr) const { return cart_.addrWithBank(addr); }
 	void updateInput();
 
 private:
