@@ -390,6 +390,11 @@ BreakpointEditor::BreakpointEditor() {
   breakOnBRK->setChecked(SNES::debugger.break_on_brk);
   connect(breakOnBRK, SIGNAL(toggled(bool)), this, SLOT(toggle()));
   layout->addWidget(breakOnBRK);
+
+  logWithoutBreak = new QCheckBox("Log breakpoints without breaking");
+  logWithoutBreak->setChecked(SNES::debugger.log_without_break);
+  connect(logWithoutBreak, SIGNAL(toggled(bool)), this, SLOT(toggle()));
+  layout->addWidget(logWithoutBreak);
 }
 
 void BreakpointEditor::add() {
@@ -407,6 +412,7 @@ void BreakpointEditor::remove() {
 void BreakpointEditor::toggle() {
   SNES::debugger.break_on_brk = breakOnBRK->isChecked();
   SNES::debugger.break_on_wdm = breakOnWDM->isChecked();
+  SNES::debugger.log_without_break = logWithoutBreak->isChecked();
 }
 
 void BreakpointEditor::clear() {
