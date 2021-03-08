@@ -697,8 +697,10 @@ void Debugger::event() {
   
   audio.clear();
   autoUpdate();
-  show();
-  activateWindow();
+  if(!SNES::debugger.log_without_break) {
+    show();
+    activateWindow();
+  }
 }
 
 // update "auto refresh" tool windows
