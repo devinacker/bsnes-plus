@@ -1,3 +1,5 @@
+#include "w32_socket.h"
+
 class Tracer : public QObject {
   Q_OBJECT
 
@@ -21,10 +23,14 @@ public slots:
 
   void resetTraceState();
 
+  void flushTraceOutput();
+
 private:
   void setTraceState(bool);
 
   file tracefile;
+  BufferedServer traceServer;
+
   bool traceCpu;
   bool traceSmp;
   bool traceSa1;
@@ -37,6 +43,19 @@ private:
   uint8_t *traceMaskSA1;
   uint8_t *traceMaskSFX;
   uint8_t *traceMaskSGB;
+
+  void outputTrace(const char *buf, int len);
+  void outputTraceToSocket(const char *buf, int len);
+  void outputTraceToFile(const char *buf, int len);
+
+  void ensureTraceOutputReady();
+  void ensureTraceOutputShutdown();
+
+  void outputCpuTrace();
+  void outputSmpTrace();
+  void outputSa1Trace();
+  void outputSfxTrace();
+  void outputSgbTrace();
 };
 
 extern Tracer *tracer;

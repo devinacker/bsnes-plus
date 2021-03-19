@@ -154,6 +154,7 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
   }
 }
 
+// create a human-readable text version of the current opcode
 void CPUcore::disassemble_opcode(char *output, uint32 addr, bool hclocks) {
   static reg24_t pc;
   char t[256];
@@ -211,6 +212,83 @@ void CPUcore::disassemble_opcode(char *output, uint32 addr, bool hclocks) {
   else
     sprintf(t, "V:%3d H:%3d F:%2d", cpu.vcounter(), cpu.hdot(), cpu.framecounter());
   strcat(s, t);
+}
+
+// disassemble current opcode but represent as a binary format instead of text
+//
+// goals:
+// 1) be really fast
+// 2) be fixed length and easy to parse out later
+// 3) be as compact as possible. (abridgedFormat cuts even more stuff)
+// 4) be extensible (use a header length so we can add more info later)
+void CPUcore::disassemble_opcode_bin(char* buf, uint32 addr, int &len_out, bool abridgedFormat) {
+    static reg24_t pc;
+
+    pc.d = addr;
+    uint8 opcode = dreadb(pc.d);
+    unsigned opcode_len = SNESCPU::getOpcodeLength((regs.e || regs.p.m), (regs.e || regs.p.x), opcode);
+
+    int i = 0;
+
+    // --- header (2 bytes) ---
+
+    // watermark identifying the type of data coming next
+    buf[i++] = abridgedFormat ? 0xEE : 0xEF;
+
+    // size in bytes of data starting after this byte (we will populate final size at the end)
+    int sizeIdx = i; i++;
+
+    // --- data ---
+    buf[i++] = (addr >> 0) & 0xFF;
+    buf[i++] = (addr >> 8) & 0xFF;
+    buf[i++] = (addr >> 16) & 0xFF;
+
+    // # of bytes for the instruction we're looking at
+    buf[i++] = opcode_len; // valid values: 1,2,3,4
+
+    buf[i++] = (regs.d.w >> 0) & 0xFF;
+    buf[i++] = (regs.d.w >> 8) & 0xFF;
+
+    buf[i++] = (regs.db) & 0xFF;
+
+    buf[i++] = (regs.p) & 0xFF; // 8 flags stored as bitmask in 1 byte
+
+    if (!abridgedFormat) {
+        // we'll always transmit 4 bytes, but, consumers should only use up to 'opcode_len'
+        // and discard the remaining bytes.
+        // i.e. if opcode_len is 2,
+        // then a consumer should USE opcode and operand0 (2 bytes)
+        // then read but discard the remaining 2 bytes (operand1 and operand2 will be garbage)
+        pc.w++;
+        uint8 operand0 = dreadb(pc.d); pc.w++;
+        uint8 operand1 = dreadb(pc.d); pc.w++;
+        uint8 operand2 = dreadb(pc.d);
+
+        buf[i++] = opcode;      // always valid (opcode_len >= 1)
+        buf[i++] = operand0;    // valid if opcode_len >= 2
+        buf[i++] = operand1;    // valid if opcode_len >= 3
+        buf[i++] = operand2;    // valid if opcode_len == 4
+
+        buf[i++] = (regs.a.w >> 0) & 0xFF;
+        buf[i++] = (regs.a.w >> 8) & 0xFF;
+
+        buf[i++] = (regs.x.w >> 0) & 0xFF;
+        buf[i++] = (regs.x.w >> 8) & 0xFF;
+
+        buf[i++] = (regs.y.w >> 0) & 0xFF;
+        buf[i++] = (regs.y.w >> 8) & 0xFF;
+
+        buf[i++] = (regs.s.w >> 0) & 0xFF;
+        buf[i++] = (regs.s.w >> 8) & 0xFF;
+
+        buf[i++] = (regs.e) & 0xFF; // emu flag
+
+        // TODO: hclocks/etc if we want them.
+    }
+
+    // put the length of everything back in the header
+    len_out = i;
+    buf[sizeIdx] = len_out - sizeIdx - 1;
 }
 
 #endif
