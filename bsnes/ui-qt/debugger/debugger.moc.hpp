@@ -47,6 +47,7 @@ public:
   class SymbolMap *symbolsSA1;
   class SymbolMap *symbolsSMP;
   class SymbolMap *symbolsDSP;
+  class SymbolMap *symbolsSGB;
 
   void modifySystemState(unsigned);
   void echo(const char *message);
@@ -79,6 +80,7 @@ private:
   string defaultSymbolsSMP;
   string defaultSymbolsDSP;
   string defaultSymbolsSA1;
+  string defaultSymbolsSGB;
 };
 
 extern Debugger *debugger;

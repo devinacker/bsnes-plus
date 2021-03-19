@@ -95,6 +95,9 @@ bool SMPDebugger::property(unsigned id, string &name, string &value) {
   //$00f1
   item("$00f1", "");
   item("IPLROM Enable", status.iplrom_enabled);
+  item("Timer 0 Enable", t0.enabled);
+  item("Timer 1 Enable", t1.enabled);
+  item("Timer 2 Enable", t2.enabled);
 
   //$00f2
   item("$00f2-$00f3", "");

@@ -34,7 +34,7 @@ void DisassemblerView::init() {
 void DisassemblerView::setFont(const QFont &font) {
   QWidget::setFont(font);
 
-  charWidth = fontMetrics().width(QLatin1Char('2'));
+  charWidth = fontMetrics().horizontalAdvance(QLatin1Char('2'));
   charHeight = fontMetrics().height() + 1;
   charPadding = charWidth / 2;
   headerHeight = charHeight + 3;
@@ -685,6 +685,14 @@ int DisassemblerView::renderValue(QPainter &painter, int x, int y, uint8_t type,
   switch (type) {
     case 'X':
       text = QString("$%1").arg(value, size, 16, QChar('0'));
+      break;
+
+    case 'D':
+      text = QString("%1").arg((int32_t)value, size, 10, QChar('0'));
+      break;
+    
+    case 'U':
+      text = QString("%1").arg(value, size, 10, QChar('0'));
       break;
 
     default:
