@@ -60,7 +60,7 @@ QWidget* NTSCFilter::settings() {
     gridLayout->addWidget(hueLabel, 1, 0);
 
     hueValue = new QLabel;
-    hueValue->setMinimumWidth(hueValue->fontMetrics().width("-100.0"));
+    hueValue->setMinimumWidth(hueValue->fontMetrics().horizontalAdvance("-100.0"));
     hueValue->setAlignment(Qt::AlignHCenter);
     gridLayout->addWidget(hueValue, 1, 1);
 

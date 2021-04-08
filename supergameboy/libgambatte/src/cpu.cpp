@@ -198,12 +198,12 @@ void CPU::loadState(SaveState const &state) {
 
 #define READ(dest, addr) do { \
 	(dest) = mem_.read(addr, cycleCounter); \
-	if (debug_) debug_->op_read(addr, (dest)); \
+	if (debug_) debug_->op_read(mem_.addrWithBank(addr), (dest)); \
 	cycleCounter += 4; \
 } while (0)
 #define PC_READ(dest) do { \
 	(dest) = mem_.read(pc, cycleCounter); \
-	if (debug_) debug_->op_readpc(pc, (dest)); \
+	if (debug_) debug_->op_readpc(mem_.addrWithBank(pc), (dest)); \
 	pc = (pc + 1) & 0xFFFF; \
 	cycleCounter += 4; \
 } while (0)
@@ -214,7 +214,7 @@ void CPU::loadState(SaveState const &state) {
 } while (0)
 
 #define WRITE(addr, data) do { \
-	if (debug_) debug_->op_write(addr, data); \
+	if (debug_) debug_->op_write(mem_.addrWithBank(addr), data); \
 	mem_.write(addr, data, cycleCounter); \
 	cycleCounter += 4; \
 } while (0)
@@ -554,7 +554,7 @@ void CPU::loadState(SaveState const &state) {
 // Jump to 16-bit immediate operand and push return address onto stack:
 #define call_nn() do { \
 	unsigned const npc = (pc + 2) & 0xFFFF; \
-	if (debug_) debug_->op_call(npc); \
+	if (debug_) debug_->op_call(mem_.addrWithBank(npc)); \
 	jp_nn(); \
 	PUSH(npc >> 8, npc & 0xFF); \
 } while (0)
@@ -610,12 +610,12 @@ void CPU::process(unsigned long const cycles) {
 
 			if (!prefetched_) {
 				if (debug_)
-					debug_->op_step(pc);
+					debug_->op_step(mem_.addrWithBank(pc));
 
 				PC_READ(opcode);
 			} else {
 //				if (debug_)
-//					debug_->op_step(pc - 1);
+//					debug_->op_step(mem_.addrWithBank(pc - 1));
 
 				opcode = opcode_;
 				cycleCounter += 4;

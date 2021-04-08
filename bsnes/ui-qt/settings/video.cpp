@@ -25,7 +25,7 @@ VideoSettingsWindow::VideoSettingsWindow() {
 
   contrastValue = new QLabel;
   contrastValue->setAlignment(Qt::AlignHCenter);
-  contrastValue->setMinimumWidth(contrastValue->fontMetrics().width("+100%"));
+  contrastValue->setMinimumWidth(contrastValue->fontMetrics().horizontalAdvance("+100%"));
   colorLayout->addWidget(contrastValue, 0, 1);
 
   contrastSlider = new QSlider(Qt::Horizontal);
@@ -88,7 +88,7 @@ VideoSettingsWindow::VideoSettingsWindow() {
 
   cropLeftValue = new QLabel;
   cropLeftValue->setAlignment(Qt::AlignHCenter);
-  cropLeftValue->setMinimumWidth(cropLeftValue->fontMetrics().width("+100%"));
+  cropLeftValue->setMinimumWidth(cropLeftValue->fontMetrics().horizontalAdvance("+100%"));
   cropLayout->addWidget(cropLeftValue, 0, 1);
 
   cropLeftSlider = new QSlider(Qt::Horizontal);

@@ -4,6 +4,7 @@
 
 #include <nall/snes/cpu.hpp>
 #include <nall/snes/smp.hpp>
+#include <nall/snes/sgb.hpp>
 
 #include "debugger.moc"
 Debugger *debugger;
@@ -17,6 +18,7 @@ Debugger *debugger;
 #include "disassembler/processor/cpu_processor.cpp"
 #include "disassembler/processor/smp_processor.cpp"
 #include "disassembler/processor/sfx_processor.cpp"
+#include "disassembler/processor/sgb_processor.cpp"
 
 #include "registeredit.cpp"
 #include "debuggerview.cpp"
@@ -109,6 +111,7 @@ Debugger::Debugger() {
   symbolsSMP = new SymbolMap();
   symbolsDSP = new SymbolMap();
   symbolsSFX = new SymbolMap();
+  symbolsSGB = new SymbolMap();
   
   application.locateFile(defaultSymbolsCPU = "default.cpu.sym", true, true);
   application.locateFile(defaultSymbolsCPUWithSA1 = "default_sa1.cpu.sym", true, true);
@@ -116,6 +119,7 @@ Debugger::Debugger() {
   application.locateFile(defaultSymbolsSMP = "default.smp.sym", true, true);
   application.locateFile(defaultSymbolsDSP = "default.dsp.sym", true, true);
   application.locateFile(defaultSymbolsSA1 = "default.sa1.sym", true, true);
+  application.locateFile(defaultSymbolsSGB = "default.sgb.sym", true, true);
   
   if (config().debugger.loadDefaultSymbols) {
     symbolsCPU->loadFromFile(defaultSymbolsCPU);
@@ -127,7 +131,7 @@ Debugger::Debugger() {
   debugSMP = new DebuggerView(registerEditSMP, new SmpDisasmProcessor(symbolsSMP));
   debugSA1 = new DebuggerView(registerEditSA1, new CpuDisasmProcessor(CpuDisasmProcessor::SA1, symbolsSA1));
   debugSFX = new DebuggerView(registerEditSFX, new SfxDisasmProcessor(symbolsSFX));
-  debugSGB = new DebuggerView(registerEditSGB, new CommonDisasmProcessor(CommonDisasmProcessor::SGB));
+  debugSGB = new DebuggerView(registerEditSGB, new SgbDisasmProcessor(symbolsSGB));
 
   editTabs = new QTabWidget;
   editTabs->addTab(debugCPU, "CPU");
@@ -141,7 +145,7 @@ Debugger::Debugger() {
   console->setReadOnly(true);
   console->setFont(QFont(Style::Monospace));
   console->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  console->setMinimumWidth((98 + 4) * console->fontMetrics().width(' '));
+  console->setMinimumWidth((98 + 4) * console->fontMetrics().horizontalAdvance(' '));
   console->setMinimumHeight((6 + 1) * console->fontMetrics().height());
   consoleLayout->addWidget(console);
 
@@ -277,7 +281,7 @@ void Debugger::modifySystemState(unsigned state) {
     
     memset(SNES::sa1.usage, 0x00, 1 << 24);
     memset(SNES::superfx.usage, 0x00, 1 << 23);
-    memset(SNES::supergameboy.usage, 0x00, 1 << 16);
+    memset(SNES::supergameboy.usage_, 0x00, 1 << 24);
     
     if(config().debugger.cacheUsageToDisk && fp.open(usagefile, file::mode::read)) {
       fp.read(SNES::cpu.usage, 1 << 24);
@@ -287,7 +291,7 @@ void Debugger::modifySystemState(unsigned state) {
       if (SNES::cartridge.has_superfx())
         fp.read(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
-        fp.read(SNES::supergameboy.usage, 1 << 16);
+        fp.read(SNES::supergameboy.usage_, 1 << 24);
       fp.close();
       
       for (unsigned i = 0; i < 1 << 24; i++) {
@@ -332,6 +336,10 @@ void Debugger::modifySystemState(unsigned state) {
     }
     if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy) {
       editTabs->addTab(debugSGB, "Super GB");
+      if (!symbolsSA1->loadFromFile(nall::basename(symfile), ".sgb.sym") &&
+          config().debugger.loadDefaultSymbols) {
+        symbolsSGB->loadFromFile(defaultSymbolsSGB);  
+      }
     }
 
     string data;
@@ -360,7 +368,7 @@ void Debugger::modifySystemState(unsigned state) {
       if (SNES::cartridge.has_superfx())
         fp.write(SNES::superfx.usage, 1 << 23);
       if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
-        fp.write(SNES::supergameboy.usage, 1 << 16);
+        fp.write(SNES::supergameboy.usage_, 1 << 24);
       fp.close();
     }
     
@@ -371,6 +379,8 @@ void Debugger::modifySystemState(unsigned state) {
         symbolsSA1->saveToFile(nall::basename(symfile), ".sa1.sym");
       if (SNES::cartridge.has_superfx())
         symbolsSFX->saveToFile(nall::basename(symfile), ".sfx.sym");
+      if (SNES::cartridge.mode() == SNES::Cartridge::Mode::SuperGameBoy)
+        symbolsSGB->saveToFile(nall::basename(symfile), ".sgb.sym");
     }
 
     if(config().debugger.saveBreakpoints) {

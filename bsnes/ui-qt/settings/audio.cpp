@@ -44,7 +44,7 @@ AudioSettingsWindow::AudioSettingsWindow() {
 
   volumeValue = new QLabel;
   volumeValue->setAlignment(Qt::AlignHCenter);
-  volumeValue->setMinimumWidth(volumeValue->fontMetrics().width("262144hz"));
+  volumeValue->setMinimumWidth(volumeValue->fontMetrics().horizontalAdvance("262144hz"));
   sliders->addWidget(volumeValue, 0, 1);
 
   volume = new QSlider(Qt::Horizontal);

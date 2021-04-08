@@ -103,6 +103,7 @@ public:
 
 	void setGameGenie(std::string const &codes) { mem_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { mem_.setGameShark(codes); }
+	unsigned addrWithBank(unsigned addr) const { return mem_.addrWithBank(addr); }
 
 private:
 	Memory mem_;

@@ -138,7 +138,7 @@ QModelIndex OamDataModel::parent(const QModelIndex & index) const {
 }
 
 Qt::ItemFlags OamDataModel::flags(const QModelIndex & index) const {
-  if(isIndexValid(index) == false) return 0;
+  if(isIndexValid(index) == false) return {};
 
   if(index.column() == ID) {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;

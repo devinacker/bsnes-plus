@@ -54,15 +54,15 @@ bsnesexport bool snesmusic_load_spc(string &filename, uint8_t *&dump,
 
 	file spc;
 	char header[sizeof(spc_header)-1];
-		
+
 	snesmusic_unload();
-	
+
 	if (!spc.open(filename, file::mode::read))
 		return false;
-	
+
 	if (spc.size() < 0x10200)
 		return false;
-	
+
 	// validate file header
 	spc.read((uint8_t*)header, sizeof(header));
 	if (memcmp(header, spc_header, sizeof(header)))
@@ -76,20 +76,22 @@ bsnesexport bool snesmusic_load_spc(string &filename, uint8_t *&dump,
 	regs[2] = spc.read();
 	p       = spc.read();
 	regs[3] = spc.read();
-	
+
 	// read APU RAM and DSP registers
 	spc.seek(0x100);
 	spc.read(dump, 0x10000 + 128);
-	
-	// clear existing echo buffer contents
-	uint16_t echo_base = dump[0x1006d] << 8;
-	uint16_t echo_size = dump[0x1007d] << 11;
-	for (uint32_t addr = echo_base; addr < echo_base + echo_size; addr += 0x100) {
-		memset(dump + (addr & 0xffff), 0, 0x100);
+
+	// clear existing echo buffer contents if echo writes are enabled
+	if (!(dump[0x1006c] & 0x20)) {
+		uint16_t echo_base = dump[0x1006d] << 8;
+		uint16_t echo_size = dump[0x1007d] << 11;
+		for (uint32_t addr = echo_base; addr < echo_base + echo_size; addr += 0x100) {
+			memset(dump + (addr & 0xffff), 0, 0x100);
+		}
 	}
 
 	info.loaded = true;
-	
+
 	read_tag_id666(spc);
 	return true;
 }

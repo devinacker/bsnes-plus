@@ -106,6 +106,10 @@ void GB::debugSetFlag(char flag, bool value) {
 	p_->cpu.debugSetFlag(flag, value);
 }
 
+unsigned GB::addrWithBank(unsigned addr) const {
+	return p_->cpu.addrWithBank(addr);
+}
+
 void GB::setDebugHandler(DebugHandler *debug) {
 	p_->cpu.setDebugHandler(debug);
 }
