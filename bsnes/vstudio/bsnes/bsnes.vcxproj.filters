@@ -283,9 +283,6 @@
     <Filter Include="ui-qt\platform">
       <UniqueIdentifier>{9cd0b4b9-18a4-4b7c-8e52-4499d88ff1c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ui-qt\resource">
-      <UniqueIdentifier>{7d1a8e75-3830-4ad6-9a68-043f5f0a4c61}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ui-qt\settings">
       <UniqueIdentifier>{af5af218-a29b-496e-a765-dc3bd1f53e90}</UniqueIdentifier>
     </Filter>
@@ -327,6 +324,9 @@
     </Filter>
     <Filter Include="thrift">
       <UniqueIdentifier>{eebd1030-6c40-480a-a594-cad9f5f85100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{728a4f4b-668c-4d59-ad6a-ffd4c290a395}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1711,6 +1711,7 @@
     <Image Include="..\..\ui-qt\data\logo.png">
       <Filter>ui-qt\data</Filter>
     </Image>
+    <Image Include="..\..\ui-qt\resource\data\bsnes.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ui-qt\data\documentation.html">
@@ -1837,9 +1838,6 @@
     <CustomBuild Include="..\..\ui-qt\debugger\registeredit.moc.hpp">
       <Filter>mocs</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\ui-qt\resource\resource.qrc">
-      <Filter>mocs</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\ui-qt\settings\settings.moc.hpp">
       <Filter>mocs</Filter>
     </CustomBuild>
@@ -1876,5 +1874,13 @@
     <CustomBuild Include="..\..\..\common\nall\qt\window.moc.hpp">
       <Filter>mocs</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\resource\resource.qrc">
+      <Filter>resource</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\ui-qt\resource\resource.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -93,21 +93,30 @@ uint32_t IdaClient_add_visited_args::read(::apache::thrift::protocol::TProtocol*
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_LIST) {
+        if (ftype == ::apache::thrift::protocol::T_SET) {
           {
             this->changed.clear();
             uint32_t _size10;
             ::apache::thrift::protocol::TType _etype13;
-            xfer += iprot->readListBegin(_etype13, _size10);
-            this->changed.resize(_size10);
+            xfer += iprot->readSetBegin(_etype13, _size10);
             uint32_t _i14;
             for (_i14 = 0; _i14 < _size10; ++_i14)
             {
-              xfer += iprot->readI32(this->changed[_i14]);
+              int32_t _elem15;
+              xfer += iprot->readI32(_elem15);
+              this->changed.insert(_elem15);
             }
-            xfer += iprot->readListEnd();
+            xfer += iprot->readSetEnd();
           }
           this->__isset.changed = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->is_step);
+          this->__isset.is_step = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -129,16 +138,20 @@ uint32_t IdaClient_add_visited_args::write(::apache::thrift::protocol::TProtocol
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("IdaClient_add_visited_args");
 
-  xfer += oprot->writeFieldBegin("changed", ::apache::thrift::protocol::T_LIST, 1);
+  xfer += oprot->writeFieldBegin("changed", ::apache::thrift::protocol::T_SET, 1);
   {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->changed.size()));
-    std::vector<int32_t> ::const_iterator _iter15;
-    for (_iter15 = this->changed.begin(); _iter15 != this->changed.end(); ++_iter15)
+    xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->changed.size()));
+    std::set<int32_t> ::const_iterator _iter16;
+    for (_iter16 = this->changed.begin(); _iter16 != this->changed.end(); ++_iter16)
     {
-      xfer += oprot->writeI32((*_iter15));
+      xfer += oprot->writeI32((*_iter16));
     }
-    xfer += oprot->writeListEnd();
+    xfer += oprot->writeSetEnd();
   }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("is_step", ::apache::thrift::protocol::T_BOOL, 2);
+  xfer += oprot->writeBool(this->is_step);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -156,16 +169,20 @@ uint32_t IdaClient_add_visited_pargs::write(::apache::thrift::protocol::TProtoco
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("IdaClient_add_visited_pargs");
 
-  xfer += oprot->writeFieldBegin("changed", ::apache::thrift::protocol::T_LIST, 1);
+  xfer += oprot->writeFieldBegin("changed", ::apache::thrift::protocol::T_SET, 1);
   {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>((*(this->changed)).size()));
-    std::vector<int32_t> ::const_iterator _iter16;
-    for (_iter16 = (*(this->changed)).begin(); _iter16 != (*(this->changed)).end(); ++_iter16)
+    xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>((*(this->changed)).size()));
+    std::set<int32_t> ::const_iterator _iter17;
+    for (_iter17 = (*(this->changed)).begin(); _iter17 != (*(this->changed)).end(); ++_iter17)
     {
-      xfer += oprot->writeI32((*_iter16));
+      xfer += oprot->writeI32((*_iter17));
     }
-    xfer += oprot->writeListEnd();
+    xfer += oprot->writeSetEnd();
   }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("is_step", ::apache::thrift::protocol::T_BOOL, 2);
+  xfer += oprot->writeBool((*(this->is_step)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -328,18 +345,19 @@ void IdaClientClient::send_start_event()
   oprot_->getTransport()->flush();
 }
 
-void IdaClientClient::add_visited(const std::vector<int32_t> & changed)
+void IdaClientClient::add_visited(const std::set<int32_t> & changed, const bool is_step)
 {
-  send_add_visited(changed);
+  send_add_visited(changed, is_step);
 }
 
-void IdaClientClient::send_add_visited(const std::vector<int32_t> & changed)
+void IdaClientClient::send_add_visited(const std::set<int32_t> & changed, const bool is_step)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("add_visited", ::apache::thrift::protocol::T_ONEWAY, cseqid);
 
   IdaClient_add_visited_pargs args;
   args.changed = &changed;
+  args.is_step = &is_step;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -462,7 +480,7 @@ void IdaClientProcessor::process_add_visited(int32_t, ::apache::thrift::protocol
   }
 
   try {
-    iface_->add_visited(args.changed);
+    iface_->add_visited(args.changed, args.is_step);
   } catch (const std::exception&) {
     if (this->eventHandler_.get() != nullptr) {
       this->eventHandler_->handlerError(ctx, "IdaClient.add_visited");
@@ -579,12 +597,12 @@ void IdaClientConcurrentClient::send_start_event()
   sentry.commit();
 }
 
-void IdaClientConcurrentClient::add_visited(const std::vector<int32_t> & changed)
+void IdaClientConcurrentClient::add_visited(const std::set<int32_t> & changed, const bool is_step)
 {
-  send_add_visited(changed);
+  send_add_visited(changed, is_step);
 }
 
-void IdaClientConcurrentClient::send_add_visited(const std::vector<int32_t> & changed)
+void IdaClientConcurrentClient::send_add_visited(const std::set<int32_t> & changed, const bool is_step)
 {
   int32_t cseqid = 0;
   ::apache::thrift::async::TConcurrentSendSentry sentry(this->sync_.get());
@@ -592,6 +610,7 @@ void IdaClientConcurrentClient::send_add_visited(const std::vector<int32_t> & ch
 
   IdaClient_add_visited_pargs args;
   args.changed = &changed;
+  args.is_step = &is_step;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();

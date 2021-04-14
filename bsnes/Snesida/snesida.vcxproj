@@ -87,7 +87,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>d:\idasdk76\lib\x64_win_vc_32\;../thrift/;../thrift/libevent/lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ida.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ida.lib;thrift_$(PlatformArchitecture).lib;thriftnb_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ class IdaClientIf {
  public:
   virtual ~IdaClientIf() {}
   virtual void start_event() = 0;
-  virtual void add_visited(const std::vector<int32_t> & changed) = 0;
+  virtual void add_visited(const std::set<int32_t> & changed, const bool is_step) = 0;
   virtual void pause_event(const int32_t address) = 0;
   virtual void stop_event() = 0;
 };
@@ -58,7 +58,7 @@ class IdaClientNull : virtual public IdaClientIf {
   void start_event() {
     return;
   }
-  void add_visited(const std::vector<int32_t> & /* changed */) {
+  void add_visited(const std::set<int32_t> & /* changed */, const bool /* is_step */) {
     return;
   }
   void pause_event(const int32_t /* address */) {
@@ -107,8 +107,9 @@ class IdaClient_start_event_pargs {
 };
 
 typedef struct _IdaClient_add_visited_args__isset {
-  _IdaClient_add_visited_args__isset() : changed(false) {}
+  _IdaClient_add_visited_args__isset() : changed(false), is_step(false) {}
   bool changed :1;
+  bool is_step :1;
 } _IdaClient_add_visited_args__isset;
 
 class IdaClient_add_visited_args {
@@ -116,19 +117,24 @@ class IdaClient_add_visited_args {
 
   IdaClient_add_visited_args(const IdaClient_add_visited_args&);
   IdaClient_add_visited_args& operator=(const IdaClient_add_visited_args&);
-  IdaClient_add_visited_args() {
+  IdaClient_add_visited_args() : is_step(0) {
   }
 
   virtual ~IdaClient_add_visited_args() noexcept;
-  std::vector<int32_t>  changed;
+  std::set<int32_t>  changed;
+  bool is_step;
 
   _IdaClient_add_visited_args__isset __isset;
 
-  void __set_changed(const std::vector<int32_t> & val);
+  void __set_changed(const std::set<int32_t> & val);
+
+  void __set_is_step(const bool val);
 
   bool operator == (const IdaClient_add_visited_args & rhs) const
   {
     if (!(changed == rhs.changed))
+      return false;
+    if (!(is_step == rhs.is_step))
       return false;
     return true;
   }
@@ -149,7 +155,8 @@ class IdaClient_add_visited_pargs {
 
 
   virtual ~IdaClient_add_visited_pargs() noexcept;
-  const std::vector<int32_t> * changed;
+  const std::set<int32_t> * changed;
+  const bool* is_step;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -268,8 +275,8 @@ class IdaClientClient : virtual public IdaClientIf {
   }
   void start_event();
   void send_start_event();
-  void add_visited(const std::vector<int32_t> & changed);
-  void send_add_visited(const std::vector<int32_t> & changed);
+  void add_visited(const std::set<int32_t> & changed, const bool is_step);
+  void send_add_visited(const std::set<int32_t> & changed, const bool is_step);
   void pause_event(const int32_t address);
   void send_pause_event(const int32_t address);
   void stop_event();
@@ -337,13 +344,13 @@ class IdaClientMultiface : virtual public IdaClientIf {
     ifaces_[i]->start_event();
   }
 
-  void add_visited(const std::vector<int32_t> & changed) {
+  void add_visited(const std::set<int32_t> & changed, const bool is_step) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->add_visited(changed);
+      ifaces_[i]->add_visited(changed, is_step);
     }
-    ifaces_[i]->add_visited(changed);
+    ifaces_[i]->add_visited(changed, is_step);
   }
 
   void pause_event(const int32_t address) {
@@ -398,8 +405,8 @@ class IdaClientConcurrentClient : virtual public IdaClientIf {
   }
   void start_event();
   void send_start_event();
-  void add_visited(const std::vector<int32_t> & changed);
-  void send_add_visited(const std::vector<int32_t> & changed);
+  void add_visited(const std::set<int32_t> & changed, const bool is_step);
+  void send_add_visited(const std::set<int32_t> & changed, const bool is_step);
   void pause_event(const int32_t address);
   void send_pause_event(const int32_t address);
   void stop_event();

@@ -54,27 +54,48 @@ static const char* register_classes[] = {
 
 static struct apply_codemap_req : public exec_request_t {
 private:
-  const std::vector<int32_t>& _changed;
+  const std::set<int32_t>& _changed;
+  const bool _is_step;
 public:
-  apply_codemap_req(const std::vector<int32_t>& changed) : _changed(changed) {};
+  apply_codemap_req(const std::set<int32_t>& changed, bool is_step) : _changed(changed), _is_step(is_step) {};
 
   int idaapi execute(void) override {
+    auto m = _changed.size();
+
+    if (!_is_step) {
+      show_wait_box("Applying codemap: %d/%d...", 1, m);
+    }
+
+    auto x = 0;
     for (auto i = _changed.cbegin(); i != _changed.cend(); ++i) {
+      if (!_is_step && user_cancelled()) {
+        break;
+      }
+
+      if (!_is_step) {
+        replace_wait_box("Applying codemap: %d/%d...", x, m);
+      }
+
       ea_t addr = (ea_t)(*i | 0x800000);
       auto_make_code(addr);
       plan_ea(addr);
       show_addr(addr);
+      x++;
+    }
+
+    if (!_is_step) {
+      hide_wait_box();
     }
 
     return 0;
   }
 };
 
-static void apply_codemap(const std::vector<int32_t>& changed)
+static void apply_codemap(const std::set<int32_t>& changed, bool is_step)
 {
   if (changed.empty()) return;
 
-  apply_codemap_req req(changed);
+  apply_codemap_req req(changed, is_step);
   execute_sync(req, MFF_FAST);
 }
 
@@ -102,6 +123,15 @@ static void continue_execution()
   }
 }
 
+static void stop_server() {
+  try {
+    srv->stop();
+  }
+  catch (...) {
+
+  }
+}
+
 static void finish_execution()
 {
   try {
@@ -112,15 +142,8 @@ static void finish_execution()
   catch (...) {
 
   }
-}
 
-void stop_server() {
-  try {
-    srv->stop();
-  }
-  catch (...) {
-
-  }
+  stop_server();
 }
 
 class IdaClientHandler : virtual public IdaClientIf {
@@ -169,8 +192,8 @@ public:
 	}
 
 
-  void add_visited(const std::vector<int32_t>& changed) override {
-    apply_codemap(changed);
+  void add_visited(const std::set<int32_t>& changed, bool is_step) override {
+    apply_codemap(changed, is_step);
   }
 
 };
@@ -273,7 +296,7 @@ static drc_t idaapi s_start_process(const char* path,
     }
   }
   catch (...) {
-
+    return DRC_FAILED;
   }
 
   return DRC_OK;
@@ -381,7 +404,7 @@ static drc_t idaapi s_set_resume_mode(thid_t tid, resume_mode_t resmod) // Run o
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
 
     break;
@@ -392,7 +415,7 @@ static drc_t idaapi s_set_resume_mode(thid_t tid, resume_mode_t resmod) // Run o
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
     break;
   }
@@ -431,7 +454,7 @@ static drc_t idaapi read_registers(thid_t tid, int clsmask, regval_t* values, qs
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
 	}
 
@@ -453,7 +476,7 @@ static drc_t idaapi write_register(thid_t tid, int regidx, const regval_t* value
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
 	}
 
@@ -526,7 +549,7 @@ static ssize_t idaapi read_memory(ea_t ea, void* buffer, size_t size, qstring* e
     }
   }
   catch (...) {
-
+    return DRC_FAILED;
   }
 
   return size;
@@ -545,7 +568,7 @@ static ssize_t idaapi write_memory(ea_t ea, const void* buffer, size_t size, qst
     }
   }
   catch (...) {
-
+    return 0;
   }
 
   return size;
@@ -655,7 +678,7 @@ static drc_t idaapi update_bpts(int* nbpts, update_bpt_info_t* bpts, int nadd, i
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
 
     bpts[i].code = BPT_OK;
@@ -724,7 +747,7 @@ static drc_t idaapi update_bpts(int* nbpts, update_bpt_info_t* bpts, int nadd, i
       }
     }
     catch (...) {
-
+      return DRC_FAILED;
     }
 
     bpts[nadd + i].code = BPT_OK;

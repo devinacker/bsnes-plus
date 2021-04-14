@@ -1,5 +1,5 @@
 #include <snes.hpp>
-#include <vector>
+#include <set>
 
 #define CPU_CPP
 namespace SNES {

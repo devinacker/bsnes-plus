@@ -20,29 +20,16 @@ static ::std::shared_ptr<TNonblockingServer> srv;
 static ::std::shared_ptr<TTransport> cli_transport;
 
 static ::std::mutex list_mutex;
-::std::vector<int32_t> visited;
+::std::set<int32_t> visited;
 
-static void send_visited() {
+static void send_visited(bool is_step) {
   const auto part = visited.size();
 
   ::std::lock_guard<::std::mutex> lock(list_mutex);
 
-  while (visited.size() > part) {
-    try {
-      if (client) {
-        std::vector<int32_t> split(visited.begin(), visited.begin() + part);
-        client->add_visited(split);
-        visited.erase(visited.begin(), visited.begin() + part);
-      }
-    }
-    catch (...) {
-
-    }
-  }
-
   try {
     if (client) {
-      client->add_visited(visited);
+      client->add_visited(visited, is_step);
     }
   }
   catch (...) {
@@ -55,7 +42,7 @@ static void send_visited() {
 static void stop_client() {
   try {
     if (client) {
-      send_visited();
+      send_visited(false);
       client->stop_event();
     }
     cli_transport->close();
@@ -84,10 +71,11 @@ static void init_ida_client() {
   atexit(stop_client);
 }
 
-static void toggle_pause() {
-  application.debug = !application.debug || application.debugrun;
-  application.debugrun = false;
-  if (application.debug) {
+static void toggle_pause(bool enable) {
+  application.debug = enable;
+  application.debugrun = enable;
+
+  if (enable) {
     audio.clear();
   }
 }
@@ -191,7 +179,7 @@ public:
   void exit_emulation() override {
     try {
       if (client) {
-        send_visited();
+        send_visited(false);
         client->stop_event();
       }
     }
@@ -204,12 +192,12 @@ public:
 
 
   void pause() override {
-    toggle_pause();
+    step_into();
   }
 
 
   void resume() override {
-    toggle_pause();
+    toggle_pause(false);
   }
 
 
@@ -273,11 +261,11 @@ void init_dbg_server() {
   SNES::debugger.step_cpu = true;
 }
 
-void send_pause_event() {
+void send_pause_event(bool is_step) {
   try {
     if (client) {
       client->pause_event(SNES::cpu.getRegister(SNES::CPUDebugger::RegisterPC));
-      send_visited();
+      send_visited(is_step);
     }
   }
   catch (...) {

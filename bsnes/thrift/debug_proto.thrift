@@ -91,7 +91,7 @@ service BsnesDebugger {
 
 service IdaClient {
   oneway void start_event(),
-  oneway void add_visited(1:list<i32> changed),
+  oneway void add_visited(1:set<i32> changed, 2:bool is_step),
   oneway void pause_event(1:i32 address),
   oneway void stop_event(),
 }
