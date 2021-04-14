@@ -686,7 +686,7 @@ void Debugger::event() {
   
   audio.clear();
   autoUpdate();
-  //show();
+  showMinimized();
   //activateWindow();
 }
 
