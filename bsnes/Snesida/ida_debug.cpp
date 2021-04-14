@@ -30,6 +30,18 @@ using namespace ::apache::thrift::concurrency;
 static ::std::mutex list_mutex;
 static eventlist_t events;
 
+static const char* const p_reg[] =
+{
+    "CF",
+    "ZF",
+    "IF",
+    "DF",
+    "XF",
+    "MF",
+    "VF",
+    "NF",
+};
+
 static register_info_t registers[] = {
 	{"A", 0, RC_CPU, dt_word, NULL, 0},
 	{"X", 0, RC_CPU, dt_word, NULL, 0},
@@ -41,7 +53,7 @@ static register_info_t registers[] = {
 	{"PC", REGISTER_IP | REGISTER_ADDRESS, RC_CPU, dt_dword, NULL, 0},
   {"S", REGISTER_SP | REGISTER_ADDRESS, RC_CPU, dt_word, NULL, 0},
 
-	{"P", REGISTER_READONLY, RC_CPU, dt_byte, NULL, 0},
+	{"P", REGISTER_READONLY, RC_CPU, dt_byte, p_reg, 0xFF},
   {"m", REGISTER_READONLY, RC_CPU, dt_byte, NULL, 0},
   {"x", REGISTER_READONLY, RC_CPU, dt_byte, NULL, 0},
 	{"e", REGISTER_READONLY, RC_CPU, dt_byte, NULL, 0},
