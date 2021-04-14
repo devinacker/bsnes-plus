@@ -51,6 +51,7 @@ public:
   bool bus_access;
   bool break_on_wdm;
   bool break_on_brk;
+  bool log_without_break;
 
   enum class StepType : unsigned {
     None, StepToNMI, StepToIRQ, StepToVBlank, StepToHBlank, StepInto, StepOver, StepOut

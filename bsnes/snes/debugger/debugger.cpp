@@ -204,6 +204,7 @@ Debugger::Debugger() {
   bus_access = false;
   break_on_wdm = false;
   break_on_brk = false;
+  log_without_break = false;
 
   step_type = StepType::None;
 }

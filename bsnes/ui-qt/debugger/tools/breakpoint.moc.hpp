@@ -74,6 +74,7 @@ public:
   QPushButton *btnRemove;
   QCheckBox *breakOnWDM;
   QCheckBox *breakOnBRK;
+  QCheckBox *logWithoutBreak;
 
   static const QStringList sources;
   
