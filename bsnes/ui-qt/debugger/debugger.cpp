@@ -465,7 +465,7 @@ void Debugger::clear() {
 void Debugger::switchWindow() {
   // give focus to the main window if needed so that emulation can continue
   if(config().input.focusPolicy == Configuration::Input::FocusPolicyPauseEmulation) {
-    mainWindow->activateWindow();
+    //mainWindow->activateWindow();
   }
 }
 
@@ -473,7 +473,7 @@ void Debugger::toggleRunStatus() {
   application.debug = !application.debug || application.debugrun;
   application.debugrun = false;
   if(!application.debug) {
-    mainWindow->activateWindow();
+    //mainWindow->activateWindow();
   } else {
     audio.clear();
   }
@@ -686,8 +686,8 @@ void Debugger::event() {
   
   audio.clear();
   autoUpdate();
-  show();
-  activateWindow();
+  //show();
+  //activateWindow();
 }
 
 // update "auto refresh" tool windows

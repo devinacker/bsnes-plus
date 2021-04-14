@@ -322,6 +322,12 @@
     <Filter Include="libco">
       <UniqueIdentifier>{7e4a35b9-7b93-41fc-a22c-699b7a2e207f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="mocs">
+      <UniqueIdentifier>{70586847-48e9-42c2-8999-880771f61f52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thrift">
+      <UniqueIdentifier>{eebd1030-6c40-480a-a594-cad9f5f85100}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\snes\alt\cpu\cpu.cpp">
@@ -1038,6 +1044,18 @@
     <ClCompile Include="..\..\libco\x86.c">
       <Filter>libco</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\BsnesDebugger.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\debug_proto_types.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\IdaClient.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\remote_debugger.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\snes\alt\cpu\cpu.hpp">
@@ -1328,24 +1346,6 @@
     <ClInclude Include="..\..\ruby\video.hpp">
       <Filter>ruby</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ui-qt\application\application.moc.hpp">
-      <Filter>ui-qt\application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\base\filebrowser.moc.hpp">
-      <Filter>ui-qt\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\base\htmlviewer.moc.hpp">
-      <Filter>ui-qt\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\base\loader.moc.hpp">
-      <Filter>ui-qt\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\base\main.moc.hpp">
-      <Filter>ui-qt\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\base\stateselect.moc.hpp">
-      <Filter>ui-qt\base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ui-qt\cartridge\cartridge.hpp">
       <Filter>ui-qt\cartridge</Filter>
     </ClInclude>
@@ -1379,71 +1379,17 @@
     <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_file_adapters.hpp">
       <Filter>ui-qt\debugger\disassembler\symbols</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_map.moc.hpp">
-      <Filter>ui-qt\debugger\disassembler\symbols</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\disassembler\disassemblerview.moc.hpp">
-      <Filter>ui-qt\debugger\disassembler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ui-qt\debugger\disassembler\line.hpp">
-      <Filter>ui-qt\debugger\disassembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbolsview.moc.hpp">
       <Filter>ui-qt\debugger\disassembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ui-qt\debugger\ppu\base-renderer.hpp">
       <Filter>ui-qt\debugger\ppu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\cgram-viewer.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\cgram-widget.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\image-grid-widget.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\oam-data-model.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\oam-graphics-scene.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\oam-viewer.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ui-qt\debugger\ppu\tile-renderer.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\tile-viewer.moc.hpp">
       <Filter>ui-qt\debugger\ppu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ui-qt\debugger\ppu\tilemap-renderer.hpp">
       <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\ppu\tilemap-viewer.moc.hpp">
-      <Filter>ui-qt\debugger\ppu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\tools\qhexedit2\qhexedit.moc.hpp">
-      <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\tools\breakpoint.moc.hpp">
-      <Filter>ui-qt\debugger\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\tools\memory.moc.hpp">
-      <Filter>ui-qt\debugger\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\tools\properties.moc.hpp">
-      <Filter>ui-qt\debugger\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\debuggerview.moc.hpp">
-      <Filter>ui-qt\debugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\registeredit.moc.hpp">
-      <Filter>ui-qt\debugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\debugger\tracer.moc.hpp">
-      <Filter>ui-qt\debugger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ui-qt\input\controller.hpp">
       <Filter>ui-qt\input</Filter>
@@ -1466,50 +1412,8 @@
     <ClInclude Include="..\..\ui-qt\movie\movie.hpp">
       <Filter>ui-qt\movie</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\advanced.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\audio.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\bsx.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\input.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\paths.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\settings.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\settings\video.moc.hpp">
-      <Filter>ui-qt\settings</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ui-qt\state\state.hpp">
       <Filter>ui-qt\state</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\cheateditor.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\cheatfinder.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\effecttoggle.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\manifestviewer.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\soundviewer.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\statemanager.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ui-qt\tools\tools.moc.hpp">
-      <Filter>ui-qt\tools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ui-qt\utility\utility.hpp">
       <Filter>ui-qt\utility</Filter>
@@ -1643,25 +1547,7 @@
     <ClInclude Include="..\..\..\common\nall\bps\patch.hpp">
       <Filter>common\nall\bps</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\check-action.moc.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\check-delegate.moc.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\combo-delegate.moc.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\common\nall\qt\concept.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\file-dialog.moc.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\radio-action.moc.hpp">
-      <Filter>common\nall\qt</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\common\nall\qt\window.moc.hpp">
       <Filter>common\nall\qt</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\common\nall\snes\cartridge.hpp">
@@ -1757,6 +1643,15 @@
     <ClInclude Include="..\..\libco\libco.h">
       <Filter>libco</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\BsnesDebugger.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\debug_proto_types.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\IdaClient.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\ui-qt\data\icons-16x16\dbg-break.png">
@@ -1824,9 +1719,6 @@
     <None Include="..\..\ui-qt\data\license.html">
       <Filter>ui-qt\data</Filter>
     </None>
-    <None Include="..\..\ui-qt\resource\resource.qrc">
-      <Filter>ui-qt\resource</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\ui-qt\debugger\tools\qhexedit2\license.txt">
@@ -1848,6 +1740,141 @@
     </CustomBuild>
     <CustomBuild Include="..\..\ui-qt\debugger\tools\qhexedit2\commands.moc.hpp">
       <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\advanced.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\application\application.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\audio.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\breakpoint.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\bsx.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\cgram-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\cgram-widget.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\cheateditor.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\cheatfinder.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\check-action.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\check-delegate.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\combo-delegate.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\debuggerview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\disassemblerview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\effecttoggle.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\filebrowser.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\file-dialog.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\htmlviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\image-grid-widget.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\input.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\loader.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\main.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\manifestviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\memory.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-data-model.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-graphics-scene.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\paths.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\properties.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\qhexedit2\qhexedit.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\radio-action.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\registeredit.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\resource\resource.qrc">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\settings.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\soundviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\statemanager.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\stateselect.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_map.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\symbolsview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\tilemap-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\tile-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\tools.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tracer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\video.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\window.moc.hpp">
+      <Filter>mocs</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

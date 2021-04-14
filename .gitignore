@@ -11,3 +11,5 @@
 *.rar
 */out
 */bin
+/bsnes/vstudio/bsnes/
+/bsnes/Snesida/x64/

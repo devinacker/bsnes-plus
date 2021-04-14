@@ -231,13 +231,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_PERFORMANCE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Compatibility|Win32'">
@@ -245,13 +248,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_COMPATIBILITY;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Accuracy|Win32'">
@@ -259,13 +265,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_ACCURACY;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Performance|Win32'">
@@ -275,15 +284,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_PERFORMANCE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Compatibility|Win32'">
@@ -293,15 +304,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_COMPATIBILITY;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Accuracy|Win32'">
@@ -311,15 +324,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_ACCURACY;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Performance|x64'">
@@ -327,13 +342,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_PERFORMANCE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Compatibility|x64'">
@@ -341,13 +359,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_COMPATIBILITY;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Accuracy|x64'">
@@ -355,13 +376,16 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_ACCURACY;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4267;4018;4244</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Performance|x64'">
@@ -371,15 +395,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_PERFORMANCE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Compatibility|x64'">
@@ -389,15 +415,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_COMPATIBILITY;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Accuracy|x64'">
@@ -407,15 +435,17 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;DEBUGGER;VIDEO_DIRECT3D;AUDIO_DIRECTSOUND;INPUT_DIRECTINPUT;PROFILE_ACCURACY;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;../../;../../snes/;../../ui-qt/debugger/tools/qhexedit2/;../../ui-qt/resource/;../../../common/;../../../common/nall/qt/;../../thrift/;../../thrift/libevent/include/;C:/local/boost_1_75_0/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>c:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories);../../thrift/;../../thrift/libevent/lib/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>D3d9.lib;Dsound.lib;Dinput8.lib;Dxguid.lib;thriftd_$(PlatformArchitecture).lib;thriftnbd_$(PlatformArchitecture).lib;event_$(PlatformArchitecture).lib;Iphlpapi.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -425,6 +455,9 @@
     <ClCompile Include="..\..\..\common\zlib\inflate.c" />
     <ClCompile Include="..\..\..\common\zlib\inftrees.c" />
     <ClCompile Include="..\..\..\common\zlib\zutil.c" />
+    <ClCompile Include="..\..\gen-cpp\BsnesDebugger.cpp" />
+    <ClCompile Include="..\..\gen-cpp\debug_proto_types.cpp" />
+    <ClCompile Include="..\..\gen-cpp\IdaClient.cpp" />
     <ClCompile Include="..\..\libco\amd64.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Compatibility|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Compatibility|Win32'">true</ExcludedFromBuild>
@@ -2836,6 +2869,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Accuracy|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Performance|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\remote_debugger.cpp" />
     <ClCompile Include="..\..\ui-qt\debugger\tools\breakpoint.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Compatibility|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Compatibility|Win32'">true</ExcludedFromBuild>
@@ -3591,6 +3625,9 @@
     <ClInclude Include="..\..\..\common\zlib\zconf.h" />
     <ClInclude Include="..\..\..\common\zlib\zlib.h" />
     <ClInclude Include="..\..\..\common\zlib\zutil.h" />
+    <ClInclude Include="..\..\gen-cpp\BsnesDebugger.h" />
+    <ClInclude Include="..\..\gen-cpp\debug_proto_types.h" />
+    <ClInclude Include="..\..\gen-cpp\IdaClient.h" />
     <ClInclude Include="..\..\libco\libco.h" />
     <ClInclude Include="..\..\ruby\audio.hpp" />
     <ClInclude Include="..\..\ruby\input.hpp" />
