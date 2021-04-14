@@ -13,7 +13,6 @@
 #define _WIN32_WINNT 0x0501
 #define NOMINMAX
 #include <windows.h>
-#undef interface
 
 namespace nall {
   //UTF-8 to UTF-16

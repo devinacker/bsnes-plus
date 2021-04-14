@@ -1,0 +1,1886 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="snes">
+      <UniqueIdentifier>{acd77031-02f8-49a2-bbf1-25c69facfcdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt">
+      <UniqueIdentifier>{70cea245-a73f-408e-b43d-4577fe26a4cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\cpu">
+      <UniqueIdentifier>{626fcbc7-09f9-489b-928a-685320937ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\dsp">
+      <UniqueIdentifier>{fd4f25dc-2534-4e88-b17f-1a5b7bc84fe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\ppu">
+      <UniqueIdentifier>{e8362c26-2292-4e08-bdaf-b31cb577811a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\ppu\debugger">
+      <UniqueIdentifier>{3c14ee14-c3b0-4c7e-bd61-7b01730c0919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\ppu\memory">
+      <UniqueIdentifier>{18258502-b1ec-4df4-b32d-33b55955f64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\ppu\mmio">
+      <UniqueIdentifier>{2c51348c-ac6a-4b5d-b515-46b912f63e58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\alt\ppu\render">
+      <UniqueIdentifier>{cad0ee95-7364-428e-9699-bdb4a1754d6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\audio">
+      <UniqueIdentifier>{1798fb10-d931-4e41-92c9-64a3222c4ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cartridge">
+      <UniqueIdentifier>{3c91d563-1ab8-4df1-b7f2-6dfc2c0f3f40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cheat">
+      <UniqueIdentifier>{f6bbb465-9106-4729-8e7f-8e527f5c0e11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip">
+      <UniqueIdentifier>{48b91aa9-cf7f-490b-9d0e-516c34129c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\config">
+      <UniqueIdentifier>{57ac3a6e-4010-486a-ad41-1c195df9bd01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu">
+      <UniqueIdentifier>{601b8ef2-a300-4eba-98d8-a15212df8613}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\debugger">
+      <UniqueIdentifier>{d3974109-0028-4b92-ba84-6305f5a0b690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\dsp">
+      <UniqueIdentifier>{a8e9772a-0d1c-4ad6-8168-ac1a1d427c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\input">
+      <UniqueIdentifier>{30b00000-dd79-49a1-a059-9852e52163ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\interface">
+      <UniqueIdentifier>{c23fc12a-cae5-4e7a-a5b4-e6a988bffcee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\memory">
+      <UniqueIdentifier>{b87146bf-127f-4f16-87a9-280a1ab3a66c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu">
+      <UniqueIdentifier>{eac77925-d76a-487f-b3f4-729f3292e12c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\scheduler">
+      <UniqueIdentifier>{d65eebe3-05f6-47dd-b0ae-099836f3ffdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp">
+      <UniqueIdentifier>{1df7a165-809e-434d-bb91-052511536cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\system">
+      <UniqueIdentifier>{921bd4f7-a76a-464d-98de-d7c6f93092d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\video">
+      <UniqueIdentifier>{03dc6de4-65e9-4e22-beea-9af350968971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\bsx">
+      <UniqueIdentifier>{14025810-8974-4e7e-a374-5d3ee2480fb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\cx4">
+      <UniqueIdentifier>{8a2970cb-c9b4-41bb-8bc3-1c5e0535d6ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\msu1">
+      <UniqueIdentifier>{86944617-8e1f-4081-9503-ee657549b12c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\necdsp">
+      <UniqueIdentifier>{2d81073c-06f4-466f-ac20-c93bcc846eae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\obc1">
+      <UniqueIdentifier>{f74e47c9-7c62-4b46-b02f-3770ea8d4a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1">
+      <UniqueIdentifier>{e1fc50dd-72ef-44ed-a758-b2b0c3251b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\supergameboy">
+      <UniqueIdentifier>{b7c5faf4-c3d3-4996-975e-b642d77b7914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sdd1">
+      <UniqueIdentifier>{9ed6318f-da0c-4318-9fee-c961c97d692f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\serial">
+      <UniqueIdentifier>{d4737b51-2409-4e57-ba36-388847edffde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\spc7110">
+      <UniqueIdentifier>{6efb6bad-0d4a-4fc8-a061-2460a8bce976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\srtc">
+      <UniqueIdentifier>{eccfcce6-b9e0-4494-8a7d-c3cbce288ac9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\st0018">
+      <UniqueIdentifier>{b6c6e828-c371-44bd-aec8-9a069688cd44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx">
+      <UniqueIdentifier>{20a649d2-5a4a-4758-acd9-fd08fb8d11bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1\bus">
+      <UniqueIdentifier>{13032fc1-0577-40e9-85d4-5d8124e1b272}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1\debugger">
+      <UniqueIdentifier>{9d11d620-3303-4198-994f-716bf436fd98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1\dma">
+      <UniqueIdentifier>{fb13c71f-7fd8-467e-b3f5-420327cc2177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1\memory">
+      <UniqueIdentifier>{b5c7f29c-6c51-40ef-b23a-978a09867680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\sa1\mmio">
+      <UniqueIdentifier>{0323c3ef-81d4-4d9e-ac2d-cc6aa83b0f9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\bus">
+      <UniqueIdentifier>{c96aed74-c04f-4566-b2c4-10a3953a46d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\core">
+      <UniqueIdentifier>{e999255b-61d7-4c81-9716-ab98c20c14aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\debugger">
+      <UniqueIdentifier>{e7649b04-a877-4884-96f3-d46b7d42eb80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\disasm">
+      <UniqueIdentifier>{db79c623-8c33-4cbe-bfe2-eb16bca18d39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\memory">
+      <UniqueIdentifier>{e267b9c3-a579-41c4-a9e8-f2a4b93bf017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\mmio">
+      <UniqueIdentifier>{78c204cc-e5c6-40d5-b0c7-28d791f720bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\superfx\timing">
+      <UniqueIdentifier>{cea11459-df08-4fe2-bde7-681e1c5cd356}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\chip\supergameboy\debugger">
+      <UniqueIdentifier>{4acd9689-bae2-4dfc-b78e-e3e26062c437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\core">
+      <UniqueIdentifier>{14a6ff35-16ff-416e-9def-9fa53c24e93e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\debugger">
+      <UniqueIdentifier>{aabbaa14-6d0f-49b5-95b2-b0d2a211e04e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\dma">
+      <UniqueIdentifier>{cea517a4-3e9b-4a80-91d6-a8fd24324268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\memory">
+      <UniqueIdentifier>{1c3f4c6a-aaf3-4da7-94eb-dd9b5a16cb6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\mmio">
+      <UniqueIdentifier>{e8734f1d-7789-4921-989b-109b58a52338}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\timing">
+      <UniqueIdentifier>{e8a6a10c-e33b-4850-86ba-a7d333ad182a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\cpu\core\disassembler">
+      <UniqueIdentifier>{a484e997-e50e-4d33-b87d-637842768a7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\dsp\debugger">
+      <UniqueIdentifier>{dd1d04c3-ef77-47f6-99a1-b70bb32e5300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\background">
+      <UniqueIdentifier>{659d386d-3ff2-43cf-8152-07392ace1eef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\counter">
+      <UniqueIdentifier>{51f2c766-fbfc-484a-a5cb-fc2ea0a4555a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\debugger">
+      <UniqueIdentifier>{31fe7a10-ac1b-4a26-81f8-5fd3cc4bd301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\mmio">
+      <UniqueIdentifier>{0b954590-3027-4ad7-afb3-108e9309638a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\screen">
+      <UniqueIdentifier>{0bc2e82d-9bd6-4ca2-bc86-1f9abe95374c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\sprite">
+      <UniqueIdentifier>{e85cc1cb-0950-4487-8830-7eaa8f9d45ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\ppu\window">
+      <UniqueIdentifier>{9f9eb3a2-facd-4222-b484-cf428810ef1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\core">
+      <UniqueIdentifier>{aff14859-0cd9-4a72-8cd8-285ea41b969b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\debugger">
+      <UniqueIdentifier>{537b06c8-1725-4703-a294-9ef3115bd1a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\memory">
+      <UniqueIdentifier>{fed788f7-d79e-4b83-841d-5a7b4c441ecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\mmio">
+      <UniqueIdentifier>{9ca72061-358c-49ba-89ad-72ffc78fc2fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\timing">
+      <UniqueIdentifier>{f6a99ada-84ea-4699-b944-8884e825c808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="snes\smp\core\disassembler">
+      <UniqueIdentifier>{24753958-aead-4c41-8f80-c64c05ad4cea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ruby">
+      <UniqueIdentifier>{a4bbf361-2b35-43e1-a1b4-108f46279664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ruby\audio">
+      <UniqueIdentifier>{6e3a43c3-e7cd-44f4-af77-b18a5270847a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ruby\input">
+      <UniqueIdentifier>{2348049f-6872-4199-b1ad-f3f2037cf557}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ruby\video">
+      <UniqueIdentifier>{042405c8-db97-4147-a10f-560369a56104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt">
+      <UniqueIdentifier>{f79a6510-9483-4238-b730-d44cef56a0ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\application">
+      <UniqueIdentifier>{2d800095-b254-4c2b-b25c-4e4d86fc37bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\base">
+      <UniqueIdentifier>{57293206-a35e-4eed-aa5e-bf8f9d4cee61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\cartridge">
+      <UniqueIdentifier>{804f84f4-c308-4acb-9e68-5ab1f4d343cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\data">
+      <UniqueIdentifier>{8672c5f2-dea6-434c-a63b-6d9d94e3d355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\data\icons-16x16">
+      <UniqueIdentifier>{9a51d029-9462-41e1-b091-9c49c3370918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger">
+      <UniqueIdentifier>{3e82b754-3305-44c8-b27f-fcda6bf9f858}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\disassembler">
+      <UniqueIdentifier>{694c75c8-8ae1-43a0-a0f3-dadb9901b62a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\disassembler\processor">
+      <UniqueIdentifier>{d38a4f1f-0474-4d28-b567-1a79a16e1121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\disassembler\symbols">
+      <UniqueIdentifier>{72b3d432-f56c-4d0b-a3e7-f87a4341e102}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\disassembler\symbols\adapters">
+      <UniqueIdentifier>{005cc49e-0588-4a77-85f1-fb968a8f815e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\ppu">
+      <UniqueIdentifier>{f13602a0-e01b-4429-8023-41efeb05d01b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\tools">
+      <UniqueIdentifier>{77b15f02-9346-4292-a6a3-63dec9407187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\debugger\tools\qhexedit2">
+      <UniqueIdentifier>{6744e85c-04b5-4624-98da-31fc3f2c6e58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\input">
+      <UniqueIdentifier>{ec5dd2b6-5820-42b2-b598-e566ab91fac5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\link">
+      <UniqueIdentifier>{a42c83cd-678a-430a-92c5-75e7e3dd123d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\movie">
+      <UniqueIdentifier>{17a483f6-7ea5-48b0-95b7-caf0b10a6f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\platform">
+      <UniqueIdentifier>{9cd0b4b9-18a4-4b7c-8e52-4499d88ff1c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\settings">
+      <UniqueIdentifier>{af5af218-a29b-496e-a765-dc3bd1f53e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\state">
+      <UniqueIdentifier>{e235539e-3461-403c-ab3c-4fd343608101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\tools">
+      <UniqueIdentifier>{d4a73649-d17c-4d29-88fb-7c3a153a2f58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui-qt\utility">
+      <UniqueIdentifier>{43892867-6aa5-4686-9aaf-5a2c0129511a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{60fe0955-d12b-4c0b-986c-e630fc82bffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nall">
+      <UniqueIdentifier>{f8b7264f-ca84-4a7e-9d77-48cec5348288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\zlib">
+      <UniqueIdentifier>{e21f8e58-e334-4f8d-a2ba-927153365ab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nall\bps">
+      <UniqueIdentifier>{1a72ba3c-9d91-43c4-bdf9-ab9dd97a7a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nall\qt">
+      <UniqueIdentifier>{20c63d81-799b-4857-b334-55bc9a027dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nall\string">
+      <UniqueIdentifier>{fabff825-473b-48c8-8f64-b2fde98619d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nall\snes">
+      <UniqueIdentifier>{390e9dcd-7e41-4a8b-a005-8d259da51a8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libco">
+      <UniqueIdentifier>{7e4a35b9-7b93-41fc-a22c-699b7a2e207f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mocs">
+      <UniqueIdentifier>{70586847-48e9-42c2-8999-880771f61f52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thrift">
+      <UniqueIdentifier>{eebd1030-6c40-480a-a594-cad9f5f85100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{728a4f4b-668c-4d59-ad6a-ffd4c290a395}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\snes\alt\cpu\cpu.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\cpu\dma.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\cpu\memory.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\cpu\mmio.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\cpu\serialization.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\cpu\timing.cpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\dsp\dsp.cpp">
+      <Filter>snes\alt\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\dsp\serialization.cpp">
+      <Filter>snes\alt\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\dsp\SPC_DSP.cpp">
+      <Filter>snes\alt\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\debugger\debugger.cpp">
+      <Filter>snes\alt\ppu\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\memory\memory.cpp">
+      <Filter>snes\alt\ppu\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\mmio\mmio.cpp">
+      <Filter>snes\alt\ppu\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\addsub.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\bg.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\cache.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\line.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\mode7.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\oam.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\render.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\render\windows.cpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\ppu.cpp">
+      <Filter>snes\alt\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\alt\ppu\serialization.cpp">
+      <Filter>snes\alt\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\audio\audio.cpp">
+      <Filter>snes\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cartridge\cartridge.cpp">
+      <Filter>snes\cartridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cartridge\serialization.cpp">
+      <Filter>snes\cartridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cartridge\xml.cpp">
+      <Filter>snes\cartridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cheat\cheat.cpp">
+      <Filter>snes\cheat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\bsx\bsx.cpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\bsx\bsx_base.cpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\bsx\bsx_cart.cpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\bsx\bsx_flash.cpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\bsx\serialization.cpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\bus.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\cx4.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\data.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\instructions.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\memory.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\registers.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\cx4\serialization.cpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\msu1\msu1.cpp">
+      <Filter>snes\chip\msu1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\msu1\serialization.cpp">
+      <Filter>snes\chip\msu1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\necdsp\disassembler.cpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\necdsp\memory.cpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\necdsp\necdsp.cpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\necdsp\serialization.cpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\obc1\obc1.cpp">
+      <Filter>snes\chip\obc1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\obc1\serialization.cpp">
+      <Filter>snes\chip\obc1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\sa1.cpp">
+      <Filter>snes\chip\sa1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\serialization.cpp">
+      <Filter>snes\chip\sa1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\bus\bus.cpp">
+      <Filter>snes\chip\sa1\bus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\debugger\debugger.cpp">
+      <Filter>snes\chip\sa1\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\dma\dma.cpp">
+      <Filter>snes\chip\sa1\dma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\memory\memory.cpp">
+      <Filter>snes\chip\sa1\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sa1\mmio\mmio.cpp">
+      <Filter>snes\chip\sa1\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sdd1\sdd1.cpp">
+      <Filter>snes\chip\sdd1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sdd1\sdd1emu.cpp">
+      <Filter>snes\chip\sdd1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\sdd1\serialization.cpp">
+      <Filter>snes\chip\sdd1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\serial\serial.cpp">
+      <Filter>snes\chip\serial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\serial\serialization.cpp">
+      <Filter>snes\chip\serial</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\spc7110\decomp.cpp">
+      <Filter>snes\chip\spc7110</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\spc7110\serialization.cpp">
+      <Filter>snes\chip\spc7110</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\spc7110\spc7110.cpp">
+      <Filter>snes\chip\spc7110</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\srtc\serialization.cpp">
+      <Filter>snes\chip\srtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\srtc\srtc.cpp">
+      <Filter>snes\chip\srtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\st0018\st0018.cpp">
+      <Filter>snes\chip\st0018</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\serialization.cpp">
+      <Filter>snes\chip\superfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\superfx.cpp">
+      <Filter>snes\chip\superfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\bus\bus.cpp">
+      <Filter>snes\chip\superfx\bus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\core\core.cpp">
+      <Filter>snes\chip\superfx\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\core\opcode_table.cpp">
+      <Filter>snes\chip\superfx\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\core\opcodes.cpp">
+      <Filter>snes\chip\superfx\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\debugger\debugger.cpp">
+      <Filter>snes\chip\superfx\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\disasm\disasm.cpp">
+      <Filter>snes\chip\superfx\disasm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\memory\memory.cpp">
+      <Filter>snes\chip\superfx\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\mmio\mmio.cpp">
+      <Filter>snes\chip\superfx\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\superfx\timing\timing.cpp">
+      <Filter>snes\chip\superfx\timing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\supergameboy\debugger\debugger.cpp">
+      <Filter>snes\chip\supergameboy\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\supergameboy\serialization.cpp">
+      <Filter>snes\chip\supergameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\chip\supergameboy\supergameboy.cpp">
+      <Filter>snes\chip\supergameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\config\config.cpp">
+      <Filter>snes\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\cpu.cpp">
+      <Filter>snes\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\serialization.cpp">
+      <Filter>snes\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\algorithms.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\core.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\opcode_misc.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\opcode_pc.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\opcode_read.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\opcode_rmw.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\opcode_write.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\serialization.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\table.cpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\core\disassembler\disassembler.cpp">
+      <Filter>snes\cpu\core\disassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\debugger\analyst.cpp">
+      <Filter>snes\cpu\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\debugger\debugger.cpp">
+      <Filter>snes\cpu\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\dma\dma.cpp">
+      <Filter>snes\cpu\dma</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\memory\memory.cpp">
+      <Filter>snes\cpu\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\mmio\mmio.cpp">
+      <Filter>snes\cpu\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\timing\irq.cpp">
+      <Filter>snes\cpu\timing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\timing\joypad.cpp">
+      <Filter>snes\cpu\timing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\cpu\timing\timing.cpp">
+      <Filter>snes\cpu\timing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\debugger\debugger.cpp">
+      <Filter>snes\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\debugger\debugger.cpp">
+      <Filter>snes\dsp\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\brr.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\counter.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\dsp.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\echo.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\envelope.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\gaussian.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\misc.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\serialization.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\dsp\voice.cpp">
+      <Filter>snes\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\input\input.cpp">
+      <Filter>snes\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\memory\memory.cpp">
+      <Filter>snes\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\memory\serialization.cpp">
+      <Filter>snes\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\ppu.cpp">
+      <Filter>snes\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\serialization.cpp">
+      <Filter>snes\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\background\background.cpp">
+      <Filter>snes\ppu\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\background\mode7.cpp">
+      <Filter>snes\ppu\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\counter\serialization.cpp">
+      <Filter>snes\ppu\counter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\debugger\debugger.cpp">
+      <Filter>snes\ppu\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\mmio\mmio.cpp">
+      <Filter>snes\ppu\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\screen\screen.cpp">
+      <Filter>snes\ppu\screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\sprite\list.cpp">
+      <Filter>snes\ppu\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\sprite\sprite.cpp">
+      <Filter>snes\ppu\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\ppu\window\window.cpp">
+      <Filter>snes\ppu\window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\scheduler\scheduler.cpp">
+      <Filter>snes\scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\iplrom.cpp">
+      <Filter>snes\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\serialization.cpp">
+      <Filter>snes\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\smp.cpp">
+      <Filter>snes\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\disassembler\disassembler.cpp">
+      <Filter>snes\smp\core\disassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\algorithms.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\core.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\opcode_misc.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\opcode_mov.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\opcode_pc.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\opcode_read.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\opcode_rmw.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\serialization.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\core\table.cpp">
+      <Filter>snes\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\debugger\debugger.cpp">
+      <Filter>snes\smp\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\memory\memory.cpp">
+      <Filter>snes\smp\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\mmio\mmio.cpp">
+      <Filter>snes\smp\mmio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\smp\timing\timing.cpp">
+      <Filter>snes\smp\timing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\system\random.cpp">
+      <Filter>snes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\system\serialization.cpp">
+      <Filter>snes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\system\system.cpp">
+      <Filter>snes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\snes\video\video.cpp">
+      <Filter>snes\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\ruby.cpp">
+      <Filter>ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\ruby_audio.cpp">
+      <Filter>ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\ruby_impl.cpp">
+      <Filter>ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\audio\directsound.cpp">
+      <Filter>ruby\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\input\directinput.cpp">
+      <Filter>ruby\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ruby\video\direct3d.cpp">
+      <Filter>ruby\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\application\application.cpp">
+      <Filter>ui-qt\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\application\arguments.cpp">
+      <Filter>ui-qt\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\application\init.cpp">
+      <Filter>ui-qt\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\about.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\base.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\filebrowser.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\htmlviewer.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\loader.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\main.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\base\stateselect.cpp">
+      <Filter>ui-qt\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\cartridge\cartridge.cpp">
+      <Filter>ui-qt\cartridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\processor\common_processor.cpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\processor\cpu_processor.cpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\processor\processor.cpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\processor\sfx_processor.cpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\processor\smp_processor.cpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\fma_symbol_file.cpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\vice_label_file.cpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\wla_symbol_file.cpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_file_adapters.cpp">
+      <Filter>ui-qt\debugger\disassembler\symbols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_map.cpp">
+      <Filter>ui-qt\debugger\disassembler\symbols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\disassemblerview.cpp">
+      <Filter>ui-qt\debugger\disassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\disassembler\symbolsview.cpp">
+      <Filter>ui-qt\debugger\disassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\base-renderer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\cgram-viewer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\cgram-widget.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\image-grid-widget.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\oam-data-model.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\oam-graphics-scene.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\oam-viewer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\tile-renderer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\tile-viewer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\tilemap-renderer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\ppu\tilemap-viewer.cpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tools\qhexedit2\commands.cpp">
+      <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tools\qhexedit2\qhexedit.cpp">
+      <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tools\breakpoint.cpp">
+      <Filter>ui-qt\debugger\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tools\memory.cpp">
+      <Filter>ui-qt\debugger\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tools\properties.cpp">
+      <Filter>ui-qt\debugger\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\debugger.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\debuggerview.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\registeredit.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\tracer.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\controller.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\input.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\userinterface-emulationspeed.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\userinterface-general.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\userinterface-states.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\userinterface-system.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\input\userinterface-videosettings.cpp">
+      <Filter>ui-qt\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\link\filter.cpp">
+      <Filter>ui-qt\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\link\music.cpp">
+      <Filter>ui-qt\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\link\reader.cpp">
+      <Filter>ui-qt\link</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\movie\movie.cpp">
+      <Filter>ui-qt\movie</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\platform\platform_win.cpp">
+      <Filter>ui-qt\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\advanced.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\audio.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\bsx.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\input.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\paths.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\settings.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\settings\video.cpp">
+      <Filter>ui-qt\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\state\state.cpp">
+      <Filter>ui-qt\state</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\cheateditor.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\cheatfinder.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\effecttoggle.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\manifestviewer.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\soundviewer.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\statemanager.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\tools\tools.cpp">
+      <Filter>ui-qt\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\utility\system-state.cpp">
+      <Filter>ui-qt\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\utility\utility.cpp">
+      <Filter>ui-qt\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\utility\window.cpp">
+      <Filter>ui-qt\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\config.cpp">
+      <Filter>ui-qt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\interface.cpp">
+      <Filter>ui-qt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\main.cpp">
+      <Filter>ui-qt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\adler32.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\crc32.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\inffast.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\inflate.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\inftrees.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\zlib\zutil.c">
+      <Filter>common\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libco\libco.c">
+      <Filter>libco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libco\amd64.c">
+      <Filter>libco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libco\x86.c">
+      <Filter>libco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\BsnesDebugger.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\debug_proto_types.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gen-cpp\IdaClient.cpp">
+      <Filter>thrift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ui-qt\debugger\remote_debugger.cpp">
+      <Filter>ui-qt\debugger</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\snes\alt\cpu\cpu.hpp">
+      <Filter>snes\alt\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\blargg_common.h">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\blargg_config.h">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\blargg_endian.h">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\blargg_source.h">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\dsp.hpp">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\dsp\SPC_DSP.h">
+      <Filter>snes\alt\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\ppu\debugger\debugger.hpp">
+      <Filter>snes\alt\ppu\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\ppu\memory\memory.hpp">
+      <Filter>snes\alt\ppu\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\ppu\mmio\mmio.hpp">
+      <Filter>snes\alt\ppu\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\ppu\render\render.hpp">
+      <Filter>snes\alt\ppu\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\alt\ppu\ppu.hpp">
+      <Filter>snes\alt\ppu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\audio\audio.hpp">
+      <Filter>snes\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cartridge\cartridge.hpp">
+      <Filter>snes\cartridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cheat\cheat.hpp">
+      <Filter>snes\cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cheat\cheat-inline.hpp">
+      <Filter>snes\cheat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\chip.hpp">
+      <Filter>snes\chip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\bsx\bsx.hpp">
+      <Filter>snes\chip\bsx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\cx4\bus.hpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\cx4\cx4.hpp">
+      <Filter>snes\chip\cx4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\msu1\msu1.hpp">
+      <Filter>snes\chip\msu1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\necdsp\necdsp.hpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\necdsp\registers.hpp">
+      <Filter>snes\chip\necdsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\obc1\obc1.hpp">
+      <Filter>snes\chip\obc1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\sa1.hpp">
+      <Filter>snes\chip\sa1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\bus\bus.hpp">
+      <Filter>snes\chip\sa1\bus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\debugger\debugger.hpp">
+      <Filter>snes\chip\sa1\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\dma\dma.hpp">
+      <Filter>snes\chip\sa1\dma</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\memory\memory.hpp">
+      <Filter>snes\chip\sa1\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sa1\mmio\mmio.hpp">
+      <Filter>snes\chip\sa1\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sdd1\sdd1.hpp">
+      <Filter>snes\chip\sdd1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\sdd1\sdd1emu.hpp">
+      <Filter>snes\chip\sdd1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\serial\serial.hpp">
+      <Filter>snes\chip\serial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\spc7110\decomp.hpp">
+      <Filter>snes\chip\spc7110</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\spc7110\spc7110.hpp">
+      <Filter>snes\chip\spc7110</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\srtc\srtc.hpp">
+      <Filter>snes\chip\srtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\st0018\st0018.hpp">
+      <Filter>snes\chip\st0018</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\superfx.hpp">
+      <Filter>snes\chip\superfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\bus\bus.hpp">
+      <Filter>snes\chip\superfx\bus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\core\core.hpp">
+      <Filter>snes\chip\superfx\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\core\registers.hpp">
+      <Filter>snes\chip\superfx\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\debugger\debugger.hpp">
+      <Filter>snes\chip\superfx\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\disasm\disasm.hpp">
+      <Filter>snes\chip\superfx\disasm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\memory\memory.hpp">
+      <Filter>snes\chip\superfx\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\mmio\mmio.hpp">
+      <Filter>snes\chip\superfx\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\superfx\timing\timing.hpp">
+      <Filter>snes\chip\superfx\timing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\supergameboy\debugger\debugger.hpp">
+      <Filter>snes\chip\supergameboy\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\chip\supergameboy\supergameboy.hpp">
+      <Filter>snes\chip\supergameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\config\config.hpp">
+      <Filter>snes\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\cpu.hpp">
+      <Filter>snes\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\core\core.hpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\core\memory.hpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\core\registers.hpp">
+      <Filter>snes\cpu\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\core\disassembler\disassembler.hpp">
+      <Filter>snes\cpu\core\disassembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\debugger\analyst.hpp">
+      <Filter>snes\cpu\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\debugger\debugger.hpp">
+      <Filter>snes\cpu\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\dma\dma.hpp">
+      <Filter>snes\cpu\dma</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\memory\memory.hpp">
+      <Filter>snes\cpu\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\mmio\mmio.hpp">
+      <Filter>snes\cpu\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\cpu\timing\timing.hpp">
+      <Filter>snes\cpu\timing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\debugger\debugger.hpp">
+      <Filter>snes\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\dsp\debugger\debugger.hpp">
+      <Filter>snes\dsp\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\dsp\dsp.hpp">
+      <Filter>snes\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\input\input.hpp">
+      <Filter>snes\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\interface\interface.hpp">
+      <Filter>snes\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\memory\memory.hpp">
+      <Filter>snes\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\memory\memory-inline.hpp">
+      <Filter>snes\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\ppu.hpp">
+      <Filter>snes\ppu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\background\background.hpp">
+      <Filter>snes\ppu\background</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\counter\counter.hpp">
+      <Filter>snes\ppu\counter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\counter\counter-inline.hpp">
+      <Filter>snes\ppu\counter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\debugger\debugger.hpp">
+      <Filter>snes\ppu\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\mmio\mmio.hpp">
+      <Filter>snes\ppu\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\screen\screen.hpp">
+      <Filter>snes\ppu\screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\sprite\sprite.hpp">
+      <Filter>snes\ppu\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\ppu\window\window.hpp">
+      <Filter>snes\ppu\window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\scheduler\scheduler.hpp">
+      <Filter>snes\scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\smp.hpp">
+      <Filter>snes\smp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\core\disassembler\disassembler.hpp">
+      <Filter>snes\smp\core\disassembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\core\core.hpp">
+      <Filter>snes\smp\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\core\memory.hpp">
+      <Filter>snes\smp\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\core\registers.hpp">
+      <Filter>snes\smp\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\debugger\debugger.hpp">
+      <Filter>snes\smp\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\memory\memory.hpp">
+      <Filter>snes\smp\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\mmio\mmio.hpp">
+      <Filter>snes\smp\mmio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\smp\timing\timing.hpp">
+      <Filter>snes\smp\timing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\system\system.hpp">
+      <Filter>snes\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\video\video.hpp">
+      <Filter>snes\video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\profile-accuracy.hpp">
+      <Filter>snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\profile-compatibility.hpp">
+      <Filter>snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\profile-performance.hpp">
+      <Filter>snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\snes\snes.hpp">
+      <Filter>snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ruby\audio.hpp">
+      <Filter>ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ruby\input.hpp">
+      <Filter>ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ruby\ruby.hpp">
+      <Filter>ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ruby\video.hpp">
+      <Filter>ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\cartridge\cartridge.hpp">
+      <Filter>ui-qt\cartridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\processor\common_processor.hpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\processor\cpu_processor.hpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\processor\processor.hpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\processor\sfx_processor.hpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\processor\smp_processor.hpp">
+      <Filter>ui-qt\debugger\disassembler\processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\fma_symbol_file.hpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\symbol_file_interface.hpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\vice_label_file.hpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\adapters\wla_symbol_file.hpp">
+      <Filter>ui-qt\debugger\disassembler\symbols\adapters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_file_adapters.hpp">
+      <Filter>ui-qt\debugger\disassembler\symbols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\disassembler\line.hpp">
+      <Filter>ui-qt\debugger\disassembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\ppu\base-renderer.hpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\ppu\tile-renderer.hpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\debugger\ppu\tilemap-renderer.hpp">
+      <Filter>ui-qt\debugger\ppu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\input\controller.hpp">
+      <Filter>ui-qt\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\input\input.hpp">
+      <Filter>ui-qt\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\input\userinterface.hpp">
+      <Filter>ui-qt\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\link\filter.hpp">
+      <Filter>ui-qt\link</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\link\music.hpp">
+      <Filter>ui-qt\link</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\link\reader.hpp">
+      <Filter>ui-qt\link</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\movie\movie.hpp">
+      <Filter>ui-qt\movie</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\state\state.hpp">
+      <Filter>ui-qt\state</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\utility\utility.hpp">
+      <Filter>ui-qt\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\config.hpp">
+      <Filter>ui-qt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\interface.hpp">
+      <Filter>ui-qt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ui-qt\ui-base.hpp">
+      <Filter>ui-qt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\algorithm.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\any.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\array.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\base64.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\bit.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\concept.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\config.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\crc32.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\detect.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\dictionary.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\directory.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\dl.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\endian.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\file.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\filemap.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\foreach.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\function.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\input.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\lzss.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\moduloarray.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\platform.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\priorityqueue.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\property.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\random.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\serial.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\serializer.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\sha256.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\sort.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\static.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\stdint.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\ups.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\utf8.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\utility.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\varint.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\vector.hpp">
+      <Filter>common\nall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\bps\delta.hpp">
+      <Filter>common\nall\bps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\bps\linear.hpp">
+      <Filter>common\nall\bps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\bps\metadata.hpp">
+      <Filter>common\nall\bps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\bps\patch.hpp">
+      <Filter>common\nall\bps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\qt\concept.hpp">
+      <Filter>common\nall\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\snes\cartridge.hpp">
+      <Filter>common\nall\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\snes\cpu.hpp">
+      <Filter>common\nall\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\snes\sgb.hpp">
+      <Filter>common\nall\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\snes\smp.hpp">
+      <Filter>common\nall\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\base.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\bsv.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\cast.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\compare.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\convert.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\core.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\filename.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\math.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\platform.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\replace.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\split.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\strl.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\strpos.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\trim.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\utility.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\variadic.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\wrapper.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\nall\string\xml.hpp">
+      <Filter>common\nall\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\crc32.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\inffast.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\inffixed.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\inflate.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\inftrees.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\zconf.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\zlib.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\common\zlib\zutil.h">
+      <Filter>common\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libco\libco.h">
+      <Filter>libco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\BsnesDebugger.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\debug_proto_types.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gen-cpp\IdaClient.h">
+      <Filter>thrift</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\ui-qt\data\icons-16x16\dbg-break.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\dbg-run.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\dbg-step.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\dbg-step-out.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\dbg-step-over.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\folder-new.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\go-up.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\item-check-off.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\item-check-on.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\item-radio-off.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\item-radio-on.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-find.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-next-code.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-next-data.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-next-unknown.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-prev-code.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-prev-data.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\icons-16x16\mem-prev-unknown.png">
+      <Filter>ui-qt\data\icons-16x16</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\data\logo.png">
+      <Filter>ui-qt\data</Filter>
+    </Image>
+    <Image Include="..\..\ui-qt\resource\data\bsnes.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ui-qt\data\documentation.html">
+      <Filter>ui-qt\data</Filter>
+    </None>
+    <None Include="..\..\ui-qt\data\license.html">
+      <Filter>ui-qt\data</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\ui-qt\debugger\tools\qhexedit2\license.txt">
+      <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
+    </Text>
+    <Text Include="..\..\..\common\zlib\readme.txt">
+      <Filter>common\zlib</Filter>
+    </Text>
+    <Text Include="..\..\..\common\zlib\zlib.txt">
+      <Filter>common\zlib</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\ui-qt\base\about.moc.hpp">
+      <Filter>ui-qt\base</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\debugger.moc.hpp">
+      <Filter>ui-qt\debugger</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\qhexedit2\commands.moc.hpp">
+      <Filter>ui-qt\debugger\tools\qhexedit2</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\advanced.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\application\application.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\audio.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\breakpoint.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\bsx.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\cgram-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\cgram-widget.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\cheateditor.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\cheatfinder.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\check-action.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\check-delegate.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\combo-delegate.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\debuggerview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\disassemblerview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\effecttoggle.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\filebrowser.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\file-dialog.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\htmlviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\image-grid-widget.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\input.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\loader.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\main.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\manifestviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\memory.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-data-model.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-graphics-scene.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\oam-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\paths.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\properties.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tools\qhexedit2\qhexedit.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\radio-action.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\registeredit.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\settings.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\soundviewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\statemanager.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\base\stateselect.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\symbols\symbol_map.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\disassembler\symbolsview.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\tilemap-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\ppu\tile-viewer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\tools\tools.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\debugger\tracer.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\settings\video.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\common\nall\qt\window.moc.hpp">
+      <Filter>mocs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\ui-qt\resource\resource.qrc">
+      <Filter>resource</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\ui-qt\resource\resource.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

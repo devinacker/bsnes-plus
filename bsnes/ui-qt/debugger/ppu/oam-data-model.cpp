@@ -36,7 +36,7 @@ OamDataModel::OamDataModel(QObject* parent)
 {
   assert(COLUMN_STRINGS.size() == N_COLUMNS);
   assert(FLIP_STRINGS.size() == 4);
-  assert(OBJECT_SIZE_TABLE == N_OAM_BASE_SIZES);
+  assert(OBJECT_SIZE_TABLE.size() == N_OAM_BASE_SIZES);
 
   for(OamObject& obj : mOamObjects) {
     obj.visible = true;

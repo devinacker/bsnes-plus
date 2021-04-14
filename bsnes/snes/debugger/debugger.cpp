@@ -49,6 +49,9 @@ void Debugger::breakpoint_test(Debugger::Breakpoint::Source source, Debugger::Br
       }
     }
     if (addr_start > addr_end) continue;
+
+    extern void send_pause_event(bool is_step);
+    send_pause_event(false);
     
     breakpoint[i].counter++;
     breakpoint_hit = i;

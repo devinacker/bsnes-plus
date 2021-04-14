@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsnes", "bsnes.vcxproj", "{42D864F9-AFDA-4EF7-99C3-218E982AA46E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "snesida", "..\..\Snesida\snesida.vcxproj", "{C89C7CCD-A6DA-4364-A7DA-8092983FB9A5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug-Accuracy|x64 = Debug-Accuracy|x64
+		Release-Accuracy|x64 = Release-Accuracy|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x64.ActiveCfg = Debug-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Debug-Accuracy|x64.Build.0 = Debug-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x64.ActiveCfg = Release-Accuracy|x64
+		{42D864F9-AFDA-4EF7-99C3-218E982AA46E}.Release-Accuracy|x64.Build.0 = Release-Accuracy|x64
+		{C89C7CCD-A6DA-4364-A7DA-8092983FB9A5}.Debug-Accuracy|x64.ActiveCfg = Debug|x64
+		{C89C7CCD-A6DA-4364-A7DA-8092983FB9A5}.Debug-Accuracy|x64.Build.0 = Debug|x64
+		{C89C7CCD-A6DA-4364-A7DA-8092983FB9A5}.Release-Accuracy|x64.ActiveCfg = Release|x64
+		{C89C7CCD-A6DA-4364-A7DA-8092983FB9A5}.Release-Accuracy|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79215649-444D-4FCC-97DD-3CD012E031FA}
+	EndGlobalSection
+EndGlobal

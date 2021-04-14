@@ -1,4 +1,4 @@
-Interface interface;
+Interface intf;
 
 void Interface::video_extras(uint16_t *data, unsigned width, unsigned height) {
     if (music.loaded()) music.render((uint16_t*)data, 1024, width, height);

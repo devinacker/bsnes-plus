@@ -46,9 +46,13 @@ void CPUDebugger::op_step() {
   usage[regs.pc] |= UsageOpcode | (regs.p.m << 1) | (regs.p.x << 0);
   opcode_pc = regs.pc;
 
+  extern void send_pause_event(bool is_step);
+
   if(debugger.step_cpu &&
       (debugger.step_type == Debugger::StepType::StepInto ||
        (debugger.step_type >= Debugger::StepType::StepOver && debugger.call_count < 0))) {
+
+    send_pause_event(true);
 
     debugger.break_event = Debugger::BreakEvent::CPUStep;
     debugger.step_type = Debugger::StepType::None;
@@ -58,6 +62,8 @@ void CPUDebugger::op_step() {
     if (debugger.break_on_wdm || debugger.break_on_brk) {
       uint8 opcode = disassembler_read(opcode_pc);
       if ((opcode == 0x42 && debugger.break_on_wdm) || (opcode == 0x00 && debugger.break_on_brk)) {
+        send_pause_event(true);
+
         debugger.breakpoint_hit = Debugger::SoftBreakCPU;
         debugger.break_event = Debugger::BreakEvent::BreakpointHit;
         scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
@@ -65,7 +71,9 @@ void CPUDebugger::op_step() {
     }
     debugger.breakpoint_test(Debugger::Breakpoint::Source::CPUBus, Debugger::Breakpoint::Mode::Exec, regs.pc, 0x00);
   }
-  if(step_event) step_event();
+  if(step_event) {
+    step_event();
+  }
 
   uint8 hvb_old;
 
@@ -101,6 +109,9 @@ void CPUDebugger::op_step() {
 }
 
 alwaysinline uint8_t CPUDebugger::op_readpc() {
+  extern std::set<int32_t> visited;
+  visited.insert(regs.pc);
+
   usage[regs.pc] |= UsageExec;
   
   int offset = cartridge.rom_offset(regs.pc);

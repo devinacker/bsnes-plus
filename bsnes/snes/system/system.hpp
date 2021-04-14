@@ -30,7 +30,7 @@ public:
   System();
 
 private:
-  Interface *interface;
+  Interface *intf;
   bool runthreadtosave(cothread_t&);
 
   void serialize(serializer&);

@@ -1,3 +1,4 @@
+#undef small
 
 struct OamObject {
   signed   xpos;

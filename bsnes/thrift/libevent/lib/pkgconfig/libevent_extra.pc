@@ -1,0 +1,16 @@
+#libevent pkg-config source file
+
+prefix=D:/git/smd_ida_tools2/Gensida/libevent
+exec_prefix=D:/git/smd_ida_tools2/Gensida/libevent
+libdir=D:/git/smd_ida_tools2/Gensida/libevent/lib
+includedir=D:/git/smd_ida_tools2/Gensida/libevent/include
+
+Name: libevent_extra
+Description: libevent_extra
+Version: 2.1.12
+Requires:
+Conflicts:
+Libs: -L${libdir} -levent_extra
+Libs.private:  -Lws2_32 -Lshell32 -Ladvapi32
+Cflags: -I${includedir}
+

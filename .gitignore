@@ -9,5 +9,8 @@
 *.so.1
 *.patch
 *.rar
+*.obj
 */out
 */bin
+/bsnes/vstudio/bsnes/
+/bsnes/Snesida/x64/

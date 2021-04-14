@@ -72,13 +72,13 @@ void Video::update() {
     }
   }
 
-  system.interface->video_extras(data, width, height);
+  system.intf->video_extras(data, width, height);
 
   if(frame_interlace) {
     height <<= 1;
   }
 
-  system.interface->video_refresh(ppu.output + 1024, width, height);
+  system.intf->video_refresh(ppu.output + 1024, width, height);
 
   frame_hires = false;
   frame_interlace = false;

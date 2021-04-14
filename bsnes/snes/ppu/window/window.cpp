@@ -88,7 +88,7 @@ void PPU::Window::test(
 ) {
   bool one = Window::one ^ one_invert;
   bool two = Window::two ^ two_invert;
-  bool output;
+  bool output = true;
 
   if(one_enable == false && two_enable == false) {
     output = false;
