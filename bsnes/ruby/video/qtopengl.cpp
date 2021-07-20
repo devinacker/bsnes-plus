@@ -52,6 +52,8 @@ public:
     void paintGL() {
       unsigned outputWidth  = width();
       unsigned outputHeight = height();
+      outputWidth *= QApplication::desktop()->devicePixelRatio();
+      outputHeight *= QApplication::desktop()->devicePixelRatio();
 
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
