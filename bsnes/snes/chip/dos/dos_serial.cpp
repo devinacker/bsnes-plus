@@ -7,11 +7,24 @@ DOSSerial::DOSSerial() {
 DOSSerial::~DOSSerial() {
 }
 
+
+void DOSSerial::init() {
+  reset();
+}
+
 void DOSSerial::reset() {
   reset(0);
   reset(1);
   
   irq_enable = false;
+}
+
+void DOSSerial::power() {
+  reset();
+}
+
+void DOSSerial::unload() {
+
 }
 
 void DOSSerial::reset(bool channel) {

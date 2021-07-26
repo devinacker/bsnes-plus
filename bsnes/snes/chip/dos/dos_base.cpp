@@ -9,12 +9,11 @@ DOS::~DOS() {
 }
 
 void DOS::init() {
-  reset();
+  serial.init();
+  floppy.init();
 }
 
 void DOS::enable() {
-  bus.map(Bus::MapMode::Direct, 0x00, 0x3f, 0x5f00, 0x5fff, *this);
-  bus.map(Bus::MapMode::Direct, 0x80, 0xbf, 0x5f00, 0x5fff, *this);
 
   // terrible hack to patch the NMI and IRQ vectors in the standard
   // SFX-DOS ROM, since they normally have bogus addresses for some reason
@@ -33,12 +32,18 @@ void DOS::enable() {
 }
 
 void DOS::power() {
-  reset();
+  serial.power();
+  floppy.power();
 }
 
 void DOS::reset() {
   serial.reset();
   floppy.reset();
+}
+
+void DOS::unload() {
+  serial.unload();
+  floppy.unload();
 }
 
 uint8 DOS::read(unsigned addr) {
