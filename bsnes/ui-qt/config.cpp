@@ -17,6 +17,7 @@ Configuration::Configuration() {
   attach((unsigned&)(snes_config.expansion_port   = SNES::System::ExpansionPortDevice::BSX), "snes.expansionPort");
   attach((unsigned&)(snes_config.vram_size        = 0), "snes.vramSize");
   attach((unsigned&)(snes_config.region           = SNES::System::Region::Autodetect), "snes.region");
+  attach((unsigned&)(snes_config.spc_save_policy  = SNES::SMP::SPCSavePolicy::OnNextNote), "snes.SPCSavePolicy");
 
   attach(snes_config.random = true, "snes.random", "Randomize some system state on powerup");
 

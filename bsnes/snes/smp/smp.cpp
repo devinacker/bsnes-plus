@@ -171,6 +171,9 @@ void SMP::load_dump(uint8 *dump, uint16_t pc, uint8_t r[4], uint8_t p) {
 void SMP::save_spc_dump(string path) {
   dump_spc = true;
   spc_path = path;
+  if(config().spc_save_policy == SPCSavePolicy::Immediately) {
+    save_spc_dump();
+  }
 }
 
 void SMP::save_spc_dump() {

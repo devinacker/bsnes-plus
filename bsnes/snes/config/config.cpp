@@ -12,6 +12,7 @@ Configuration::Configuration() {
   vram_size        = 0; // 64 kb
   region           = System::Region::Autodetect;
   random           = true;
+  spc_save_policy  = SNES::SMP::SPCSavePolicy::OnNextNote;
 
   cpu.version         = 2;
   cpu.ntsc_frequency  = 21477272;  //315 / 88 * 6000000

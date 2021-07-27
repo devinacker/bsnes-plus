@@ -46,6 +46,12 @@ public:
   QCheckBox *rewindEnable;
   QCheckBox *allowInvalidInput;
   QCheckBox *useCommonDialogs;
+  
+  QLabel *saveSPCTitle;
+  QHBoxLayout *saveSPCLayout;
+  QButtonGroup *saveSPCButtonGroup;
+  QRadioButton *saveSPCOnNextNote;
+  QRadioButton *saveSPCImmediately;
 
   void initializeUi();
   AdvancedSettingsWindow();
@@ -69,6 +75,8 @@ public slots:
   void toggleRewindEnable();
   void toggleAllowInvalidInput();
   void toggleUseCommonDialogs();
+  void setSaveSPCOnNextNote();
+  void setSaveSPCImmediately();
 };
 
 extern AdvancedSettingsWindow *advancedSettingsWindow;
