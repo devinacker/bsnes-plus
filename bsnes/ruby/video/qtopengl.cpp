@@ -50,8 +50,15 @@ public:
     }
 
     void paintGL() {
-      unsigned outputWidth  = width();
-      unsigned outputHeight = height();
+ #if QT_VERSION >= 0x050600 
+      qreal pixelRatio = devicePixelRatioF();
+ #elif QT_VERSION >= 0x050000 
+      int pixelRatio = devicePixelRatio();
+ #else 
+      int pixelRatio = 1; 
+ #endif 
+      unsigned outputWidth  = width() * pixelRatio;
+      unsigned outputHeight = height() * pixelRatio;
 
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
