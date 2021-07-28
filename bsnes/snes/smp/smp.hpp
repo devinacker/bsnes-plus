@@ -1,6 +1,7 @@
 class SMP : public Processor, public SMPcore, public MMIO {
 public:
   enum : bool { Threaded = true };
+  enum class SPCSavePolicy : unsigned { OnNextNote = 0, Immediately = 1 };
   alwaysinline void step(unsigned clocks);
   alwaysinline void synchronize_cpu();
   alwaysinline void synchronize_dsp();
