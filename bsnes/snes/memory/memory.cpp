@@ -142,6 +142,7 @@ bool Bus::load_cart() {
 }
 
 void Bus::unload_cart() {
+    dos.unload();
 }
 
 void Bus::map_reset() {

@@ -161,6 +161,7 @@ extern "C" {
 /* auxiliary command codes */
 #define UPD72069_AUX_RESET                  ((1<<5)|(1<<4)|(1<<2)|(1<<1))
 #define UPD72069_AUX_SET_STANDBY            ((1<<5)|(1<<4)|(1<<2)|(1<<0))
+#define UPD72069_AUX_RESET_STANDBY          ((1<<5)|(1<<4)|(1<<2))
 #define UPD72069_AUX_START_CLOCK            ((1<<6)|(1<<2)|(1<<1)|(1<<0))
 #define UPD72069_AUX_INTERNAL_MODE_250      ((1<<3)|(1<<1)|(1<<0))
 #define UPD72069_AUX_INTERNAL_MODE_300      ((1<<7)|(1<<6)|(1<<3)|(1<<1)|(1<<0))
@@ -746,6 +747,7 @@ static void _upd765_write_aux(upd765_t* upd, uint8_t data) {
     switch (data) {
         case UPD72069_AUX_RESET: printf("UPD72069_AUX_RESET\n"); break;
         case UPD72069_AUX_SET_STANDBY: printf("UPD72069_AUX_SET_STANDBY\n"); break;
+        case UPD72069_AUX_RESET_STANDBY: printf("UPD72069_AUX_RESET_STANDBY\n"); break;
         case UPD72069_AUX_START_CLOCK: printf("UPD72069_AUX_START_CLOCK\n"); break;
         case UPD72069_AUX_INTERNAL_MODE_250: printf("UPD72069_AUX_INTERNAL_MODE_250\n"); break;
         case UPD72069_AUX_INTERNAL_MODE_300: printf("UPD72069_AUX_INTERNAL_MODE_300\n"); break;
@@ -764,6 +766,7 @@ static void _upd765_write_aux(upd765_t* upd, uint8_t data) {
         case UPD72069_AUX_START_CLOCK:
             break;
 
+        case UPD72069_AUX_RESET_STANDBY:
         case UPD72069_AUX_INTERNAL_MODE_250:
         case UPD72069_AUX_INTERNAL_MODE_300:
         case UPD72069_AUX_INTERNAL_MODE_500:

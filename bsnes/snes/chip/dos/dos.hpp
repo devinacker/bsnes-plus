@@ -1,6 +1,9 @@
 class DOSSerial {
 public:
+  void init();
   void reset();
+  void power();
+  void unload();
 
   // CPU interface ($5f0x)
   uint8 read(uint3 addr);
@@ -43,7 +46,10 @@ private:
 
 class DOSFloppy {
 public:
+  void init();
   void reset();
+  void power();
+  void unload();
 
   // CPU interface ($5f2x)
   uint8 read(bool addr);
@@ -88,6 +94,7 @@ public:
   void enable();
   void power();
   void reset();
+  void unload();
 
   void serialize(serializer&);
 

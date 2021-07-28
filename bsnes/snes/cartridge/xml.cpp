@@ -22,6 +22,7 @@ void Cartridge::parse_xml_cartridge(const char *data) {
   xml_element document = xml_parse(data);
   if(document.element.size() == 0) return;
 
+
   foreach(head, document.element) {
     if(head.name == "cartridge") {
       foreach(attr, head.attribute) {
@@ -48,8 +49,17 @@ void Cartridge::parse_xml_cartridge(const char *data) {
         if(node.name == "setarisc") xml_parse_setarisc(node);
         if(node.name == "msu1") xml_parse_msu1(node);
         if(node.name == "serial") xml_parse_serial(node);
+        if(node.name == "dos") xml_parse_dos(node);
       }
     }
+  }
+
+  // set dos mapping here if no mapping given. Fix later?
+  if (!dos_mapped) {
+    has_dos = true;
+    dos_mapped = true;
+    bus.map(Bus::MapMode::Direct, 0x00, 0x3f, 0x5f00, 0x5fff, dos);
+    bus.map(Bus::MapMode::Direct, 0x80, 0xbf, 0x5f00, 0x5fff, dos);
   }
 }
 
@@ -550,6 +560,25 @@ void Cartridge::xml_parse_msu1(xml_element &root) {
 void Cartridge::xml_parse_serial(xml_element &root) {
   has_serial = true;
 }
+
+
+void Cartridge::xml_parse_dos(xml_element& root) {
+  has_dos = true;
+
+  foreach(node, root.element) {
+    if (node.name == "map") {
+      Mapping m(dos);
+      foreach(attr, node.attribute) {
+        if (attr.name == "address") {
+          xml_parse_address(m, attr.content);
+          dos_mapped = true;
+        }
+      }
+      mapping.append(m);
+    }
+  }
+}
+
 
 void Cartridge::xml_parse_address(Mapping &m, const string &data) {
   lstring part;

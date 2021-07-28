@@ -28,28 +28,50 @@ DOSFloppy::~DOSFloppy() {
   delete[] fdd;
 }
 
-void DOSFloppy::reset() {
 
+void DOSFloppy::init() {
   upd765_reset(fdc);
 
   file discimage;
-  for(int i; i < 4; i++){
-    discimage.open(string(cartridge.basename(), "-floppy-", i+1, ".raw"), file::mode::writeread);
-    if(fdd[i].has_disc){
-      discimage.truncate(0);
-      discimage.write(fdd[i].data, fdd[i].data_size);
-    } else {
-      fdd_init(&fdd[i]);
-      if(discimage.size() > 0){
-        fdd_dos_insert_empty(&fdd[i], discimage.size());
-        discimage.read(fdd[i].data, discimage.size());
-        printf("%d\n", discimage.size());
-      } else {
-        fdd_dos_insert_empty(&fdd[i], FDD_MAX_DISC_SIZE);
-      }
+  for (int i; i < 4; i++) {
+    discimage.open(string(cartridge.basename(), "-floppy-", i + 1, ".raw"), file::mode::read);
+    fdd_init(&fdd[i]);
+    if (discimage.size() > 0) {
+      printf("DEBUG: Disk %d found.\n", i + 1);
+      fdd_dos_insert_empty(&fdd[i], discimage.size());
+      discimage.read(fdd[i].data, discimage.size());
+    }
+    else {
+      printf("DEBUG: Disc %d not found. Creating virtual disc.\n", i + 1);
+      discimage.close();
+      discimage.open(string(cartridge.basename(), "-floppy-", i + 1, ".raw"), file::mode::readwrite);
+      fdd_dos_insert_empty(&fdd[i], FDD_MAX_DISC_SIZE);
     }
     discimage.close();
   }
+}
+
+void DOSFloppy::reset() {
+    power();
+}
+
+
+void DOSFloppy::power() {
+    init();
+}
+
+
+void DOSFloppy::unload() {
+  file discimage;
+  for (int i; i < 4; i++) {
+    if (fdd[i].has_disc) {
+      discimage.open(string(cartridge.basename(), "-floppy-", i + 1, ".raw"), file::mode::write);
+      discimage.truncate(0);
+      discimage.write(fdd[i].data, fdd[i].data_size);
+      discimage.close();
+    }
+  }
+
 }
 
 int DOSFloppy::seek_track(int drive, int track, void* user_data) {
