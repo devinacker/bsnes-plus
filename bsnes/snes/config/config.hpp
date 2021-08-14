@@ -5,7 +5,7 @@ struct Configuration {
   unsigned vram_size;
   System::Region region;
   bool random;
-  SMP::SPCSavePolicy spc_save_policy;
+  SNES::SMP::SPCSavePolicy spc_save_policy;
 
   struct CPU {
     unsigned version;
