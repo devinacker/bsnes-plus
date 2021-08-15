@@ -276,7 +276,7 @@ void SgbDisasmProcessor::analyze(uint32_t address) {
     SNES::supergameboy.usage(address) |= SNES::SGBDebugger::UsageOpcode;
     SNES::supergameboy.disassemble_opcode_ex(op, address);
 
-    if (op.isBraWithContinue() && !op.isIndirect()) {
+    if (op.isCall() || (op.isBraWithContinue() && !op.isIndirect())) {
       uint32_t target = decode(op, address);
       if (usage(target) == 0) {
         // hack: if jumping from fixed to swappable ROM bank, don't continue

@@ -7,7 +7,8 @@ struct Opcode {
     FLAG_SET_P = 0x20, // sets P flag
     FLAG_PUSH_P = 0x100, // pushes flags
     FLAG_POP_P = 0x200, // pops flags
-    FLAG_RETURN = 0x400, // returns from call
+    FLAG_CALL = 0x400, // performs call
+    FLAG_RETURN = 0x800, // returns from call
     FLAG_BRK = 0x1000, // software interrupt
     FLAG_HALT = 0x2000, // sleep/stop
   };
@@ -36,6 +37,7 @@ struct Opcode {
   inline bool popsP() const { return flags & FLAG_POP_P; }
   inline bool breaks() const { return flags & FLAG_BRK; }
   inline bool halts() const { return flags & FLAG_HALT; }
+  inline bool isCall() const { return flags & FLAG_CALL; }
   inline bool returns() const { return flags & FLAG_RETURN; }
 
   uint8 op() {

@@ -124,10 +124,12 @@ void CPUcore::disassemble_opcode_ex(CPUcore::Opcode &opcode, uint32 addr, bool e
       opcode.flags |= Opcode::FLAG_BRK; break;
     case 0x08: 
       opcode.flags |= Opcode::FLAG_PUSH_P; break;
-    case 0x10: case 0x20: case 0x22: case 0x30:
-    case 0x50: case 0x70: case 0x90: case 0xb0:
-    case 0xd0: case 0xf0: case 0xfc:
+    case 0x10: case 0x30: case 0x50: case 0x70:
+    case 0x90: case 0xb0: case 0xd0: case 0xf0:
+    case 0xfc:
       opcode.flags |= Opcode::FLAG_BRA_CONTINUE; break;
+    case 0x20: case 0x22:
+      opcode.flags |= Opcode::FLAG_CALL; break;
     case 0x28:
       opcode.flags |= Opcode::FLAG_POP_P; break;
     case 0x40: case 0x60: case 0x6b:

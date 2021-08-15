@@ -65,8 +65,13 @@ uint32_t CPUAnalyst::performAnalysis(uint32_t address, CPUAnalystState &state, b
       break;
     }
 
-    if (op.isBraWithContinue() && !op.isIndirect()) {
+    if (op.isCall()) {
+      // analyze the call target, preserving any state changes inside the subroutine
       numRoutines += performAnalysis(core.decode(op.optype, op.opall(), address), state);
+    } else if (op.isBraWithContinue() && !op.isIndirect()) {
+      // analyze the branch target, not preserving any state changes from when the branch is taken
+      CPUAnalystState tempState(state);
+      numRoutines += performAnalysis(core.decode(op.optype, op.opall(), address), tempState);
     }
 
     if (op.isBra() && !op.isIndirect()) {

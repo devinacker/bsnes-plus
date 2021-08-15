@@ -5,7 +5,8 @@ struct Opcode {
     FLAG_INDIRECT = 0x04, // indirect memory accesses
     FLAG_PUSH_F = 0x10, // pushes flags
     FLAG_POP_F = 0x20, // pops flags
-    FLAG_RETURN = 0x40, // returns from call (unconditionally)
+    FLAG_CALL = 0x40, // performs call
+    FLAG_RETURN = 0x80, // returns from call (unconditionally)
   };
 
   void set(uint16 flags, uint8 optype1, uint8 optype2, const char *opcode, uint8 (&param)[3], uint8 paramsize=0) {
@@ -29,6 +30,7 @@ struct Opcode {
   inline bool isIndirect() const { return flags & FLAG_INDIRECT; }
   inline bool pushesF() const { return flags & FLAG_PUSH_F; }
   inline bool popsF() const { return flags & FLAG_POP_F; }
+  inline bool isCall() const { return flags & FLAG_CALL; }
   inline bool returns() const { return flags & FLAG_RETURN; }
 
   uint8 op() {

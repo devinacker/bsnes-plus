@@ -77,11 +77,13 @@ void SGBDebugger::disassemble_opcode_ex(SGBDebugger::Opcode &opcode, uint24 addr
     case 0x18: case 0xc3: case 0xe9:
       opcode.flags |= Opcode::FLAG_BRA; break;
     case 0x20: case 0x28: case 0x30: case 0x38:
-    case 0xc2: case 0xc4: case 0xc7: case 0xcc:
-    case 0xcd: case 0xcf: case 0xd4: case 0xd7:
-    case 0xdc: case 0xdf: case 0xe7: case 0xef:
-    case 0xf7: case 0xff:
+    case 0xc2: case 0xca: case 0xd2: case 0xda:
       opcode.flags |= Opcode::FLAG_BRA_CONTINUE; break;
+    case 0xc4: case 0xc7: case 0xcc: case 0xcd:
+    case 0xcf: case 0xd4: case 0xd7: case 0xdc:
+    case 0xdf: case 0xe7: case 0xef: case 0xf7:
+    case 0xff:
+      opcode.flags |= Opcode::FLAG_CALL; break;
     case 0xc9: case 0xd9:
       opcode.flags |= Opcode::FLAG_RETURN; break;
     case 0xf1:
