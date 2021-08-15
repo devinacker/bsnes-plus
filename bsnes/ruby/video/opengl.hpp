@@ -43,6 +43,7 @@ public:
     iheight = max(height, iheight);
     if(buffer) delete[] buffer;
     buffer = new uint32_t[iwidth * iheight];
+    clear();
 
     glBindTexture(GL_TEXTURE_2D, gltexture);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, iwidth);

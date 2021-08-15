@@ -724,9 +724,7 @@ void CanvasObject::mouseMoveEvent(QMouseEvent *event) {
 //custom video render and mouse capture functionality
 
 QPaintEngine* CanvasWidget::paintEngine() const {
-  if(SNES::cartridge.loaded()) {
-    video.refresh();
-  }
+  video.refresh();
   return 0;
 }
 

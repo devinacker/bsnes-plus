@@ -50,6 +50,7 @@ public:
       SDL_SWSURFACE, iwidth, iheight, 32,
       0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000
     );
+    clear();
   }
 
   bool lock(uint32_t *&data, unsigned &pitch, unsigned width, unsigned height) {

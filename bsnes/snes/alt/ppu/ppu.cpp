@@ -102,10 +102,12 @@ void PPU::scanline() {
 }
 
 void PPU::render_scanline() {
+  if(framecounter) return;
   if(line >= 1 && line < (!overscan() ? 225 : 240)) {
-    if(framecounter) return;
     render_line_oam_rto();
     render_line();
+  } else if(line >= 1 && line < 240) {
+    render_line_clear();
   }
 }
 

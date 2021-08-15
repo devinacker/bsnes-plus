@@ -1,6 +1,4 @@
 void Utility::updateFullscreenState() {
-  video.clear();
-
   if(config().video.isFullscreen == false) {
     config().video.context = &config().video.windowed;
     mainWindow->showNormal();

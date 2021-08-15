@@ -144,6 +144,8 @@ void PPU::frame() {
   oam.frame();
 
   display.interlace = regs.interlace;
+  if (display.overscan && !regs.overscan)
+    memset(output + 225 * 1024, 0, 15 * 1024 * sizeof(uint16));
   display.overscan = regs.overscan;
 }
 
