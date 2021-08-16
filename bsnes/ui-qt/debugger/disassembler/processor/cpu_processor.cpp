@@ -260,8 +260,13 @@ bool CpuDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
 
   // Advance to next
-  if ((usagePointer[(address + opcode.size()) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) != 0) {
-    address += opcode.size();
+  for (uint32_t i=1; i<=4; i++) {
+    if ((usagePointer[(address + i) & 0xFFFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
+      continue;
+    }
+
+    address += i;
+    break;
   }
 
   return true;

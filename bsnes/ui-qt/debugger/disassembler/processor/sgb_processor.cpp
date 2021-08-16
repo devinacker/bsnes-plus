@@ -255,10 +255,14 @@ bool SgbDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
 
   // Advance to next
-  if ((usage(address + opcode.size()) & SNES::SGBDebugger::UsageOpcode) != 0) {
-    address += opcode.size();
-  }
+  for (uint32_t i=1; i<=4; i++) {
+    if ((usage(address + i) & SNES::SGBDebugger::UsageOpcode) == 0) {
+      continue;
+    }
 
+    address += i;
+    break;
+  }
   return true;
 }
 

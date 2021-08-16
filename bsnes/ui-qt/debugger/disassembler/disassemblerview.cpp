@@ -144,7 +144,7 @@ void DisassemblerView::updateVisibleLines() {
     if (stopped || line < emptyRowsAround || line >= maxLines - emptyRowsAround) {
       lines[index].line.setEmpty();
     } else {
-      uint32_t currentAddress = address;
+      uint32_t currentLineAddress = address;
 
       if (first) {
         topLineAddress = address;
@@ -159,13 +159,13 @@ void DisassemblerView::updateVisibleLines() {
         rop.flags |= RenderableDisassemblerLine::FLAG_RETURN;
       }
 
-      if (op.isBra() && op.targetAddress < currentAddress && op.targetAddress >= currentRangeStartAddress) {
+      if (op.isBra() && op.targetAddress < currentLineAddress && op.targetAddress >= currentRangeStartAddress) {
         createLoopUpwards(index, op.targetAddress);
       }
 
       bottomLineAddress = address;
       
-      if (address == currentAddress) {
+      if (address == currentLineAddress) {
         stopped = true; // no next instruction found
       }
     }
@@ -195,6 +195,8 @@ void DisassemblerView::updateLines() {
 void DisassemblerView::updateLineRange() {
   uint32_t currentAddressLine;
   processor->findKnownRange(currentAddress, currentRangeStartAddress, currentRangeEndAddress, currentAddressLine, currentRangeLineNumbers);
+  // do an extra analysis pass to catch code around branches that may not have run yet, etc
+  processor->analyze(currentRangeStartAddress);
 
   verticalScrollBar()->setRange(0, currentRangeLineNumbers + emptyRowsAround + emptyRowsAround - rowsShown);
   verticalScrollBar()->setPageStep(rowsShown);

@@ -407,8 +407,13 @@ bool SmpDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
   
   // Advance to next
-  if ((SNES::smp.usage[(address + opcode.size()) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) != 0) {
-    address += opcode.size();
+  for (uint32_t i=1; i<=4; i++) {
+    if ((SNES::smp.usage[(address + i) & 0xFFFF] & SNES::SMPDebugger::UsageOpcode) == 0) {
+      continue;
+    }
+
+    address += i;
+    break;
   }
 
   return true;

@@ -135,8 +135,13 @@ bool SfxDisasmProcessor::getLine(DisassemblerLine &result, uint32_t &address) {
   }
 
   // Advance to next
-  if ((SNES::superfx.usage[(address + opcode.size()) & 0x7FFFFF] & SNES::SFXDebugger::UsageOpcode) != 0) {
-    address += opcode.size();
+  for (uint32_t i=1; i<=4; i++) {
+    if ((SNES::superfx.usage[(address + i) & 0x7FFFFF] & SNES::CPUDebugger::UsageOpcode) == 0) {
+      continue;
+    }
+
+    address += i;
+    break;
   }
 
   return true;
