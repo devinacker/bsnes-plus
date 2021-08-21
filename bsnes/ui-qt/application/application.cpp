@@ -216,7 +216,7 @@ void Application::run() {
       pause = true;
     }
   } else {
-    usleep(20 * 1000);
+    usleep(1000);
     if (frameAdvance) {
       audio.clear();
       frameAdvance = false;
