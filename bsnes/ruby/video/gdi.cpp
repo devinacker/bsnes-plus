@@ -45,7 +45,10 @@ public:
 
   void unlock() {}
 
-  void clear() {}
+  void clear() {
+    memset(buffer, 0, bmi.bmiHeader.biSizeImage);
+    refresh();
+  }
 
   void refresh() {
     RECT rc;
