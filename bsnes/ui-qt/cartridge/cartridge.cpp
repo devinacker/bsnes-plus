@@ -132,7 +132,7 @@ bool Cartridge::loadBsxSlotted(const char *base, const char *slot) {
   loadMemory(baseName, ".rtc", SNES::memory::cartrtc);
 
   fileName = baseName;
-  name = notdir(nall::basename(baseName));
+  name = notdir(SNES::cartridge.basename());
   if(*slot) name << " + " << notdir(nall::basename(slotAName));
 
   utility.modifySystemState(Utility::LoadCartridge);
@@ -144,7 +144,6 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
   if(loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::bsxpack) == false)
     loadEmptyMemoryPack(cartridge.slotAXml, SNES::memory::bsxpack);
-  SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::Bsx,
     lstring() << cartridge.baseXml << cartridge.slotAXml);
@@ -157,10 +156,9 @@ bool Cartridge::loadBsx(const char *base, const char *slot) {
   else
     fileName = baseName;
   application.currentRom = fileName;
+  SNES::cartridge.basename = nall::basename(fileName);
   
-  name = *slot
-  ? notdir(nall::basename(slotAName))
-  : notdir(nall::basename(baseName));
+  name = notdir(SNES::cartridge.basename());
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
@@ -171,7 +169,6 @@ bool Cartridge::loadSufamiTurbo(const char *base, const char *slotA, const char 
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
   loadCartridge(slotAName = slotA, cartridge.slotAXml, SNES::memory::stArom);
   loadCartridge(slotBName = slotB, cartridge.slotBXml, SNES::memory::stBrom);
-  SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::SufamiTurbo,
     lstring() << cartridge.baseXml << cartridge.slotAXml << cartridge.slotBXml);
@@ -179,12 +176,16 @@ bool Cartridge::loadSufamiTurbo(const char *base, const char *slotA, const char 
   loadMemory(slotAName, ".srm", SNES::memory::stAram);
   loadMemory(slotBName, ".srm", SNES::memory::stBram);
 
-  fileName = slotAName;
+  if (slotAName != "")
+    fileName = slotAName;
+  else
+    fileName = baseName;
   if(!*slotA && !*slotB) name = notdir(nall::basename(baseName));
   else if(!*slotB) name = notdir(nall::basename(slotAName));
   else if(!*slotA) name = notdir(nall::basename(slotBName));
   else name = notdir(nall::basename(slotAName)) << " + " << notdir(nall::basename(slotBName));
   application.currentRom = fileName;
+  SNES::cartridge.basename = nall::basename(fileName);
 
   utility.modifySystemState(Utility::LoadCartridge);
   return true;
@@ -194,7 +195,6 @@ bool Cartridge::loadSuperGameBoy(const char *base, const char *slot) {
   unload();
   if(loadCartridge(baseName = base, cartridge.baseXml, SNES::memory::cartrom) == false) return false;
   loadCartridge(slotAName = slot, cartridge.slotAXml, SNES::memory::gbrom);
-  SNES::cartridge.basename = nall::basename(baseName);
 
   SNES::cartridge.load(SNES::Cartridge::Mode::SuperGameBoy,
     lstring() << cartridge.baseXml << cartridge.slotAXml);
@@ -202,10 +202,12 @@ bool Cartridge::loadSuperGameBoy(const char *base, const char *slot) {
   loadMemory(slotAName, ".sav", SNES::memory::gbram);
   loadMemory(slotBName, ".rtc", SNES::memory::gbrtc);
 
-  fileName = slotAName;
-  name = *slot
-  ? notdir(nall::basename(slotAName))
-  : notdir(nall::basename(baseName));
+  if (slotAName != "")
+    fileName = slotAName;
+  else
+    fileName = baseName;
+  SNES::cartridge.basename = nall::basename(fileName);
+  name = notdir(SNES::cartridge.basename());
   application.currentRom = fileName;
 
   utility.modifySystemState(Utility::LoadCartridge);
