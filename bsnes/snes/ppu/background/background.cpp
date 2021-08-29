@@ -145,34 +145,36 @@ void PPU::Background::run(bool screen) {
   
   if(regs.mode == Mode::Mode7) return run_mode7();
   
-  uint8 palette = get_tile_color();
+  Pixel pixel;
+  pixel.priority = priority;
+  pixel.palette = get_tile_color();
+  if(pixel.palette) pixel.palette += palette_index;
+  pixel.tile = tile;
+  
   bool update_mosaic = !hires || screen == Screen::Sub;
   if(x == 0) mosaic_hcounter = 1;
   if((x == 0 && update_mosaic)
      || (x > 0 && update_mosaic && --mosaic_hcounter == 0)) {
     mosaic_hcounter = regs.mosaic ? self.regs.mosaic_size : 1;
-    mosaic_priority = priority;
-    mosaic_palette = palette ? palette_index + palette : 0;
-    mosaic_tile = tile;
+    mosaic = pixel;
   }
+  else if (regs.mosaic)
+  {
+    pixel = mosaic;
+  }
+  
   if(screen == Screen::Main) x++;
-  if(mosaic_palette == 0) return;
+  if(pixel.palette == 0) return;
 
   if(regs.mode == Mode::Inactive) return;
   if(!hires || screen == Screen::Main) {
-    if(regs.main_enable) {
-      output.main.priority = mosaic_priority;
-      output.main.palette = mosaic_palette;
-      output.main.tile = mosaic_tile;
-    }
+    if(regs.main_enable)
+      output.main = pixel;
   }
 
   if(!hires || screen == Screen::Sub) {
-    if(regs.sub_enable) {
-      output.sub.priority = mosaic_priority;
-      output.sub.palette = mosaic_palette;
-      output.sub.tile = mosaic_tile;
-    }
+    if(regs.sub_enable)
+      output.sub = pixel;
   }
 }
 
@@ -222,9 +224,9 @@ void PPU::Background::reset() {
   mosaic_hcounter = 0;
   mosaic_hoffset = 0;
 
-  mosaic_priority = 0;
-  mosaic_palette = 0;
-  mosaic_tile = 0;
+  mosaic.priority = 0;
+  mosaic.palette = 0;
+  mosaic.tile = 0;
 
   tile_counter = 0;
   tile = 0;

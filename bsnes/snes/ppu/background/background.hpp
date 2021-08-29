@@ -25,12 +25,14 @@ class Background {
     unsigned voffset;
   } regs;
 
+  struct Pixel {
+    unsigned priority;
+    uint8 palette;  //0 = none (transparent)
+    uint16 tile;
+  };
+  
   struct Output {
-    struct Pixel {
-      unsigned priority;  //0 = none (transparent)
-      uint8 palette;
-      uint16 tile;
-    } main, sub;
+    Pixel main, sub;
   } output;
 
   struct {
@@ -39,10 +41,7 @@ class Background {
 
     unsigned mosaic_hcounter;
     unsigned mosaic_hoffset;
-
-    unsigned mosaic_priority;
-    uint8 mosaic_palette;
-    uint16 mosaic_tile;
+    Pixel mosaic;
 
     unsigned tile_counter;
     unsigned tile;
