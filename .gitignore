@@ -11,3 +11,12 @@
 *.rar
 */out
 */bin
+
+# No QTCreator project metadata files.
+*.cflags
+*.config
+*.creator
+*.cxxflags
+*.files
+*.includes
+
