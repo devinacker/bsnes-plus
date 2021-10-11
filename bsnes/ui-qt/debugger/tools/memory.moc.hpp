@@ -10,6 +10,7 @@ public:
   QComboBox *source;
   QLineEdit *addr;
   QCheckBox *autoUpdateBox;
+  QCheckBox *trackMemoryBox;
   QPushButton *refreshButton;
   
   QHBoxLayout *toolLayout;

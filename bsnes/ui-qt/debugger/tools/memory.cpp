@@ -54,6 +54,9 @@ MemoryEditor::MemoryEditor() {
   autoUpdateBox = new QCheckBox("Auto update");
   controlLayout->addWidget(autoUpdateBox);
 
+  trackMemoryBox = new QCheckBox("Highlight changes");
+  controlLayout->addWidget(trackMemoryBox);
+
   refreshButton = new QPushButton("Refresh");
   controlLayout->addWidget(refreshButton);
 
@@ -107,6 +110,7 @@ MemoryEditor::MemoryEditor() {
   connect(refreshButton, SIGNAL(released()), this, SLOT(refresh()));
   connect(exportButton, SIGNAL(released()), this, SLOT(exportMemory()));
   connect(importButton, SIGNAL(released()), this, SLOT(importMemory()));
+  connect(trackMemoryBox, SIGNAL(toggled(bool)), editor, SLOT(setMemoryTracking(bool)));
   
   searchPos = -1;
   breakpointPos = -1;
