@@ -719,7 +719,7 @@ void DisassemblerView::paintHeader(QPainter &painter) {
 
   painter.setPen(Qt::black);
   SET_CLIPPING(1);
-  painter.drawText(columnPositions[1] + charPadding, headerHeight - charPadding, "Disassemble");
+  painter.drawText(columnPositions[1] + charPadding, headerHeight - charPadding, "Disassembly");
   SET_CLIPPING(2);
   painter.drawText(columnPositions[2] + charPadding, headerHeight - charPadding, "Comment");
   NO_CLIPPING();
