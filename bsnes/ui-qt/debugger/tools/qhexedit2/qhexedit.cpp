@@ -1023,7 +1023,7 @@ QHexEdit::ScopedMemoryTracker::ScopedMemoryTracker(QHexEdit *editor)
 
     for (qint64 i = first; i < qMin(editorSize, last + BYTES_PER_LINE + 1); i++) {
         const qint64 addr = i + _editor->_addressOffset;
-        quint16 value = qFromLittleEndian<quint16>(currentData.mid(i-first, 1).data());
+        char value = currentData.at(i-first);
         _dataHash.insert(addr, value);
     }
 }
@@ -1038,7 +1038,7 @@ QHexEdit::ScopedMemoryTracker::~ScopedMemoryTracker() {
         const qint64 addr = i + _editor->_addressOffset;
         // Track any changes to memory we saw when the object was created, and
         // register those changes with the memory tracker...
-        const quint16 value = qFromLittleEndian<quint16>(currentData.mid(i-first, 1).data());
+        char value = currentData.at(i-first);
         if (_dataHash.contains(addr) && _dataHash[addr] != value) {
             if (_editor->_hexChangesMap.contains(addr)) {
                 _editor->_hexChangesMap[addr] = FRAMES_TO_FADE_HEXBG;
