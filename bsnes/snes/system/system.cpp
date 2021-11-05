@@ -71,8 +71,8 @@ bool System::runthreadtosave(cothread_t& thread) {
 }
 
 void System::init(Interface *interface_) {
-  interface = interface_;
-  assert(interface != 0);
+  intf = interface_;
+  assert(intf != 0);
 
   supergameboy.init();
   superfx.init();
@@ -236,7 +236,7 @@ void System::scanline() {
 void System::frame() {
 }
 
-System::System() : interface(0) {
+System::System() : intf(0) {
   region = Region::Autodetect;
   expansion = ExpansionPortDevice::None;
 }

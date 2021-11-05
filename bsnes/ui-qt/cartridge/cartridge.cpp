@@ -115,6 +115,11 @@ bool Cartridge::loadNormal(const char *base) {
   application.currentRom = base;
 
   utility.modifySystemState(Utility::LoadCartridge);
+
+  extern void init_dbg_server();
+  // init remote debugger here
+  init_dbg_server();
+
   return true;
 }
 

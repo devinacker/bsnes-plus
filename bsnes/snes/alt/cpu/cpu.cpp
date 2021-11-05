@@ -1,4 +1,5 @@
 #include <snes.hpp>
+#include <set>
 
 #define CPU_CPP
 #define ALT_CPU_CPP
