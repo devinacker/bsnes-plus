@@ -53,14 +53,6 @@ void Cartridge::parse_xml_cartridge(const char *data) {
       }
     }
   }
-
-  // set dos mapping here if no mapping given. Fix later?
-  if (!dos_mapped) {
-    has_dos = true;
-    dos_mapped = true;
-    bus.map(Bus::MapMode::Direct, 0x00, 0x3f, 0x5f00, 0x5fff, dos);
-    bus.map(Bus::MapMode::Direct, 0x80, 0xbf, 0x5f00, 0x5fff, dos);
-  }
 }
 
 void Cartridge::parse_xml_bsx(const char *data) {
@@ -571,7 +563,6 @@ void Cartridge::xml_parse_dos(xml_element& root) {
       foreach(attr, node.attribute) {
         if (attr.name == "address") {
           xml_parse_address(m, attr.content);
-          dos_mapped = true;
         }
       }
       mapping.append(m);

@@ -96,6 +96,7 @@ public:
   bool has_st010;
   bool has_st011;
   bool has_st018;
+  bool has_dos;
 };
 
 SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
@@ -508,6 +509,15 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "  </setarisc>\n";
   }
 
+  // always set dos default mapping if none applied
+  has_dos = true;
+  if (has_dos) {
+    xml << "  <dos>\n";
+    xml << "    <map address='00-3f:5f00-5fff'/>\n";
+    xml << "    <map address='80-bf:5f00-5fff'/>\n";
+    xml << "  </dos>\n";
+  }
+
   xml << "</cartridge>\n";
   xmlMemoryMap = xml;
 }
@@ -532,6 +542,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   has_st010      = false;
   has_st011      = false;
   has_st018      = false;
+  has_dos        = false;
 
   //=====================
   //detect Game Boy carts
