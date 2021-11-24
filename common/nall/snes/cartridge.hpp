@@ -508,6 +508,15 @@ SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
     xml << "  </setarisc>\n";
   }
 
+  // always set dos default mapping if none applied
+  has_dos = true;
+  if (has_dos) {
+    xml << "  <dos>\n";
+    xml << "    <map address='00-3f:5f00-5fff'/>\n";
+    xml << "    <map address='80-bf:5f00-5fff'/>\n";
+    xml << "  </dos>\n";
+  }
+
   xml << "</cartridge>\n";
   xmlMemoryMap = xml;
 }
