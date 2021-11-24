@@ -96,6 +96,7 @@ public:
   bool has_st010;
   bool has_st011;
   bool has_st018;
+  bool has_dos;
 };
 
 SNESCartridge::SNESCartridge(const uint8_t *data, unsigned size) {
@@ -541,6 +542,7 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   has_st010      = false;
   has_st011      = false;
   has_st018      = false;
+  has_dos        = false;
 
   //=====================
   //detect Game Boy carts
