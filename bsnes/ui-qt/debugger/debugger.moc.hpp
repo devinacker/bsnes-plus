@@ -56,6 +56,8 @@ public:
   Debugger();
 
 public slots:
+  void hide();
+
   void clear();
   void synchronize();
   void frameTick();
@@ -69,6 +71,9 @@ public slots:
   void stepToNMIAction();
   void stepToIRQAction();
   void createMemoryEditor();
+
+protected:
+  void closeEvent(QCloseEvent *event);
 
 private:
   inline void switchWindow();
