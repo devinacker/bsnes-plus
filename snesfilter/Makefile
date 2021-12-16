@@ -36,6 +36,7 @@ endif
 objects := snesfilter
 
 compile = \
+  @echo Compiling $<... &&\
   $(strip \
     $(if $(filter %.c,$<), \
       $(c) $(flags) $1 -c $< -o $@, \
@@ -76,13 +77,16 @@ obj/snesfilter.o: snesfilter.cpp *
 
 build: $(moc_objects) $(objects)
 ifeq ($(platform),x)
-	ar rcs libsnesfilter.a $(objects)
-	$(cpp) $(link) -o libsnesfilter.so -shared -Wl,-soname,libsnesfilter.so.1 $(objects) $(qtlib)
+	@echo Linking libsnesfilter.so...
+	@ar rcs libsnesfilter.a $(objects)
+	@$(cpp) $(link) -o libsnesfilter.so -shared -Wl,-soname,libsnesfilter.so.1 $(objects) $(qtlib)
 else ifeq ($(platform),osx)
-	ar rcs libsnesfilter.a $(objects)
-	$(cpp) $(link) -o libsnesfilter.dylib -shared -dynamiclib $(objects) $(qtlib)
+	@echo Linking libsnesfilter.dylib...
+	@ar rcs libsnesfilter.a $(objects)
+	@$(cpp) $(link) -o libsnesfilter.dylib -shared -dynamiclib $(objects) $(qtlib)
 else ifeq ($(platform),$(filter $(platform),win msys))
-	$(cpp) $(link) -o snesfilter.dll -shared -Wl,--out-implib,libsnesfilter.a $(objects) $(qtlib)
+	@echo Linking snesfilter.dll...
+	@$(cpp) $(link) -o snesfilter.dll -shared -Wl,--out-implib,libsnesfilter.a $(objects) $(qtlib)
 endif
 
 install:

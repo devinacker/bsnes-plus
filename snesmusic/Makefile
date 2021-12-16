@@ -32,6 +32,7 @@ objects += bitmap_font
 objects += adler32 crc32 inffast inflate inftrees zutil
 
 compile = \
+  @echo Compiling $<... &&\
   $(strip \
     $(if $(filter %.c,$<), \
       $(c) $(flags) $1 -c $< -o $@, \
@@ -76,13 +77,16 @@ obj/zutil.o   : $(zlib)/zutil.c $(zlib)/*
 
 build: $(objects)
 ifeq ($(platform),$(filter $(platform),win msys))
-	$(cpp) $(link) -o snesmusic.dll -shared -Wl,--out-implib,libsnesmusic.a $(objects) $(qtlib)
+	@echo Linking snesmusic.dll...
+	@$(cpp) $(link) -o snesmusic.dll -shared -Wl,--out-implib,libsnesmusic.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
-	ar rcs libsnesmusic.a $(objects)
-	$(cpp) $(link) -o libsnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
+	@echo Linking libsnesfilter.dylib...
+	@ar rcs libsnesmusic.a $(objects)
+	@$(cpp) $(link) -o libsnesmusic.dylib -shared -dynamiclib $(objects) $(qtlib)
 else
-	ar rcs libsnesmusic.a $(objects)
-	$(cpp) $(link) -o libsnesmusic.so -shared -Wl,-soname,libsnesmusic.so.1 $(objects) $(qtlib)
+	@echo Linking libsnesfilter.so...
+	@ar rcs libsnesmusic.a $(objects)
+	@$(cpp) $(link) -o libsnesmusic.so -shared -Wl,-soname,libsnesmusic.so.1 $(objects) $(qtlib)
 endif
 
 install:

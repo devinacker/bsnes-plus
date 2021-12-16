@@ -44,6 +44,7 @@ objects += micro-bunzip
 objects += jma jcrc32 lzmadecode 7zlzma iiostrm inbyte lzma winout
 
 compile = \
+  @echo Compiling $<... &&\
   $(strip \
     $(if $(filter %.c,$<), \
       $(c) $(flags) $1 -c $< -o $@, \
@@ -176,13 +177,16 @@ obj/winout.o    : libjma/winout.cpp libjma/*
 
 build: $(moc_objects) $(objects)
 ifeq ($(platform),x)
-	ar rcs libsnesreader.a $(objects)
-	$(cpp) $(link) -o libsnesreader.so -shared -Wl,-soname,libsnesreader.so.1 $(objects) $(qtlib)
+	@echo Linking libsnesreader.so...
+	@ar rcs libsnesreader.a $(objects)
+	@$(cpp) $(link) -o libsnesreader.so -shared -Wl,-soname,libsnesreader.so.1 $(objects) $(qtlib)
 else ifeq ($(platform),osx)
-	ar rcs libsnesreader.a $(objects)
-	$(cpp) $(link) -o libsnesreader.dylib -shared -dynamiclib $(objects) $(qtlib)
+	@echo Linking libsnesreader.dylib...
+	@ar rcs libsnesreader.a $(objects)
+	@$(cpp) $(link) -o libsnesreader.dylib -shared -dynamiclib $(objects) $(qtlib)
 else ifeq ($(platform),$(filter $(platform),win msys))
-	$(cpp) $(link) -o snesreader.dll -shared -Wl,--out-implib,libsnesreader.a $(objects) $(qtlib)
+	@echo Linking snesreader.dll...
+	@$(cpp) $(link) -o snesreader.dll -shared -Wl,--out-implib,libsnesreader.a $(objects) $(qtlib)
 endif
 
 install:

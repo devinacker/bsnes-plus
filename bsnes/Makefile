@@ -70,6 +70,7 @@ endif
 
 # implicit rules
 compile = \
+  @echo Compiling $<... &&\
   $(strip \
     $(if $(filter %.c,$<), \
       $(c) $(flags) $1 -c $< -o $@, \
@@ -91,15 +92,17 @@ objects := $(patsubst %,$(objdir)/%.o,$(objects))
 # targets
 build: ui_build $(objects)
 ifeq ($(platform),osx)
-	test -d $(osxbundle) || mkdir -p $(osxbundle)/Contents/MacOS
-	$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/$(out) $(objects) $(link))
-	mkdir -p $(osxbundle)/Contents/Resources
-	cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
-	sed 's/@VERSION/v$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
+	@echo Linking $(osxbundle)...
+	@test -d $(osxbundle) || mkdir -p $(osxbundle)/Contents/MacOS
+	@$(strip $(cpp) -o $(osxbundle)/Contents/MacOS/$(out) $(objects) $(link))
+	@mkdir -p $(osxbundle)/Contents/Resources
+	@cp -f data/bsnes.icns $(osxbundle)/Contents/Resources/AppIcon.icns
+	@sed 's/@VERSION/v$(version)/g' data/Info.plist > $(osxbundle)/Contents/Info.plist
 else
+	@echo Linking out/$(out)...
 #	$(foreach qtdll,$(qtdlls),xcopy $(winqtpath)\bin\$(qtdll) .\out\ /D /Y &)
 #	$(foreach qtplatformdll,$(qtplatformdlls),xcopy $(winqtpath)\$(qtplatformdll) .\out\platforms\ /D /Y &)
-	$(strip $(cpp) -o out/$(out) $(objects) $(link))
+	@$(strip $(cpp) -o out/$(out) $(objects) $(link))
 endif
 
 install: build plugins

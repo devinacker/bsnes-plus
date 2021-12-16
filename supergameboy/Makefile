@@ -24,6 +24,7 @@ objects += ly_counter lyc_irq next_m0_time ppu sprite_mapper
 objects += file
 
 compile = \
+  @echo Compiling $<... &&\
   $(strip \
     $(if $(filter %.c,$<), \
       $(c) $(flags) $1 -c $< -o $@, \
@@ -90,13 +91,16 @@ obj/file.o: libgambatte/src/file/file.cpp $(call rwildcard,common/) $(call rwild
 
 build: $(objects)
 ifeq ($(platform),$(filter $(platform),win msys))
-	$(cpp) $(link) -o supergameboy.dll -shared -Wl,--out-implib,libsupergameboy.a $(objects) $(qtlib)
+	@echo Linking supergameboy.dll...
+	@$(cpp) $(link) -o supergameboy.dll -shared -Wl,--out-implib,libsupergameboy.a $(objects) $(qtlib)
 else ifeq ($(platform),osx)
-	ar rcs libsupergameboy.a $(objects)
-	$(cpp) $(link) -o libsupergameboy.dylib -shared -dynamiclib $(objects) $(qtlib)
+	@echo Linking libsupergameboy.dylib...
+	@ar rcs libsupergameboy.a $(objects)
+	@$(cpp) $(link) -o libsupergameboy.dylib -shared -dynamiclib $(objects) $(qtlib)
 else
-	ar rcs libsupergameboy.a $(objects)
-	$(cpp) $(link) -o libsupergameboy.so -shared -Wl,-soname,libsupergameboy.so.1 $(objects) $(qtlib)
+	@echo Linking libsupergameboy.so...
+	@ar rcs libsupergameboy.a $(objects)
+	@$(cpp) $(link) -o libsupergameboy.so -shared -Wl,-soname,libsupergameboy.so.1 $(objects) $(qtlib)
 endif
 
 install:
