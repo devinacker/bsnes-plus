@@ -25,7 +25,6 @@ public:
   QButtonGroup *portGroup;
   QRadioButton *portSatellaview;
   QRadioButton *portNone;
-  QWidget *portSpacer;
 
   QLabel *vramTitle;
   QHBoxLayout *vramLayout;

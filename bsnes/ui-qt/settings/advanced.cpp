@@ -78,8 +78,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   portGroup->addButton(portNone);
   portLayout->addWidget(portNone);
 
-  portSpacer = new QWidget;
-  portLayout->addWidget(portSpacer);
+  portLayout->addWidget(new QWidget); // spacer
 
   vramTitle = new QLabel("VRAM size:");
   layout->addWidget(vramTitle);
@@ -128,21 +127,6 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   focusButtonGroup->addButton(focusAllow);
   focusLayout->addWidget(focusAllow);
 
-  miscTitle = new QLabel("Miscellaneous:");
-  layout->addWidget(miscTitle);
-
-  autoSaveEnable = new QCheckBox("Auto-save SRAM once every minute");
-  layout->addWidget(autoSaveEnable);
-  
-  rewindEnable = new QCheckBox("Enable rewind support");
-  layout->addWidget(rewindEnable);
-
-  allowInvalidInput = new QCheckBox("Allow up+down / left+right combinations");
-  layout->addWidget(allowInvalidInput);
-
-  useCommonDialogs = new QCheckBox("Use native OS file dialogs");
-  layout->addWidget(useCommonDialogs);
-
   saveSPCTitle = new QLabel("Save SPC file:");
   layout->addWidget(saveSPCTitle);
 
@@ -162,6 +146,23 @@ AdvancedSettingsWindow::AdvancedSettingsWindow() {
   saveSPCImmediately->setToolTip("Useful for debugging");
   saveSPCButtonGroup->addButton(saveSPCImmediately);
   saveSPCLayout->addWidget(saveSPCImmediately);
+  
+  saveSPCLayout->addWidget(new QWidget); // spacer
+  
+  miscTitle = new QLabel("Miscellaneous:");
+  layout->addWidget(miscTitle);
+
+  autoSaveEnable = new QCheckBox("Auto-save SRAM once every minute");
+  layout->addWidget(autoSaveEnable);
+  
+  rewindEnable = new QCheckBox("Enable rewind support");
+  layout->addWidget(rewindEnable);
+
+  allowInvalidInput = new QCheckBox("Allow up+down / left+right combinations");
+  layout->addWidget(allowInvalidInput);
+
+  useCommonDialogs = new QCheckBox("Use native OS file dialogs");
+  layout->addWidget(useCommonDialogs);
 
   initializeUi();
 
