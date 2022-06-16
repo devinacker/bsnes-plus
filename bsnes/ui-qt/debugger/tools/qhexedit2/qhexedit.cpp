@@ -8,6 +8,7 @@
 
 const int HEXCHARS_IN_LINE = 47;
 const int BYTES_PER_LINE = 16;
+const quint16 FRAMES_TO_FADE_HEXBG = 30;
 
 
 // ********************************************************************** Constructor, destructor
@@ -24,6 +25,9 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _cursorTimer.setInterval(500);
     _cursorTimer.start();
 
+    _animatedHexChangeTimer.setInterval(64);
+    _animatedHexChangeTimer.start();
+
     _editorSize = 0;
     _lastEventSize = 0;
     _asciiArea = true;
@@ -32,8 +36,10 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _highlighting = true;
     _readOnly = false;
     _cursorPosition = 0;
+    _trackMemoryChanges = false;
     
     connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
+    connect(&_animatedHexChangeTimer, SIGNAL(timeout()), this, SLOT(updateAnimatedHexValues()));
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
     connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
 
@@ -73,8 +79,12 @@ QColor QHexEdit::addressAreaColor()
 
 void QHexEdit::setAddressOffset(qint64 addressOffset)
 {
-    _addressOffset = addressOffset;
-    adjust();
+    {
+        ScopedMemoryTracker tracker(this);
+        _addressOffset = addressOffset;
+        adjust();
+    }
+
     setCursorPosition(_cursorPosition);
     viewport()->update();
 }
@@ -86,8 +96,11 @@ qint64 QHexEdit::addressOffset()
 
 void QHexEdit::setEditorSize(qint64 size)
 {
-    _editorSize = size;
-    adjust();
+    {
+        ScopedMemoryTracker tracker(this);
+        _editorSize = size;
+        adjust();
+    }
     setCursorPosition(_cursorPosition);
     viewport()->update();
 }
@@ -181,6 +194,12 @@ void QHexEdit::setHighlighting(bool highlighting)
 {
     _highlighting = highlighting;
     viewport()->update();
+}
+
+void QHexEdit::setMemoryTracking(bool mode)
+{
+    _trackMemoryChanges = mode;
+    refresh();
 }
 
 bool QHexEdit::highlighting()
@@ -738,6 +757,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
             for (int colIdx = 0; ((bPosLine + colIdx) < _dataShown.size() and (colIdx < BYTES_PER_LINE)); colIdx++)
             {
                 QColor c = viewport()->palette().color(QPalette::Base);
+                QColor accent = viewport()->palette().color(QPalette::Link);
                 painter.setPen(colStandard);
 
                 qint64 posBa = _bPosFirst + bPosLine + colIdx;
@@ -777,6 +797,11 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     r.setRect(pxPosX - _pxCharWidth, pxPosY - _pxCharHeight + _pxSelectionSub, 3*_pxCharWidth, _pxCharHeight);
                 painter.fillRect(r, c);
                 hex = _hexDataShown.mid((bPosLine + colIdx) * 2, 2);
+                if (_trackMemoryChanges && _hexChangesMap.contains(_bPosFirst + colIdx + row * BYTES_PER_LINE + _addressOffset)) {
+                    const qreal value = _hexChangesMap[_bPosFirst + colIdx + row * BYTES_PER_LINE + _addressOffset];
+                    accent.setAlphaF(value / qreal(FRAMES_TO_FADE_HEXBG));
+                    painter.fillRect(r, accent);
+                }
                 painter.drawText(pxPosX, pxPosY, hex);
                 pxPosX += 3*_pxCharWidth;
 
@@ -918,16 +943,22 @@ void QHexEdit::refresh(bool showCursor)
 {
     if (showCursor)
         ensureVisible();
-    readBuffers();
+
+    {
+        ScopedMemoryTracker tracker(this);
+        readBuffers();
+    }
+
     viewport()->update();
 }
 
 void QHexEdit::readBuffers()
 {
     _dataShown.clear();
-    for (qint64 i = _bPosFirst; i < qMin(_editorSize, _bPosLast + BYTES_PER_LINE + 1); i++)
+    for (qint64 i = _bPosFirst; i < qMin(_editorSize, _bPosLast + BYTES_PER_LINE + 1); i++) {
         _dataShown.append(reader ? reader(i) : 0);
-    
+    }
+
     _hexDataShown = QByteArray(_dataShown.toHex());
 }
 
@@ -964,4 +995,58 @@ void QHexEdit::updateCursor()
         _blink = true;
     viewport()->update(_cursorRect);
 }
+
+void QHexEdit::updateAnimatedHexValues()
+{
+    if (_trackMemoryChanges && !_hexChangesMap.keys().empty()) {
+        QHash<qint64, quint16>::iterator it = _hexChangesMap.begin();
+        while (it != _hexChangesMap.end()) {
+           it.value()--;
+           if (it.value() == 0) {
+               it = _hexChangesMap.erase(it);
+           } else {
+               ++it;
+           }
+        }
+
+        viewport()->update();
+    }
+}
+
+QHexEdit::ScopedMemoryTracker::ScopedMemoryTracker(QHexEdit *editor)
+    : _editor(editor){
+    Q_ASSERT(_editor);
+    const QByteArray currentData = _editor->_dataShown;
+    const qint64 first = _editor->_bPosFirst;
+    const qint64 last = _editor->_bPosLast;
+    const qint64 editorSize = _editor->_editorSize;
+
+    for (qint64 i = first; i < qMin(editorSize, last + BYTES_PER_LINE + 1); i++) {
+        const qint64 addr = i + _editor->_addressOffset;
+        char value = currentData.at(i-first);
+        _dataHash.insert(addr, value);
+    }
+}
+
+QHexEdit::ScopedMemoryTracker::~ScopedMemoryTracker() {
+    const QByteArray currentData = _editor->_dataShown;
+    const qint64 first = _editor->_bPosFirst;
+    const qint64 last = _editor->_bPosLast;
+    const qint64 editorSize = _editor->_editorSize;
+
+    for (qint64 i = first; i < qMin(editorSize, last + BYTES_PER_LINE + 1); i++) {
+        const qint64 addr = i + _editor->_addressOffset;
+        // Track any changes to memory we saw when the object was created, and
+        // register those changes with the memory tracker...
+        char value = currentData.at(i-first);
+        if (_dataHash.contains(addr) && _dataHash[addr] != value) {
+            if (_editor->_hexChangesMap.contains(addr)) {
+                _editor->_hexChangesMap[addr] = FRAMES_TO_FADE_HEXBG;
+            } else {
+                _editor->_hexChangesMap.insert(addr, FRAMES_TO_FADE_HEXBG);
+            }
+        }
+    }
+}
+
 

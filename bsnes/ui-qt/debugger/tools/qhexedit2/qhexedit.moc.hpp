@@ -93,6 +93,19 @@ class QHexEdit : public QAbstractScrollArea
     /*! Set the font of the widget. Please use fixed width fonts like Mono or Courier.*/
     Q_PROPERTY(QFont font READ font WRITE setFont)
 
+private:
+    /* Tracks values associated with certain memory addresses,
+     * and registers any changes in those values to _hexChangesMap */
+    struct ScopedMemoryTracker {
+        ScopedMemoryTracker(QHexEdit* editor);
+
+        ~ScopedMemoryTracker();
+
+    private:
+        QHexEdit* _editor;
+        QHash<qint64, quint16> _dataHash;
+    };
+
 public:
     /*! Creates an instance of QHexEdit.
     \param parent Parent widget of QHexEdit.
@@ -100,7 +113,6 @@ public:
     QHexEdit(QWidget *parent=0);
 
     // Access to data of qhexedit
-
     function<uint8_t (unsigned)> reader;
     function<void (unsigned, uint8_t)> writer;
     function<uint8_t (unsigned)> usage;
@@ -246,10 +258,15 @@ public slots:
       */
     void setAsciiArea(bool asciiArea);
 
-    /*! Switch the highlighting feature on or of.
+    /*! Switch the highlighting feature on or off.
       \param mode true (show it), false (hide it).
       */
     void setHighlighting(bool mode);
+
+    /*! Switch memory change tracking feature on or off.
+     \param state true (enabled), false (disabled).
+     */
+    void setMemoryTracking(bool mode);
 
     /*! Undoes the last operation. If there is no operation to undo, i.e.
       there is no undo step in the undo/redo history, nothing happens.
@@ -321,6 +338,7 @@ private slots:
     void adjust();                              // recalc pixel positions
     void dataChangedPrivate(int idx=0);        // emit dataChanged() signal
     void updateCursor();                        // update blinking cursor
+    void updateAnimatedHexValues();             // update animated hex value change effect.
 
 private:
     // Name convention: pixel positions start with _px
@@ -368,6 +386,9 @@ private:
     qint64 _editorSize;
     QByteArray _dataShown;                      // data in the current View
     QByteArray _hexDataShown;                   // data in view, transformed to hex
+    bool _trackMemoryChanges;                     // Whether we should be rendering hex value changes.
+    QTimer _animatedHexChangeTimer;             // timer used for animating hax value change background color.
+    QHash<qint64, quint16> _hexChangesMap;      // Map of changed indices to number of frames left for fade transition.
     qint64 _lastEventSize;                      // size, which was emitted last time
     QByteArray _markedShown;                    // marked data in view
     bool _modified;                             // Is any data in editor modified?
