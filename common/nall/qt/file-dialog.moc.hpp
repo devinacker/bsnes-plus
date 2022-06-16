@@ -251,8 +251,7 @@ inline void FileDialog::setPath(string path) {
     QDir directory(path);
     while(true) {
       pathBox->addItem(directory.absolutePath());
-      if(directory.isRoot()) break;
-      directory.cdUp();
+      if(!directory.cdUp()) break;
     }
   }
   pathBox->addItem("<root>");
