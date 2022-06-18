@@ -2,7 +2,7 @@ class SymbolItemModel : public QStandardItemModel {
   Q_OBJECT
   
 public:
-  SymbolItemModel(SymbolMap *symbols, QObject *parent = 0);
+  SymbolItemModel(SymbolMap *map, QObject *parent = 0);
 };
 
 class SymbolDelegate : public QStyledItemDelegate {

@@ -65,11 +65,11 @@ bool ViceLabelFile::read(const lstring &rows, SymbolMap *map) const {
 
 // ------------------------------------------------------------------------
 bool ViceLabelFile::write(nall::file &f, SymbolMap *map) const {
-  for (uint32_t i=0; i<map->symbols.size(); i++) {
-    Symbol s = map->symbols[i].getSymbol();
+  foreach(symbols, map->symbols) {
+    Symbol s = symbols.getSymbol();
 
     if (!s.isInvalid()) {
-      f.print("al ", hex<6>(s.address), " ", s.name, "\n");
+      f.print("al ", hex<6>(symbols.address), " ", s.name, "\n");
     }
   }
 

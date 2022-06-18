@@ -1,16 +1,16 @@
 #include "breakpoint.moc"
 BreakpointEditor *breakpointEditor;
 
-SymbolItemModel::SymbolItemModel(SymbolMap *symbols, QObject *parent)
+SymbolItemModel::SymbolItemModel(SymbolMap *map, QObject *parent)
   : QStandardItemModel(parent) {
 
-  for (int i = 0; i < symbols->symbols.size(); i++) {
-    Symbol symbol = symbols->symbols[i].getSymbol();
+  foreach(symbols, map->symbols) {
+    Symbol symbol = symbols.getSymbol();
     if (!symbol.isSymbol()) continue;
     
     QStandardItem *item = new QStandardItem();
-    item->setText(QString::asprintf("%06x %s", symbol.address, symbol.name()));
-    item->setData(symbol.address);
+    item->setText(QString::asprintf("%06x %s", symbols.address, symbol.name()));
+    item->setData(symbols.address);
     appendRow(item);
   }
 }

@@ -63,12 +63,12 @@ void SymbolMap::reset() {
 
 // ------------------------------------------------------------------------
 void SymbolMap::addLocation(uint32_t address, const string &name) {
-  addSymbol(address, Symbol::createLocation(address, name));
+  addSymbol(address, Symbol::createLocation(name));
 }
 
 // ------------------------------------------------------------------------
 void SymbolMap::addComment(uint32_t address, const string &name) {
-  addSymbol(address, Symbol::createComment(address, name));
+  addSymbol(address, Symbol::createComment(name));
 }
 
 // ------------------------------------------------------------------------

@@ -56,7 +56,7 @@ void SymbolsView::bind(QTreeWidgetItem *item, int value) {
 // ------------------------------------------------------------------------
 void SymbolsView::synchronize() {
   QString filter = search->text();
-  SymbolMap *symbols = processor->getSymbols();
+  SymbolMap *map = processor->getSymbols();
 
   list->clear();
   list->setSortingEnabled(false);
@@ -64,9 +64,8 @@ void SymbolsView::synchronize() {
   // don't cause existing breakpoints to be added or removed while repopulating the list
   bool blocked = list->blockSignals(true);
 
-  uint32_t count = symbols->symbols.size();
-  for (uint32_t i=0; i<count; i++) {
-    const Symbol &sym = symbols->symbols[i].getSymbol();
+  foreach(symbols, map->symbols) {
+    const Symbol &sym = symbols.getSymbol();
     if (sym.isInvalid()) {
       continue;
     }
@@ -87,12 +86,12 @@ void SymbolsView::synchronize() {
       }
     }
 
-    int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(sym.address, processor->getBreakpointBusName());
+    int32_t breakpoint = breakpointEditor->indexOfBreakpointExec(symbols.address, processor->getBreakpointBusName());
 
     auto item = new QTreeWidgetItem(list);
-    item->setData(0, Qt::UserRole, QVariant(sym.address));
+    item->setData(0, Qt::UserRole, QVariant(symbols.address));
     item->setCheckState(0, breakpoint >= 0 ? Qt::Checked : Qt::Unchecked);
-    item->setText(0, hex<6, '0'>(sym.address));
+    item->setText(0, hex<6, '0'>(symbols.address));
     item->setText(1, sym.name);
     item->setText(2, "");
   }

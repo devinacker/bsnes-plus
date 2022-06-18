@@ -13,18 +13,16 @@ struct Symbol {
     return s;
   }
 
-  static Symbol createComment(uint32_t address, const string &name) {
+  static Symbol createComment(const string &name) {
     Symbol s;
     s.type = COMMENT;
-    s.address = address;
     s.name = name;
     return s;
   }
 
-  static Symbol createLocation(uint32_t address, const string &name) {
+  static Symbol createLocation(const string &name) {
     Symbol s;
     s.type = LOCATION;
-    s.address = address;
     s.name = name;
     return s;
   }
@@ -41,11 +39,6 @@ struct Symbol {
     return type == COMMENT;
   }
 
-  bool operator <(const Symbol &other) {
-    return address < other.address;
-  }
-
-  uint32_t address;
   string name;
   Type type;
 };

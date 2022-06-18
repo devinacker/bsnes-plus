@@ -82,7 +82,7 @@ void FmaSymbolFile::readComment(SymbolMap *map, const lstring &args) const {
   uint32_t address = parseAddress(args[0]);
   const string &name = args[1];
 
-  map->addSymbol(address, Symbol::createComment(address, name));
+  map->addComment(address, name);
 }
 
 // ------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void FmaSymbolFile::readSymbol(SymbolMap *map, const lstring &args) const {
   const string &type = args[2];
   uint32_t size = hex(args[3]);
 
-  map->addSymbol(address, Symbol::createLocation(address, name));
+  map->addLocation(address, name);
 }
 
 // ------------------------------------------------------------------------
@@ -164,20 +164,20 @@ bool FmaSymbolFile::write(nall::file &f, SymbolMap *map) const {
   f.print("\n");
 
   f.print("[SYMBOL]\n");
-  for (i=0; i<map->symbols.size(); i++) {
-    s = map->symbols[i].getSymbol();
+  foreach(symbols, map->symbols) {
+    s = symbols.getSymbol();
 
     if (!s.isInvalid()) {
-      f.print(writeAddress(s.address), " ", s.name, " ANY 1\n");
+      f.print(writeAddress(symbols.address), " ", s.name, " ANY 1\n");
     }
   }
 
   f.print("\n");
   f.print("[COMMENT]\n");
-  for (i=0; i<map->symbols.size(); i++) {
-    s = map->symbols[i].getComment();
+  foreach(symbols, map->symbols) {
+    s = symbols.getComment();
     if (!s.isInvalid()) {
-      f.print(writeAddress(s.address), " \"", s.name, "\"\n");
+      f.print(writeAddress(symbols.address), " \"", s.name, "\"\n");
     }
   }
 

@@ -124,20 +124,20 @@ bool WlaSymbolFile::write(nall::file &f, SymbolMap *map) const {
   Symbol s;
 
   f.print("[labels]\n");
-  for (i=0; i<map->symbols.size(); i++) {
-    s = map->symbols[i].getSymbol();
+  foreach(symbols, map->symbols) {
+    s = symbols.getSymbol();
 
     if (!s.isInvalid()) {
-      f.print(writeAddress(s.address), " ", s.name, "\n");
+      f.print(writeAddress(symbols.address), " ", s.name, "\n");
     }
   }
 
   f.print("\n");
   f.print("[comments]\n");
-  for (i=0; i<map->symbols.size(); i++) {
+  foreach(symbols, map->symbols) {
     s = map->symbols[i].getComment();
     if (!s.isInvalid()) {
-      f.print(writeAddress(s.address), " ", s.name, "\n");
+      f.print(writeAddress(symbols.address), " ", s.name, "\n");
     }
   }
 
