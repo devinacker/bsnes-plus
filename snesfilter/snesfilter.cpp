@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef QT_CORE_LIB
 #define QT_CORE_LIB
+#endif
 #include <QtWidgets>
 
 #include <nall/config.hpp>
