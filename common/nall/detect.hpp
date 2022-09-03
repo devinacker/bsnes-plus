@@ -21,7 +21,7 @@
 
 /* Endian detection */
 
-#if defined(__i386__) || defined(__amd64__) || defined(_M_IX86) || defined(_M_AMD64)
+#if defined(__i386__) || defined(__amd64__) || defined(_M_IX86) || defined(_M_AMD64) || defined(__LITTLE_ENDIAN__)
   #define ARCH_LSB
 #elif defined(__powerpc__) || defined(_M_PPC) || defined(__BIG_ENDIAN__)
   #define ARCH_MSB
