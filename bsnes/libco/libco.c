@@ -18,7 +18,7 @@
     #endif
   #elif defined(__arm__)
     #include "arm.c"
-  #elif defined(_ARCH_PPC)
+  #elif defined(_ARCH_PPC) && !defined(__LITTLE_ENDIAN__)
     #include "ppc.c"
   #elif defined(_WIN32)
     #include "fiber.c"
