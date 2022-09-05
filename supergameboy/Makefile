@@ -11,7 +11,7 @@ ifeq ($(platform),x)
   flags := -fPIC $(flags)
   link += -s
 else ifeq ($(platform),osx)
-  flags += -fPIC -march=native -mmacosx-version-min=10.10
+  flags += -fPIC -march=$(arch) -mmacosx-version-min=10.10
   link += -F/usr/local/lib -mmacosx-version-min=10.10
 endif
 

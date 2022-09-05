@@ -43,6 +43,10 @@ ifeq ($(prefix),)
   prefix := /usr/local
 endif
 
+ifeq ($(arch),)
+  arch := native
+endif
+
 #####
 # function rwildcard(directory, pattern)
 #####

@@ -1,0 +1,24 @@
+name: Build bsnes+
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      submodules: true
+    - name: make
+      run: make
+      working-directory: bsnes
+      env:
+        arch: ${{ matrix.arch }}
