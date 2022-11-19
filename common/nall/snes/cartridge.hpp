@@ -701,8 +701,12 @@ void SNESCartridge::read_header(const uint8_t *data, unsigned size) {
   if(mapperid == 0x20 && (rom_type == 0x13 || rom_type == 0x14 || rom_type == 0x15 || rom_type == 0x1a)) {
     mapper = SuperFXROM;
     if(company == 0x33) {
-      ram_size = 1024 << min(8, data[index - 3] & 15);
-      if(ram_size == 1024) ram_size = 0;
+      if(data[index - 3] != 0)
+      {
+        // determine RAM size from the expanded header, if present
+        ram_size = 1024 << min(8, data[index - 3] & 15);
+        if(ram_size == 1024) ram_size = 0;
+      }
     } else {
       // Star Fox has no extended header but still needs RAM
       ram_size = 0x8000;
