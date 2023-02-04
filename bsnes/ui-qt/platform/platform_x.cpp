@@ -1,8 +1,4 @@
-#define None XNone
-#define Window XWindow
 #include <dbus/dbus.h>
-#undef None
-#undef Window
 
 static void log(DBusError &error) {
   fprintf(stderr, "DBus error: %s\n", error.name);
@@ -24,7 +20,7 @@ void Application::App::inhibitScreenSaver() {
       "org.freedesktop.ScreenSaver", "Inhibit");
 
   const char *app = "org.bsnes.bsnes-plus";
-  const char *reason = tr("Playing a game").toLocal8Bit().data();
+  const char *reason = "Playing a game";
   if (!dbus_message_append_args(message, DBUS_TYPE_STRING, &app,
                                 DBUS_TYPE_STRING, &reason, DBUS_TYPE_INVALID)) {
     dbus_connection_unref(connection);
