@@ -1,33 +1,41 @@
-#define None XNone
-#define Window XWindow
-#include <X11/Xlib.h>
-#undef None
-#undef Window
+#include <dbus/dbus.h>
 
-struct LibXtst : public library {
-  function<int (Display*, unsigned int, Bool, unsigned long)> XTestFakeKeyEvent;
-
-  LibXtst() {
-    if(open("Xtst")) {
-      XTestFakeKeyEvent = sym("XTestFakeKeyEvent");
-    }
-  }
-} libXtst;
-
-void supressScreenSaver() {
-  if(!libXtst.XTestFakeKeyEvent) return;
-
-  //XSetScreenSaver(timeout = 0) does not work
-  //XResetScreenSaver() does not work
-  //XScreenSaverSuspend() does not work
-  //DPMSDisable() does not work
-  //XSendEvent(KeyPressMask) does not work
-  //use XTest extension to send fake keypress every ~20 seconds.
-  //keycode of 255 does not map to any actual key,
-  //but it will block screensaver and power management.
-  Display *display = XOpenDisplay(0);
-  libXtst.XTestFakeKeyEvent(display, 255, True,  0);
-  libXtst.XTestFakeKeyEvent(display, 255, False, 0);
-  XCloseDisplay(display);
+static void log(DBusError &error) {
+  fprintf(stderr, "DBus error: %s\n", error.name);
+  fprintf(stderr, "Message: %s\n", error.message);
 }
 
+void Application::App::inhibitScreenSaver() {
+  DBusError error;
+  dbus_error_init(&error);
+
+  DBusConnection *connection = dbus_bus_get(DBUS_BUS_SESSION, &error);
+  if (connection == nullptr) {
+    log(error);
+    return;
+  }
+
+  DBusMessage *message = dbus_message_new_method_call(
+      "org.freedesktop.ScreenSaver", "/org/freedesktop/ScreenSaver",
+      "org.freedesktop.ScreenSaver", "Inhibit");
+
+  const char *app = "org.bsnes.bsnes-plus";
+  const char *reason = "Playing a game";
+  if (!dbus_message_append_args(message, DBUS_TYPE_STRING, &app,
+                                DBUS_TYPE_STRING, &reason, DBUS_TYPE_INVALID)) {
+    dbus_connection_unref(connection);
+    dbus_message_unref(message);
+    fputs("Failed to append arguments to DBus call\n", stderr);
+    return;
+  }
+
+  DBusMessage *reply = dbus_connection_send_with_reply_and_block(
+      connection, message, DBUS_TIMEOUT_USE_DEFAULT, &error);
+  dbus_connection_unref(connection);
+  dbus_message_unref(message);
+  if (reply == nullptr) {
+    log(error);
+    return;
+  }
+  dbus_message_unref(reply);
+}

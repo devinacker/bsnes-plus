@@ -5,7 +5,6 @@
   #include "platform/platform_x.cpp"
   const char Style::Monospace[64] = "monospace";
 #elif defined(PLATFORM_OSX)
-  #include "platform/platform_osx.cpp"
   const char Style::Monospace[64] = "Courier New";
 #elif defined(PLATFORM_WIN)
   #include "platform/platform_win.cpp"
