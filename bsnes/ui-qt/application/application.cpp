@@ -64,11 +64,11 @@ void Application::locateFile(string &filename, bool createDataDirectory, bool cr
     if(createDataDirectory) mkdir(temp, 0755);  //ensure directory exists
     temp << "/" << filename;
   }
-  
+
   if(createFile && !QFile::exists(temp)) {
     QFile::copy(QString(":/") + filename(), temp);
   }
-  
+
   filename = temp;
 }
 
@@ -79,30 +79,30 @@ void Application::loadCartridge(const string &filename) {
       } else {
         cartridge.loadBsx(config().path.bsx, filename);
       }
-      
-    } else if(striend(filename, ".st")) { 
+
+    } else if(striend(filename, ".st")) {
       if(config().path.st == "") {
         loaderWindow->loadSufamiTurboCartridge("", filename, "");
       } else {
         cartridge.loadSufamiTurbo(config().path.st, filename, "");
       }
-      
+
     } else if(striend(filename, ".gb") || striend(filename, ".sgb") || striend(filename, ".gbc")) {
       if(config().path.sgb == "") {
         loaderWindow->loadSuperGameBoyCartridge("", filename);
       } else {
         cartridge.loadSuperGameBoy(config().path.sgb, filename);
       }
-      
+
     } else if(striend(filename, ".spc")) {
       cartridge.loadSpc(filename);
-      
+
     } else if(striend(filename, ".snsf") || striend(filename, ".minisnsf"))  {
       cartridge.loadSnsf(filename);
-      
+
     } else {
       cartridge.loadNormal(filename);
-      
+
     }
 }
 
@@ -111,19 +111,19 @@ void Application::reloadCartridge() {
   case SNES::Cartridge::Mode::Normal:
     loadCartridge(cartridge.baseName);
     break;
-  
+
   case SNES::Cartridge::Mode::BsxSlotted:
     cartridge.loadBsxSlotted(cartridge.baseName, cartridge.slotAName);
     break;
-  
+
   case SNES::Cartridge::Mode::Bsx:
     cartridge.loadBsx(cartridge.baseName, cartridge.slotAName);
     break;
-  
+
   case SNES::Cartridge::Mode::SufamiTurbo:
     cartridge.loadSufamiTurbo(cartridge.baseName, cartridge.slotAName, cartridge.slotBName);
     break;
-  
+
   case SNES::Cartridge::Mode::SuperGameBoy:
     cartridge.loadSuperGameBoy(cartridge.baseName, cartridge.slotAName);
     break;
@@ -185,7 +185,7 @@ void Application::run() {
     app->quit();
     return;
   }
-  
+
   utility.updateSystemState();
   mapper().poll();
 
@@ -233,12 +233,6 @@ void Application::run() {
     autosaveTime = 0;
     if(config().system.autoSaveMemory == true) cartridge.saveMemory();
   }
-
-  if(screensaverTime >= CLOCKS_PER_SEC * 30) {
-    //supress screen saver every 30 seconds so it will not trigger during gameplay
-    screensaverTime = 0;
-    supressScreenSaver();
-  }
 }
 
 Application::Application() : timer(0) {
@@ -253,8 +247,12 @@ Application::Application() : timer(0) {
   clockTime       = clock();
   autosaveTime    = 0;
   screensaverTime = 0;
-  
+
   loadType = SNES::Cartridge::Mode::Normal;
+
+  #ifdef PLATFORM_X
+  app->inhibitScreenSaver();
+  #endif
 }
 
 Application::~Application() {

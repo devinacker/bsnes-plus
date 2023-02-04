@@ -4,7 +4,7 @@ bool Application::App::winEventFilter(MSG *msg, long *result) {
   //supress screen saver from activating during gameplay
   if(msg->message == WM_SYSCOMMAND) {
     WPARAM wParam = msg->wParam & 0xFFF0;
-  
+
     if(wParam == SC_SCREENSAVE || wParam == SC_MONITORPOWER) {
       *result = 0;
       return true;
@@ -18,8 +18,3 @@ bool Application::App::winEventFilter(MSG *msg, long *result) {
 
   return false;
 }
-
-void supressScreenSaver() {
-  //handled by event filter above
-}
-

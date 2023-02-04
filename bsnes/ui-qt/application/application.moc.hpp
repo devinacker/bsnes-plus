@@ -19,6 +19,9 @@ public:
     #if defined(PLATFORM_WIN)
     bool winEventFilter(MSG *msg, long *result);
     #endif
+    #if defined(PLATFORM_X)
+    void inhibitScreenSaver();
+    #endif
 
     App(int &argc, char **argv) : QApplication(argc, argv) {}
   } *app;
