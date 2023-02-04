@@ -28,6 +28,7 @@ void Application::App::inhibitScreenSaver() {
   if (!dbus_message_append_args(message, DBUS_TYPE_STRING, &app,
                                 DBUS_TYPE_STRING, &reason, DBUS_TYPE_INVALID)) {
     dbus_connection_unref(connection);
+    dbus_message_unref(message);
     fputs("Failed to append arguments to DBus call\n", stderr);
     return;
   }
