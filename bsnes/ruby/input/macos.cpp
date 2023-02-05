@@ -351,8 +351,11 @@ public:
 
       // Type: Misc - Usage: Hat switch
       if (usage == kHIDUsage_GD_Hatswitch) {
-        int range = (int)(IOHIDElementGetLogicalMax(element_ref) - IOHIDElementGetLogicalMin(element_ref));
+        int min = (int)IOHIDElementGetLogicalMin(element_ref);
+        int max = (int)IOHIDElementGetLogicalMax(element_ref);
+        int range = max - min;
         if (range == 3) value *= 2;
+        value -= min;
         switch (value) {
           case 0: table_buffer[joypad(device_slot).hat(0)] = Joypad::HatUp; break;
           case 1: table_buffer[joypad(device_slot).hat(0)] = Joypad::HatUp | Joypad::HatRight; break;
@@ -365,7 +368,7 @@ public:
           default:
             table_buffer[joypad(device_slot).hat(0)] = Joypad::HatCenter; break;
         }
-        //printf("hid_input_value_received - slot %d - hat %d %d\n", device_slot, value, cookie);
+        //printf("hid_input_value_received - slot %d - hat %d (range %d...%d) %d\n", device_slot, value, min, max, cookie);
       }
 
       // Type: Misc - Usage: D-Pad
