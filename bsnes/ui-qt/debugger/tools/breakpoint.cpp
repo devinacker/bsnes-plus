@@ -446,7 +446,8 @@ void BreakpointEditor::addBreakpoint(const string& addr, const string& mode, con
     // Try to find a comparison operator.
     // Search in reverse through the available ones so that two-character operators (!=, <=, >=) get found first
     for (int i = BreakpointModel::compares.count() - 1; i >= 0; i--) {
-      const char *oper = BreakpointModel::compares[i].toUtf8().constData();
+      auto data = BreakpointModel::compares[i].toUtf8();
+      const char *oper = data.constData();
       if (addr.position(oper)) {
         addresses.split<2>(oper, addr);
         model->setData(model->index(row, BreakpointModel::BreakCompare), i);
