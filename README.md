@@ -45,7 +45,7 @@ Currently, OS X is not officially 100% supported. See [this fork](https://github
 As there is no ``configure`` step, make sure necessary Qt5/X11 packages are installed. On a Debian/Ubuntu system, it would require a command like:
 
 ```
-sudo apt install qtbase5-dev qtbase5-dev-tools libxv-dev libsdl1.2-dev libao-dev libopenal-dev g++
+sudo apt install qtbase5-dev qtbase5-dev-tools libxv-dev libsdl1.2-dev libao-dev libopenal-dev g++ libdbus-1-dev
 ```
 
 (`qtbase5-dev` might be `qt5-default` on older distros)
