@@ -9,8 +9,10 @@
 #include "fex/fex.h"
 #include "libjma/jma.h"
 extern "C" char* uncompressStream(int, int);  //micro-bunzip
-
+					      //
+#ifndef QT_CORE_LIB
 #define QT_CORE_LIB
+#endif
 #include <QtWidgets>
 
 #include <nall/file.hpp>
