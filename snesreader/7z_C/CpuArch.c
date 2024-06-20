@@ -3,6 +3,10 @@
 
 #include "CpuArch.h"
 
+#ifndef _MSC_VER
+#include <cpuid.h>
+#endif
+
 #ifdef MY_CPU_X86_OR_AMD64
 
 #if (defined(_MSC_VER) && !defined(MY_CPU_AMD64)) || defined(__GNUC__)
@@ -50,7 +54,7 @@ static UInt32 CheckFlag(UInt32 flag)
 
 static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
 {
-  #ifdef USE_ASM
+  #if defined USE_ASM && defined _MSC_VER // non-windows ASM version seems to be broken
 
   #ifdef _MSC_VER
 
@@ -89,12 +93,25 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
   
   #else
 
+  #ifdef _MSC_VER
+
   int CPUInfo[4];
   __cpuid(CPUInfo, function);
   *a = CPUInfo[0];
   *b = CPUInfo[1];
   *c = CPUInfo[2];
   *d = CPUInfo[3];
+
+  #else
+
+  UInt32 a2, b2, c2, d2;
+  __cpuid(function, a2, b2, c2, d2);
+  *a = a2;
+  *b = b2;
+  *c = c2;
+  *d = d2;
+
+  #endif
 
   #endif
 }
