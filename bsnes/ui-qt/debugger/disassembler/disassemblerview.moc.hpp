@@ -75,6 +75,7 @@ private slots:
   void setSymbol();
   void jumpToPc();
   void jumpToAddress();
+  void copyInstructions();
 
 private:
   void paintHeader(QPainter &painter);
@@ -86,6 +87,8 @@ private:
   uint32_t currentAddress;
   uint32_t currentPcAddress;
   uint32_t lineOffset;
+  int32_t selectionStart = -1;
+  int32_t selectionEnd = -1;
 
   uint32_t charWidth;
   uint32_t charHeight;

@@ -304,6 +304,30 @@ void DisassemblerView::mouseReleaseEvent(QMouseEvent *event) {
 void DisassemblerView::mousePressEvent(QMouseEvent * event) {
   bool left = event->button() & Qt::LeftButton;
 
+  int row = (event->y() - lineOffset + charHeight) / charHeight;
+  if (left) {
+    if (row >= 0 && row < lines.size()) { 
+      if(selectionStart == -1) {
+        selectionStart = row;
+        selectionEnd = -1;
+      } else {
+        if ((event->modifiers() & Qt::ShiftModifier)) {
+          selectionEnd = row;
+        } else {
+          selectionStart = row;
+          selectionEnd = -1;
+        }
+      }
+      viewport()->update();
+    }
+  } else {
+    if(selectionEnd == -1) {
+      selectionStart = row;
+      selectionEnd = row;
+      viewport()->update();
+    }
+  }
+
   switch (mouseState) {
   case STATE_RESIZE_COLUMN:
     if (left) {
@@ -374,6 +398,10 @@ void DisassemblerView::showLineContextMenu(const QPoint &point) {
   QAction jumpToAddressAction("Jump to address", this);
   connect(&jumpToAddressAction, SIGNAL(triggered()), this, SLOT(jumpToAddress()));
 
+  QAction copyInstructionsAction("Copy instructions", this);
+  connect(&copyInstructionsAction, SIGNAL(triggered()), this, SLOT(copyInstructions()));
+  contextMenu.addAction(&copyInstructionsAction);
+
   if (processor->getSymbols() != NULL) {
     contextMenu.addAction(&setCommentAction);
     contextMenu.addAction(&setSymbolAction);
@@ -385,6 +413,35 @@ void DisassemblerView::showLineContextMenu(const QPoint &point) {
   contextMenu.addAction(&jumpToAddressAction);
 
   contextMenu.exec(mapToGlobal(point));
+}
+
+
+void DisassemblerView::copyInstructions() {
+  if(selectionStart == -1 || selectionEnd == -1) {
+    return;
+  }
+  QString copiedText;
+  for (int i = selectionStart; i <= selectionEnd; ++i) {
+    if (i >= 0 && i < lines.size()) {
+      const RenderableDisassemblerLine &line = lines[i];
+      if (!line.line.isEmpty()) {
+        QString params;
+        for (int j = 0; j < line.line.params.size(); ++j) {
+          params += QString("%1 ").arg(line.line.params[j].value, 0, 16);
+        }
+        copiedText += QString("%1\t%2\t%3\t%4\n")
+              .arg(line.line.address, addressWidth, 16, QChar('0'))
+              .arg(line.line.text)
+              .arg(params.trimmed())
+              .arg(line.line.targetAddress, addressWidth, 16, QChar('0'));
+
+        copiedText += QString("%1\t%2\n").arg(line.line.address, addressWidth, 16, QChar('0')).arg(line.line.text);
+      }
+    }
+  }
+
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(copiedText);
 }
 
 // ------------------------------------------------------------------------
@@ -746,6 +803,15 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
     case DisassemblerLine::Opcode:
       paintOpcode(painter, line, y);
       break;
+    }
+  }
+
+  if (selectionStart != -1 && selectionEnd != -1) {
+    int start = qMin(selectionStart, selectionEnd);
+    int end = qMax(selectionStart, selectionEnd);
+    for (int i = start; i <= end; ++i) {
+      QRect rect(0, (i - 1) * charHeight, viewport()->width(), charHeight);
+      painter.fillRect(rect, QColor(0, 0, 255, 50)); // Semi-transparent blue
     }
   }
 
