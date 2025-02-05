@@ -1,5 +1,7 @@
 #include "line.hpp"
 
+// Add a constant for an invalid address:
+static const uint32_t INVALID_ADDRESS = 0xFFFFFFFF;
 struct RenderableDisassemblerLine {
   enum Flag {
     FLAG_START_BRA = 0x1,
@@ -87,6 +89,11 @@ private:
   uint32_t currentAddress;
   uint32_t currentPcAddress;
   uint32_t lineOffset;
+
+  // Replace or add these: 
+  uint32_t selectionStartAddress = INVALID_ADDRESS;
+  uint32_t selectionEndAddress = INVALID_ADDRESS;
+
   int32_t selectionStart = -1;
   int32_t selectionEnd = -1;
 
