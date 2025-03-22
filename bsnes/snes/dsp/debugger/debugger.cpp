@@ -60,7 +60,7 @@ bool DSPDebugger::property(unsigned id, string &name, string &value) {
                             ? ((unsigned)read((i << 4) + 0x07) & 0x1f)
                             : ((unsigned)read((i << 4) + 0x07) & 0x7f));
 
-    item("Envelope Output", (unsigned)read((i << 4) + 0x08));
+    item("Envelope Output", voice[i].env);
     item("Sample Output", (unsigned)read((i << 4) + 0x09));
   }
 
