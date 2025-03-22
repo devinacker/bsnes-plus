@@ -135,7 +135,7 @@ bool WlaSymbolFile::write(nall::file &f, SymbolMap *map) const {
   f.print("\n");
   f.print("[comments]\n");
   foreach(symbols, map->symbols) {
-    s = map->symbols[i].getComment();
+    s = symbols.getComment();
     if (!s.isInvalid()) {
       f.print(writeAddress(symbols.address), " ", s.name, "\n");
     }
