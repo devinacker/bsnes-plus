@@ -304,6 +304,32 @@ void DisassemblerView::mouseReleaseEvent(QMouseEvent *event) {
 void DisassemblerView::mousePressEvent(QMouseEvent * event) {
   bool left = event->button() & Qt::LeftButton;
 
+  // Calculate the visible row from the mouse position.
+  int row = (event->y() - lineOffset + charHeight) / charHeight;
+  if (row >= 0 && row < (int)lines.size()) { 
+    // Make sure this line isn’t empty before selecting.
+    if (!lines[row].line.isEmpty()) {
+      uint32_t addr = lines[row].line.address;
+      if (left) {
+        // If no selection yet, or no shift-click, set a new selection.
+        if (selectionStartAddress == INVALID_ADDRESS) {
+          selectionStartAddress = addr;
+          selectionEndAddress = addr;
+        } else {
+          if (event->modifiers() & Qt::ShiftModifier) {
+            // Extend selection.
+            selectionEndAddress = addr;
+          } else {
+            // New selection.
+            selectionStartAddress = addr;
+            selectionEndAddress = addr;
+          }
+        }
+        viewport()->update();
+      }
+    }
+  }
+
   switch (mouseState) {
   case STATE_RESIZE_COLUMN:
     if (left) {
@@ -374,6 +400,10 @@ void DisassemblerView::showLineContextMenu(const QPoint &point) {
   QAction jumpToAddressAction("Jump to address", this);
   connect(&jumpToAddressAction, SIGNAL(triggered()), this, SLOT(jumpToAddress()));
 
+  QAction copyInstructionsAction("Copy instructions", this);
+  connect(&copyInstructionsAction, SIGNAL(triggered()), this, SLOT(copyInstructions()));
+  contextMenu.addAction(&copyInstructionsAction);
+
   if (processor->getSymbols() != NULL) {
     contextMenu.addAction(&setCommentAction);
     contextMenu.addAction(&setSymbolAction);
@@ -386,6 +416,129 @@ void DisassemblerView::showLineContextMenu(const QPoint &point) {
 
   contextMenu.exec(mapToGlobal(point));
 }
+
+void DisassemblerView::copyInstructions() {
+  // If no valid selection exists, do nothing.
+  if (selectionStartAddress == INVALID_ADDRESS || selectionEndAddress == INVALID_ADDRESS)
+    return;
+  
+  // Determine the lower and upper bounds from the two selected addresses.
+  uint32_t lower = qMin(selectionStartAddress, selectionEndAddress);
+  uint32_t upper = qMax(selectionStartAddress, selectionEndAddress);
+  
+  QString copiedText;
+  
+  // Iterate over the current disassembled lines.
+  for (int i = 0; i < (int)lines.size(); i++) {
+    const DisassemblerLine &line = lines[i].line;
+    // Only process non-empty lines whose address is within the selection.
+    if (!line.isEmpty() && line.address >= lower && line.address <= upper) {
+      QString lineStr;
+      // Print the instruction address (padded in hexadecimal).
+      lineStr += QString("%1").arg(line.address, addressWidth, 16, QChar('0'));
+      lineStr += "\t"; // tab separator
+      
+      // Convert the nall::string opcode text into a QString.
+      // (Assuming nall::string overloads operator const char*())
+      QString qLineText = QString::fromUtf8((const char *)line.text);
+      lineStr += qLineText;
+      
+      QString paramsStr;
+      QString directComment;
+      
+      // Convert the nall::string parameter format into a QString similarly.
+      QString qParamFormat = QString::fromUtf8((const char *)line.paramFormat);
+      if (!qParamFormat.isEmpty()) {
+        int left = 0;
+        int textLength = qParamFormat.length();
+        for (int j = 0; j < textLength; j++) {
+          if (qParamFormat[j] == '%') {
+            // Append any literal text before the placeholder.
+            if (j > left)
+              paramsStr += qParamFormat.mid(left, j - left);
+            // Ensure there are at least 3 characters following '%' for index, type, and length.
+            if (j + 3 < textLength) {
+              int argNum = qParamFormat[j+1].digitValue() - 1;
+              char argType = qParamFormat[j+2].toLatin1();
+              int argLength = qParamFormat[j+3].digitValue();
+              if (argNum < 0 || argNum >= (int)line.params.size()) {
+                paramsStr += "???";
+              } else {
+                const DisassemblerParam &param = line.params[argNum];
+                QString paramText;
+                if (param.type == DisassemblerParam::Value) {
+                  // Heuristic: if the opcode text contains '#' assume immediate addressing.
+                  bool immediate = qLineText.contains("#");
+                  if (argType == 'X') {
+                    paramText = QString("%1%2")
+                                  .arg(immediate ? "#$" : "$")
+                                  .arg(param.value, argLength, 16, QChar('0'));
+                  }
+                  else if (argType == 'D') {
+                    paramText = QString("%1").arg((int32_t)param.value, argLength, 10, QChar('0'));
+                  }
+                  else if (argType == 'U') {
+                    paramText = QString("%1").arg(param.value, argLength, 10, QChar('0'));
+                  }
+                  else {
+                    paramText = "???";
+                  }
+                }
+                else if (param.type == DisassemblerParam::Address) {
+                  // Try to resolve a symbol for the address.
+                  Symbol sym = processor->getSymbols() ? processor->getSymbols()->getSymbol(param.address) : Symbol::createInvalid();
+                  if (sym.type != Symbol::INVALID) {
+                    // Print the symbol name in angle brackets.
+                    paramText = QString("<%1>").arg(sym.name);
+                  }
+                  else {
+                    if (argType == 'X') {
+                      paramText = QString("$%1").arg(param.value, argLength, 16, QChar('0'));
+                    }
+                    else if (argType == 'D') {
+                      paramText = QString("%1").arg((int32_t)param.value, argLength, 10, QChar('0'));
+                    }
+                    else if (argType == 'U') {
+                      paramText = QString("%1").arg(param.value, argLength, 10, QChar('0'));
+                    }
+                    else {
+                      paramText = "???";
+                    }
+                  }
+                  // Append a direct comment showing the target address.
+                  directComment += QString("[%1]").arg(param.targetAddress, addressWidth, 16, QChar('0'));
+                }
+                else {
+                  paramText = "???";
+                }
+                paramsStr += paramText;
+              }
+              j += 3;
+              left = j + 1;
+            }
+          }
+        }
+        // Append any literal text remaining after the last placeholder.
+        if (left < textLength)
+          paramsStr += qParamFormat.mid(left);
+      }
+      
+      // Append parameters and the direct comment (if any) separated by tabs.
+      if (!paramsStr.isEmpty())
+        lineStr += "\t" + paramsStr;
+      if (!directComment.isEmpty())
+        lineStr += "\t" + directComment;
+      
+      // Append the completed line and a newline.
+      copiedText += lineStr + "\n";
+    }
+  }
+  
+  // Place the final copied text into the clipboard.
+  QClipboard *clipboard = QApplication::clipboard();
+  clipboard->setText(copiedText);
+}
+
 
 // ------------------------------------------------------------------------
 void DisassemblerView::showContextMenu(const QPoint &point) {
@@ -746,6 +899,22 @@ void DisassemblerView::paintEvent(QPaintEvent *event) {
     case DisassemblerLine::Opcode:
       paintOpcode(painter, line, y);
       break;
+    }
+  }
+
+  // Highlight selected lines based on the stored addresses.
+  if (selectionStartAddress != INVALID_ADDRESS && selectionEndAddress != INVALID_ADDRESS) {
+    uint32_t lower = qMin(selectionStartAddress, selectionEndAddress);
+    uint32_t upper = qMax(selectionStartAddress, selectionEndAddress);
+    for (int i = 0; i < (int)lines.size(); i++) {
+      if (!lines[i].line.isEmpty()) {
+        uint32_t addr = lines[i].line.address;
+        if (addr >= lower && addr <= upper) {
+          // Use the same y-coordinate calculation as in paintOpcode.
+          QRect rect(0, (i * charHeight) - charHeight + lineOffset, viewport()->width(), charHeight);
+          painter.fillRect(rect, QColor(0, 0, 255, 50));
+        }
+      }
     }
   }
 
