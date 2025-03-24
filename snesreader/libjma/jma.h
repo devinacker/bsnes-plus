@@ -23,6 +23,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <vector>
 #include <time.h>
 
+#pragma GCC diagnostic ignored "-Wdeprecated"
+
 namespace JMA
 {
   enum jma_errors { JMA_NO_CREATE, JMA_NO_MEM_ALLOC, JMA_NO_OPEN, JMA_BAD_FILE,
