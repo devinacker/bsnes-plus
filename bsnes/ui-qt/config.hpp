@@ -83,6 +83,27 @@ public:
     bool loadDefaultSymbols;
     bool saveSymbols;
     bool showHClocks;
+
+    struct Disassembler {
+      string opColor;
+      string paramImmediateColor;
+      string paramAddressColor;
+      string paramSymbolColor;
+    } disassembler;
+
+    struct Console {
+      string breakpointColor;
+      string cpuStepColor;
+      string smpStepColor;
+      string coprocessorStepColor;
+    } console;
+
+    struct HexEditor {
+      string readUsageColor;
+      string writeUsageColor;
+      string execUsageColor;
+      string rweUsageColor;
+    } hexEditor;
   } debugger;
 
   struct Geometry {

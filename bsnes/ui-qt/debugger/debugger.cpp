@@ -588,7 +588,11 @@ void Debugger::event() {
         SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        QColor color = QColor(config().debugger.console.breakpointColor());
+        if (!color.isValid()) {
+          color = QColor("#a000a0");
+        }
+        echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
         debugCPU->refresh(SNES::cpu.opcode_pc);
         registerEditCPU->setEnabled(true);
         editTabs->setCurrentIndex(0);
@@ -600,7 +604,11 @@ void Debugger::event() {
         SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        QColor color = QColor(config().debugger.console.breakpointColor());
+        if (!color.isValid()) {
+          color = QColor("#a000a0");
+        }
+        echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
         debugSA1->refresh(SNES::sa1.opcode_pc);
         registerEditSA1->setEnabled(true);
         editTabs->setCurrentIndex(editTabs->indexOf(debugSA1));
@@ -613,7 +621,11 @@ void Debugger::event() {
         SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        QColor color = QColor(config().debugger.console.breakpointColor());
+        if (!color.isValid()) {
+          color = QColor("#a000a0");
+        }
+        echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
         debugSMP->refresh(SNES::smp.opcode_pc);
         registerEditSMP->setEnabled(true);
         editTabs->setCurrentIndex(1);
@@ -625,7 +637,11 @@ void Debugger::event() {
         SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        QColor color = QColor(config().debugger.console.breakpointColor());
+        if (!color.isValid()) {
+          color = QColor("#a000a0");
+        }
+        echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
         debugSFX->refresh(SNES::superfx.opcode_pc);
         registerEditSFX->setEnabled(true);
         editTabs->setCurrentIndex(editTabs->indexOf(debugSFX));
@@ -637,7 +653,11 @@ void Debugger::event() {
         SNES::supergameboy.disassemble_opcode(t, SNES::supergameboy.opcode_pc);
         string s = t;
         s.replace(" ", "&nbsp;");
-        echo(string() << "<font color='#a000a0'>" << s << "</font><br>");
+        QColor color = QColor(config().debugger.console.breakpointColor());
+        if (!color.isValid()) {
+          color = QColor("#a000a0");
+        }
+        echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
         debugSGB->refresh(SNES::supergameboy.opcode_pc);
         registerEditSGB->setEnabled(true);
         editTabs->setCurrentIndex(editTabs->indexOf(debugSGB));
@@ -649,7 +669,11 @@ void Debugger::event() {
       SNES::cpu.disassemble_opcode(t, SNES::cpu.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
-      echo(string() << "<font color='#0000a0'>" << s << "</font><br>");
+      QColor color = QColor(config().debugger.console.cpuStepColor());
+      if (!color.isValid()) {
+        color = QColor("#0000a0");
+      }
+      echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
       debugCPU->refresh(SNES::cpu.opcode_pc);
       registerEditCPU->setEnabled(true);
     } break;
@@ -658,7 +682,11 @@ void Debugger::event() {
       SNES::smp.disassemble_opcode(t, SNES::smp.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
-      echo(string() << "<font color='#a00000'>" << s << "</font><br>");
+      QColor color = QColor(config().debugger.console.smpStepColor());
+      if (!color.isValid()) {
+        color = QColor("#a00000");
+      }
+      echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
       debugSMP->refresh(SNES::smp.opcode_pc);
       registerEditSMP->setEnabled(true);
     } break;
@@ -667,7 +695,11 @@ void Debugger::event() {
       SNES::sa1.disassemble_opcode(t, SNES::sa1.opcode_pc, config().debugger.showHClocks);
       string s = t;
       s.replace(" ", "&nbsp;");
-      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      QColor color = QColor(config().debugger.console.coprocessorStepColor());
+      if (!color.isValid()) {
+        color = QColor("#008000");
+      }
+      echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
       debugSA1->refresh(SNES::sa1.opcode_pc);
       registerEditSA1->setEnabled(true);
     } break;
@@ -676,7 +708,11 @@ void Debugger::event() {
       SNES::superfx.disassemble_opcode(t, SNES::superfx.opcode_pc, true);
       string s = t;
       s.replace(" ", "&nbsp;");
-      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      QColor color = QColor(config().debugger.console.coprocessorStepColor());
+      if (!color.isValid()) {
+        color = QColor("#008000");
+      }
+      echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
       debugSFX->refresh(SNES::superfx.opcode_pc);
       registerEditSFX->setEnabled(true);
     } break;
@@ -685,7 +721,11 @@ void Debugger::event() {
       SNES::supergameboy.disassemble_opcode(t, SNES::supergameboy.opcode_pc);
       string s = t;
       s.replace(" ", "&nbsp;");
-      echo(string() << "<font color='#008000'>" << s << "</font><br>");
+      QColor color = QColor(config().debugger.console.coprocessorStepColor());
+      if (!color.isValid()) {
+        color = QColor("#008000");
+      }
+      echo(string() << "<font color='" << color.name() << "'>" << s << "</font><br>");
       debugSGB->refresh(SNES::supergameboy.opcode_pc);
       registerEditSGB->setEnabled(true);
     } break;

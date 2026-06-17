@@ -665,10 +665,26 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
 
     addressColor = Qt::gray;
     textColor = viewport()->palette().color(QPalette::WindowText);
-    opColor = QColor(0x00, 0x00, 0x88, 0xff);
-    paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
-    paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
-    paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
+    
+    opColor = QColor(config().debugger.disassembler.opColor());
+    if (!opColor.isValid()) {
+      opColor = QColor(0x00, 0x00, 0x88, 0xff);
+    }
+    
+    paramImmediateColor = QColor(config().debugger.disassembler.paramImmediateColor());
+    if (!paramImmediateColor.isValid()) {
+      paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
+    }
+
+    paramAddressColor = QColor(config().debugger.disassembler.paramAddressColor());
+    if (!paramAddressColor.isValid()) {
+      paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
+    }
+
+    paramSymbolColor = QColor(config().debugger.disassembler.paramSymbolColor());
+    if (!paramSymbolColor.isValid()) {
+      paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
+    }
   }
 
   if (breakpointEditor->indexOfBreakpointExec(line.line.address, processor->getBreakpointBusName()) >= 0) {

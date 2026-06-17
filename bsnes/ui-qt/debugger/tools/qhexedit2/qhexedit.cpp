@@ -721,11 +721,28 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 
         // paint hex and ascii area
         QPen colStandard = QPen(viewport()->palette().color(QPalette::WindowText));
-        // TODO: make these configurable
-        QPen colUsageRead   = QPen(QColor(0, 0, 224));
-        QPen colUsageWrite  = QPen(QColor(0, 0, 224));
-        QPen colUsageExec   = QPen(QColor(224, 0, 0));
-        QPen colUsageRWExec = QPen(QColor(224, 0, 224));
+        
+        QColor readUsageColor = QColor(config().debugger.hexEditor.readUsageColor());
+        if (! readUsageColor.isValid()) {
+            readUsageColor = QColor(0, 224, 128);
+        }
+        QColor writeUsageColor = QColor(config().debugger.hexEditor.writeUsageColor());
+        if (! writeUsageColor.isValid()) {
+            writeUsageColor = QColor(0, 128, 224);
+        }
+        QColor execUsageColor = QColor(config().debugger.hexEditor.execUsageColor());
+        if (! execUsageColor.isValid()) {
+            execUsageColor = QColor(224, 0, 0);
+        }
+        QColor rweUsageColor = QColor(config().debugger.hexEditor.rweUsageColor());
+        if (! rweUsageColor.isValid()) {
+            rweUsageColor = QColor(224, 0, 224);
+        }
+
+        QPen colUsageRead   = QPen(readUsageColor);
+        QPen colUsageWrite  = QPen(writeUsageColor);
+        QPen colUsageExec   = QPen(execUsageColor);
+        QPen colUsageRWExec = QPen(rweUsageColor);
 
         painter.setBackgroundMode(Qt::TransparentMode);
 

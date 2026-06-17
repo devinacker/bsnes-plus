@@ -137,6 +137,21 @@ Configuration::Configuration() {
   attach(debugger.saveSymbols = true, "debugger.saveSymbols");
   attach(debugger.showHClocks = false, "debugger.showHClocks");
 
+  attach(debugger.disassembler.opColor = "#000088", "debugger.disassembler.opColor");
+  attach(debugger.disassembler.paramImmediateColor = "#008800", "debugger.disassembler.paramImmediatColor");
+  attach(debugger.disassembler.paramAddressColor = "#880000", "debugger.disassembler.paramAddressColor");
+  attach(debugger.disassembler.paramSymbolColor = "#ff0000", "debugger.disassembler.paramSymbolColor");
+
+  attach(debugger.console.breakpointColor = "#a000a0", "debugger.console.breakpointColor");
+  attach(debugger.console.cpuStepColor = "#0000a0", "debugger.console.cpuStepColor");
+  attach(debugger.console.smpStepColor = "#a00000", "debugger.console.smpStepColor");
+  attach(debugger.console.coprocessorStepColor = "#008000", "debugger.console.coprocessorStepColor");
+
+  attach(debugger.hexEditor.readUsageColor = "#0000e0", "debugger.hexEditor.readUsageColor");
+  attach(debugger.hexEditor.writeUsageColor = "#0000e0", "debugger.hexEditor.writeUsageColor");
+  attach(debugger.hexEditor.execUsageColor = "#e00000", "debugger.hexEditor.execUsageColor");
+  attach(debugger.hexEditor.rweUsageColor = "#e000e0", "debugger.hexEditor.rweUsageColor");
+
   attach(geometry.mainWindow        = "", "geometry.mainWindow");
   attach(geometry.loaderWindow      = "", "geometry.loaderWindow");
   attach(geometry.stateSelectWindow = "", "geometry.stateSelectWindow");
