@@ -50,7 +50,7 @@ void DisassemblerView::setFont(const QFont &font) {
 // ------------------------------------------------------------------------
 void DisassemblerView::setAddressWidth(uint32_t width) {
   addressWidth = width;
-  
+
   // adjust text dimensions
   setFont(font());
 }
@@ -164,7 +164,7 @@ void DisassemblerView::updateVisibleLines() {
       }
 
       bottomLineAddress = address;
-      
+
       if (address == currentLineAddress) {
         stopped = true; // no next instruction found
       }
@@ -306,7 +306,7 @@ void DisassemblerView::mousePressEvent(QMouseEvent * event) {
 
   // Calculate the visible row from the mouse position.
   int row = (event->y() - lineOffset + charHeight) / charHeight;
-  if (row >= 0 && row < (int)lines.size()) { 
+  if (row >= 0 && row < (int)lines.size()) {
     // Make sure this line isn’t empty before selecting.
     if (!lines[row].line.isEmpty()) {
       uint32_t addr = lines[row].line.address;
@@ -421,13 +421,13 @@ void DisassemblerView::copyInstructions() {
   // If no valid selection exists, do nothing.
   if (selectionStartAddress == INVALID_ADDRESS || selectionEndAddress == INVALID_ADDRESS)
     return;
-  
+
   // Determine the lower and upper bounds from the two selected addresses.
   uint32_t lower = qMin(selectionStartAddress, selectionEndAddress);
   uint32_t upper = qMax(selectionStartAddress, selectionEndAddress);
-  
+
   QString copiedText;
-  
+
   // Iterate over the current disassembled lines.
   for (int i = 0; i < (int)lines.size(); i++) {
     const DisassemblerLine &line = lines[i].line;
@@ -437,15 +437,15 @@ void DisassemblerView::copyInstructions() {
       // Print the instruction address (padded in hexadecimal).
       lineStr += QString("%1").arg(line.address, addressWidth, 16, QChar('0'));
       lineStr += "\t"; // tab separator
-      
+
       // Convert the nall::string opcode text into a QString.
       // (Assuming nall::string overloads operator const char*())
       QString qLineText = QString::fromUtf8((const char *)line.text);
       lineStr += qLineText;
-      
+
       QString paramsStr;
       QString directComment;
-      
+
       // Convert the nall::string parameter format into a QString similarly.
       QString qParamFormat = QString::fromUtf8((const char *)line.paramFormat);
       if (!qParamFormat.isEmpty()) {
@@ -522,18 +522,18 @@ void DisassemblerView::copyInstructions() {
         if (left < textLength)
           paramsStr += qParamFormat.mid(left);
       }
-      
+
       // Append parameters and the direct comment (if any) separated by tabs.
       if (!paramsStr.isEmpty())
         lineStr += "\t" + paramsStr;
       if (!directComment.isEmpty())
         lineStr += "\t" + directComment;
-      
+
       // Append the completed line and a newline.
       copiedText += lineStr + "\n";
     }
   }
-  
+
   // Place the final copied text into the clipboard.
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(copiedText);
@@ -665,10 +665,26 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
 
     addressColor = Qt::gray;
     textColor = viewport()->palette().color(QPalette::WindowText);
-    opColor = QColor(0x00, 0x00, 0x88, 0xff);
-    paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
-    paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
-    paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
+
+    opColor = QColor(config().debugger.disassembler.opColor());
+    if (!opColor.isValid()) {
+      opColor = QColor(0x00, 0x00, 0x88, 0xff);
+    }
+
+    paramImmediateColor = QColor(config().debugger.disassembler.paramImmediateColor());
+    if (!paramImmediateColor.isValid()) {
+      paramImmediateColor = QColor(0x00, 0x88, 0x00, 0xff);
+    }
+
+    paramAddressColor = QColor(config().debugger.disassembler.paramAddressColor());
+    if (!paramAddressColor.isValid()) {
+      paramAddressColor = QColor(0x88, 0x00, 0x00, 0xff);
+    }
+
+    paramSymbolColor = QColor(config().debugger.disassembler.paramSymbolColor());
+    if (!paramSymbolColor.isValid()) {
+      paramSymbolColor = QColor(0xFF, 0x00, 0x00, 0xff);
+    }
   }
 
   if (breakpointEditor->indexOfBreakpointExec(line.line.address, processor->getBreakpointBusName()) >= 0) {
@@ -725,8 +741,9 @@ void DisassemblerView::paintOpcode(QPainter &painter, RenderableDisassemblerLine
     path.lineTo(ar, t + hw);
     path.lineTo(al, t + w + ap);
 
-    painter.setPen(Qt::black);
-    painter.setBrush(Qt::black);
+    textColor = viewport()->palette().color(QPalette::WindowText);
+    painter.setPen(textColor);
+    painter.setBrush(textColor);
     painter.drawEllipse(QPoint(l + hw, b - hw), hw, hw);
     painter.drawEllipse(QPoint(l + hw, t + hw), hw, hw);
     painter.drawRect(l, t + hw, w, b - t - w);
@@ -845,7 +862,7 @@ int DisassemblerView::renderValue(QPainter &painter, int x, int y, uint8_t type,
     case 'D':
       text = QString("%1").arg((int32_t)value, size, 10, QChar('0'));
       break;
-    
+
     case 'U':
       text = QString("%1").arg(value, size, 10, QChar('0'));
       break;
@@ -870,7 +887,7 @@ void DisassemblerView::paintHeader(QPainter &painter) {
     painter.drawLine(columnPositions[i], 0, columnPositions[i], headerHeight);
   }
 
-  painter.setPen(Qt::black);
+  painter.setPen(viewport()->palette().color(QPalette::WindowText));
   SET_CLIPPING(1);
   painter.drawText(columnPositions[1] + charPadding, headerHeight - charPadding, "Disassembly");
   SET_CLIPPING(2);

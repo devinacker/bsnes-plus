@@ -55,6 +55,7 @@ using namespace ruby;
   #include "debugger/tools/breakpoint.moc.hpp"
   #include "debugger/tools/memory.moc.hpp"
   #include "debugger/tools/properties.moc.hpp"
+  #include "debugger/tools/debuggercolors.moc.hpp"
 
   #include "debugger/ppu/base-renderer.hpp"
   #include "debugger/ppu/tile-renderer.hpp"

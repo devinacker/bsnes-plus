@@ -20,6 +20,7 @@ public:
   QAction *menu_misc_saveSymbols;
   QAction *menu_misc_showHClocks;
   QAction *menu_misc_options;
+  QAction *menu_misc_editColors;
 
   QVBoxLayout *layout;
   QSplitter *consoleLayout;
@@ -61,7 +62,7 @@ public slots:
   void clear();
   void synchronize();
   void frameTick();
-
+  
   void toggleRunStatus();
   void stepAction();
   void stepOverAction();
@@ -71,7 +72,9 @@ public slots:
   void stepToNMIAction();
   void stepToIRQAction();
   void createMemoryEditor();
-
+  void refreshDebuggerViews();
+  void refreshMemoryEditors();
+  
 protected:
   void closeEvent(QCloseEvent *event);
 
