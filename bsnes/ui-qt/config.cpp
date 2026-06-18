@@ -169,6 +169,7 @@ Configuration::Configuration() {
   attach(geometry.breakpointEditor = "", "geometry.breakpointEditor");
   attach(geometry.memoryEditor     = "", "geometry.memoryEditor");
   attach(geometry.propertiesViewer = "", "geometry.propertiesViewer");
+  attach(geometry.debuggerColors   = "", "geometry.debuggerColors");
   attach(geometry.layerToggle      = "", "geometry.layerToggle");
   attach(geometry.tileViewer       = "", "geometry.tileViewer");
   attach(geometry.tilemapViewer    = "", "geometry.tilemapViewer");

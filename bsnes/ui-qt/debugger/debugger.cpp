@@ -24,6 +24,7 @@ Debugger *debugger;
 #include "debuggerview.cpp"
 
 #include "tools/breakpoint.cpp"
+#include "tools/debuggercolors.cpp"
 #include "tools/memory.cpp"
 #include "tools/properties.cpp"
 
@@ -86,6 +87,8 @@ Debugger::Debugger() {
   menu_misc_showHClocks->setCheckable(true);
   menu_misc_showHClocks->setChecked(config().debugger.showHClocks);
 
+  menu_misc_editColors = menu_misc->addAction("Edit c&olors ...");
+
   tracer = new Tracer;
   breakpointEditor = new BreakpointEditor;
   propertiesViewer = new PropertiesViewer;
@@ -93,6 +96,7 @@ Debugger::Debugger() {
   tilemapViewer = new TilemapViewer;
   oamViewer = new OamViewer;
   cgramViewer = new CgramViewer;
+  debuggerColors = new DebuggerColorsWindow;
 
   registerEditCPU = new RegisterEditCPU(SNES::cpu);
   registerEditSMP = new RegisterEditSMP;
@@ -226,6 +230,7 @@ Debugger::Debugger() {
   connect(menu_misc_loadDefaultSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_saveSymbols, SIGNAL(triggered()), this, SLOT(synchronize()));
   connect(menu_misc_showHClocks, SIGNAL(triggered()), this, SLOT(synchronize()));
+  connect(menu_misc_editColors, SIGNAL(triggered()), debuggerColors, SLOT(show()));
 
   connect(runBreak->defaultAction(), SIGNAL(triggered()), this, SLOT(toggleRunStatus()));
 
@@ -249,6 +254,9 @@ Debugger::Debugger() {
   connect(debugSFX, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSfxTraceState(int)));
   connect(debugSGB, SIGNAL(traceStateChanged(int)), tracer, SLOT(setSgbTraceState(int)));
   connect(traceMask->defaultAction(), SIGNAL(toggled(bool)), tracer, SLOT(setTraceMaskState(bool)));
+
+  connect(debuggerColors, SIGNAL(disassemblerColorChanged()), this, SLOT(refreshDebuggerViews()));
+  connect(debuggerColors, SIGNAL(hexEditorColorChanged()), this, SLOT(refreshMemoryEditors()));
 
   frameCounter = 0;
   synchronize();
@@ -775,6 +783,22 @@ void Debugger::autoUpdate() {
     registerEditSMP->synchronize();
     registerEditSFX->synchronize();
     registerEditSGB->synchronize();
+  }
+}
+
+void Debugger::refreshDebuggerViews() {
+  registerEditCPU->setEnabled(false);
+  registerEditSMP->setEnabled(false);
+  debugCPU->refresh(SNES::cpu.opcode_pc);
+  debugSMP->refresh(SNES::smp.opcode_pc);
+  registerEditCPU->setEnabled(true);
+  registerEditSMP->setEnabled(true);
+}
+
+void Debugger::refreshMemoryEditors() {
+  QVectorIterator<MemoryEditor*> i(memoryEditors);
+  while (i.hasNext()) {
+    i.next()->refresh();
   }
 }
 

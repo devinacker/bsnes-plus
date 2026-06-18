@@ -124,6 +124,7 @@ public:
     string breakpointEditor;
     string memoryEditor;
     string propertiesViewer;
+    string debuggerColors;
     string layerToggle;
     string tileViewer;
     string tilemapViewer;
